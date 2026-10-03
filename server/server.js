@@ -1,16 +1,15 @@
 import express from "express";
 import fs from "fs";
-
-
 import Anthropic from "@anthropic-ai/sdk";
 
-
-const AI_INSTRUCTIONS = fs.readFileSync("./server/proper_prompts.md", "utf8");
+const AI_INSTRUCTIONS = fs.readFileSync(
+    "./server/proper_prompts.md",
+    "utf8"
+);
 
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY
 });
-
 
 const app = express();
 
@@ -22,7 +21,7 @@ app.post("/api/analyze", async (req, res) => {
     try {
         const message = await anthropic.messages.create({
             model: "claude-opus-5-5",
-            max_tokens: 2000,
+            max_tokens: 5000, // decided the LLM needs more reasoning and 3000 was too limited
 
             system: AI_INSTRUCTIONS,
 
@@ -42,11 +41,16 @@ Analyze these two depositions according to the provided instructions.
             ]
         });
 
-        console.log(message.content[0].text);
+        const textBlock = message.content.find(
+            block => block.type === "text"
+        );
 
-        res.json({
-            message: "Claude analysis completed"
-        });
+        const rawText = textBlock.text;
+        const parsed = JSON.parse(rawText);
+
+        console.log(parsed);
+
+        res.json(parsed);
 
     } catch (error) {
         console.error(error);

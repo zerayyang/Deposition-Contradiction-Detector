@@ -56,7 +56,7 @@ export default function DepositionChecker() {
     setResults(null);
 
     try {
-      const res = await fetch("http://localhost:3000/api/analyze", {
+      const res = await fetch("/api/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -70,6 +70,8 @@ export default function DepositionChecker() {
       const data = await res.json();
 
       console.log(data);
+
+      setResults(data.contradictions);
 
     } catch (e) {
       setError("Failed: " + e.message);
