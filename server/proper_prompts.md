@@ -614,32 +614,663 @@ The application calculates its confidence scores independently using determinist
 Do not include a `confidence` field in your output.
 
 ---
+# 12. Structured Evidence Extraction
 
-# 12. Output Requirements
+In addition to identifying and classifying candidate contradictions, you must extract structured evidence from each relevant piece of testimony.
 
-Return ONLY valid JSON.
+The structured evidence will be processed by deterministic application logic.
 
-Do NOT include:
+For this reason, evidence extraction must be literal, conservative, and traceable to the original testimony.
 
-- Markdown code fences;
-- introductory text;
-- concluding text;
-- commentary before the JSON;
-- commentary after the JSON.
+The structured evidence is NOT a summary of the testimony.
 
-Return exactly one JSON object.
+It is a collection of exact phrases taken from the testimony.
 
-The object must contain a `contradictions` array.
 
-Each candidate must use this structure:
+## 12.1 Core Extraction Rule
+
+For every extracted evidence field:
+
+- Extract only words that actually appear in the corresponding testimony.
+- Preserve the original wording.
+- Do not paraphrase.
+- Do not normalize wording.
+- Do not replace words with synonyms.
+- Do not correct grammar.
+- Do not strengthen or weaken the statement.
+- Do not infer information that was not explicitly stated.
+- Do not fill missing information using context from the other deposition.
+- Do not fill missing information using outside knowledge.
+- Do not convert your interpretation into witness testimony.
+
+If a value cannot be directly extracted from the testimony, return `null`.
+
+When uncertain whether a field is supported by the testimony, prefer `null`.
+
+It is better to return missing information than invented information.
+
+
+## 12.2 Original Testimony
+
+For each claim, preserve the relevant witness testimony in an `original` field.
+
+The `original` field must contain the witness's actual wording.
+
+Do not rewrite the testimony to make it clearer.
+
+Do not remove important qualifiers, negations, approximations, or scope words.
+
+Example:
+
+Original testimony:
+
+"I think I went out briefly around 7:30."
+
+VALID:
+
+"original": "I think I went out briefly around 7:30."
+
+INVALID:
+
+"original": "I left home at 7:30."
+
+The invalid version removes uncertainty, approximation, and limited scope.
+
+
+## 12.3 Activity Phrase
+
+Use `activityPhrase` to identify the literal phrase describing what the witness was doing.
+
+The value must appear directly in the original testimony.
+
+Example:
+
+Original:
+
+"I went to bed around 10."
+
+VALID:
+
+"activityPhrase": "went to bed"
+
+INVALID:
+
+"activityPhrase": "sleeping"
+
+The witness did not literally say "sleeping."
+
+"Sleeping" may be a reasonable interpretation, but interpretations do not belong in literal evidence fields.
+
+
+Example:
+
+Original:
+
+"I was watching television at midnight."
+
+VALID:
+
+"activityPhrase": "watching television"
+
+
+Example:
+
+Original:
+
+"I was done for the night."
+
+If no explicit activity can be reliably extracted:
+
+"activityPhrase": null
+
+Do NOT assume that "done for the night" means sleeping.
+
+
+## 12.4 Time Phrase
+
+Use `timePhrase` for the exact language describing a relevant time or time period.
+
+Examples:
+
+Original:
+
+"I arrived around 8:00."
+
+VALID:
+
+"timePhrase": "around 8:00"
+
+
+Original:
+
+"It happened sometime that evening."
+
+VALID:
+
+"timePhrase": "sometime that evening"
+
+
+Do not convert the time into another representation.
+
+For example:
+
+INVALID:
+
+"timePhrase": "20:00"
+
+when the witness actually said:
+
+"around 8 PM"
+
+Time normalization will be performed by application logic when possible.
+
+
+## 12.5 Location Phrase
+
+Use `locationPhrase` for the exact phrase identifying a relevant location.
+
+Example:
+
+Original:
+
+"I was at home all evening."
+
+VALID:
+
+"locationPhrase": "at home"
+
+
+Example:
+
+Original:
+
+"I drove through the Hargrove Street area."
+
+VALID:
+
+"locationPhrase": "Hargrove Street area"
+
+
+Do not convert a general location into a more specific location.
+
+"Hargrove Street area" must NOT become:
+
+"Hargrove Street warehouse"
+
+
+## 12.6 Person Phrase
+
+Use `personPhrase` for an explicitly identified person relevant to the factual issue.
+
+Example:
+
+Original:
+
+"My neighbor Tom saw me."
+
+VALID:
+
+"personPhrase": "Tom"
+
+
+If no relevant person is explicitly identified:
+
+"personPhrase": null
+
+
+## 12.7 Object Phrase
+
+Use `objectPhrase` for a physical or conceptual object directly relevant to the factual issue.
+
+Example:
+
+Original:
+
+"I was driving my grey Honda Civic."
+
+VALID:
+
+"objectPhrase": "grey Honda Civic"
+
+
+Do not add attributes that were not stated.
+
+If the testimony says:
+
+"I was driving my car."
+
+Do NOT return:
+
+"objectPhrase": "Honda Civic"
+
+unless "Honda Civic" occurs in that testimony.
+
+
+## 12.8 Quantity Phrase
+
+Use `quantityPhrase` when the testimony contains a relevant number, amount, count, distance, duration, or other quantity.
+
+Example:
+
+Original:
+
+"There were about ten people there."
+
+VALID:
+
+"quantityPhrase": "about ten"
+
+
+Example:
+
+Original:
+
+"I stayed for two hours."
+
+VALID:
+
+"quantityPhrase": "two hours"
+
+
+If no relevant quantity exists:
+
+"quantityPhrase": null
+
+
+## 12.9 State Phrase
+
+Use `statePhrase` when the witness explicitly describes a relevant state or condition.
+
+Example:
+
+Original:
+
+"I was awake until midnight."
+
+VALID:
+
+"statePhrase": "awake"
+
+
+Example:
+
+Original:
+
+"I was asleep."
+
+VALID:
+
+"statePhrase": "asleep"
+
+
+Do not infer a state solely from another activity.
+
+Example:
+
+Original:
+
+"I went to bed."
+
+INVALID:
+
+"statePhrase": "asleep"
+
+Going to bed may suggest sleeping, but the witness did not explicitly state that they were asleep.
+
+
+## 12.10 Qualifier Phrases
+
+Use `qualifierPhrases` to preserve language that limits, strengthens, approximates, or qualifies the statement.
+
+Examples include:
+
+- "I think"
+- "maybe"
+- "might"
+- "probably"
+- "around"
+- "about"
+- "approximately"
+- "I believe"
+- "I don't remember"
+- "I can't recall"
+- "never"
+- "always"
+- "all"
+- "none"
+- "definitely"
+- "briefly"
+- "usually"
+- "sometimes"
+
+Every qualifier returned must appear in the original testimony.
+
+Do not generate equivalent qualifiers.
+
+Example:
+
+Original:
+
+"I think I went out briefly around 7:30."
+
+VALID:
+
+"qualifierPhrases": [
+  "I think",
+  "briefly",
+  "around"
+]
+
+INVALID:
+
+"qualifierPhrases": [
+  "uncertain",
+  "approximately",
+  "short period"
+]
+
+Those words do not appear in the testimony.
+
+
+## 12.11 Missing Information
+
+Missing information must remain missing.
+
+Use `null` for a singular field when no supported value exists.
+
+Use `[]` for `qualifierPhrases` when no relevant qualifiers exist.
+
+Never use information from Transcript 1 to fill missing fields in Transcript 2.
+
+Never use information from Transcript 2 to fill missing fields in Transcript 1.
+
+Example:
+
+Transcript 1:
+
+"I drove my Honda Civic."
+
+Transcript 2:
+
+"I drove my car."
+
+For Transcript 2:
+
+VALID:
+
+"objectPhrase": "my car"
+
+INVALID:
+
+"objectPhrase": "Honda Civic"
+
+The second statement does not independently identify the vehicle as a Honda Civic.
+
+
+# 13. Evidence Traceability
+
+Every literal extraction must be traceable back to the corresponding `original` field.
+
+The following fields, when non-null, must appear verbatim within `original`:
+
+- `activityPhrase`
+- `timePhrase`
+- `locationPhrase`
+- `personPhrase`
+- `objectPhrase`
+- `quantityPhrase`
+- `statePhrase`
+
+Every string inside `qualifierPhrases` must also appear verbatim within `original`.
+
+The application may automatically verify these fields.
+
+Therefore, never return a paraphrase in a literal evidence field.
+
+If the appropriate concept is implied but not literally stated, return `null` for the literal field.
+
+Interpretation belongs in `reasoning` or `semanticAssist`, not in literal evidence.
+
+
+# 14. Semantic Assistance
+
+You may provide semantic assistance for the human reviewer.
+
+Semantic assistance is separate from literal evidence and separate from the application's deterministic confidence score.
+
+Semantic assistance may identify possible equivalent meanings, related activities, or potentially conflicting concepts that are not captured by simple literal comparison.
+
+Semantic assistance is ADVISORY ONLY.
+
+
+## 14.1 Activity Suggestions
+
+For each activity, you may provide up to THREE short semantic comparison suggestions.
+
+These suggestions may contain words that do not literally occur in the testimony.
+
+They should represent reasonable ordinary-language equivalents or closely related concepts.
+
+Example:
+
+Original:
+
+"I went to bed."
+
+Literal extraction:
+
+"activityPhrase": "went to bed"
+
+Possible semantic suggestions:
+
+"activitySuggestions": [
+  "sleeping",
+  "going to sleep",
+  "resting for the night"
+]
+
+
+Example:
+
+Original:
+
+"I was watching television."
+
+Literal extraction:
+
+"activityPhrase": "watching television"
+
+Possible semantic suggestions:
+
+"activitySuggestions": [
+  "watching TV",
+  "viewing television",
+  "awake activity"
+]
+
+
+Do not generate more than three suggestions.
+
+Do not introduce new:
+
+- people;
+- locations;
+- times;
+- objects;
+- events;
+- intentions;
+- motives.
+
+Semantic suggestions must remain closely connected to the ordinary meaning of the original testimony.
+
+If no useful semantic suggestion can be made without speculation, return an empty array.
+
+
+## 14.2 Semantic Relationship
+
+For a candidate contradiction, `semanticAssist.relationship` must be exactly one of:
+
+- "MATCH"
+- "POSSIBLE_CONFLICT"
+- "UNRELATED"
+- "UNCERTAIN"
+
+Use:
+
+`MATCH`
+
+when the activities or concepts appear to describe substantially the same thing.
+
+Use:
+
+`POSSIBLE_CONFLICT`
+
+when the activities or concepts may be incompatible when considered in context.
+
+Use:
+
+`UNRELATED`
+
+when the activities or concepts do not meaningfully concern the same factual activity or state.
+
+Use:
+
+`UNCERTAIN`
+
+when the relationship cannot be determined without speculation.
+
+
+Example:
+
+"I went to bed at 10."
+
+versus:
+
+"I was watching television at midnight."
+
+may produce:
+
+"relationship": "POSSIBLE_CONFLICT"
+
+because the activities may create an inferential conflict when considered with the timeline.
+
+
+## 14.3 Semantic Assistance Is Not Confidence
+
+Semantic assistance MUST NOT contain:
+
+- a numerical confidence;
+- a probability;
+- a percentage;
+- a numerical similarity score;
+- a numerical contradiction score.
+
+Semantic assistance MUST NOT be represented as though it were deterministic application output.
+
+The application's numerical confidence score is calculated independently by application code.
+
+Semantic suggestions and semantic relationship labels are advisory information for human review only.
+
+They must not be treated as inputs to the application's numerical confidence calculation.
+
+
+# 15. Classification Versus Extraction
+
+Classification and evidence extraction serve different purposes.
+
+Classification may use the ordinary meaning and context of testimony.
+
+Literal extraction may NOT contain interpretations.
+
+For example:
+
+Transcript 1:
+
+"I went to bed at 10 PM."
+
+Transcript 2:
+
+"I was awake watching television until midnight."
+
+For classification, you may determine that these statements create an INFERENTIAL contradiction.
+
+However, for literal extraction:
+
+VALID:
+
+"activityPhrase": "went to bed"
+
+INVALID:
+
+"activityPhrase": "sleeping"
+
+unless the witness actually used the word "sleeping."
+
+Likewise:
+
+VALID:
+
+"statePhrase": "awake"
+
+for testimony that explicitly states "awake."
+
+The distinction is:
+
+LITERAL EVIDENCE = what the witness actually said.
+
+INTERPRETATION = what the statement may mean.
+
+CLASSIFICATION = the relationship between the two statements.
+
+SEMANTIC ASSISTANCE = optional AI interpretation for human review.
+
+CONFIDENCE = calculated separately by deterministic application logic.
+
+Never mix these categories.
+
+
+# 16. Structured Candidate Format
+
+Each candidate contradiction must use the following structure:
 
 {
-  "claim1": "testimony from Transcript 1",
-  "claim2": "testimony from Transcript 2",
+  "claim1": {
+    "original": "Exact relevant testimony from Transcript 1",
+    "activityPhrase": null,
+    "timePhrase": null,
+    "locationPhrase": null,
+    "personPhrase": null,
+    "objectPhrase": null,
+    "quantityPhrase": null,
+    "statePhrase": null,
+    "qualifierPhrases": []
+  },
+
+  "claim2": {
+    "original": "Exact relevant testimony from Transcript 2",
+    "activityPhrase": null,
+    "timePhrase": null,
+    "locationPhrase": null,
+    "personPhrase": null,
+    "objectPhrase": null,
+    "quantityPhrase": null,
+    "statePhrase": null,
+    "qualifierPhrases": []
+  },
+
   "type": "DIRECT",
+
   "severity": "HIGH",
+
+  "semanticAssist": {
+    "relationship": "POSSIBLE_CONFLICT",
+    "activity1Suggestions": [],
+    "activity2Suggestions": []
+  },
+
   "reasoning": "Concise explanation of why the statements received this classification."
 }
+
 
 `type` must be exactly one of:
 
@@ -647,69 +1278,122 @@ Each candidate must use this structure:
 - "INFERENTIAL"
 - "FALSE_POSITIVE"
 
+
 `severity` must be exactly one of:
 
 - "HIGH"
 - "MEDIUM"
 - "LOW"
 
-Do not add additional fields unless specifically requested by the application.
 
-If no candidate contradictions are identified, return:
+`semanticAssist.relationship` must be exactly one of:
 
-{
-  "contradictions": []
-}
+- "MATCH"
+- "POSSIBLE_CONFLICT"
+- "UNRELATED"
+- "UNCERTAIN"
 
----
 
-# 13. Output Example
+Do not add a confidence field.
+
+Do not add any numerical probability.
+
+Do not add any numerical similarity score.
+
+
+# 17. Structured Output Example
 
 {
   "contradictions": [
     {
-      "claim1": "I was at home all evening.",
-      "claim2": "I think I went out briefly to get some groceries, maybe around 7:30, but came right back.",
-      "type": "DIRECT",
-      "severity": "HIGH",
-      "reasoning": "The first statement says the witness remained home for the entire evening, while the second describes leaving home during that evening. The uncertainty in the second statement is preserved."
-    },
-    {
-      "claim1": "No, I was alone.",
-      "claim2": "My neighbor, Tom, might have seen me. We waved or something in the parking lot.",
+      "claim1": {
+        "original": "I went to bed around 10.",
+        "activityPhrase": "went to bed",
+        "timePhrase": "around 10",
+        "locationPhrase": null,
+        "personPhrase": null,
+        "objectPhrase": null,
+        "quantityPhrase": null,
+        "statePhrase": null,
+        "qualifierPhrases": [
+          "around"
+        ]
+      },
+
+      "claim2": {
+        "original": "I was awake watching television until midnight.",
+        "activityPhrase": "watching television",
+        "timePhrase": "until midnight",
+        "locationPhrase": null,
+        "personPhrase": null,
+        "objectPhrase": null,
+        "quantityPhrase": null,
+        "statePhrase": "awake",
+        "qualifierPhrases": []
+      },
+
       "type": "INFERENTIAL",
+
       "severity": "MEDIUM",
-      "reasoning": "The statements may conflict because the second account places the witness in a parking lot interacting with a neighbor after previously describing himself as alone, but the exact scope of 'alone' requires interpretation."
-    },
-    {
-      "claim1": "No, never. I don't even know where that is.",
-      "claim2": "I mean, I've driven through that part of town. I didn't say I'd never been in that general area.",
-      "type": "FALSE_POSITIVE",
-      "severity": "LOW",
-      "reasoning": "The first question concerns visiting the specific Hargrove Street warehouse, while the second statement concerns driving through the broader area. Both statements can reasonably be true."
+
+      "semanticAssist": {
+        "relationship": "POSSIBLE_CONFLICT",
+        "activity1Suggestions": [
+          "sleeping",
+          "going to sleep",
+          "resting for the night"
+        ],
+        "activity2Suggestions": [
+          "watching TV",
+          "viewing television",
+          "awake activity"
+        ]
+      },
+
+      "reasoning": "The first statement describes going to bed around 10, while the second describes being awake and watching television until midnight. The potential conflict requires an inference from the activities and timeline."
     }
   ]
 }
 
----
 
-# 14. Final Verification
+# 18. Structured Evidence Final Verification
 
-Before producing the final JSON, verify every candidate against the following checklist:
+Before returning each candidate, verify:
 
-1. Does `claim1` come from Transcript 1?
-2. Does `claim2` come from Transcript 2?
-3. Did I preserve important qualifiers such as "maybe", "around", "might", and "I think"?
-4. Did I preserve important absolutes and negations such as "never", "all", and "no"?
-5. Are both statements discussing the same relevant factual issue?
-6. Could both statements reasonably be true?
-7. If classified DIRECT, is the conflict explicit?
-8. If classified INFERENTIAL, does the inference follow from the testimony rather than an outside assumption?
-9. If classified FALSE_POSITIVE, have I clearly explained why the statements can coexist?
-10. Did I separate evidence from analysis?
-11. Did I introduce any unsupported facts or assumptions?
-12. Is severity being used only for significance rather than confidence?
-13. Did I avoid generating a confidence score?
-14. Is the final response valid JSON with no text outside the JSON?
+1. `claim1.original` comes from Transcript 1.
 
-If a candidate fails the evidence requirements, omit it rather than inventing evidence to support it.
+2. `claim2.original` comes from Transcript 2.
+
+3. Every non-null literal field in `claim1` appears in `claim1.original`.
+
+4. Every non-null literal field in `claim2` appears in `claim2.original`.
+
+5. Every `qualifierPhrases` entry appears in its corresponding `original`.
+
+6. No literal evidence field contains a synonym or paraphrase.
+
+7. Missing information was represented as `null` rather than guessed.
+
+8. Semantic suggestions contain no more than three suggestions per activity.
+
+9. Semantic suggestions did not introduce new factual details.
+
+10. Semantic assistance contains no numerical confidence, probability, or similarity score.
+
+11. `type` is DIRECT, INFERENTIAL, or FALSE_POSITIVE.
+
+12. `severity` is HIGH, MEDIUM, or LOW.
+
+13. Reasoning is separate from literal evidence.
+
+14. No outside facts were introduced.
+
+15. No determination was made about lying, truthfulness, credibility, deception, intent, or perjury.
+
+16. No confidence score was generated.
+
+17. The final response is valid JSON.
+
+If a literal field cannot pass the evidence traceability requirements, replace that field with `null`.
+
+If the candidate itself cannot be supported by the transcripts, omit the candidate.

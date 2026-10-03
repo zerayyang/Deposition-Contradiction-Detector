@@ -114,72 +114,123 @@ function containsAny(text, phrases) {
     return phrases.some(phrase => text.includes(phrase));
 }
 
+
+function calculateDiminishingAdjustment(text, phrases, initialWeight) {
+    let matches = 0;
+
+    // Count how many phrases from this category appear
+    for (const phrase of phrases) {
+        if (text.includes(phrase)) {
+            matches++;
+        }
+    }
+
+    let adjustment = 0;
+    let currentWeight = initialWeight;
+
+    // Every additional match is worth half as much
+    for (let i = 0; i < matches; i++) {
+        adjustment += currentWeight;
+        currentWeight /= 2;
+    }
+
+    return adjustment;
+}
+
+
 export function calculateHumanConfidence(claim1, claim2, type) {
     const text = `${claim1} ${claim2}`.toLowerCase();
 
-    let score = 50;
+    // Start at moderate confidence
+    let score = 60;
 
-    // Strong language
-    if (containsAny(text, STRONG_LANGUAGE)) {
-        score += 10;
-    }
+    // Strong/certain language
+    // +5, +2.5, +1.25, +0.625...
+    score += calculateDiminishingAdjustment(
+        text,
+        STRONG_LANGUAGE,
+        5
+    );
 
-    // Uncertain or hedging language
-    if (containsAny(text, UNCERTAIN_LANGUAGE)) {
-        score -= 10;
-    }
+    // Uncertain/hedging language
+    // -5, -2.5, -1.25, -0.625...
+    score += calculateDiminishingAdjustment(
+        text,
+        UNCERTAIN_LANGUAGE,
+        -5
+    );
 
-    // Memory limitations
-    if (containsAny(text, MEMORY_LIMITATIONS)) {
-        score -= 15;
-    }
+    // Memory limitations have a stronger negative effect
+    // -8, -4, -2, -1...
+    score += calculateDiminishingAdjustment(
+        text,
+        MEMORY_LIMITATIONS,
+        -8
+    );
 
-    // Approximate times, quantities, or descriptions
-    if (containsAny(text, APPROXIMATION_LANGUAGE)) {
-        score -= 5;
-    }
+    // Approximation has a smaller effect
+    // -2, -1, -0.5, -0.25...
+    score += calculateDiminishingAdjustment(
+        text,
+        APPROXIMATION_LANGUAGE,
+        -2
+    );
 
     // Limited scope
-    if (containsAny(text, LIMITED_SCOPE)) {
-        score -= 3;
-    }
+    score += calculateDiminishingAdjustment(
+        text,
+        LIMITED_SCOPE,
+        -2
+    );
 
     // Habit/general behavior instead of event-specific recollection
-    if (containsAny(text, HABITUAL_LANGUAGE)) {
-        score -= 7;
-    }
+    score += calculateDiminishingAdjustment(
+        text,
+        HABITUAL_LANGUAGE,
+        -4
+    );
 
     // Second-hand information
-    if (containsAny(text, SECOND_HAND_LANGUAGE)) {
-        score -= 10;
-    }
+    score += calculateDiminishingAdjustment(
+        text,
+        SECOND_HAND_LANGUAGE,
+        -6
+    );
 
     // Explicit inference or assumption
-    if (containsAny(text, INFERENCE_LANGUAGE)) {
-        score -= 8;
-    }
+    score += calculateDiminishingAdjustment(
+        text,
+        INFERENCE_LANGUAGE,
+        -5
+    );
 
     // Reaffirming previous testimony
-    if (containsAny(text, REAFFIRMATION_LANGUAGE)) {
-        score += 5;
-    }
+    score += calculateDiminishingAdjustment(
+        text,
+        REAFFIRMATION_LANGUAGE,
+        4
+    );
 
     // Correcting previous testimony
-    if (containsAny(text, CORRECTION_LANGUAGE)) {
-        score -= 12;
-    }
+    score += calculateDiminishingAdjustment(
+        text,
+        CORRECTION_LANGUAGE,
+        -6
+    );
 
     // Contradiction classification
     if (type === "DIRECT") {
         score += 5;
     } else if (type === "INFERENTIAL") {
-        score -= 5;
+        score -= 3;
     } else if (type === "FALSE_POSITIVE") {
-        score -= 15;
+        score -= 5;
     }
 
-    // Keep the score within 0–100
+    // Keep score between 0 and 100 and return a whole number
     score = Math.max(0, Math.min(100, score));
 
-    return score;
+    return Math.round(score);
 }
+
+
