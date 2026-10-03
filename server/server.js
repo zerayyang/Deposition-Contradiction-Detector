@@ -22,7 +22,7 @@ app.post("/api/analyze", async (req, res) => {
     try {
         const message = await anthropic.messages.create({
             model: "claude-opus-5-5",
-            max_tokens: 5000,
+            max_tokens: 10000,
 
             system: AI_INSTRUCTIONS,
 
@@ -47,12 +47,20 @@ Analyze these two depositions according to the provided instructions.
         );
 
         const rawText = textBlock.text;
-        const parsed = JSON.parse(rawText);
+
+        const cleanedText = rawText // fixed the JSON formatting issues
+            .replace(/```json/g, "")
+            .replace(/```/g, "")
+            .trim();
+        console.log("CLAUDE RAW OUTPUT:");
+        console.log(rawText);
+        console.log("STOP REASON:", message.stop_reason);  
+        const parsed = JSON.parse(cleanedText);
 
         parsed.contradictions = parsed.contradictions.map(contradiction => {
             const humanConfidence = calculateHumanConfidence(
-                contradiction.claim1,
-                contradiction.claim2,
+                contradiction.claim1.original,
+                contradiction.claim2.original,
                 contradiction.type
             );
 
