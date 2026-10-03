@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs";
 import Anthropic from "@anthropic-ai/sdk";
+import { calculateHumanConfidence } from "./confidenceratehuman.js";
 
 const AI_INSTRUCTIONS = fs.readFileSync(
     "./server/proper_prompts.md",
@@ -21,7 +22,7 @@ app.post("/api/analyze", async (req, res) => {
     try {
         const message = await anthropic.messages.create({
             model: "claude-opus-5-5",
-            max_tokens: 5000, // decided the LLM needs more reasoning and 3000 was too limited
+            max_tokens: 5000,
 
             system: AI_INSTRUCTIONS,
 
@@ -47,6 +48,19 @@ Analyze these two depositions according to the provided instructions.
 
         const rawText = textBlock.text;
         const parsed = JSON.parse(rawText);
+
+        parsed.contradictions = parsed.contradictions.map(contradiction => {
+            const humanConfidence = calculateHumanConfidence(
+                contradiction.claim1,
+                contradiction.claim2,
+                contradiction.type
+            );
+
+            return {
+                ...contradiction,
+                humanConfidence
+            };
+        });
 
         console.log(parsed);
 
