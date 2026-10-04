@@ -9,7 +9,6 @@ You need:
 - **Node.js 24** and npm: [download Node.js](https://nodejs.org/).
 - **Git**: [download Git](https://git-scm.com/downloads).
 - Your own **Anthropic API key** with access to Claude Opus 5.5. Requests are billed to the account associated with that key.
-- Access to this repository if it is private.
 
 Open Terminal on Mac/Linux or PowerShell on Windows and paste this one command:
 
