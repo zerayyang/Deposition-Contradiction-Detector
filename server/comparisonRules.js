@@ -53,6 +53,119 @@ function hasApproximation(timePhrase) {
 }
 
 
+
+
+// Detect whether a statement contains explicit negative language
+export function hasNegation(text) {
+    if (text === null) {
+        return false;
+    }
+
+    const lower = text.toLowerCase();
+
+    const negativePhrases = [
+        "never",
+        "no",
+        "not",
+        "didn't",
+        "did not",
+        "don't",
+        "do not",
+        "hadn't",
+        "had not",
+        "haven't",
+        "have not"
+    ];
+
+    return negativePhrases.some(phrase =>
+        lower.includes(phrase)
+    );
+}
+
+
+
+// Remove explicit negative language so the underlying activity can be compared
+export function normalizeActivity(activity) {
+    if (activity === null) {
+        return null;
+    }
+
+    let normalized = activity.toLowerCase().trim();
+
+    const negativePhrases = [
+        "did not ",
+        "didn't ",
+        "never ",
+        "not ",
+        "no "
+    ];
+
+    for (const phrase of negativePhrases) {
+        normalized = normalized.replace(phrase, "");
+    }
+
+    return normalized.trim();
+}
+
+
+// Determine whether two activity phrases are similar enough
+// for our code to safely compare them
+export function activitiesAreComparable(fact1, fact2) {
+
+    if (fact1.activity === null || fact2.activity === null) {
+        return false;
+    }
+
+    const activity1 = normalizeActivity(fact1.activity);
+    const activity2 = normalizeActivity(fact2.activity);
+
+    // Exact same underlying activity
+    if (activity1 === activity2) {
+        return true;
+    }
+
+    // One activity phrase contains the other
+    if (
+        activity1.includes(activity2) ||
+        activity2.includes(activity1)
+    ) {
+        return true;
+    }
+
+    return false;
+}
+
+
+
+
+/// Convert activity comparison into deterministic evidence strength
+export function scoreActivityEvidence(fact1, fact2) {
+
+    // Only score activities when our code can safely compare them
+    if (!activitiesAreComparable(fact1, fact2)) {
+        return null;
+    }
+
+    const activity1 = normalizeActivity(fact1.activity);
+    const activity2 = normalizeActivity(fact2.activity);
+
+    const negative1 = hasNegation(fact1.activity);
+    const negative2 = hasNegation(fact2.activity);
+
+    // Same underlying activity with the same polarity is compatible
+    if (activity1 === activity2 && negative1 === negative2) {
+        return 0;
+    }
+
+    // Same underlying activity with opposite polarity is deterministic conflict evidence
+    if (activity1 === activity2 && negative1 !== negative2) {
+        return 1;
+    }
+
+    return null;
+}
+
+
 // Compare activities stated in the testimony
 export function compareActivities(activity1, activity2) {
 
