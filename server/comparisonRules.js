@@ -3,9 +3,9 @@ export function parseTime(timePhrase) {
         return null;
     }
 
-    const text = timePhrase.toLowerCase();
+    const text = timePhrase.toLowerCase().trim();
 
-    // Handle words with known times
+    // Explicitly known times
     if (text.includes("midnight")) {
         return 0;
     }
@@ -14,8 +14,21 @@ export function parseTime(timePhrase) {
         return 12 * 60;
     }
 
-    // Find a time such as 7pm, 7:30pm, 10, or 10:30
-    const match = text.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/);
+    // Do not try to interpret vague periods as exact times
+    if (
+        text.includes("morning") ||
+        text.includes("afternoon") ||
+        text.includes("evening") ||
+        text.includes("night")
+    ) {
+        return null;
+    }
+
+    // Only accept a number when it is actually written as a time.
+    // Examples: 7pm, 7:30pm, 10:00am
+    const match = text.match(
+        /\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/
+    );
 
     if (!match) {
         return null;
@@ -24,6 +37,11 @@ export function parseTime(timePhrase) {
     let hour = Number(match[1]);
     const minute = match[2] ? Number(match[2]) : 0;
     const period = match[3];
+
+    // Invalid clock times
+    if (hour < 1 || hour > 12 || minute > 59) {
+        return null;
+    }
 
     if (period === "pm" && hour !== 12) {
         hour += 12;
@@ -35,7 +53,6 @@ export function parseTime(timePhrase) {
 
     return hour * 60 + minute;
 }
-
 
 function hasApproximation(timePhrase) {
     if (timePhrase === null) {
@@ -166,7 +183,7 @@ export function scoreActivityEvidence(fact1, fact2) {
 }
 
 
-// Compare activities stated in the testimony
+// Compare activities stated in two pieces of testimony
 export function compareActivities(activity1, activity2) {
 
     // If either activity is missing, there is not enough evidence to compare
@@ -177,10 +194,34 @@ export function compareActivities(activity1, activity2) {
     const act1 = activity1.toLowerCase().trim();
     const act2 = activity2.toLowerCase().trim();
 
+    // Exactly the same activity
     if (act1 === act2) {
         return "SAME";
     }
 
+    // Obvious opposite activity statements
+    const oppositePairs = [
+        ["entered", "never entered"],
+        ["entered", "did not enter"],
+        ["met", "never met"],
+        ["met", "did not meet"],
+        ["stayed home", "went out"],
+        ["staying home", "going out"],
+        ["asleep", "awake"],
+        ["sleeping", "awake"]
+    ];
+
+    for (const [first, second] of oppositePairs) {
+
+        if (
+            (act1.includes(first) && act2.includes(second)) ||
+            (act1.includes(second) && act2.includes(first))
+        ) {
+            return "CONFLICT";
+        }
+    }
+
+    // Different activities do not automatically mean contradiction
     return "DIFFERENT";
 }
 
@@ -197,24 +238,19 @@ export function compareTimes(time1, time2) {
     }
 
     let difference = Math.abs(minutes1 - minutes2);
+
+    // Handle times across midnight.
     difference = Math.min(difference, 1440 - difference);
 
-    // Give more tolerance if either witness statement is approximate
-    const approximate =
-        hasApproximation(time1) || hasApproximation(time2);
-
-    const compatibleLimit = approximate ? 45 : 30;
-    const possibleConflictLimit = approximate ? 90 : 60;
-
-    if (difference <= compatibleLimit) {
+    // Exact same time
+    if (difference === 0) {
         return "COMPATIBLE";
     }
 
-    if (difference <= possibleConflictLimit) {
-        return "POSSIBLE_CONFLICT";
-    }
-
-    return "CONFLICT";
+    // Different exact times are potentially conflicting,
+    // but JS should not decide that they are definitely
+    // contradictory without a defined tolerance.
+    return "POSSIBLE_CONFLICT";
 }
 
 
@@ -360,6 +396,42 @@ export function scoreQuantityEvidence(fact1, fact2) {
 }
 
 
+// Determine whether location and activity together provide
+// deterministic evidence of a contradiction.
+export function scoreLocationActivityEvidence(fact1, fact2) {
+
+    const location1 = fact1.location?.toLowerCase().trim() || "";
+    const location2 = fact2.location?.toLowerCase().trim() || "";
+
+    const activity1 = fact1.activity?.toLowerCase().trim() || "";
+    const activity2 = fact2.activity?.toLowerCase().trim() || "";
+
+    const home1 = location1.includes("home");
+    const home2 = location2.includes("home");
+
+    const wentOut1 =
+        activity1.includes("went out") ||
+        activity1.includes("left home") ||
+        activity1.includes("left the house");
+
+    const wentOut2 =
+        activity2.includes("went out") ||
+        activity2.includes("left home") ||
+        activity2.includes("left the house");
+
+    if (home1 && wentOut2) {
+        return 1;
+    }
+
+    if (home2 && wentOut1) {
+        return 1;
+    }
+
+    return null;
+}
+
+
+
 // Calculate the deterministic evidence portion of the confidence score
 export function calculateEvidenceScore(fact1, fact2) {
     const comparisons = compareFacts(fact1, fact2);
@@ -380,6 +452,20 @@ export function calculateEvidenceScore(fact1, fact2) {
         scores.push(quantityScore);
     }
 
+    // Activity evidence
+    const activityScore = scoreActivityEvidence(fact1, fact2);
+
+    if (activityScore !== null) {
+        scores.push(activityScore);
+}
+    // Location + activity evidence
+    const locationActivityScore =
+        scoreLocationActivityEvidence(fact1, fact2);
+
+    if (locationActivityScore !== null) {
+        scores.push(locationActivityScore);
+}
+
     // If there is no deterministic evidence we can safely score,
     // do not pretend that we know
     if (scores.length === 0) {
@@ -391,3 +477,111 @@ export function calculateEvidenceScore(fact1, fact2) {
 
     return total / scores.length;
 }
+
+
+
+// Calculate how much of the testimony our deterministic
+// system was actually able to evaluate
+export function calculateEvidenceCoverage(fact1, fact2) {
+
+    let availableEvidence = 0;
+    let totalEvidence = 0;
+
+    // Time
+    if (fact1.time !== null || fact2.time !== null) {
+        totalEvidence++;
+
+        if (
+            fact1.time !== null &&
+            fact2.time !== null &&
+            compareTimes(fact1.time, fact2.time) !== "UNKNOWN"
+        ) {
+            availableEvidence++;
+        }
+    }
+
+    // Quantity
+    if (fact1.quantity !== null || fact2.quantity !== null) {
+        totalEvidence++;
+
+        if (quantitiesAreComparable(fact1, fact2)) {
+            availableEvidence++;
+        }
+    }
+
+    // Activity
+    if (fact1.activity !== null || fact2.activity !== null) {
+        totalEvidence++;
+
+        if (activitiesAreComparable(fact1, fact2)) {
+            availableEvidence++;
+        }
+    }
+
+    // Location
+    if (fact1.location !== null || fact2.location !== null) {
+        totalEvidence++;
+
+        if (
+            fact1.location !== null &&
+            fact2.location !== null
+        ) {
+            availableEvidence++;
+        }
+    }
+
+    // Location + activity
+    // This is usable even when only one claim has a location.
+    if (
+        (fact1.location !== null && fact2.activity !== null) ||
+        (fact2.location !== null && fact1.activity !== null)
+    ) {
+        totalEvidence++;
+
+        if (
+            scoreLocationActivityEvidence(fact1, fact2) !== null
+        ) {
+            availableEvidence++;
+        }
+    }
+
+    // State
+    if (fact1.state !== null || fact2.state !== null) {
+        totalEvidence++;
+
+        if (
+            fact1.state !== null &&
+            fact2.state !== null
+        ) {
+            availableEvidence++;
+        }
+    }
+
+    // Nothing was provided to evaluate
+    if (totalEvidence === 0) {
+        return 0;
+    }
+
+    return availableEvidence / totalEvidence;
+}
+
+
+
+
+const activityTest1 = {
+    activity: "ordered pizza",
+    time: null,
+    quantity: null,
+    object: null,
+    location: null,
+    state: null
+};
+
+const activityTest2 = {
+    activity: "went out briefly",
+    time: null,
+    quantity: null,
+    object: null,
+    location: null,
+    state: null
+};

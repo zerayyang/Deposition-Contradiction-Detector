@@ -204,11 +204,11 @@ export default function DepositionChecker() {
 
               <div style={{ fontSize: 14 }}>
                 <div style={{ marginBottom: 4 }}>
-                  <strong>March:</strong> "{r.claim1}"
+                  <strong>March:</strong> "{r.claim1.original}"
                 </div>
 
                 <div>
-                  <strong>September:</strong> "{r.claim2}"
+                  <strong>September:</strong> "{r.claim2.original}"
                 </div>
               </div>
             </div>

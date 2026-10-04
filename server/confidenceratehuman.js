@@ -110,10 +110,6 @@ const CORRECTION_LANGUAGE = [
     "what i meant was"
 ];
 
-function containsAny(text, phrases) {
-    return phrases.some(phrase => text.includes(phrase));
-}
-
 
 function calculateDiminishingAdjustment(text, phrases, initialWeight) {
     let matches = 0;
@@ -138,99 +134,156 @@ function calculateDiminishingAdjustment(text, phrases, initialWeight) {
 }
 
 
-export function calculateHumanConfidence(claim1, claim2, type) {
+// Calculate the strength of the witness's language only
+// This does not use Claude's contradiction classification.
+export function calculateLanguageScore(claim1, claim2) {
+
     const text = `${claim1} ${claim2}`.toLowerCase();
 
-    // Start at moderate confidence
-    let score = 60;
+    // Start at neutral language strength
+    let score = 0.5;
 
     // Strong/certain language
-    // +5, +2.5, +1.25, +0.625...
+    // +0.05, +0.025, +0.0125, +0.00625...
     score += calculateDiminishingAdjustment(
         text,
         STRONG_LANGUAGE,
-        5
+        0.05
     );
 
     // Uncertain/hedging language
-    // -5, -2.5, -1.25, -0.625...
+    // -0.05, -0.025, -0.0125, -0.00625...
     score += calculateDiminishingAdjustment(
         text,
         UNCERTAIN_LANGUAGE,
-        -5
+        -0.05
     );
 
     // Memory limitations have a stronger negative effect
-    // -8, -4, -2, -1...
+    // -0.08, -0.04, -0.02, -0.01...
     score += calculateDiminishingAdjustment(
         text,
         MEMORY_LIMITATIONS,
-        -8
+        -0.08
     );
 
     // Approximation has a smaller effect
-    // -2, -1, -0.5, -0.25...
+    // -0.02, -0.01, -0.005, -0.0025...
     score += calculateDiminishingAdjustment(
         text,
         APPROXIMATION_LANGUAGE,
-        -2
+        -0.02
     );
 
     // Limited scope
     score += calculateDiminishingAdjustment(
         text,
         LIMITED_SCOPE,
-        -2
+        -0.02
     );
 
     // Habit/general behavior instead of event-specific recollection
     score += calculateDiminishingAdjustment(
         text,
         HABITUAL_LANGUAGE,
-        -4
+        -0.04
     );
 
     // Second-hand information
     score += calculateDiminishingAdjustment(
         text,
         SECOND_HAND_LANGUAGE,
-        -6
+        -0.06
     );
 
     // Explicit inference or assumption
     score += calculateDiminishingAdjustment(
         text,
         INFERENCE_LANGUAGE,
-        -5
+        -0.05
     );
 
     // Reaffirming previous testimony
     score += calculateDiminishingAdjustment(
         text,
         REAFFIRMATION_LANGUAGE,
-        4
+        0.04
     );
 
     // Correcting previous testimony
     score += calculateDiminishingAdjustment(
         text,
         CORRECTION_LANGUAGE,
-        -6
+        -0.06
     );
 
-    // Contradiction classification
-    if (type === "DIRECT") {
-        score += 5;
-    } else if (type === "INFERENTIAL") {
-        score -= 3;
-    } else if (type === "FALSE_POSITIVE") {
-        score -= 5;
-    }
+    // Keep language score between 0 and 1
+    score = Math.max(0, Math.min(1, score));
 
-    // Keep score between 0 and 100 and return a whole number
-    score = Math.max(0, Math.min(100, score));
-
-    return Math.round(score);
+    return score;
 }
 
+// Calculate the final human confidence score
+// using deterministic evidence, language rules,
+// and evidence coverage.
+//
+// Claude's contradiction type and semanticAssist are NOT used here.
+export function calculateHumanConfidence(
+    claim1,
+    claim2,
+    evidenceScore,
+    evidenceCoverage
+) {
 
+    const languageScore = calculateLanguageScore(
+        claim1,
+        claim2
+    );
+
+    const EVIDENCE_WEIGHT = 0.70;
+    const LANGUAGE_WEIGHT = 0.30;
+
+    let finalScore;
+
+    // If deterministic evidence is available,
+    // use the normal 70/30 weighting.
+    if (evidenceScore !== null) {
+
+        const weightedScore =
+            (evidenceScore * EVIDENCE_WEIGHT) +
+            (languageScore * LANGUAGE_WEIGHT);
+
+        // Evidence coverage limits how confident
+        // the system can ultimately be.
+        let maximumConfidence;
+
+        if (evidenceCoverage >= 0.75) {
+            maximumConfidence = 0.85;
+        } else if (evidenceCoverage >= 0.50) {
+            maximumConfidence = 0.70;
+        } else if (evidenceCoverage >= 0.25) {
+            maximumConfidence = 0.60;
+        } else {
+            maximumConfidence = 0.55;
+        }
+
+        finalScore = Math.min(
+            weightedScore,
+            maximumConfidence
+        );
+
+    } else {
+
+        // Without deterministic evidence, language
+        // cannot create high-confidence contradiction evidence.
+        finalScore = Math.min(
+            languageScore,
+            0.55
+        );
+    }
+
+    // Convert from 0-1 to 0-100
+    finalScore *= 100;
+
+    return Math.round(finalScore);
+}

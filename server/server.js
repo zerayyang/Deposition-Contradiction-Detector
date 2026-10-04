@@ -1,10 +1,14 @@
+import "dotenv/config";
 import express from "express";
 import fs from "fs";
 import Anthropic from "@anthropic-ai/sdk";
 import { calculateHumanConfidence } from "./confidenceratehuman.js";
 import { validateClaim } from "./evidenceValidator.js";
 import { TestimonyFact } from "./TestimonyFact.js";
-import { calculateEvidenceScore } from "./comparisonRules.js";
+import {
+    calculateEvidenceScore,
+    calculateEvidenceCoverage
+} from "./comparisonRules.js";
 
 const AI_INSTRUCTIONS = fs.readFileSync(
     "./server/proper_prompts.md",
@@ -77,19 +81,35 @@ Analyze these two depositions according to the provided instructions.
             const fact2 = new TestimonyFact(contradiction.claim2);
 
             // Calculate deterministic evidence strength using our own logic
-            const evidenceScore = calculateEvidenceScore(fact1, fact2);
+            const evidenceScore = calculateEvidenceScore(
+                fact1,
+                fact2
+            );
 
+            // Calculate how much of the available evidence
+            // our deterministic system was able to evaluate
+            const evidenceCoverage = calculateEvidenceCoverage(
+                fact1,
+                fact2
+            );
+
+            // Debug the facts and scores
+            console.log("Fact 1:", fact1);
+            console.log("Fact 2:", fact2);
             console.log("Evidence score:", evidenceScore);
+            console.log("Evidence coverage:", evidenceCoverage);
 
             const humanConfidence = calculateHumanConfidence(
                 contradiction.claim1.original,
                 contradiction.claim2.original,
-                contradiction.type
+                evidenceScore,
+                evidenceCoverage
             );
 
             return {
                 ...contradiction,
-                humanConfidence
+                humanConfidence,
+                evidenceCoverage
             };
         });
 
