@@ -585,3 +585,9 @@ const activityTest2 = {
     location: null,
     state: null
 };
+
+
+
+console.log("TEST 1:", compareTimes("7pm", "7pm"));
+console.log("TEST 2:", compareTimes("7pm", "7:30pm"));
+console.log("TEST 3:", compareTimes("around 7", "7:30pm"));
