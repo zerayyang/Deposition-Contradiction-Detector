@@ -524,66 +524,70 @@ export function calculateEvidenceScore(fact1, fact2) {
 // Calculate how much of the testimony our deterministic
 // system was actually able to evaluate
 export function calculateEvidenceCoverage(fact1, fact2) {
-
     let availableEvidence = 0;
     let totalEvidence = 0;
 
     // Time
-    if (fact1.time !== null || fact2.time !== null) {
+    // Only count time as available if both times can actually
+    // be deterministically compared.
+    if (
+        fact1.time !== null &&
+        fact2.time !== null &&
+        compareTimes(fact1.time, fact2.time) !== "UNKNOWN"
+    ) {
         totalEvidence++;
-
-        const timeComparison = compareTimes(
-            fact1.time,
-            fact2.time
-        );
-
-        if (timeComparison !== "UNKNOWN") {
-            availableEvidence++;
-        }
+        availableEvidence++;
     }
 
     // Quantity
+    // Only count quantity when both claims describe the same object.
     if (fact1.quantity !== null || fact2.quantity !== null) {
-        totalEvidence++;
-
         if (quantitiesAreComparable(fact1, fact2)) {
+            totalEvidence++;
             availableEvidence++;
         }
     }
 
     // Activity
+    // Only count activity when our deterministic activity
+    // comparison can actually be performed.
     if (fact1.activity !== null || fact2.activity !== null) {
-        totalEvidence++;
-
-        // Coverage should match what the evidence scorer
-        // can actually evaluate.
-        if (scoreActivityEvidence(fact1, fact2) !== null) {
+        if (activitiesAreComparable(fact1, fact2)) {
+            totalEvidence++;
             availableEvidence++;
         }
     }
+
+    // Location
+    // Location by itself is not currently used to calculate
+    // evidenceScore, so do not count it toward coverage.
+    // It is used through location + activity evidence below.
 
     // Location + activity
     if (
         (fact1.location !== null && fact2.activity !== null) ||
         (fact2.location !== null && fact1.activity !== null)
     ) {
-        totalEvidence++;
+        const locationActivityScore =
+            scoreLocationActivityEvidence(fact1, fact2);
 
-        if (
-            scoreLocationActivityEvidence(fact1, fact2) !== null
-        ) {
+        if (locationActivityScore !== null) {
+            totalEvidence++;
             availableEvidence++;
         }
     }
 
-    // Nothing was provided to evaluate
+    // State
+    // State is currently compared by compareFacts(), but there is
+    // no deterministic state scoring function yet, so do not count
+    // it toward evidence coverage.
+
     if (totalEvidence === 0) {
         return 0;
     }
 
     return availableEvidence / totalEvidence;
 }
-
 
 
 
