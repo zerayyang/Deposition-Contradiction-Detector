@@ -3,6 +3,8 @@ import fs from "fs";
 import Anthropic from "@anthropic-ai/sdk";
 import { calculateHumanConfidence } from "./confidenceratehuman.js";
 import { validateClaim } from "./evidenceValidator.js";
+import { TestimonyFact } from "./TestimonyFact.js";
+import { calculateEvidenceScore } from "./comparisonRules.js";
 
 const AI_INSTRUCTIONS = fs.readFileSync(
     "./server/proper_prompts.md",
@@ -69,6 +71,15 @@ Analyze these two depositions according to the provided instructions.
 
             console.log("Claim 1 valid:", claim1Valid);
             console.log("Claim 2 valid:", claim2Valid);
+
+            // Convert Claude's structured claims into our own TestimonyFact objects
+            const fact1 = new TestimonyFact(contradiction.claim1);
+            const fact2 = new TestimonyFact(contradiction.claim2);
+
+            // Calculate deterministic evidence strength using our own logic
+            const evidenceScore = calculateEvidenceScore(fact1, fact2);
+
+            console.log("Evidence score:", evidenceScore);
 
             const humanConfidence = calculateHumanConfidence(
                 contradiction.claim1.original,
