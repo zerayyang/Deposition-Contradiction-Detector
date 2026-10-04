@@ -175,75 +175,78 @@ export function calculateLanguageScore(claim1, claim2) {
         // Start at neutral language strength
         let score = 0.5;
 
-        // Strong/certain language
-        score += calculateDiminishingAdjustment(
+        // Positive language adjustments
+        const strongAdjustment = calculateDiminishingAdjustment(
             text,
             STRONG_LANGUAGE,
             0.05
         );
 
-        // Uncertain/hedging language
-        score += calculateDiminishingAdjustment(
-            text,
-            UNCERTAIN_LANGUAGE,
-            -0.05
-        );
-
-        // Memory limitations
-        score += calculateDiminishingAdjustment(
-            text,
-            MEMORY_LIMITATIONS,
-            -0.08
-        );
-
-        // Approximation
-        score += calculateDiminishingAdjustment(
-            text,
-            APPROXIMATION_LANGUAGE,
-            -0.02
-        );
-
-        // Limited scope
-        score += calculateDiminishingAdjustment(
-            text,
-            LIMITED_SCOPE,
-            -0.02
-        );
-
-        // Habit/general behavior
-        score += calculateDiminishingAdjustment(
-            text,
-            HABITUAL_LANGUAGE,
-            -0.04
-        );
-
-        // Second-hand information
-        score += calculateDiminishingAdjustment(
-            text,
-            SECOND_HAND_LANGUAGE,
-            -0.06
-        );
-
-        // Explicit inference or assumption
-        score += calculateDiminishingAdjustment(
-            text,
-            INFERENCE_LANGUAGE,
-            -0.05
-        );
-
-        // Reaffirming previous testimony
-        score += calculateDiminishingAdjustment(
+        const reaffirmationAdjustment = calculateDiminishingAdjustment(
             text,
             REAFFIRMATION_LANGUAGE,
             0.04
         );
 
-        // Correcting previous testimony
-        score += calculateDiminishingAdjustment(
-            text,
-            CORRECTION_LANGUAGE,
-            -0.06
+        // Negative language adjustments
+        const negativeAdjustments = [
+            calculateDiminishingAdjustment(
+                text,
+                UNCERTAIN_LANGUAGE,
+                -0.05
+            ),
+            calculateDiminishingAdjustment(
+                text,
+                MEMORY_LIMITATIONS,
+                -0.08
+            ),
+            calculateDiminishingAdjustment(
+                text,
+                APPROXIMATION_LANGUAGE,
+                -0.02
+            ),
+            calculateDiminishingAdjustment(
+                text,
+                LIMITED_SCOPE,
+                -0.02
+            ),
+            calculateDiminishingAdjustment(
+                text,
+                HABITUAL_LANGUAGE,
+                -0.04
+            ),
+            calculateDiminishingAdjustment(
+                text,
+                SECOND_HAND_LANGUAGE,
+                -0.06
+            ),
+            calculateDiminishingAdjustment(
+                text,
+                INFERENCE_LANGUAGE,
+                -0.05
+            ),
+            calculateDiminishingAdjustment(
+                text,
+                CORRECTION_LANGUAGE,
+                -0.06
+            )
+        ];
+
+        const totalNegativeAdjustment = negativeAdjustments.reduce(
+            (sum, adjustment) => sum + adjustment,
+            0
         );
+
+        // Do not allow uncertainty indicators to reduce
+        // the language score by more than 0.15 overall.
+        const cappedNegativeAdjustment = Math.max(
+            totalNegativeAdjustment,
+            -0.15
+        );
+
+        score += strongAdjustment;
+        score += reaffirmationAdjustment;
+        score += cappedNegativeAdjustment;
 
         // Keep individual language score between 0 and 1
         return Math.max(0, Math.min(1, score));
@@ -393,5 +396,30 @@ console.log(
         "I don't remember exactly what happened. I can't recall the location.",
         MEMORY_LIMITATIONS,
         -0.08
+    )
+);
+
+
+console.log(
+    "NORMAL UNCERTAINTY:",
+    calculateLanguageScore(
+        "I don't remember exactly, I think it was around 7.",
+        "I don't remember exactly, I think it was around 7."
+    )
+);
+
+console.log(
+    "HEAVY UNCERTAINTY:",
+    calculateLanguageScore(
+        "I don't remember, I can't recall, I'm not sure, I think maybe it was around 7.",
+        "I don't remember, I can't recall, I'm not sure, I think maybe it was around 7."
+    )
+);
+
+console.log(
+    "STRONG LANGUAGE:",
+    calculateLanguageScore(
+        "I definitely remember exactly what happened.",
+        "I definitely remember exactly what happened."
     )
 );
