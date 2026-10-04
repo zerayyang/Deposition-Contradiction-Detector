@@ -158,7 +158,28 @@ export function activitiesAreComparable(fact1, fact2) {
     return false;
 }
 
+export function scoreStateEvidence(fact1, fact2) {
 
+    // Only score state when both claims provide a state.
+    if (fact1.state === null || fact2.state === null) {
+        return null;
+    }
+
+    const comparison = compareStates(
+        fact1.state,
+        fact2.state
+    );
+
+    if (comparison === "DIFFERENT") {
+        return 1;
+    }
+
+    if (comparison === "SAME") {
+        return 0;
+    }
+
+    return null;
+}
 
 
 /// Convert activity comparison into deterministic evidence strength
@@ -498,28 +519,37 @@ export function calculateEvidenceScore(fact1, fact2) {
 
     if (activityScore !== null) {
         scores.push(activityScore);
-}
+    }
+
+    // State evidence
+    const stateScore = scoreStateEvidence(fact1, fact2);
+
+    if (stateScore !== null) {
+        scores.push(stateScore);
+    }
+
     // Location + activity evidence
     const locationActivityScore =
         scoreLocationActivityEvidence(fact1, fact2);
 
     if (locationActivityScore !== null) {
         scores.push(locationActivityScore);
-}
+    }
 
     // If there is no deterministic evidence we can safely score,
-    // do not pretend that we know
+    // do not pretend that we know.
     if (scores.length === 0) {
         return null;
     }
 
-    // Average only the evidence categories that were actually usable
-    const total = scores.reduce((sum, score) => sum + score, 0);
+    // Average only the evidence categories that were actually usable.
+    const total = scores.reduce(
+        (sum, score) => sum + score,
+        0
+    );
 
     return total / scores.length;
 }
-
-
 
 // Calculate how much of the testimony our deterministic
 // system was actually able to evaluate
@@ -578,9 +608,20 @@ export function calculateEvidenceCoverage(fact1, fact2) {
     }
 
     // State
-    // State is currently compared by compareFacts(), but there is
-    // no deterministic state scoring function yet, so do not count
-    // it toward evidence coverage.
+    // Count state when both claims provide a state that
+    // our deterministic system can compare.
+    if (
+        fact1.state !== null &&
+        fact2.state !== null
+    ) {
+        const stateScore =
+            scoreStateEvidence(fact1, fact2);
+
+        if (stateScore !== null) {
+            totalEvidence++;
+            availableEvidence++;
+        }
+    }
 
     if (totalEvidence === 0) {
         return 0;
@@ -608,4 +649,5 @@ const activityTest2 = {
     location: null,
     state: null
 };
+
 
