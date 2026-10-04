@@ -109,14 +109,21 @@ const CORRECTION_LANGUAGE = [
     "i misspoke",
     "what i meant was"
 ];
-
-
 function calculateDiminishingAdjustment(text, phrases, initialWeight) {
     let matches = 0;
 
-    // Count how many phrases from this category appear
+    // Match complete words/phrases instead of substrings.
+    // This prevents "all" from matching "recall"
+    // and "may" from matching "maybe".
     for (const phrase of phrases) {
-        if (text.includes(phrase)) {
+        const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const pattern = new RegExp(
+            `(?<!\\w)${escapedPhrase}(?!\\w)`,
+            "i"
+        );
+
+        if (pattern.test(text)) {
             matches++;
         }
     }
@@ -124,7 +131,7 @@ function calculateDiminishingAdjustment(text, phrases, initialWeight) {
     let adjustment = 0;
     let currentWeight = initialWeight;
 
-    // Every additional match is worth half as much
+    // Every additional match is worth half as much.
     for (let i = 0; i < matches; i++) {
         adjustment += currentWeight;
         currentWeight /= 2;
@@ -287,3 +294,31 @@ export function calculateHumanConfidence(
 
     return Math.round(finalScore);
 }
+
+
+console.log(
+    "RECALL TEST:",
+    calculateDiminishingAdjustment(
+        "I can't recall exactly what happened.",
+        ["all"],
+        0.05
+    )
+);
+
+console.log(
+    "MAYBE TEST:",
+    calculateDiminishingAdjustment(
+        "Maybe I saw him.",
+        ["may"],
+        0.05
+    )
+);
+
+console.log(
+    "REAL MATCH TEST:",
+    calculateDiminishingAdjustment(
+        "I may have seen him.",
+        ["may"],
+        0.05
+    )
+);
