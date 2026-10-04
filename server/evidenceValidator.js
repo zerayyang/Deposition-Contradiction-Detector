@@ -45,39 +45,3 @@ export function validateClaim(claim, transcript) {
 
     return true;
 }
-
-console.log(
-    "VALID QUOTE:",
-    validateClaim(
-        {
-            original: "I was home all evening.",
-            activityPhrase: null,
-            timePhrase: null,
-            locationPhrase: "home",
-            personPhrase: null,
-            objectPhrase: null,
-            quantityPhrase: null,
-            statePhrase: null,
-            qualifierPhrases: []
-        },
-        "Q: Where were you?\nA: I was home all evening."
-    )
-);
-
-console.log(
-    "FAKE QUOTE:",
-    validateClaim(
-        {
-            original: "I was at the warehouse at 8 PM.",
-            activityPhrase: null,
-            timePhrase: "8 PM",
-            locationPhrase: "warehouse",
-            personPhrase: null,
-            objectPhrase: null,
-            quantityPhrase: null,
-            statePhrase: null,
-            qualifierPhrases: []
-        },
-        "Q: Where were you?\nA: I was home all evening."
-    )
-);
