@@ -145,89 +145,92 @@ function calculateDiminishingAdjustment(text, phrases, initialWeight) {
 // This does not use Claude's contradiction classification.
 export function calculateLanguageScore(claim1, claim2) {
 
-    const text = `${claim1} ${claim2}`.toLowerCase();
+    function scoreSingleClaim(claim) {
+        const text = claim.toLowerCase();
 
-    // Start at neutral language strength
-    let score = 0.5;
+        // Start at neutral language strength
+        let score = 0.5;
 
-    // Strong/certain language
-    // +0.05, +0.025, +0.0125, +0.00625...
-    score += calculateDiminishingAdjustment(
-        text,
-        STRONG_LANGUAGE,
-        0.05
-    );
+        // Strong/certain language
+        score += calculateDiminishingAdjustment(
+            text,
+            STRONG_LANGUAGE,
+            0.05
+        );
 
-    // Uncertain/hedging language
-    // -0.05, -0.025, -0.0125, -0.00625...
-    score += calculateDiminishingAdjustment(
-        text,
-        UNCERTAIN_LANGUAGE,
-        -0.05
-    );
+        // Uncertain/hedging language
+        score += calculateDiminishingAdjustment(
+            text,
+            UNCERTAIN_LANGUAGE,
+            -0.05
+        );
 
-    // Memory limitations have a stronger negative effect
-    // -0.08, -0.04, -0.02, -0.01...
-    score += calculateDiminishingAdjustment(
-        text,
-        MEMORY_LIMITATIONS,
-        -0.08
-    );
+        // Memory limitations
+        score += calculateDiminishingAdjustment(
+            text,
+            MEMORY_LIMITATIONS,
+            -0.08
+        );
 
-    // Approximation has a smaller effect
-    // -0.02, -0.01, -0.005, -0.0025...
-    score += calculateDiminishingAdjustment(
-        text,
-        APPROXIMATION_LANGUAGE,
-        -0.02
-    );
+        // Approximation
+        score += calculateDiminishingAdjustment(
+            text,
+            APPROXIMATION_LANGUAGE,
+            -0.02
+        );
 
-    // Limited scope
-    score += calculateDiminishingAdjustment(
-        text,
-        LIMITED_SCOPE,
-        -0.02
-    );
+        // Limited scope
+        score += calculateDiminishingAdjustment(
+            text,
+            LIMITED_SCOPE,
+            -0.02
+        );
 
-    // Habit/general behavior instead of event-specific recollection
-    score += calculateDiminishingAdjustment(
-        text,
-        HABITUAL_LANGUAGE,
-        -0.04
-    );
+        // Habit/general behavior
+        score += calculateDiminishingAdjustment(
+            text,
+            HABITUAL_LANGUAGE,
+            -0.04
+        );
 
-    // Second-hand information
-    score += calculateDiminishingAdjustment(
-        text,
-        SECOND_HAND_LANGUAGE,
-        -0.06
-    );
+        // Second-hand information
+        score += calculateDiminishingAdjustment(
+            text,
+            SECOND_HAND_LANGUAGE,
+            -0.06
+        );
 
-    // Explicit inference or assumption
-    score += calculateDiminishingAdjustment(
-        text,
-        INFERENCE_LANGUAGE,
-        -0.05
-    );
+        // Explicit inference or assumption
+        score += calculateDiminishingAdjustment(
+            text,
+            INFERENCE_LANGUAGE,
+            -0.05
+        );
 
-    // Reaffirming previous testimony
-    score += calculateDiminishingAdjustment(
-        text,
-        REAFFIRMATION_LANGUAGE,
-        0.04
-    );
+        // Reaffirming previous testimony
+        score += calculateDiminishingAdjustment(
+            text,
+            REAFFIRMATION_LANGUAGE,
+            0.04
+        );
 
-    // Correcting previous testimony
-    score += calculateDiminishingAdjustment(
-        text,
-        CORRECTION_LANGUAGE,
-        -0.06
-    );
+        // Correcting previous testimony
+        score += calculateDiminishingAdjustment(
+            text,
+            CORRECTION_LANGUAGE,
+            -0.06
+        );
 
-    // Keep language score between 0 and 1
-    score = Math.max(0, Math.min(1, score));
+        // Keep individual language score between 0 and 1
+        return Math.max(0, Math.min(1, score));
+    }
 
-    return score;
+    const claim1Score = scoreSingleClaim(claim1);
+    const claim2Score = scoreSingleClaim(claim2);
+
+    // The contradiction is only as linguistically strong
+    // as the less-committed statement.
+    return Math.min(claim1Score, claim2Score);
 }
 
 // Calculate the final human confidence score
@@ -320,5 +323,31 @@ console.log(
         "I may have seen him.",
         ["may"],
         0.05
+    )
+);
+
+
+
+console.log(
+    "EQUAL:",
+    calculateLanguageScore(
+        "I saw the car.",
+        "I saw the car."
+    )
+);
+
+console.log(
+    "STRONG VS UNCERTAIN:",
+    calculateLanguageScore(
+        "I definitely saw the car.",
+        "I think I saw the car."
+    )
+);
+
+console.log(
+    "UNCERTAIN VS STRONG:",
+    calculateLanguageScore(
+        "I think I saw the car.",
+        "I definitely saw the car."
     )
 );
