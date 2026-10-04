@@ -109,22 +109,46 @@ const CORRECTION_LANGUAGE = [
     "i misspoke",
     "what i meant was"
 ];
+
 function calculateDiminishingAdjustment(text, phrases, initialWeight) {
     let matches = 0;
 
-    // Match complete words/phrases instead of substrings.
-    // This prevents "all" from matching "recall"
-    // and "may" from matching "maybe".
-    for (const phrase of phrases) {
-        const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Sort longer phrases first so that more specific phrases
+    // take priority over shorter phrases contained inside them.
+    const sortedPhrases = [...phrases].sort(
+        (a, b) => b.length - a.length
+    );
+
+    const matchedRanges = [];
+
+    for (const phrase of sortedPhrases) {
+        const escapedPhrase = phrase.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        );
 
         const pattern = new RegExp(
             `(?<!\\w)${escapedPhrase}(?!\\w)`,
-            "i"
+            "gi"
         );
 
-        if (pattern.test(text)) {
-            matches++;
+        let match;
+
+        while ((match = pattern.exec(text)) !== null) {
+            const start = match.index;
+            const end = start + match[0].length;
+
+            // Don't count this phrase if it overlaps
+            // with a more specific phrase already matched.
+            const overlaps = matchedRanges.some(
+                ([existingStart, existingEnd]) =>
+                    start < existingEnd && end > existingStart
+            );
+
+            if (!overlaps) {
+                matchedRanges.push([start, end]);
+                matches++;
+            }
         }
     }
 
@@ -349,5 +373,25 @@ console.log(
     calculateLanguageScore(
         "I think I saw the car.",
         "I definitely saw the car."
+    )
+);
+
+
+
+console.log(
+    "MEMORY OVERLAP TEST:",
+    calculateDiminishingAdjustment(
+        "I don't remember exactly what happened.",
+        MEMORY_LIMITATIONS,
+        -0.08
+    )
+);
+
+console.log(
+    "TWO DIFFERENT MATCHES TEST:",
+    calculateDiminishingAdjustment(
+        "I don't remember exactly what happened. I can't recall the location.",
+        MEMORY_LIMITATIONS,
+        -0.08
     )
 );
