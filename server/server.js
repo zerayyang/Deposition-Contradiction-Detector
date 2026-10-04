@@ -2,6 +2,7 @@ import express from "express";
 import fs from "fs";
 import Anthropic from "@anthropic-ai/sdk";
 import { calculateHumanConfidence } from "./confidenceratehuman.js";
+import { validateClaim } from "./evidenceValidator.js";
 
 const AI_INSTRUCTIONS = fs.readFileSync(
     "./server/proper_prompts.md",
@@ -52,12 +53,23 @@ Analyze these two depositions according to the provided instructions.
             .replace(/```json/g, "")
             .replace(/```/g, "")
             .trim();
+
         console.log("CLAUDE RAW OUTPUT:");
         console.log(rawText);
-        console.log("STOP REASON:", message.stop_reason);  
+        console.log("STOP REASON:", message.stop_reason);
+
         const parsed = JSON.parse(cleanedText);
 
         parsed.contradictions = parsed.contradictions.map(contradiction => {
+
+            // Validate that Claude's extracted evidence actually exists
+            // in the original testimony
+            const claim1Valid = validateClaim(contradiction.claim1);
+            const claim2Valid = validateClaim(contradiction.claim2);
+
+            console.log("Claim 1 valid:", claim1Valid);
+            console.log("Claim 2 valid:", claim2Valid);
+
             const humanConfidence = calculateHumanConfidence(
                 contradiction.claim1.original,
                 contradiction.claim2.original,
