@@ -4,15 +4,23 @@ export function phraseExists(original, phrase) {
         return true;
     }
 
+    if (original === null) {
+        return false;
+    }
+
     const originalLower = original.toLowerCase();
     const phraseLower = phrase.toLowerCase();
 
     return originalLower.includes(phraseLower);
 }
 
+export function validateClaim(claim, transcript) {
+    // First verify that Claude's original quote
+    // actually exists in the real transcript.
+    if (!phraseExists(transcript, claim.original)) {
+        return false;
+    }
 
-
-export function validateClaim(claim) {
     const fields = [
         claim.activityPhrase,
         claim.timePhrase,
@@ -37,3 +45,39 @@ export function validateClaim(claim) {
 
     return true;
 }
+
+console.log(
+    "VALID QUOTE:",
+    validateClaim(
+        {
+            original: "I was home all evening.",
+            activityPhrase: null,
+            timePhrase: null,
+            locationPhrase: "home",
+            personPhrase: null,
+            objectPhrase: null,
+            quantityPhrase: null,
+            statePhrase: null,
+            qualifierPhrases: []
+        },
+        "Q: Where were you?\nA: I was home all evening."
+    )
+);
+
+console.log(
+    "FAKE QUOTE:",
+    validateClaim(
+        {
+            original: "I was at the warehouse at 8 PM.",
+            activityPhrase: null,
+            timePhrase: "8 PM",
+            locationPhrase: "warehouse",
+            personPhrase: null,
+            objectPhrase: null,
+            quantityPhrase: null,
+            statePhrase: null,
+            qualifierPhrases: []
+        },
+        "Q: Where were you?\nA: I was home all evening."
+    )
+);
