@@ -50,12 +50,16 @@ For approximate times or quantities, treat ranges that plausibly overlap as comp
 
 ### Step 5: Directness test
 
-DIRECT requires BOTH:
+Use DIRECT when the two statements concern the same fact and cannot both be true on their face:
 
-1. The statements make incompatible factual assertions about the same issue, and
-2. The conflict remains even if every hedge or qualifier ("around," "maybe," "I think," "might") is read in the witness's favor, and no further reasoning is needed to see it.
+- one affirms what the other denies (X vs. not-X), or
+- they state different exact values for the same single fact.
 
-If either statement is hedged or approximate and the conflict only appears by comparing uncertain ranges, timelines, or implications, the label is INFERENTIAL, never DIRECT.
+Hedges matter in ONE way only. If the conflict exists only because two APPROXIMATE VALUES are being compared (a time, quantity, date, or duration that is itself qualified, such as "around 10," "maybe 10:30," "about ten," or "three or four"), and the conflict depends on whether their ranges overlap, the label is INFERENTIAL, never DIRECT.
+
+A hedge about how sure the witness is that something happened ("I think I went out," "I don't think I met him," "I might have") does NOT make a conflict inferential. The application's confidence score handles witness certainty separately.
+
+A hedge that qualifies a different fact elsewhere in the same answer is ignored.
 
 ### Step 6: Inference test
 
@@ -70,7 +74,7 @@ Never build an inference from outside assumptions about normal behavior, how mem
 
 ### Step 7: Tie-breaks
 
-- Torn between DIRECT and INFERENTIAL: choose INFERENTIAL.
+- Torn between DIRECT and INFERENTIAL on a pair that involves approximate or hedged values: choose INFERENTIAL. This does not apply to an affirm-vs-deny pair, which is DIRECT.
 - Torn between INFERENTIAL and FALSE_POSITIVE: ask "Could a person with an imperfect memory reasonably say both statements?" If yes, FALSE_POSITIVE. This is only a compatibility check, not a judgment that the witness is honest.
 
 
@@ -78,7 +82,7 @@ Never build an inference from outside assumptions about normal behavior, how mem
 
 ### DIRECT
 
-Explicitly incompatible assertions about the same issue, and the conflict survives every hedge read in the witness's favor.
+The statements affirm and deny the same fact, or give different exact values for it, and the conflict does not depend on comparing approximate values. Hedges about how sure the witness is do not change this label; the application's confidence score accounts for them.
 
 Example (unhedged):
 
@@ -92,10 +96,22 @@ Example (negation):
 - T2: "I signed the lease in May."
 - DIRECT. One denies what the other asserts.
 
+Example (absolute claim vs. hedged contrary statement):
+
+- T1: "I was at the office all day Friday."
+- T2: "I think I left the office around noon on Friday."
+- DIRECT. "All day" and leaving at noon cannot both be true. The hedges concern how sure the witness is, and the conflict does not depend on comparing approximate ranges.
+
+Example (hedge about a different fact):
+
+- T1: "I'd never heard of the vendor."
+- T2: "I knew of the vendor. I don't think I ever met him."
+- DIRECT. One denies knowing of the vendor and the other affirms it. The hedge concerns a different fact (meeting him).
+
 
 ### INFERENTIAL
 
-No explicit denial, but the implications cannot both be true, or the conflict only appears after reasoning about ranges, timelines, or hedged values.
+No explicit denial, but the implications cannot both be true, or the conflict only appears after reasoning about ranges, timelines, or approximate values.
 
 Example (unhedged, timeline):
 
@@ -103,11 +119,11 @@ Example (unhedged, timeline):
 - T2: "I had a dentist appointment at 1 that Friday."
 - INFERENTIAL. Neither statement denies the other, but the timelines cannot both hold.
 
-Example (hedged vs. hedged, ranges do not overlap):
+Example (approximate vs. approximate, ranges do not overlap):
 
 - T1: "I think there were about ten people there."
 - T2: "Maybe three or four people were there."
-- INFERENTIAL. Both are hedged, and the approximate ranges do not plausibly overlap. The conflict requires interpreting uncertain statements, so it is not DIRECT.
+- INFERENTIAL. Both quantities are approximate, and the ranges do not plausibly overlap. The conflict requires interpreting uncertain values, so it is not DIRECT.
 
 Example (claimed ignorance vs. shown familiarity):
 
@@ -132,7 +148,7 @@ Example (different scope):
 - T2: "I've parked outside the storage facility."
 - FALSE_POSITIVE. Parking outside a facility does not establish entering a specific unit.
 
-Example (hedged vs. hedged, ranges overlap):
+Example (approximate vs. approximate, ranges overlap):
 
 - T1: "I think it was Monday."
 - T2: "Maybe Monday or Tuesday."
@@ -234,7 +250,7 @@ Top-level structure:
 2. What Claim 1 says.
 3. What Claim 2 says.
 4. Whether both can reasonably be true.
-5. Whether any conflict is explicit or requires inference, and whether any hedge affects that.
+5. Whether any conflict is explicit or requires inference, and whether any approximate value affects that.
 6. Why the chosen type follows.
 
 Allowed values:
@@ -320,8 +336,8 @@ Before returning, confirm:
 1. Every shared topic was reviewed and appears in `topicsReviewed`.
 2. Each claim's `original` comes from the right transcript and is the witness's exact words.
 3. Every non-null literal field and every qualifier appears verbatim in its own `original`.
-4. DIRECT was used only if the conflict survives every hedge read in the witness's favor; hedged range-comparison conflicts are INFERENTIAL.
-5. Torn DIRECT/INFERENTIAL cases were labeled INFERENTIAL; torn INFERENTIAL/FALSE_POSITIVE cases got the imperfect-memory check.
+4. Affirm-vs-deny pairs and exact-value conflicts were labeled DIRECT, even when the witness hedged about whether the event happened. Conflicts that depend on comparing approximate values were labeled INFERENTIAL.
+5. Torn DIRECT/INFERENTIAL cases involving approximate values were labeled INFERENTIAL; torn INFERENTIAL/FALSE_POSITIVE cases got the imperfect-memory check.
 6. Each distinct factual issue is reported once.
 7. No outside assumptions, no credibility or intent judgments, no confidence numbers.
 8. Output is valid JSON with `reasoning` before `type` and `severity`.

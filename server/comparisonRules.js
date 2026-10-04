@@ -5,47 +5,35 @@ export function parseTime(timePhrase) {
 
     const text = timePhrase.toLowerCase().trim();
 
-    // Explicitly known times
-    if (text.includes("midnight")) {
-        return [0];
-    }
-
-    if (text.includes("noon")) {
-        return [12 * 60];
-    }
-
-    // Do not interpret vague periods as exact times
+    // Do not interpret dates or durations as times.
     if (
-        text.includes("morning") ||
-        text.includes("afternoon") ||
-        text.includes("evening") ||
-        text.includes("night")
+        /\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b/.test(text) ||
+        /\b\d+\s*(?:seconds?|minutes?|hours?|days?)\b/.test(text)
     ) {
         return null;
     }
 
-    // Accept times with or without AM/PM.
-    const matches = [
-        ...text.matchAll(
-            /\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/g
-        )
-    ];
-
-    if (matches.length === 0) {
-        return null;
+    // Whole-word matching only.
+    if (/\bmidnight\b/.test(text)) {
+        return 0;
     }
 
-    const times = [];
+    if (/\bnoon\b/.test(text)) {
+        return 12 * 60;
+    }
 
-    for (const match of matches) {
+    const matches = [];
+
+    // Explicit times: 7pm, 7:30pm, 10:00am
+    const explicitRegex =
+        /\b(1[0-2]|[1-9])(?::([0-5]\d))?\s*(am|pm)\b/g;
+
+    let match;
+
+    while ((match = explicitRegex.exec(text)) !== null) {
         let hour = Number(match[1]);
         const minute = match[2] ? Number(match[2]) : 0;
         const period = match[3];
-
-        // Invalid clock times
-        if (hour < 1 || hour > 12 || minute > 59) {
-            continue;
-        }
 
         if (period === "pm" && hour !== 12) {
             hour += 12;
@@ -55,38 +43,46 @@ export function parseTime(timePhrase) {
             hour = 0;
         }
 
-        if (period === undefined) {
-            // Without AM/PM, both possibilities are possible.
-            times.push(hour * 60 + minute);
-            
-            if (hour !== 12) {
-                times.push((hour + 12) * 60 + minute);
+        matches.push(hour * 60 + minute);
+    }
+
+    // If no explicit meridiem was provided, accept simple clock numbers
+    // such as "around 7" or "around 10, maybe 10:30".
+    if (matches.length === 0) {
+        const numberRegex = /\b(1[0-2]|[1-9])(?::([0-5]\d))?\b/g;
+
+        while ((match = numberRegex.exec(text)) !== null) {
+            const numberStart = match.index;
+            const before = text.slice(
+                Math.max(0, numberStart - 20),
+                numberStart
+            );
+
+            // Reject numbers clearly belonging to dates/durations.
+            if (
+                /\b(?:november|december|january|february|march|april|may|june|july|august|september|october)\s*$/.test(before) ||
+                /\b(?:\d+\s*)$/.test(before) &&
+                /\b(?:minutes?|hours?|seconds?|days?)\s*$/.test(text.slice(match.index + match[0].length))
+            ) {
+                continue;
             }
-        } else {
-            times.push(hour * 60 + minute);
+
+            const hour = Number(match[1]);
+            const minute = match[2]
+                ? Number(match[2])
+                : 0;
+
+            matches.push(hour * 60 + minute);
         }
     }
 
-    if (times.length === 0) {
+    if (matches.length === 0) {
         return null;
     }
 
-    return [...new Set(times)];
-}
-
-function hasApproximation(timePhrase) {
-    if (timePhrase === null) {
-        return false;
-    }
-
-    const text = timePhrase.toLowerCase();
-
-    return (
-        text.includes("around") ||
-        text.includes("about") ||
-        text.includes("approximately") ||
-        text.includes("roughly")
-    );
+    // Keep all discovered times so compareTimes can treat multiple
+    // times as a range.
+    return matches;
 }
 
 
@@ -98,24 +94,14 @@ export function hasNegation(text) {
         return false;
     }
 
-    const lower = text.toLowerCase();
+    const normalized = text.toLowerCase();
 
-    const negativePhrases = [
-        "never",
-        "no",
-        "not",
-        "didn't",
-        "did not",
-        "don't",
-        "do not",
-        "hadn't",
-        "had not",
-        "haven't",
-        "have not"
-    ];
-
-    return negativePhrases.some(phrase =>
-        lower.includes(phrase)
+    return (
+        /\bno\b/.test(normalized) ||
+        /\bnot\b/.test(normalized) ||
+        /\bnever\b/.test(normalized) ||
+        /\bneither\b/.test(normalized) ||
+        /\bn't\b/.test(normalized)
     );
 }
 
@@ -156,6 +142,167 @@ export function activitiesAreComparable(fact1, fact2) {
     }
 
     return false;
+}
+
+function splitIntoSentences(text) {
+    if (!text) {
+        return [];
+    }
+
+    return text
+        .split(/[.!?]+/)
+        .map(sentence => sentence.trim())
+        .filter(Boolean);
+}
+
+function extractKnowledgeClaims(sentences) {
+    const claims = [];
+
+    for (const sentence of sentences) {
+        const text = sentence.toLowerCase().trim();
+
+        // Hedged negation is intentionally unclear.
+        if (
+            /\b(?:i|we|he|she|they)\s+(?:don't|do not|didn't|did not|doesn't|does not)\s+think\b/.test(text)
+        ) {
+            if (
+                /\b(?:met|meet|heard|know|knew)\b/.test(
+                    text
+                )
+            ) {
+                claims.push({
+                    family:
+                        /\b(?:met|meet)\b/.test(text)
+                            ? "meet"
+                            : "know",
+                    unclear: true
+                });
+
+                continue;
+            }
+        }
+
+        // HEAR / KNOW family.
+        if (
+            /\bnever heard of\b/.test(text) ||
+            /\bhad never heard of\b/.test(text) ||
+            /\bdidn't know\b/.test(text) ||
+            /\bdid not know\b/.test(text) ||
+            /\bnever knew\b/.test(text)
+        ) {
+            claims.push({
+                family: "know",
+                denial: true,
+                affirmation: false,
+                unclear: false
+            });
+        }
+
+        if (
+            /\bknew of\b/.test(text) ||
+            /\bknew him\b/.test(text) ||
+            /\bknew her\b/.test(text) ||
+            /\bknew them\b/.test(text)
+        ) {
+            claims.push({
+                family: "know",
+                denial: false,
+                affirmation: true,
+                unclear: false
+            });
+        }
+
+        // MEET family.
+        if (
+            /\bnever met\b/.test(text) ||
+            /\bhad never met\b/.test(text) ||
+            /\bdidn't meet\b/.test(text) ||
+            /\bdid not meet\b/.test(text)
+        ) {
+            claims.push({
+                family: "meet",
+                denial: true,
+                affirmation: false,
+                unclear: false
+            });
+        }
+
+        if (
+            /\bhad met\b/.test(text) ||
+            /\bi met\b/.test(text)
+        ) {
+            claims.push({
+                family: "meet",
+                denial: false,
+                affirmation: true,
+                unclear: false
+            });
+        }
+    }
+
+    return claims;
+}
+
+
+
+export function scoreKnowledgeEvidence(
+    fact1,
+    fact2
+) {
+    const sentences1 =
+        splitIntoSentences(fact1.original);
+
+    const sentences2 =
+        splitIntoSentences(fact2.original);
+
+    const claims1 =
+        extractKnowledgeClaims(sentences1);
+
+    const claims2 =
+        extractKnowledgeClaims(sentences2);
+
+    if (
+        claims1.length === 0 ||
+        claims2.length === 0
+    ) {
+        return null;
+    }
+
+    for (const claim1 of claims1) {
+        for (const claim2 of claims2) {
+
+            // Never treat hedged-negated statements
+            // as deterministic evidence.
+            if (
+                claim1.unclear ||
+                claim2.unclear
+            ) {
+                continue;
+            }
+
+            if (
+                claim1.family !== claim2.family
+            ) {
+                continue;
+            }
+
+            if (
+                claim1.denial &&
+                claim2.affirmation
+            ) {
+                return 1;
+            }
+
+            if (
+                claim2.denial &&
+                claim1.affirmation
+            ) {
+                return 1;
+            }
+        }
+    }
+
+    return null;
 }
 
 export function scoreStateEvidence(fact1, fact2) {
@@ -281,38 +428,175 @@ export function compareActivities(activity1, activity2) {
     return "DIFFERENT";
 }
 
-// Time difference thresholds:
-// Exact: 0-30 = compatible, 31-60 = possible conflict, 61+ = conflict
-// Approximate: 0-45 = compatible, 46-90 = possible conflict, 91+ = conflict
-export function compareTimes(time1, time2) {
-    const minutes1 = parseTime(time1);
-    const minutes2 = parseTime(time2);
 
-    if (minutes1 === null || minutes2 === null) {
+
+function parseTimeWithPeriod(
+    text,
+    assumedPeriod
+) {
+    const result = parseTime(text);
+
+    if (result === null) {
+        return null;
+    }
+
+    const values = Array.isArray(result)
+        ? result
+        : [result];
+
+    if (assumedPeriod === null) {
+        return values;
+    }
+
+    /*
+     * parseTime already converted explicit AM/PM times.
+     * Only apply the assumed period to numbers that did not
+     * explicitly contain a meridiem.
+     */
+    if (/(?:\b|\d)(?:am|pm)\b/.test(text)) {
+        return values;
+    }
+
+    return values.map(minutes => {
+        let hour = Math.floor(minutes / 60);
+        const minute = minutes % 60;
+
+        if (assumedPeriod === "pm" && hour !== 12) {
+            hour += 12;
+        }
+
+        if (assumedPeriod === "am" && hour === 12) {
+            hour = 0;
+        }
+
+        return hour * 60 + minute;
+    });
+}
+
+function compareTimesWithPeriod(
+    text1,
+    text2,
+    assumedPeriod
+) {
+    const times1 = parseTimeWithPeriod(
+        text1,
+        assumedPeriod
+    );
+
+    const times2 = parseTimeWithPeriod(
+        text2,
+        assumedPeriod
+    );
+
+    if (times1 === null || times2 === null) {
         return "UNKNOWN";
     }
 
-    // Check every possible interpretation of each time.
-    for (const firstTime of minutes1) {
-        for (const secondTime of minutes2) {
-            let difference = Math.abs(firstTime - secondTime);
+    /*
+     * Multiple times represent a range.
+     * Compare the closest pair of endpoints.
+     */
+    let nearestDifference = Infinity;
 
-            // Handle times across midnight.
+    for (const t1 of times1) {
+        for (const t2 of times2) {
+            let difference = Math.abs(t1 - t2);
+
             difference = Math.min(
                 difference,
                 1440 - difference
             );
 
-            // If any plausible interpretations are close,
-            // the statements are compatible.
-            if (difference <= 60) {
-                return "COMPATIBLE";
-            }
+            nearestDifference = Math.min(
+                nearestDifference,
+                difference
+            );
         }
     }
 
-    // Every plausible interpretation is more than an hour apart.
+    if (nearestDifference === 0) {
+        return "COMPATIBLE";
+    }
+
+    // Close times are compatible.
+    if (nearestDifference <= 30) {
+        return "COMPATIBLE";
+    }
+
     return "POSSIBLE_CONFLICT";
+}
+
+// Time difference thresholds:
+// Exact: 0-30 = compatible, 31-60 = possible conflict, 61+ = conflict
+// Approximate: 0-45 = compatible, 46-90 = possible conflict, 91+ = conflict
+export function compareTimes(time1, time2) {
+    if (time1 === null || time2 === null) {
+        return "UNKNOWN";
+    }
+
+    const text1 = time1.toLowerCase().trim();
+    const text2 = time2.toLowerCase().trim();
+
+    const hasMeridiem1 = /(?:\b|\d)(?:am|pm)\b/.test(text1);
+    const hasMeridiem2 = /(?:\b|\d)(?:am|pm)\b/.test(text2);
+
+    /*
+     * If neither side explicitly gives am/pm, there are two possible
+     * interpretations: both AM or both PM.
+     */
+    if (!hasMeridiem1 && !hasMeridiem2) {
+        const amResult = compareTimesWithPeriod(
+            text1,
+            text2,
+            "am"
+        );
+
+        const pmResult = compareTimesWithPeriod(
+            text1,
+            text2,
+            "pm"
+        );
+
+        if (amResult === pmResult) {
+            return amResult;
+        }
+
+        return "UNKNOWN";
+    }
+
+    /*
+     * If only one side has am/pm, assume the other side uses
+     * the same meridiem.
+     */
+    if (hasMeridiem1 && !hasMeridiem2) {
+        const period = /(?:\b|\d)am\b/.test(text1)
+            ? "am"
+            : "pm";
+
+        return compareTimesWithPeriod(
+            text1,
+            text2,
+            period
+        );
+    }
+
+    if (!hasMeridiem1 && hasMeridiem2) {
+        const period = /(?:\b|\d)am\b/.test(text2)
+            ? "am"
+            : "pm";
+
+        return compareTimesWithPeriod(
+            text1,
+            text2,
+            period
+        );
+    }
+
+    return compareTimesWithPeriod(
+        text1,
+        text2,
+        null
+    );
 }
 
 
@@ -324,9 +608,14 @@ export function compareLocations(location1, location2) {
         return "UNKNOWN";
     }
 
-    // Ignore capitalization and extra spaces when comparing locations
-    const loc1 = location1.toLowerCase().trim();
-    const loc2 = location2.toLowerCase().trim();
+    const normalize = location => location
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .trim()
+        .replace(/^(?:(?:at|the|my|in)\s+)+/, "")
+        .replace(/\s+/g, " ");
+    const loc1 = normalize(location1);
+    const loc2 = normalize(location2);
 
     if (loc1 === loc2) {
         return "SAME";
@@ -460,26 +749,44 @@ export function scoreQuantityEvidence(fact1, fact2) {
 
 // Determine whether location and activity together provide
 // deterministic evidence of a contradiction.
-export function scoreLocationActivityEvidence(fact1, fact2) {
+export function scoreLocationActivityEvidence(
+    fact1,
+    fact2
+) {
+    // Do not infer a location/activity contradiction from
+    // an explicitly negated activity.
+    if (
+        hasNegation(fact1.activity) ||
+        hasNegation(fact2.activity)
+    ) {
+        return null;
+    }
 
-    const location1 = fact1.location?.toLowerCase().trim() || "";
-    const location2 = fact2.location?.toLowerCase().trim() || "";
+    const location1 =
+        fact1.location?.toLowerCase().trim() || "";
 
-    const activity1 = fact1.activity?.toLowerCase().trim() || "";
-    const activity2 = fact2.activity?.toLowerCase().trim() || "";
+    const location2 =
+        fact2.location?.toLowerCase().trim() || "";
 
-    const home1 = location1.includes("home");
-    const home2 = location2.includes("home");
+    const activity1 =
+        fact1.activity?.toLowerCase().trim() || "";
+
+    const activity2 =
+        fact2.activity?.toLowerCase().trim() || "";
+
+    // "home" must be a whole word.
+    const home1 = /\bhome\b/.test(location1);
+    const home2 = /\bhome\b/.test(location2);
 
     const wentOut1 =
-        activity1.includes("went out") ||
-        activity1.includes("left home") ||
-        activity1.includes("left the house");
+        /\bwent out\b/.test(activity1) ||
+        /\bleft home\b/.test(activity1) ||
+        /\bleft the house\b/.test(activity1);
 
     const wentOut2 =
-        activity2.includes("went out") ||
-        activity2.includes("left home") ||
-        activity2.includes("left the house");
+        /\bwent out\b/.test(activity2) ||
+        /\bleft home\b/.test(activity2) ||
+        /\bleft the house\b/.test(activity2);
 
     if (home1 && wentOut2) {
         return 1;
@@ -498,130 +805,145 @@ export function scoreLocationActivityEvidence(fact1, fact2) {
 export function calculateEvidenceScore(fact1, fact2) {
     const comparisons = compareFacts(fact1, fact2);
 
-    const scores = [];
+    const details = [
+        { rule: "time", score: scoreTimeEvidence(comparisons.time) },
+        { rule: "quantity", score: scoreQuantityEvidence(fact1, fact2) },
+        { rule: "activity polarity", score: scoreActivityEvidence(fact1, fact2) },
+        { rule: "state", score: scoreStateEvidence(fact1, fact2) },
+        { rule: "knowledge", score: scoreKnowledgeEvidence(fact1, fact2) },
+        { rule: "location+activity", score: scoreLocationActivityEvidence(fact1, fact2) }
+    ].filter(detail => detail.score !== null);
 
-    // Time evidence
-    const timeScore = scoreTimeEvidence(comparisons.time);
+    return {
+        score: details.length === 0
+            ? null
+            : details.reduce((sum, detail) => sum + detail.score, 0) / details.length,
+        details
+    };
+}
 
-    if (timeScore !== null) {
-        scores.push(timeScore);
+// Report disagreements without changing the AI's classification.
+export function reconcile(type, evidenceScore, evidenceDetails, comparisons) {
+    const reasons = [];
+    // Comparisons are supplied for context; only scored rules justify a flag.
+    void comparisons;
+
+    if (type === "FALSE_POSITIVE" && evidenceScore >= 0.5) {
+        reasons.push("Code found conflict evidence; AI dismissed it");
     }
-
-    // Quantity evidence
-    const quantityScore = scoreQuantityEvidence(fact1, fact2);
-
-    if (quantityScore !== null) {
-        scores.push(quantityScore);
+    if (type === "INFERENTIAL" && evidenceDetails.some(
+        detail => detail.rule !== "time" && detail.score === 1
+    )) {
+        reasons.push("Code found an explicit conflict; AI labeled it inferential");
     }
-
-    // Activity evidence
-    const activityScore = scoreActivityEvidence(fact1, fact2);
-
-    if (activityScore !== null) {
-        scores.push(activityScore);
+    if ((type === "DIRECT" || type === "INFERENTIAL") && evidenceScore === 0) {
+        reasons.push("All comparable evidence was compatible; AI labeled it a contradiction");
     }
-
-    // State evidence
-    const stateScore = scoreStateEvidence(fact1, fact2);
-
-    if (stateScore !== null) {
-        scores.push(stateScore);
-    }
-
-    // Location + activity evidence
-    const locationActivityScore =
-        scoreLocationActivityEvidence(fact1, fact2);
-
-    if (locationActivityScore !== null) {
-        scores.push(locationActivityScore);
-    }
-
-    // If there is no deterministic evidence we can safely score,
-    // do not pretend that we know.
-    if (scores.length === 0) {
-        return null;
-    }
-
-    // Average only the evidence categories that were actually usable.
-    const total = scores.reduce(
-        (sum, score) => sum + score,
-        0
-    );
-
-    return total / scores.length;
+    return { flag: reasons.length ? "REVIEW" : "NONE", reasons };
 }
 
 // Calculate how much of the testimony our deterministic
 // system was actually able to evaluate
-export function calculateEvidenceCoverage(fact1, fact2) {
+export function calculateEvidenceCoverage(
+    fact1,
+    fact2
+) {
     let availableEvidence = 0;
     let totalEvidence = 0;
 
     // Time
-    // Only count time as available if both times can actually
-    // be deterministically compared.
     if (
-        fact1.time !== null &&
-        fact2.time !== null &&
-        compareTimes(fact1.time, fact2.time) !== "UNKNOWN"
+        fact1.time !== null ||
+        fact2.time !== null
     ) {
         totalEvidence++;
-        availableEvidence++;
+
+        const score = scoreTimeEvidence(
+            compareTimes(
+                fact1.time,
+                fact2.time
+            )
+        );
+
+        if (score !== null) {
+            availableEvidence++;
+        }
     }
 
     // Quantity
-    // Only count quantity when both claims describe the same object.
-    if (fact1.quantity !== null || fact2.quantity !== null) {
-        if (quantitiesAreComparable(fact1, fact2)) {
-            totalEvidence++;
+    if (
+        fact1.quantity !== null ||
+        fact2.quantity !== null
+    ) {
+        totalEvidence++;
+
+        const score = scoreQuantityEvidence(
+            fact1,
+            fact2
+        );
+
+        if (score !== null) {
             availableEvidence++;
         }
     }
 
     // Activity
-    // Only count activity when our deterministic activity
-    // comparison can actually be performed.
-    if (fact1.activity !== null || fact2.activity !== null) {
-        if (activitiesAreComparable(fact1, fact2)) {
-            totalEvidence++;
+    if (
+        fact1.activity !== null ||
+        fact2.activity !== null
+    ) {
+        totalEvidence++;
+
+        const score = scoreActivityEvidence(
+            fact1,
+            fact2
+        );
+
+        if (score !== null) {
             availableEvidence++;
         }
     }
-
-    // Location
-    // Location by itself is not currently used to calculate
-    // evidenceScore, so do not count it toward coverage.
-    // It is used through location + activity evidence below.
 
     // Location + activity
     if (
-        (fact1.location !== null && fact2.activity !== null) ||
-        (fact2.location !== null && fact1.activity !== null)
+        (fact1.location !== null &&
+            fact2.activity !== null) ||
+        (fact2.location !== null &&
+            fact1.activity !== null)
     ) {
-        const locationActivityScore =
-            scoreLocationActivityEvidence(fact1, fact2);
+        totalEvidence++;
 
-        if (locationActivityScore !== null) {
-            totalEvidence++;
+        const score =
+            scoreLocationActivityEvidence(
+                fact1,
+                fact2
+            );
+
+        if (score !== null) {
             availableEvidence++;
         }
     }
 
-    // State
-    // Count state when both claims provide a state that
-    // our deterministic system can compare.
+    // Knowledge/contact
     if (
-        fact1.state !== null &&
-        fact2.state !== null
+        fact1.original !== null &&
+        fact2.original !== null
     ) {
-        const stateScore =
-            scoreStateEvidence(fact1, fact2);
+        totalEvidence++;
 
-        if (stateScore !== null) {
-            totalEvidence++;
+        const score =
+            scoreKnowledgeEvidence(
+                fact1,
+                fact2
+            );
+
+        if (score !== null) {
             availableEvidence++;
         }
     }
+
+    // State has no scorer, so it is intentionally
+    // excluded from coverage.
 
     if (totalEvidence === 0) {
         return 0;

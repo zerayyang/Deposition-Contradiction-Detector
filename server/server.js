@@ -7,7 +7,9 @@ import { validateClaim } from "./evidenceValidator.js";
 import { TestimonyFact } from "./TestimonyFact.js";
 import {
     calculateEvidenceScore,
-    calculateEvidenceCoverage
+    calculateEvidenceCoverage,
+    compareFacts,
+    reconcile
 } from "./comparisonRules.js";
 
 const AI_INSTRUCTIONS = fs.readFileSync(
@@ -140,7 +142,10 @@ Analyze these two depositions according to the provided instructions.
                     contradiction.claim2
                 );
 
-                const evidenceScore =
+                console.log("Fact 1:", fact1);
+                console.log("Fact 2:", fact2);
+
+                const { score: evidenceScore, details: evidenceDetails } =
                     calculateEvidenceScore(
                         fact1,
                         fact2
@@ -152,8 +157,6 @@ Analyze these two depositions according to the provided instructions.
                         fact2
                     );
 
-                console.log("Fact 1:", fact1);
-                console.log("Fact 2:", fact2);
                 console.log(
                     "Evidence score:",
                     evidenceScore
@@ -164,20 +167,49 @@ Analyze these two depositions according to the provided instructions.
                     evidenceCoverage
                 );
 
-                const humanConfidence =
+                const confidence =
                     calculateHumanConfidence(
                         contradiction.claim1.original,
                         contradiction.claim2.original,
                         evidenceScore,
-                        evidenceCoverage
+                        evidenceCoverage,
+                        evidenceDetails
                     );
+
+                const comparisons = compareFacts(
+                    fact1,
+                    fact2
+                );
+
+                const reconciliation = reconcile(
+                    contradiction.type, evidenceScore, evidenceDetails, comparisons
+                );
+                console.log("Reconciliation flag:", reconciliation.flag, "Reasons:", reconciliation.reasons);
 
                 return {
                     ...contradiction,
+
                     claim1Valid,
                     claim2Valid,
-                    humanConfidence,
-                    evidenceCoverage
+
+                    // Keep humanConfidence as a number
+                    // so existing frontend code does not break.
+                    humanConfidence: confidence.score,
+
+                    // Additional confidence information.
+                    evidenceScore: confidence.evidenceScore,
+                    evidenceDetails: confidence.evidenceDetails,
+                    coverageCapped: confidence.coverageCapped,
+                    coverageCap: confidence.coverageCap,
+                    flag: reconciliation.flag,
+                    reasons: reconciliation.reasons,
+                    languageScore: confidence.languageScore,
+                    basis: confidence.basis,
+
+                    evidenceCoverage,
+
+                    // Deterministic comparisons.
+                    comparisons
                 };
             }
         );

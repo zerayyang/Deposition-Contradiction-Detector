@@ -269,7 +269,8 @@ export function calculateHumanConfidence(
     claim1,
     claim2,
     evidenceScore,
-    evidenceCoverage
+    evidenceCoverage,
+    evidenceDetails = []
 ) {
 
     const languageScore = calculateLanguageScore(
@@ -281,12 +282,14 @@ export function calculateHumanConfidence(
     const LANGUAGE_WEIGHT = 0.30;
 
     let finalScore;
+    let weightedScore = null;
+    let coverageCap = null;
 
     // If deterministic evidence is available,
     // use the normal 70/30 weighting.
     if (evidenceScore !== null) {
 
-        const weightedScore =
+        weightedScore =
             (evidenceScore * EVIDENCE_WEIGHT) +
             (languageScore * LANGUAGE_WEIGHT);
 
@@ -304,6 +307,7 @@ export function calculateHumanConfidence(
             maximumConfidence = 0.55;
         }
 
+        coverageCap = maximumConfidence;
         finalScore = Math.min(
             weightedScore,
             maximumConfidence
@@ -322,6 +326,16 @@ export function calculateHumanConfidence(
     // Convert from 0-1 to 0-100
     finalScore *= 100;
 
-    return Math.round(finalScore);
+    return {
+    score: Math.round(finalScore),
+    languageScore,
+    evidenceScore,
+    evidenceDetails,
+    coverageCapped: weightedScore !== null && weightedScore > coverageCap,
+    coverageCap: coverageCap === null ? null : Math.round(coverageCap * 100),
+    basis: evidenceScore !== null
+        ? "EVIDENCE"
+        : "LANGUAGE_ONLY"
 }
 
+}
