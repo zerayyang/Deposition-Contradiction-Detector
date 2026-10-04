@@ -107,21 +107,7 @@ export function normalizeActivity(activity) {
         return null;
     }
 
-    let normalized = activity.toLowerCase().trim();
-
-    const negativePhrases = [
-        "did not ",
-        "didn't ",
-        "never ",
-        "not ",
-        "no "
-    ];
-
-    for (const phrase of negativePhrases) {
-        normalized = normalized.replace(phrase, "");
-    }
-
-    return normalized.trim();
+    return activity.toLowerCase().trim();
 }
 
 
@@ -185,8 +171,8 @@ export function scoreActivityEvidence(fact1, fact2) {
 
 // Compare activities stated in two pieces of testimony
 export function compareActivities(activity1, activity2) {
-
-    // If either activity is missing, there is not enough evidence to compare
+    // If either activity is missing, there is not enough evidence
+    // to make a deterministic comparison.
     if (activity1 === null || activity2 === null) {
         return "UNKNOWN";
     }
@@ -199,12 +185,42 @@ export function compareActivities(activity1, activity2) {
         return "SAME";
     }
 
+    // Compatible statements about remaining/staying at home
+    const stayedHome1 =
+        act1.includes("at home") ||
+        act1.includes("stayed home") ||
+        act1.includes("staying home");
+
+    const stayedHome2 =
+        act2.includes("at home") ||
+        act2.includes("stayed home") ||
+        act2.includes("staying home");
+
+    const neverLeft1 =
+        act1.includes("never left") ||
+        act1.includes("did not leave") ||
+        act1.includes("didn't leave");
+
+    const neverLeft2 =
+        act2.includes("never left") ||
+        act2.includes("did not leave") ||
+        act2.includes("didn't leave");
+
+    if (
+        (stayedHome1 && neverLeft2) ||
+        (stayedHome2 && neverLeft1)
+    ) {
+        return "SAME";
+    }
+
     // Obvious opposite activity statements
     const oppositePairs = [
         ["entered", "never entered"],
         ["entered", "did not enter"],
+        ["entered", "didn't enter"],
         ["met", "never met"],
         ["met", "did not meet"],
+        ["met", "didn't meet"],
         ["stayed home", "went out"],
         ["staying home", "going out"],
         ["asleep", "awake"],
@@ -212,7 +228,6 @@ export function compareActivities(activity1, activity2) {
     ];
 
     for (const [first, second] of oppositePairs) {
-
         if (
             (act1.includes(first) && act2.includes(second)) ||
             (act1.includes(second) && act2.includes(first))
@@ -224,7 +239,6 @@ export function compareActivities(activity1, activity2) {
     // Different activities do not automatically mean contradiction
     return "DIFFERENT";
 }
-
 
 // Time difference thresholds:
 // Exact: 0-30 = compatible, 31-60 = possible conflict, 61+ = conflict
@@ -588,6 +602,27 @@ const activityTest2 = {
 
 
 
-console.log("TEST 1:", compareTimes("7pm", "7pm"));
-console.log("TEST 2:", compareTimes("7pm", "7:30pm"));
-console.log("TEST 3:", compareTimes("around 7", "7:30pm"));
+console.log(normalizeActivity("I never left the house"));
+console.log(normalizeActivity("I left the house"));
+console.log(normalizeActivity("I did not leave the house"));
+
+
+console.log(compareActivities(
+    "I was at home all evening",
+    "I never left the house"
+));
+
+console.log(compareActivities(
+    "I stayed home",
+    "I went out"
+));
+
+console.log(compareActivities(
+    "I was asleep",
+    "I was awake"
+));
+
+console.log(compareActivities(
+    "I watched television",
+    "I ordered pizza"
+));
