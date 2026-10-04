@@ -7,14 +7,14 @@ export function parseTime(timePhrase) {
 
     // Explicitly known times
     if (text.includes("midnight")) {
-        return 0;
+        return [0];
     }
 
     if (text.includes("noon")) {
-        return 12 * 60;
+        return [12 * 60];
     }
 
-    // Do not try to interpret vague periods as exact times
+    // Do not interpret vague periods as exact times
     if (
         text.includes("morning") ||
         text.includes("afternoon") ||
@@ -24,34 +24,54 @@ export function parseTime(timePhrase) {
         return null;
     }
 
-    // Only accept a number when it is actually written as a time.
-    // Examples: 7pm, 7:30pm, 10:00am
-    const match = text.match(
-        /\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/
-    );
+    // Accept times with or without AM/PM.
+    const matches = [
+        ...text.matchAll(
+            /\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/g
+        )
+    ];
 
-    if (!match) {
+    if (matches.length === 0) {
         return null;
     }
 
-    let hour = Number(match[1]);
-    const minute = match[2] ? Number(match[2]) : 0;
-    const period = match[3];
+    const times = [];
 
-    // Invalid clock times
-    if (hour < 1 || hour > 12 || minute > 59) {
+    for (const match of matches) {
+        let hour = Number(match[1]);
+        const minute = match[2] ? Number(match[2]) : 0;
+        const period = match[3];
+
+        // Invalid clock times
+        if (hour < 1 || hour > 12 || minute > 59) {
+            continue;
+        }
+
+        if (period === "pm" && hour !== 12) {
+            hour += 12;
+        }
+
+        if (period === "am" && hour === 12) {
+            hour = 0;
+        }
+
+        if (period === undefined) {
+            // Without AM/PM, both possibilities are possible.
+            times.push(hour * 60 + minute);
+            
+            if (hour !== 12) {
+                times.push((hour + 12) * 60 + minute);
+            }
+        } else {
+            times.push(hour * 60 + minute);
+        }
+    }
+
+    if (times.length === 0) {
         return null;
     }
 
-    if (period === "pm" && hour !== 12) {
-        hour += 12;
-    }
-
-    if (period === "am" && hour === 12) {
-        hour = 0;
-    }
-
-    return hour * 60 + minute;
+    return [...new Set(times)];
 }
 
 function hasApproximation(timePhrase) {
@@ -251,19 +271,26 @@ export function compareTimes(time1, time2) {
         return "UNKNOWN";
     }
 
-    let difference = Math.abs(minutes1 - minutes2);
+    // Check every possible interpretation of each time.
+    for (const firstTime of minutes1) {
+        for (const secondTime of minutes2) {
+            let difference = Math.abs(firstTime - secondTime);
 
-    // Handle times across midnight.
-    difference = Math.min(difference, 1440 - difference);
+            // Handle times across midnight.
+            difference = Math.min(
+                difference,
+                1440 - difference
+            );
 
-    // Exact same time
-    if (difference === 0) {
-        return "COMPATIBLE";
+            // If any plausible interpretations are close,
+            // the statements are compatible.
+            if (difference <= 60) {
+                return "COMPATIBLE";
+            }
+        }
     }
 
-    // Different exact times are potentially conflicting,
-    // but JS should not decide that they are definitely
-    // contradictory without a defined tolerance.
+    // Every plausible interpretation is more than an hour apart.
     return "POSSIBLE_CONFLICT";
 }
 
@@ -578,109 +605,3 @@ const activityTest2 = {
     state: null
 };
 
-
-
-console.log(normalizeActivity("I never left the house"));
-console.log(normalizeActivity("I left the house"));
-console.log(normalizeActivity("I did not leave the house"));
-
-
-console.log(compareActivities(
-    "I was at home all evening",
-    "I never left the house"
-));
-
-console.log(compareActivities(
-    "I stayed home",
-    "I went out"
-));
-
-console.log(compareActivities(
-    "I was asleep",
-    "I was awake"
-));
-
-console.log(compareActivities(
-    "I watched television",
-    "I ordered pizza"
-));
-
-console.log(
-    "ACTIVITY COVERAGE:",
-    calculateEvidenceCoverage(
-        {
-            time: null,
-            quantity: null,
-            activity: "I watched TV.",
-            location: null,
-            state: null
-        },
-        {
-            time: null,
-            quantity: null,
-            activity: "I ordered pizza.",
-            location: null,
-            state: null
-        }
-    )
-);
-
-console.log(
-    "SAME ACTIVITY COVERAGE:",
-    calculateEvidenceCoverage(
-        {
-            time: null,
-            quantity: null,
-            activity: "I stayed home.",
-            location: null,
-            state: null
-        },
-        {
-            time: null,
-            quantity: null,
-            activity: "I stayed home.",
-            location: null,
-            state: null
-        }
-    )
-);
-
-console.log(
-    "ACTIVITY COVERAGE:",
-    calculateEvidenceCoverage(
-        {
-            time: null,
-            quantity: null,
-            activity: "I watched TV.",
-            location: null,
-            state: null
-        },
-        {
-            time: null,
-            quantity: null,
-            activity: "I ordered pizza.",
-            location: null,
-            state: null
-        }
-    )
-);
-
-console.log(
-    "SAME ACTIVITY COVERAGE:",
-    calculateEvidenceCoverage(
-        {
-            time: null,
-            quantity: null,
-            activity: "I stayed home.",
-            location: null,
-            state: null
-        },
-        {
-            time: null,
-            quantity: null,
-            activity: "I stayed home.",
-            location: null,
-            state: null
-        }
-    )
-);
