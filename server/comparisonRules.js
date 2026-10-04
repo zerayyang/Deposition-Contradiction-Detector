@@ -505,11 +505,12 @@ export function calculateEvidenceCoverage(fact1, fact2) {
     if (fact1.time !== null || fact2.time !== null) {
         totalEvidence++;
 
-        if (
-            fact1.time !== null &&
-            fact2.time !== null &&
-            compareTimes(fact1.time, fact2.time) !== "UNKNOWN"
-        ) {
+        const timeComparison = compareTimes(
+            fact1.time,
+            fact2.time
+        );
+
+        if (timeComparison !== "UNKNOWN") {
             availableEvidence++;
         }
     }
@@ -527,25 +528,14 @@ export function calculateEvidenceCoverage(fact1, fact2) {
     if (fact1.activity !== null || fact2.activity !== null) {
         totalEvidence++;
 
-        if (activitiesAreComparable(fact1, fact2)) {
-            availableEvidence++;
-        }
-    }
-
-    // Location
-    if (fact1.location !== null || fact2.location !== null) {
-        totalEvidence++;
-
-        if (
-            fact1.location !== null &&
-            fact2.location !== null
-        ) {
+        // Coverage should match what the evidence scorer
+        // can actually evaluate.
+        if (scoreActivityEvidence(fact1, fact2) !== null) {
             availableEvidence++;
         }
     }
 
     // Location + activity
-    // This is usable even when only one claim has a location.
     if (
         (fact1.location !== null && fact2.activity !== null) ||
         (fact2.location !== null && fact1.activity !== null)
@@ -554,18 +544,6 @@ export function calculateEvidenceCoverage(fact1, fact2) {
 
         if (
             scoreLocationActivityEvidence(fact1, fact2) !== null
-        ) {
-            availableEvidence++;
-        }
-    }
-
-    // State
-    if (fact1.state !== null || fact2.state !== null) {
-        totalEvidence++;
-
-        if (
-            fact1.state !== null &&
-            fact2.state !== null
         ) {
             availableEvidence++;
         }
@@ -626,3 +604,83 @@ console.log(compareActivities(
     "I watched television",
     "I ordered pizza"
 ));
+
+console.log(
+    "ACTIVITY COVERAGE:",
+    calculateEvidenceCoverage(
+        {
+            time: null,
+            quantity: null,
+            activity: "I watched TV.",
+            location: null,
+            state: null
+        },
+        {
+            time: null,
+            quantity: null,
+            activity: "I ordered pizza.",
+            location: null,
+            state: null
+        }
+    )
+);
+
+console.log(
+    "SAME ACTIVITY COVERAGE:",
+    calculateEvidenceCoverage(
+        {
+            time: null,
+            quantity: null,
+            activity: "I stayed home.",
+            location: null,
+            state: null
+        },
+        {
+            time: null,
+            quantity: null,
+            activity: "I stayed home.",
+            location: null,
+            state: null
+        }
+    )
+);
+
+console.log(
+    "ACTIVITY COVERAGE:",
+    calculateEvidenceCoverage(
+        {
+            time: null,
+            quantity: null,
+            activity: "I watched TV.",
+            location: null,
+            state: null
+        },
+        {
+            time: null,
+            quantity: null,
+            activity: "I ordered pizza.",
+            location: null,
+            state: null
+        }
+    )
+);
+
+console.log(
+    "SAME ACTIVITY COVERAGE:",
+    calculateEvidenceCoverage(
+        {
+            time: null,
+            quantity: null,
+            activity: "I stayed home.",
+            location: null,
+            state: null
+        },
+        {
+            time: null,
+            quantity: null,
+            activity: "I stayed home.",
+            location: null,
+            state: null
+        }
+    )
+);
