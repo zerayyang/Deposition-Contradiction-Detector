@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { calculateHumanConfidence } from "./confidenceratehuman.js";
+
 
 import {
     parseTime,
@@ -238,54 +238,17 @@ assert.equal(reconcile("INFERENTIAL", 0, [{rule: "time", score: 0}], {}).flag, "
 assert.equal(reconcile("INFERENTIAL", 1, [{rule: "time", score: 1}], {}).flag, "NONE");
 assert.equal(reconcile("DIRECT", null, [], {}).flag, "NONE");
 
-// Details survive confidence calculation, and only actual coverage caps are labeled.
-const knowledgeDetails = [{ rule: "knowledge", score: 1 }];
-const capped = calculateHumanConfidence("I knew of him", "I never heard of him", 1, 0.25, knowledgeDetails);
-assert.equal(capped.score, 85);
-assert.equal(capped.coverageCap, null);
-assert.equal(capped.coverageCapped, false);
-assert.deepEqual(capped.evidenceDetails, knowledgeDetails);
-assert.equal(calculateHumanConfidence("I knew of him", "I never heard of him", 0, 0.25, []).coverageCapped, false);
-assert.equal(calculateHumanConfidence("I knew of him", "I never heard of him", null, 0, []).coverageCapped, false);
-
-// The active API restores 70/30 scoring and never uses the model's opinion.
-const { assessCandidate } = await import("./humanConfidencePipeline.js");
+// Active scoring contracts are covered by scoring/scoring.test.js.
 const { validateClaim } = await import("./evidenceValidator.js");
-const claim = (original, overrides = {}) => ({original, activityPhrase: null,
-    timePhrase: null, locationPhrase: null, personPhrase: null, objectPhrase: null,
-    quantityPhrase: null, statePhrase: null, qualifierPhrases: [], ...overrides});
+const claim = (original, overrides = {}) => ({original, activityPhrase:null,timePhrase:null,
+    locationPhrase:null,personPhrase:null,objectPhrase:null,quantityPhrase:null,statePhrase:null,
+    qualifierPhrases:[],...overrides});
 const homeQuote = "I was at home all evening.";
-const outQuote = "I think I went out briefly to get some groceries, maybe around 7:30, but came right back.";
-const candidate = {type: "DIRECT", severity: "HIGH", reasoning: "Model opinion",
-    claim1: claim(homeQuote, {locationPhrase: "at home", qualifierPhrases: ["all"]}),
-    claim2: claim(outQuote, {activityPhrase: "went out briefly to get some groceries", qualifierPhrases: ["I think", "maybe", "around", "briefly"]})};
-const result = assessCandidate(candidate, homeQuote, outQuote);
-assert.equal(result.humanConfidence, 81);
-assert.equal(result.evidenceScore, 1);
-assert.equal(result.type, "DIRECT");
-assert.equal(result.claim1.original, homeQuote);
-assert.equal(result.claim2.original, outQuote);
-for (const type of ["DIRECT", "INFERENTIAL", "FALSE_POSITIVE"]) {
-    const changed = assessCandidate({...candidate, type, reasoning: "Entirely different opinion", humanConfidence: 99,
-        semanticAssist: {relationship: "MATCH"}}, homeQuote, outQuote);
-    assert.equal(changed.humanConfidence, result.humanConfidence);
-    assert.equal(changed.type, type);
-}
-const invalid = assessCandidate({...candidate, claim1: claim("Invented quote")}, homeQuote, outQuote);
-assert.equal(invalid.humanConfidence, null);
-assert.equal(invalid.basis, "UNVERIFIED");
-assert.equal(invalid.flag, "REVIEW");
-assert.equal(assessCandidate({...candidate, claim1: {original: homeQuote}}, homeQuote, outQuote).humanConfidence, null);
-assert.equal(validateClaim(claim("i was at home all evening."), homeQuote), false);
-assert.equal(compareTimes("midnight", "12pm"), "CONFLICT");
-assert.equal(compareTimes("midnight", "12am"), "COMPATIBLE");
-const sleep1 = "Around 10, maybe 10:30. I had work the next morning.";
-const sleep2 = "It was late. Midnight maybe. I had trouble sleeping.";
-const sleep = assessCandidate({type: "INFERENTIAL", claim1: claim(sleep1, {timePhrase: "Around 10, maybe 10:30"}),
-    claim2: claim(sleep2, {timePhrase: "Midnight"})}, sleep1, sleep2);
-assert.equal(typeof sleep.humanConfidence, "number");
-assert.equal(sleep.evidenceScore, 0.5);
-assert.equal(sleep.type, "INFERENTIAL");
+const { assessCandidate } = await import("./humanConfidencePipeline.js");
+const outQuote = "I think I went out briefly.";
+const candidate = {type:"DIRECT",claim1:claim(homeQuote,{locationPhrase:"at home"}),
+    claim2:claim(outQuote,{activityPhrase:"went out briefly"})};
+const result=assessCandidate(candidate,homeQuote,outQuote);
 const { scoreStateEvidence, scoreActivityEvidence, calculateEvidenceCoverage } = await import("./comparisonRules.js");
 assert.equal(scoreStateEvidence({...fact(""), state:"tired"}, {...fact(""), state:"hungry"}), null);
 assert.equal(scoreStateEvidence({...fact(""), state:"awake"}, {...fact(""), state:"asleep"}), 1);
@@ -296,7 +259,7 @@ assert.equal(scoreLocationActivityEvidence(fact("I was home all evening except f
 const mixed = calculateEvidenceScore({...homeFact, time:"7pm"}, {...groceriesFact, time:"7pm"});
 assert.equal(mixed.score, 1);
 assert.ok(mixed.details.some(detail => detail.score === 0));
-assert.equal(calculateHumanConfidence("I definitely remember", "I clearly remember", 0, 1, []).score, 0);
+
 assert.equal(calculateEvidenceCoverage(homeFact, groceriesFact), 1);
 assert.equal(compareTimes("10pm tonight", "10pm tomorrow"), "UNKNOWN");
 assert.equal(compareTimes("8pm", "8:05pm"), "CONFLICT");

@@ -161,166 +161,55 @@ export default function DepositionChecker() {
     (r) => r?.type === "FALSE_POSITIVE"
   );
 
-  // Step 7:
-  // Never display UNKNOWN as 0 or as a blank value.
-  function getComparisonDisplay(value) {
-    if (value === "UNKNOWN") {
-      return "Could not compare";
-    }
-
-    return value ?? "Could not compare";
-  }
-
-  function getCoverageDisplay(r) {
-    if (
-      r?.evidenceCoverage === null ||
-      r?.evidenceCoverage === undefined
-    ) {
-      return "Could not compare";
-    }
-
-    return `${Math.round(
-      r.evidenceCoverage * 100
-    )}%`;
-  }
-
-  // Steps 6, 7, 8:
-  // Automated evidence panel.
-  function renderEvidencePanel(
-    r,
-    dismissed = false
-  ) {
-    const languageScore =
-      typeof r?.languageScore === "number"
-        ? r.languageScore
-        : null;
-
-    const unverified = r?.basis === "UNVERIFIED";
-    const languageOnlyDismissed = dismissed && r?.basis === "LANGUAGE_ONLY";
-    function fieldCheck(field) {
-      const rules = {
-        location: ["location+activity"],
-        state: ["state"],
-        person: []
-      };
-      const scored = (r?.evidenceDetails ?? []).some(detail => rules[field].includes(detail.rule));
-      return scored ? getComparisonDisplay(r?.comparisons?.[field]) : "Not scored";
-    }
-
+  function renderEvidencePanel(r, dismissed = false) {
+    const notEvaluable = r?.status === "NOT_EVALUABLE";
+    const compatible = r?.status === "COMPATIBLE_SUPPORTED";
+    const reasonLabels = {
+      NO_FACTS: "No supported facts were extracted.",
+      UNSUPPORTED_PATTERN: "The extracted facts are outside the code rule patterns.",
+      MISSING_CONTEXT: "A required person, event, day or time anchor is missing.",
+      UNVERIFIED_SOURCE: "A quote or extracted field failed exact source validation."
+    };
+    const support = (r?.rulesFired ?? []).filter(rule => rule.verdict === "CONFLICT");
+    const context = (r?.rulesFired ?? []).filter(rule => rule.verdict !== "CONFLICT");
     return (
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: 6,
-          padding: 12,
-          marginBottom: 12,
-          textAlign: "left"
-        }}
-      >
-        {needsClarification(r) && r?.flag !== "REVIEW" && (
-          <p style={{ background: "#fffbeb", color: "#92400e", padding: 12, borderRadius: 6 }}>
-            <strong>Needs clarification</strong><br />
-            Missing context limits this assessment. Review the explanation and follow-up question before relying on the classification.
-          </p>
-        )}
-        <div style={{ color: dismissed ? "#666" : "#111" }}>
-          <div>Human confidence (calculated by code)</div>
-          <strong style={{ fontSize: languageOnlyDismissed ? 14 : 28 }}>
-            {unverified
-              ? "Unverified evidence"
-              : languageOnlyDismissed
-              ? "n/a"
-              : typeof r?.humanConfidence === "number"
-                ? `${r.humanConfidence}%`
-                : "Could not compare"}
-          </strong>
-
-          <div style={{ marginTop: 8, fontSize: 14 }}>
-            {(r?.evidenceDetails ?? []).map(({ rule, score }) => {
-              const label = {
-                time: "Time",
-                quantity: "Quantity",
-                "activity polarity": "Activity polarity",
-                state: "State",
-                knowledge: "Knowledge",
-                "location+activity": "Location + activity"
-              }[rule] ?? rule;
-              const outcome = score === 1 ? "conflict" : score === 0 ? "compatible" : "possible conflict";
-              return <div key={rule}>{label} {outcome}: {score.toFixed(1)}</div>;
-            })}
-            <div>
-              Language score: {languageScore !== null ? languageScore.toFixed(2) : "Could not compare"}
-            </div>
-            <div>Applicable rule coverage: {getCoverageDisplay(r)}</div>
-          </div>
-
-          {r?.coverageCapped && (
-            <p style={{ fontSize: 13, marginBottom: 0 }}>
-              Capped at {r.coverageCap}% because only {getCoverageDisplay(r)} of the facts could be compared.
-            </p>
-          )}
-
-          {r?.basis === "LANGUAGE_ONLY" && (
-            <p style={{ fontSize: 13, marginBottom: 0 }}>
-              Language-only estimate: code could not verify a factual conflict.
-            </p>
-          )}
-
-          <p style={{fontSize: 13}}>Heuristic score: 70% evidence + 30% language when evidence is available; not a calibrated probability.</p>
-          {dismissed && (
-            <p style={{ fontSize: 13, marginBottom: 0 }}>
-              This is not a contradiction rating.
-            </p>
-          )}
-        </div>
-
-        {r?.flag === "REVIEW" && (
-          <div role="status" style={{ background: "#fffbeb", border: "1px solid #f59e0b", color: "#92400e", borderRadius: 6, padding: 12, marginTop: 12 }}>
-            <strong>{needsClarification(r) ? "Needs clarification" : "Review recommended"}</strong>
-            <ul>{(r.reasons ?? []).map(reason => <li key={reason}>{reason}</li>)}</ul>
-          </div>
-        )}
-
-        {r?.comparisons && (
-          <div style={{ marginTop: 12 }}>
-            <strong>
-              Field checks
-            </strong>
-
-            <p>
-              Time:{" "}
-              {getComparisonDisplay(
-                r?.comparisons?.time
-              )}
-            </p>
-
-            <p>
-              Activity:{" "}
-              {getComparisonDisplay(
-                r?.comparisons?.activity
-              )}
-            </p>
-
-            <p>
-              Location:{" "}
-              {fieldCheck("location")}
-            </p>
-
-            <p>
-              Quantity:{" "}
-              {getComparisonDisplay(
-                r?.comparisons?.quantity
-              )}
-            </p>
-
-            <p>
-              State:{" "}
-              {fieldCheck("state")}
-            </p>
-            <p>Person: {fieldCheck("person")}</p>
-          </div>
-        )}
-
+      <div style={{ border: "1px solid #ddd", borderRadius: 6, padding: 12, marginBottom: 12, color: dismissed ? "#666" : "#111" }}>
+        <div>Human confidence — heuristic evidence index</div>
+        <strong style={{ fontSize: notEvaluable || compatible || dismissed ? 16 : 28 }}>
+          {notEvaluable ? "Not evaluable by code rules" : compatible ? "No conflict found by code rules" : dismissed
+            ? `${r.band} code support — not a contradiction rating`
+            : `${r.humanConfidence}% · ${r.band}`}
+        </strong>
+        {notEvaluable && <p>{reasonLabels[r.notEvaluableReason] ?? r.notEvaluableReason}</p>}
+        {compatible && <p>Compatibility index: {r.humanConfidence} · {r.band}. This is not a contradiction rating.</p>}
+        <p style={{ fontSize: 13 }}>Deterministic heuristic evidence index, not a probability of contradiction or dishonesty. Claude’s type, severity and reasoning do not affect this score.</p>
+        {support.length > 0 && <div>
+          <strong>Rules that support this score</strong>
+          <ul>{support.map(rule => <li key={rule.id}>{rule.id}: {rule.explanation} Strength {rule.strength.toFixed(2)} ({rule.basis.toLowerCase()}).</li>)}</ul>
+        </div>}
+        {context.length > 0 && <div>
+          <strong>Compatible context — no conflict points</strong>
+          <ul>{context.map(rule => <li key={rule.id}>{rule.id}: {rule.explanation}</li>)}</ul>
+        </div>}
+        {(r.rulesLimiting ?? []).length > 0 && <div>
+          <strong>Rules that limit it</strong>
+          <ul>{r.rulesLimiting.map((rule, i) => <li key={`${rule.id}-${i}`}>{rule.explanation}</li>)}</ul>
+        </div>}
+        {r.commitment && <p>Commitment: claim 1 {r.commitment.claim1.toFixed(2)}, claim 2 {r.commitment.claim2.toFixed(2)}, pair {r.commitment.pair.toFixed(2)}.</p>}
+        {r.languageDetails && <details>
+          <summary>Scoped language details</summary>
+          {["claim1", "claim2"].map((key, i) => <div key={key}>
+            <strong>Claim {i + 1}</strong>
+            <ul>{[...(r.languageDetails[key]?.applied ?? []), ...(r.languageDetails[key]?.ignored ?? [])].map((detail, j) =>
+              <li key={j}>“{detail.phrase}” — {detail.scope.toLowerCase()}, effect {detail.effect.toFixed(2)}. {detail.explanation}</li>)}</ul>
+          </div>)}
+        </details>}
+        {r.factsCompared && <p>Facts compared: {r.factsCompared.compared} of {r.factsCompared.total}. Informational; does not cap the score.</p>}
+        <small>Config: {r.configVersion}. Weights and bands are uncalibrated pending owner-labeled examples.</small>
+        {(r?.flag === "REVIEW" || needsClarification(r)) && <div role="status" style={{ background: "#fffbeb", border: "1px solid #f59e0b", color: "#92400e", borderRadius: 6, padding: 12, marginTop: 12 }}>
+          <strong>Needs clarification</strong>
+          <ul>{(r.reasons?.length ? r.reasons : ["Review the missing context identified in the AI assessment (does not affect the code score)."]).map(reason => <li key={reason}>{reason}</li>)}</ul>
+        </div>}
       </div>
     );
   }
@@ -510,7 +399,7 @@ export default function DepositionChecker() {
                     }`
                   }}
                 >
-                  {/* Step 6: AI assessment */}
+                  {/* Step 6: AI assessment (does not affect the code score) */}
                   <div
                     style={{
                       border: "1px solid #ddd",
@@ -521,7 +410,7 @@ export default function DepositionChecker() {
                     }}
                   >
                     <strong>
-                      AI assessment
+                      AI assessment (does not affect the code score)
                     </strong>
 
                     <div
@@ -644,7 +533,7 @@ export default function DepositionChecker() {
                       }}
                     >
                       <strong>
-                        AI assessment
+                        AI assessment (does not affect the code score)
                       </strong>
 
                       <p>

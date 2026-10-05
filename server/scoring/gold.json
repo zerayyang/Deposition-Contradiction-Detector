@@ -1,0 +1,677 @@
+[
+  {
+    "id": "sample-home",
+    "claim1": {
+      "original": "I was at home all evening.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": "at home",
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I think I went out briefly to get some groceries, maybe around 7:30, but came right back.",
+      "activityPhrase": "went out briefly to get some groceries",
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "sample-sleep",
+    "claim1": {
+      "original": "Around 10, maybe 10:30. I had work the next morning.",
+      "activityPhrase": null,
+      "timePhrase": "Around 10, maybe 10:30",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "It was late. Midnight maybe. I had trouble sleeping.",
+      "activityPhrase": null,
+      "timePhrase": "Midnight maybe",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {
+      "sameEvent": true,
+      "period": "pm"
+    },
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": "Evening and same episode anchors supplied explicitly in fixture; unanchored clocks are not evaluable."
+  },
+  {
+    "id": "sample-food",
+    "claim1": {
+      "original": "I ordered pizza around 7pm and watched TV.",
+      "activityPhrase": "ordered pizza",
+      "timePhrase": "around 7pm",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I might have done both. I don't remember exactly, it was almost a year ago.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "sample-neighbor",
+    "claim1": {
+      "original": "No, I was alone.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": "alone",
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "My neighbor, Tom, might have seen me. We waved or something in the parking lot.",
+      "activityPhrase": "waved",
+      "timePhrase": null,
+      "locationPhrase": "parking lot",
+      "personPhrase": "Tom",
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "sample-warehouse",
+    "claim1": {
+      "original": "No, never. I don't even know where that is.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I mean, I've driven through that part of town. I didn't say I'd never been in that general area.",
+      "activityPhrase": "driven through that part of town",
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "sample-knowledge",
+    "claim1": {
+      "original": "No. I'd never heard of him before this whole thing started.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I knew of him. We had mutual friends. I don't think I'd met him face to face.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "exact-knowledge",
+    "claim1": {
+      "original": "I'd never heard of him.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I knew of him. I don't think I'd met him.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "unhedged-home",
+    "claim1": {
+      "original": "I was at home all evening.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": "at home",
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I went out briefly.",
+      "activityPhrase": "went out briefly",
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "memory-departure",
+    "claim1": {
+      "original": "I was at home all evening.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": "at home",
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I don't remember whether I left the house.",
+      "activityPhrase": "left the house",
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "MODERATE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "time-overlap",
+    "claim1": {
+      "original": "Around 8 PM.",
+      "activityPhrase": null,
+      "timePhrase": "Around 8 PM",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "8:05 PM.",
+      "activityPhrase": null,
+      "timePhrase": "8:05 PM",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {
+      "sameEvent": true
+    },
+    "expectedBand": null,
+    "provisionalBand": "WEAK",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "time-separated",
+    "claim1": {
+      "original": "Around 8 PM.",
+      "activityPhrase": null,
+      "timePhrase": "Around 8 PM",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "Around 11 PM.",
+      "activityPhrase": null,
+      "timePhrase": "Around 11 PM",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {
+      "sameEvent": true
+    },
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "quantity-overlap",
+    "claim1": {
+      "original": "About ten people.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": "About ten people",
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "Twelve people.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": "Twelve people",
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "WEAK",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "quantity-separated",
+    "claim1": {
+      "original": "About ten people.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": "About ten people",
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "Three or four people.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": "Three or four people",
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "timeline-desk",
+    "claim1": {
+      "original": "I was at my desk from 9 AM to 5 PM Friday.",
+      "activityPhrase": null,
+      "timePhrase": "from 9 AM to 5 PM",
+      "locationPhrase": "at my desk",
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I attended the appointment across town at 1 PM Friday.",
+      "activityPhrase": "attended the appointment",
+      "timePhrase": "1 PM",
+      "locationPhrase": "across town",
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {
+      "sameEvent": true
+    },
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "timeline-sleep",
+    "claim1": {
+      "original": "I was asleep continuously from 10 PM until 6 AM Friday night.",
+      "activityPhrase": null,
+      "timePhrase": "from 10 PM until 6 AM",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": "asleep",
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I watched TV at 11 PM Friday night.",
+      "activityPhrase": "watched TV",
+      "timePhrase": "11 PM",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {
+      "sameEvent": true
+    },
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "negation-compatible",
+    "claim1": {
+      "original": "I was at home all evening.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": "at home",
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I never left the house.",
+      "activityPhrase": "never left the house",
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "WEAK",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "signed-polarity",
+    "claim1": {
+      "original": "I never signed the lease.",
+      "activityPhrase": "never signed the lease",
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I signed the lease.",
+      "activityPhrase": "signed the lease",
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "afternoon",
+    "claim1": {
+      "original": "I was asleep all afternoon Friday.",
+      "activityPhrase": null,
+      "timePhrase": "all afternoon",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": "asleep",
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I was awake at 3pm Friday.",
+      "activityPhrase": null,
+      "timePhrase": "3pm",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": "awake",
+      "qualifierPhrases": []
+    },
+    "context": {
+      "sameEvent": true
+    },
+    "expectedBand": null,
+    "provisionalBand": "STRONG",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "ambiguous-clock",
+    "claim1": {
+      "original": "Around 7.",
+      "activityPhrase": null,
+      "timePhrase": "Around 7",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "8 PM.",
+      "activityPhrase": null,
+      "timePhrase": "8 PM",
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {
+      "sameEvent": true
+    },
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "ignorance-familiarity",
+    "claim1": {
+      "original": "I don't know where the depot is.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I can give directions to its entrance.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "no-facts",
+    "claim1": {
+      "original": "It was interesting.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "It was memorable.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": null,
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  },
+  {
+    "id": "unsupported-states",
+    "claim1": {
+      "original": "I was hungry.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": "hungry",
+      "qualifierPhrases": []
+    },
+    "claim2": {
+      "original": "I was tired.",
+      "activityPhrase": null,
+      "timePhrase": null,
+      "locationPhrase": null,
+      "personPhrase": null,
+      "objectPhrase": null,
+      "quantityPhrase": null,
+      "statePhrase": "tired",
+      "qualifierPhrases": []
+    },
+    "context": {},
+    "expectedBand": null,
+    "provisionalBand": "NOT_EVALUABLE",
+    "debatable": true,
+    "note": ""
+  }
+]
