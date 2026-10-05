@@ -2,12 +2,10 @@ import "dotenv/config";
 import express from "express";
 import fs from "fs";
 import Anthropic from "@anthropic-ai/sdk";
-import { calculateHumanConfidence } from "./confidenceratehuman.js";
+import { scoreValidatedQuotes } from "./deterministicConfidence.js";
 import { validateClaim } from "./evidenceValidator.js";
 import { TestimonyFact } from "./TestimonyFact.js";
 import {
-    calculateEvidenceScore,
-    calculateEvidenceCoverage,
     compareFacts,
     reconcile
 } from "./comparisonRules.js";
@@ -134,52 +132,16 @@ Analyze these two depositions according to the provided instructions.
                     claim2Valid
                 );
 
-                const fact1 = new TestimonyFact(
-                    contradiction.claim1
+                const confidence = scoreValidatedQuotes(
+                    contradiction.claim1?.original, contradiction.claim2?.original,
+                    claim1Valid, claim2Valid
                 );
-
-                const fact2 = new TestimonyFact(
-                    contradiction.claim2
-                );
-
-                console.log("Fact 1:", fact1);
-                console.log("Fact 2:", fact2);
-
-                const { score: evidenceScore, details: evidenceDetails } =
-                    calculateEvidenceScore(
-                        fact1,
-                        fact2
-                    );
-
-                const evidenceCoverage =
-                    calculateEvidenceCoverage(
-                        fact1,
-                        fact2
-                    );
-
-                console.log(
-                    "Evidence score:",
-                    evidenceScore
-                );
-
-                console.log(
-                    "Evidence coverage:",
-                    evidenceCoverage
-                );
-
-                const confidence =
-                    calculateHumanConfidence(
-                        contradiction.claim1.original,
-                        contradiction.claim2.original,
-                        evidenceScore,
-                        evidenceCoverage,
-                        evidenceDetails
-                    );
-
-                const comparisons = compareFacts(
-                    fact1,
-                    fact2
-                );
+                const evidenceScore = confidence.evidenceScore;
+                const evidenceDetails = confidence.evidenceDetails;
+                const evidenceCoverage = null;
+                const comparisons = claim1Valid && claim2Valid
+                    ? compareFacts(new TestimonyFact(contradiction.claim1), new TestimonyFact(contradiction.claim2))
+                    : {};
 
                 const reconciliation = reconcile(
                     contradiction.type, evidenceScore, evidenceDetails, comparisons
@@ -192,17 +154,18 @@ Analyze these two depositions according to the provided instructions.
                     claim1Valid,
                     claim2Valid,
 
-                    // Keep humanConfidence as a number
-                    // so existing frontend code does not break.
+                    // Preserve the response key; null means the code withheld a rating.
                     humanConfidence: confidence.score,
+                    strength: confidence.strength,
+                    scoreReason: confidence.scoreReason,
 
                     // Additional confidence information.
                     evidenceScore: confidence.evidenceScore,
                     evidenceDetails: confidence.evidenceDetails,
                     coverageCapped: confidence.coverageCapped,
                     coverageCap: confidence.coverageCap,
-                    flag: reconciliation.flag,
-                    reasons: reconciliation.reasons,
+                    flag: confidence.score === null ? "REVIEW" : reconciliation.flag,
+                    reasons: confidence.score === null ? [confidence.scoreReason, ...reconciliation.reasons] : reconciliation.reasons,
                     languageScore: confidence.languageScore,
                     basis: confidence.basis,
 

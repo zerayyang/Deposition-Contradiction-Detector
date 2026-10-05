@@ -33,25 +33,24 @@ If you prefer to configure the key manually, copy `.env.example` to `.env` and r
 ## What the app does
 
 1. **Claude reads the testimony.** It identifies pairs of claims and classifies them as `DIRECT`, `INFERENTIAL`, or `FALSE_POSITIVE`.
-2. **Code checks the extracted facts.** Each usable rule contributes a score: `0` for compatible evidence, `0.5` for a possible conflict, or `1` for a conflict. Unusable rules do not contribute. Their scores are averaged into the evidence score.
-3. **Language is scored separately.** Phrases such as “I clearly remember” or “I don't remember” affect how strongly a claim was expressed.
-4. **The final score combines evidence and language.** When evidence is available, it uses 70% evidence and 30% language. Evidence coverage can cap the result.
-5. **Disagreements are flagged for review.** The app preserves Claude's original classification and adds a review banner when it disagrees with the code's scored evidence.
-
-For example, a claim extracted with location “at home” and another with activity “went out briefly to get some groceries” trigger the location/activity conflict rule. “Around 7” and “7:30pm” are compatible under the time rule. “I was at home all evening” and “I never left the house” do not trigger the location/activity conflict rule.
+2. **Code validates the literal evidence.** Quotes and extracted phrases must occur in their sources. Invalid evidence receives no score.
+3. **Code applies narrow conflict rules to the quotes themselves.** It does not use Claude's type, reasoning, semantic suggestions, or interpretations. Supported rules currently cover complete signing assertions about the same object; continuous home presence versus leaving on the same explicit date during the defined evening (6 PM–midnight); and exact times for the same literal event and explicit date.
+4. **The strongest supported rule determines conflict strength.** Rule ratings are 0 (no conflict established), 0.5 (possible conflict), or 1 (strong conflict). Matching details do not cancel a conflict. The numeric rating uses 85% strongest supported evidence and 15% language strength from the existing phrase database. Compatible evidence stays at zero; unsupported or invalid evidence gets no rating. The conflict-strength label still follows the evidence rule. Coverage does not cap the score.
+5. **Review flags preserve Claude's classification.** Disagreement, unverified evidence, or insufficient context prompts human review.
 
 ## Reading the cards
 
-- **Automated confidence:** the final calculated score, including any coverage cap.
-- **Contributing rules:** the rules that actually supplied evidence, with their scores.
-- **Language score:** how strongly the statements were expressed.
-- **Evidence coverage:** how much of the evidence counted by the coverage calculation the code could evaluate.
-- **Field checks:** comparisons of extracted fields. “Not scored” means that field did not contribute through a scoring rule.
-- **Review recommended:** Claude and the automated checks disagree and a person should inspect the pair.
+- **Rule-based conflict strength:** Strong conflict, Possible conflict, No conflict established, Insufficient context, or Unverified evidence.
+- **Contributing rules:** The literal rules and their ratings; these are not probabilities.
+- **Language score:** The existing deterministic phrase database supplies 15% of a supported numeric rating; it cannot create a conflict.
+- **Field checks:** Legacy extracted-field comparisons for context. They do not determine the active conflict score.
+- **Review recommended:** Inspect the evidence or resolve missing context.
 
-If no evidence rule can compare the facts, the card says **“Language only, no facts compared.”** A dismissed result with this basis shows **n/a** rather than a large confidence percentage.
+For example, “I was at home all evening on November 3” versus “I left home at 7 PM on November 3” produces strong conflict evidence. Being home at 6 PM and leaving at 7 PM does not trigger this rule. Missing dates, relative-day expressions, and ambiguous clock values receive insufficient context rather than an assumed comparison.
 
-The score is a rule-based indicator, not a calibrated probability or proof that someone lied. This is a prototype for human review, not a legal conclusion.
+These deliberately limited rules do not understand every event, pronoun, paraphrase, date format, or surrounding question. The included demo may therefore receive insufficient-context ratings even where Claude flags a candidate. A blank score is not a dismissal. The previous scoring functions remain for comparison and regression coverage, but the API uses `scoreValidatedQuotes` for active scoring.
+
+This is a prototype for human review. Its ratings are not calibrated probabilities, credibility judgments, or legal conclusions.
 
 ## Included demo and project files
 
@@ -63,7 +62,8 @@ The app currently analyzes two built-in sample depositions. It does not have a d
 | `server/server.js` | Claude request and response processing |
 | `server/TestimonyFact.js` | Extracted fact objects |
 | `server/comparisonRules.js` | Evidence rules, scoring, and reconciliation |
-| `server/confidenceratehuman.js` | Language scoring and final confidence |
+| `server/deterministicConfidence.js` | Active literal conflict checker |
+| `server/confidenceratehuman.js` | Separate language score and legacy scoring |
 | `server/proper_prompts.md` | Instructions sent to Claude |
 | `start.mjs` | Local setup and launcher |
 

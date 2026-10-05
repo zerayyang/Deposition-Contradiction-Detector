@@ -4,7 +4,7 @@ export function phraseExists(original, phrase) {
         return true;
     }
 
-    if (original === null) {
+    if (typeof original !== "string" || typeof phrase !== "string" || phrase.length === 0) {
         return false;
     }
 
@@ -15,6 +15,8 @@ export function phraseExists(original, phrase) {
 }
 
 export function validateClaim(claim, transcript) {
+    if (!claim || typeof claim.original !== "string" || !claim.original.trim() ||
+        !Array.isArray(claim.qualifierPhrases)) return false;
     // First verify that Claude's original quote
     // actually exists in the real transcript.
     if (!phraseExists(transcript, claim.original)) {

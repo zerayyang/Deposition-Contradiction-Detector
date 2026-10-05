@@ -248,6 +248,36 @@ assert.deepEqual(capped.evidenceDetails, knowledgeDetails);
 assert.equal(calculateHumanConfidence("I knew of him", "I never heard of him", 0, 0.25, []).coverageCapped, false);
 assert.equal(calculateHumanConfidence("I knew of him", "I never heard of him", null, 0, []).coverageCapped, false);
 
-console.log(
-    "All comparisonRules tests passed."
-);
+// Active conflict scoring uses only verified literal quotes, never model type.
+const { scoreValidatedQuotes } = await import("./deterministicConfidence.js");
+const { validateClaim } = await import("./evidenceValidator.js");
+const check = (a, b) => scoreValidatedQuotes(a, b, true, true);
+const home = "I was at home all evening on November 3.";
+const out = "I left home at 7 PM on November 3.";
+assert.equal(check(home, out).strength, "Strong conflict");
+assert.equal(check(out, home).score, 93);
+assert.equal(check(home + " Except for a trip to the store.", out).score, null);
+assert.equal(check(home, "I never said I left home at 7 PM on November 3.").score, null);
+assert.equal(check("I was at home at 6 PM on November 3.", out).score, null);
+assert.equal(check(home, "I left home at 7 PM.").score, null);
+assert.equal(check(home, "I left home at 7 PM on November 4.").score, null);
+assert.equal(check(home, "I left home at 7 AM on November 3.").score, null);
+assert.equal(check(home, "I left home at around 7 PM on November 3.").strength, "Possible conflict");
+assert.equal(check("I signed the lease.", "I never signed the lease.").score, 93);
+assert.equal(check("I signed the lease.", "I signed the lease.").score, 0);
+assert.equal(check("I signed the lease.", "I never signed the contract.").score, null);
+assert.equal(check("I don't remember whether I signed the lease.", "I signed the lease.").score, null);
+assert.equal(check("I went to sleep at 10 PM on November 3.", "I went to sleep at 12 AM on November 4.").score, null);
+assert.equal(check("I went to sleep at 10 PM on November 3.", "I went to sleep at 11 PM on November 3.").score, 93);
+assert.equal(scoreValidatedQuotes(home, out, false, true).basis, "UNVERIFIED");
+assert.equal(scoreValidatedQuotes(undefined, undefined, false, false).score, null);
+assert.equal(validateClaim({original: "actual quote"}, "actual quote"), false);
+assert.equal(compareTimes("midnight", "12pm"), "POSSIBLE_CONFLICT");
+assert.equal(compareTimes("midnight", "12am"), "COMPATIBLE");
+const weighted = check(home, "I left home at around 7 PM on November 3.");
+assert.equal(weighted.score, Math.round((0.85 * weighted.evidenceScore + 0.15 * weighted.languageScore) * 100));
+assert.equal(weighted.strength, "Possible conflict");
+assert.equal(check("I never signed the lease.", "I never signed the lease.").score, 0);
+assert.equal(check("I definitely remember everything.", "I clearly remember everything.").score, null);
+assert.equal(scoreValidatedQuotes(home, out, false, true).score, null);
+console.log("All comparisonRules tests passed.");

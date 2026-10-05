@@ -453,7 +453,7 @@ function parseTimeWithPeriod(
      * Only apply the assumed period to numbers that did not
      * explicitly contain a meridiem.
      */
-    if (/(?:\b|\d)(?:am|pm)\b/.test(text)) {
+    if (/\b(?:noon|midnight)\b|(?:\b|\d)(?:am|pm)\b/.test(text)) {
         return values;
     }
 
@@ -951,25 +951,5 @@ export function calculateEvidenceCoverage(
 
     return availableEvidence / totalEvidence;
 }
-
-
-
-const activityTest1 = {
-    activity: "ordered pizza",
-    time: null,
-    quantity: null,
-    object: null,
-    location: null,
-    state: null
-};
-
-const activityTest2 = {
-    activity: "went out briefly",
-    time: null,
-    quantity: null,
-    object: null,
-    location: null,
-    state: null
-};
 
 

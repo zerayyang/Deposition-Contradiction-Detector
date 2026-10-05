@@ -174,7 +174,7 @@ export default function DepositionChecker() {
         ? r.languageScore
         : null;
 
-    const languageOnlyDismissed = dismissed && r?.basis === "LANGUAGE_ONLY";
+    const languageOnlyDismissed = r?.humanConfidence == null;
     function fieldCheck(field) {
       const rules = {
         location: ["location+activity"],
@@ -196,15 +196,16 @@ export default function DepositionChecker() {
         }}
       >
         <div style={{ color: dismissed ? "#666" : "#111" }}>
-          <div>Automated confidence</div>
+          <div>Rule-based conflict strength</div>
           <strong style={{ fontSize: languageOnlyDismissed ? 14 : 28 }}>
             {languageOnlyDismissed
-              ? "n/a"
+              ? (r?.strength ?? "Insufficient context")
               : typeof r?.humanConfidence === "number"
-                ? `${r.humanConfidence}%`
+                ? `${r.strength ?? "Rule rating"} · ${r.humanConfidence}/100`
                 : "Could not compare"}
           </strong>
 
+          <p style={{ fontSize: 13 }}>{r?.scoreReason}</p>
           <div style={{ marginTop: 8, fontSize: 14 }}>
             {(r?.evidenceDetails ?? []).map(({ rule, score }) => {
               const label = {
@@ -219,9 +220,9 @@ export default function DepositionChecker() {
               return <div key={rule}>{label} {outcome}: {score.toFixed(1)}</div>;
             })}
             <div>
-              Language score: {languageScore !== null ? languageScore.toFixed(2) : "Could not compare"}
+              Language score (15% of supported rating): {languageScore !== null ? languageScore.toFixed(2) : "Could not compare"}
             </div>
-            <div>Evidence coverage: {getCoverageDisplay(r)}</div>
+            <div>Rule ratings describe evidence strength, not probability.</div>
           </div>
 
           {r?.coverageCapped && (
@@ -245,7 +246,7 @@ export default function DepositionChecker() {
 
         {r?.flag === "REVIEW" && (
           <div role="status" style={{ background: "#fffbeb", border: "1px solid #f59e0b", color: "#92400e", borderRadius: 6, padding: 12, marginTop: 12 }}>
-            <strong>Review recommended: AI and automated checks disagree</strong>
+            <strong>Review recommended</strong>
             <ul>{(r.reasons ?? []).map(reason => <li key={reason}>{reason}</li>)}</ul>
           </div>
         )}
