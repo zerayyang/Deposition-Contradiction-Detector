@@ -49,6 +49,8 @@ export default function DepositionChecker() {
   const [transcript1, setTranscript1] = useState(TRANSCRIPT_1);
   const [transcript2, setTranscript2] = useState(TRANSCRIPT_2);
   const [loading, setLoading] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [totalSeconds, setTotalSeconds] = useState(null);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
 
@@ -63,6 +65,10 @@ export default function DepositionChecker() {
       return;
     }
     setLoading(true);
+    setElapsedSeconds(0);
+    setTotalSeconds(null);
+    const startedAt = performance.now();
+    const elapsedTimer = setInterval(() => setElapsedSeconds(Math.floor((performance.now() - startedAt) / 1000)), 1000);
     setError(null);
     setResults(null);
 
@@ -80,7 +86,7 @@ export default function DepositionChecker() {
 
       const data = await res.json();
 
-      console.log(data);
+
 
       // Step 4: Show a clear error instead of a blank page
       if (!res.ok) {
@@ -102,6 +108,8 @@ export default function DepositionChecker() {
           "Failed to analyze depositions."
       );
     } finally {
+      clearInterval(elapsedTimer);
+      setTotalSeconds((performance.now() - startedAt) / 1000);
       setLoading(false);
     }
   }
@@ -141,6 +149,13 @@ export default function DepositionChecker() {
         (severityOrder[b?.severity] ?? 99)
       );
     });
+
+  function needsClarification(result) {
+    return (
+      result?.flag === "REVIEW" ||
+      /^(Unresolved timing|Question meaning unresolved)\s*[—–-]/i.test(result?.reasoning ?? "")
+    );
+  }
 
   const dismissedResults = (results ?? []).filter(
     (r) => r?.type === "FALSE_POSITIVE"
@@ -202,6 +217,12 @@ export default function DepositionChecker() {
           textAlign: "left"
         }}
       >
+        {needsClarification(r) && r?.flag !== "REVIEW" && (
+          <p style={{ background: "#fffbeb", color: "#92400e", padding: 12, borderRadius: 6 }}>
+            <strong>Needs clarification</strong><br />
+            Missing context limits this assessment. Review the explanation and follow-up question before relying on the classification.
+          </p>
+        )}
         <div style={{ color: dismissed ? "#666" : "#111" }}>
           <div>Human confidence (calculated by code)</div>
           <strong style={{ fontSize: languageOnlyDismissed ? 14 : 28 }}>
@@ -255,7 +276,7 @@ export default function DepositionChecker() {
 
         {r?.flag === "REVIEW" && (
           <div role="status" style={{ background: "#fffbeb", border: "1px solid #f59e0b", color: "#92400e", borderRadius: 6, padding: 12, marginTop: 12 }}>
-            <strong>Review recommended</strong>
+            <strong>{needsClarification(r) ? "Needs clarification" : "Review recommended"}</strong>
             <ul>{(r.reasons ?? []).map(reason => <li key={reason}>{reason}</li>)}</ul>
           </div>
         )}
@@ -424,6 +445,16 @@ export default function DepositionChecker() {
           : "Find Contradictions"}
       </button>
 
+      {loading && <p role="status" aria-live="polite">Waiting for Claude’s analysis — {elapsedSeconds}s elapsed. {elapsedSeconds >= 60 ? "The request is still running; avoid submitting it again." : "Results appear when the complete response is received."}</p>}
+
+      {!loading && totalSeconds !== null && (
+        <p role="status">
+          {results ? "Analysis completed" : "Analysis request ended"} in {totalSeconds >= 60
+            ? `${Math.floor(totalSeconds / 60)}m ${(totalSeconds % 60).toFixed(1)}s`
+            : `${totalSeconds.toFixed(1)}s`} total.
+        </p>
+      )}
+
       {error && (
         <p
           style={{
@@ -443,7 +474,7 @@ export default function DepositionChecker() {
           {/* Step 5: Summary */}
           <h2>
             {flaggedResults.length} flagged,{" "}
-            {dismissedResults.length} dismissed
+            {dismissedResults.length} false positives
           </h2>
 
           {/* Step 5: Legend */}
@@ -555,7 +586,7 @@ export default function DepositionChecker() {
                   fontWeight: "bold"
                 }}
               >
-                Considered and dismissed (
+                False positives — compatible or unresolved (
                 {dismissedResults.length})
               </summary>
 
@@ -568,7 +599,7 @@ export default function DepositionChecker() {
                       borderRadius: 8,
                       padding: 16,
                       marginBottom: 12,
-                      opacity: 0.75
+                      opacity: needsClarification(r) ? 1 : 0.75
                     }}
                   >
                     <div
@@ -588,6 +619,7 @@ export default function DepositionChecker() {
                       >
                         FALSE POSITIVE
                       </span>
+                      {needsClarification(r) && <p style={{ color: "#92400e", fontWeight: "bold" }}>Conflict not established — missing context needs review.</p>}
 
                       <span
                         style={{

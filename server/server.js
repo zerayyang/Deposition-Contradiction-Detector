@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import fs from "fs";
+import { performance } from "node:perf_hooks";
+import { randomUUID } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { assessCandidate } from "./humanConfidencePipeline.js";
 
@@ -26,7 +28,15 @@ app.post("/api/analyze", async (req, res) => {
         return res.status(400).json({error: "Provide two non-empty transcripts."});
     }
 
+    const requestId = randomUUID();
+    const startedAt = performance.now();
+    res.on("finish", () => console.info("Analysis completed", {
+        requestId, status: res.statusCode, totalMs: Math.round(performance.now() - startedAt)
+    }));
+    console.info("Analysis started", { requestId, model: MODEL_NAME,
+        promptChars: AI_INSTRUCTIONS.length, transcriptChars: transcript1.length + transcript2.length });
     try {
+        const claudeStartedAt = performance.now();
         const message = await anthropic.messages.create({
             model: MODEL_NAME,
             max_tokens: 10000,
@@ -53,6 +63,11 @@ Analyze these two depositions according to the provided instructions.
             ]
         });
 
+        console.info("Claude completed", { requestId,
+            claudeMs: Math.round(performance.now() - claudeStartedAt),
+            inputTokens: message.usage?.input_tokens, outputTokens: message.usage?.output_tokens,
+            stopReason: message.stop_reason });
+        const processingStartedAt = performance.now();
         const textBlock = message.content.find(
             block => block.type === "text"
         );
@@ -65,9 +80,7 @@ Analyze these two depositions according to the provided instructions.
 
         const rawText = textBlock.text;
 
-        console.log("CLAUDE RAW OUTPUT:");
-        console.log(rawText);
-        console.log("STOP REASON:", message.stop_reason);
+
 
         if (message.stop_reason === "max_tokens") {
             return res.status(500).json({
@@ -107,11 +120,22 @@ Analyze these two depositions according to the provided instructions.
             });
         }
 
+        // Remove only byte-equivalent JSON results. Preserve distinct issues and different types.
+        const seenCandidates = new Set();
+        parsed.contradictions = parsed.contradictions.filter(candidate => {
+            const key = JSON.stringify(candidate);
+            if (seenCandidates.has(key)) return false;
+            seenCandidates.add(key);
+            return true;
+        });
+
         parsed.contradictions = parsed.contradictions.map(candidate =>
             assessCandidate(candidate, transcript1, transcript2)
         );
 
-        console.log(parsed);
+        console.info("Local processing completed", { requestId,
+            processingMs: Math.round(performance.now() - processingStartedAt),
+            candidates: parsed.contradictions.length });
 
         res.json(parsed);
 
