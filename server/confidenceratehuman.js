@@ -281,61 +281,15 @@ export function calculateHumanConfidence(
     const EVIDENCE_WEIGHT = 0.70;
     const LANGUAGE_WEIGHT = 0.30;
 
-    let finalScore;
-    let weightedScore = null;
-    let coverageCap = null;
-
-    // If deterministic evidence is available,
-    // use the normal 70/30 weighting.
-    if (evidenceScore !== null) {
-
-        weightedScore =
-            (evidenceScore * EVIDENCE_WEIGHT) +
-            (languageScore * LANGUAGE_WEIGHT);
-
-        // Evidence coverage limits how confident
-        // the system can ultimately be.
-        let maximumConfidence;
-
-        if (evidenceCoverage >= 0.75) {
-            maximumConfidence = 0.85;
-        } else if (evidenceCoverage >= 0.50) {
-            maximumConfidence = 0.70;
-        } else if (evidenceCoverage >= 0.25) {
-            maximumConfidence = 0.60;
-        } else {
-            maximumConfidence = 0.55;
-        }
-
-        coverageCap = maximumConfidence;
-        finalScore = Math.min(
-            weightedScore,
-            maximumConfidence
-        );
-
-    } else {
-
-        // Without deterministic evidence, language
-        // cannot create high-confidence contradiction evidence.
-        finalScore = Math.min(
-            languageScore,
-            0.55
-        );
-    }
-
-    // Convert from 0-1 to 0-100
-    finalScore *= 100;
-
+    // Coverage is explanatory only: irrelevant missing fields do not cap a conflict.
+    // Language cannot create conflict points when code found compatible evidence.
+    void evidenceCoverage;
+    const weightedScore = evidenceScore === null ? null : evidenceScore === 0 ? 0 :
+        evidenceScore * EVIDENCE_WEIGHT + languageScore * LANGUAGE_WEIGHT;
     return {
-    score: Math.round(finalScore),
-    languageScore,
-    evidenceScore,
-    evidenceDetails,
-    coverageCapped: weightedScore !== null && weightedScore > coverageCap,
-    coverageCap: coverageCap === null ? null : Math.round(coverageCap * 100),
-    basis: evidenceScore !== null
-        ? "EVIDENCE"
-        : "LANGUAGE_ONLY"
-}
-
+        score: weightedScore === null ? Math.round(Math.min(languageScore, 0.55) * 100) : Math.round(weightedScore * 100),
+        languageScore, evidenceScore, evidenceDetails,
+        coverageCapped: false, coverageCap: null,
+        basis: evidenceScore === null ? "LANGUAGE_ONLY" : "EVIDENCE"
+    };
 }

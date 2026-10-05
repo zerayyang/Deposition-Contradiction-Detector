@@ -8,10 +8,7 @@ export function phraseExists(original, phrase) {
         return false;
     }
 
-    const originalLower = original.toLowerCase();
-    const phraseLower = phrase.toLowerCase();
-
-    return originalLower.includes(phraseLower);
+    return original.includes(phrase);
 }
 
 export function validateClaim(claim, transcript) {
@@ -40,7 +37,7 @@ export function validateClaim(claim, transcript) {
     }
 
     for (const qualifier of claim.qualifierPhrases) {
-        if (!phraseExists(claim.original, qualifier)) {
+        if (typeof qualifier !== "string" || !phraseExists(claim.original, qualifier)) {
             return false;
         }
     }

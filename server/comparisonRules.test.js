@@ -241,43 +241,86 @@ assert.equal(reconcile("DIRECT", null, [], {}).flag, "NONE");
 // Details survive confidence calculation, and only actual coverage caps are labeled.
 const knowledgeDetails = [{ rule: "knowledge", score: 1 }];
 const capped = calculateHumanConfidence("I knew of him", "I never heard of him", 1, 0.25, knowledgeDetails);
-assert.equal(capped.score, 60);
-assert.equal(capped.coverageCap, 60);
-assert.equal(capped.coverageCapped, true);
+assert.equal(capped.score, 85);
+assert.equal(capped.coverageCap, null);
+assert.equal(capped.coverageCapped, false);
 assert.deepEqual(capped.evidenceDetails, knowledgeDetails);
 assert.equal(calculateHumanConfidence("I knew of him", "I never heard of him", 0, 0.25, []).coverageCapped, false);
 assert.equal(calculateHumanConfidence("I knew of him", "I never heard of him", null, 0, []).coverageCapped, false);
 
-// Active conflict scoring uses only verified literal quotes, never model type.
-const { scoreValidatedQuotes } = await import("./deterministicConfidence.js");
+// The active API restores 70/30 scoring and never uses the model's opinion.
+const { assessCandidate } = await import("./humanConfidencePipeline.js");
 const { validateClaim } = await import("./evidenceValidator.js");
-const check = (a, b) => scoreValidatedQuotes(a, b, true, true);
-const home = "I was at home all evening on November 3.";
-const out = "I left home at 7 PM on November 3.";
-assert.equal(check(home, out).strength, "Strong conflict");
-assert.equal(check(out, home).score, 93);
-assert.equal(check(home + " Except for a trip to the store.", out).score, null);
-assert.equal(check(home, "I never said I left home at 7 PM on November 3.").score, null);
-assert.equal(check("I was at home at 6 PM on November 3.", out).score, null);
-assert.equal(check(home, "I left home at 7 PM.").score, null);
-assert.equal(check(home, "I left home at 7 PM on November 4.").score, null);
-assert.equal(check(home, "I left home at 7 AM on November 3.").score, null);
-assert.equal(check(home, "I left home at around 7 PM on November 3.").strength, "Possible conflict");
-assert.equal(check("I signed the lease.", "I never signed the lease.").score, 93);
-assert.equal(check("I signed the lease.", "I signed the lease.").score, 0);
-assert.equal(check("I signed the lease.", "I never signed the contract.").score, null);
-assert.equal(check("I don't remember whether I signed the lease.", "I signed the lease.").score, null);
-assert.equal(check("I went to sleep at 10 PM on November 3.", "I went to sleep at 12 AM on November 4.").score, null);
-assert.equal(check("I went to sleep at 10 PM on November 3.", "I went to sleep at 11 PM on November 3.").score, 93);
-assert.equal(scoreValidatedQuotes(home, out, false, true).basis, "UNVERIFIED");
-assert.equal(scoreValidatedQuotes(undefined, undefined, false, false).score, null);
-assert.equal(validateClaim({original: "actual quote"}, "actual quote"), false);
-assert.equal(compareTimes("midnight", "12pm"), "POSSIBLE_CONFLICT");
+const claim = (original, overrides = {}) => ({original, activityPhrase: null,
+    timePhrase: null, locationPhrase: null, personPhrase: null, objectPhrase: null,
+    quantityPhrase: null, statePhrase: null, qualifierPhrases: [], ...overrides});
+const homeQuote = "I was at home all evening.";
+const outQuote = "I think I went out briefly to get some groceries, maybe around 7:30, but came right back.";
+const candidate = {type: "DIRECT", severity: "HIGH", reasoning: "Model opinion",
+    claim1: claim(homeQuote, {locationPhrase: "at home", qualifierPhrases: ["all"]}),
+    claim2: claim(outQuote, {activityPhrase: "went out briefly to get some groceries", qualifierPhrases: ["I think", "maybe", "around", "briefly"]})};
+const result = assessCandidate(candidate, homeQuote, outQuote);
+assert.equal(result.humanConfidence, 81);
+assert.equal(result.evidenceScore, 1);
+assert.equal(result.type, "DIRECT");
+assert.equal(result.claim1.original, homeQuote);
+assert.equal(result.claim2.original, outQuote);
+for (const type of ["DIRECT", "INFERENTIAL", "FALSE_POSITIVE"]) {
+    const changed = assessCandidate({...candidate, type, reasoning: "Entirely different opinion", humanConfidence: 99,
+        semanticAssist: {relationship: "MATCH"}}, homeQuote, outQuote);
+    assert.equal(changed.humanConfidence, result.humanConfidence);
+    assert.equal(changed.type, type);
+}
+const invalid = assessCandidate({...candidate, claim1: claim("Invented quote")}, homeQuote, outQuote);
+assert.equal(invalid.humanConfidence, null);
+assert.equal(invalid.basis, "UNVERIFIED");
+assert.equal(invalid.flag, "REVIEW");
+assert.equal(assessCandidate({...candidate, claim1: {original: homeQuote}}, homeQuote, outQuote).humanConfidence, null);
+assert.equal(validateClaim(claim("i was at home all evening."), homeQuote), false);
+assert.equal(compareTimes("midnight", "12pm"), "CONFLICT");
 assert.equal(compareTimes("midnight", "12am"), "COMPATIBLE");
-const weighted = check(home, "I left home at around 7 PM on November 3.");
-assert.equal(weighted.score, Math.round((0.85 * weighted.evidenceScore + 0.15 * weighted.languageScore) * 100));
-assert.equal(weighted.strength, "Possible conflict");
-assert.equal(check("I never signed the lease.", "I never signed the lease.").score, 0);
-assert.equal(check("I definitely remember everything.", "I clearly remember everything.").score, null);
-assert.equal(scoreValidatedQuotes(home, out, false, true).score, null);
+const sleep1 = "Around 10, maybe 10:30. I had work the next morning.";
+const sleep2 = "It was late. Midnight maybe. I had trouble sleeping.";
+const sleep = assessCandidate({type: "INFERENTIAL", claim1: claim(sleep1, {timePhrase: "Around 10, maybe 10:30"}),
+    claim2: claim(sleep2, {timePhrase: "Midnight"})}, sleep1, sleep2);
+assert.equal(typeof sleep.humanConfidence, "number");
+assert.equal(sleep.evidenceScore, 0.5);
+assert.equal(sleep.type, "INFERENTIAL");
+const { scoreStateEvidence, scoreActivityEvidence, calculateEvidenceCoverage } = await import("./comparisonRules.js");
+assert.equal(scoreStateEvidence({...fact(""), state:"tired"}, {...fact(""), state:"hungry"}), null);
+assert.equal(scoreStateEvidence({...fact(""), state:"awake"}, {...fact(""), state:"asleep"}), 1);
+assert.equal(scoreActivityEvidence(fact("I signed the lease", "signed the lease"), fact("I did not sign the lease", "did not sign the lease")), 1);
+assert.equal(scoreActivityEvidence(fact("I might sign", "might sign the lease"), fact("I signed", "signed the lease")), null);
+assert.equal(scoreLocationActivityEvidence(fact("I was home at 6 PM", null, "home"), groceriesFact), null);
+assert.equal(scoreLocationActivityEvidence(fact("I was home all evening except for shopping", null, "home"), groceriesFact), null);
+const mixed = calculateEvidenceScore({...homeFact, time:"7pm"}, {...groceriesFact, time:"7pm"});
+assert.equal(mixed.score, 1);
+assert.ok(mixed.details.some(detail => detail.score === 0));
+assert.equal(calculateHumanConfidence("I definitely remember", "I clearly remember", 0, 1, []).score, 0);
+assert.equal(calculateEvidenceCoverage(homeFact, groceriesFact), 1);
+assert.equal(compareTimes("10pm tonight", "10pm tomorrow"), "UNKNOWN");
+assert.equal(compareTimes("8pm", "8:05pm"), "CONFLICT");
+assert.equal(compareTimes("around 8pm", "8:05pm"), "COMPATIBLE");
+assert.equal(compareTimes("around 10:30pm", "midnight"), "POSSIBLE_CONFLICT");
+assert.equal(compareTimes("around 8pm", "11pm"), "CONFLICT");
+const dated = assessCandidate(candidate,
+    `Q: Where were you on November 3rd?\nA: ${homeQuote}`,
+    `Q: What happened on November 4th?\nA: ${outQuote}`);
+assert.equal(dated.evidenceScore, null);
+assert.equal(dated.flag, "REVIEW");
+const aligned = assessCandidate(candidate,
+    `Q: Where were you on November 3rd?\nA: ${homeQuote}`,
+    `Q: Walk through November 3rd again.\nA: ${outQuote}`);
+assert.equal(aligned.humanConfidence, result.humanConfidence);
+const knowledge1 = "I'd never heard of him before this whole thing started.";
+const knowledge2 = "I knew of him. We had mutual friends.";
+const knowledgeScoped = assessCandidate({type:"DIRECT", claim1:claim(knowledge1), claim2:claim(knowledge2)}, knowledge1, knowledge2);
+assert.equal(knowledgeScoped.evidenceScore, null);
+assert.equal(knowledgeScoped.flag, "REVIEW");
+assert.equal(calculateEvidenceScore(
+    {...fact("I was awake at 6pm"), time:"6pm", state:"awake"},
+    {...fact("I was asleep at 10pm"), time:"10pm", state:"asleep"}).score, null);
+assert.equal(scoreLocationActivityEvidence(homeFact,
+    {...groceriesFact, original:"I went out at 7am", time:"7am"}), null);
+assert.equal(validateClaim(claim(homeQuote, {qualifierPhrases:[null]}), homeQuote), false);
 console.log("All comparisonRules tests passed.");

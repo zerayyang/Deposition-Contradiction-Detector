@@ -46,6 +46,8 @@ A: I knew of him. We had mutual friends. I don't think I'd met him face to face.
 `;
 
 export default function DepositionChecker() {
+  const [transcript1, setTranscript1] = useState(TRANSCRIPT_1);
+  const [transcript2, setTranscript2] = useState(TRANSCRIPT_2);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
@@ -56,6 +58,10 @@ export default function DepositionChecker() {
       return;
     }
 
+    if (!transcript1.trim() || !transcript2.trim()) {
+      setError("Provide two non-empty transcripts.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setResults(null);
@@ -67,8 +73,8 @@ export default function DepositionChecker() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          transcript1: TRANSCRIPT_1,
-          transcript2: TRANSCRIPT_2
+          transcript1,
+          transcript2
         })
       });
 
@@ -174,7 +180,8 @@ export default function DepositionChecker() {
         ? r.languageScore
         : null;
 
-    const languageOnlyDismissed = r?.humanConfidence == null;
+    const unverified = r?.basis === "UNVERIFIED";
+    const languageOnlyDismissed = dismissed && r?.basis === "LANGUAGE_ONLY";
     function fieldCheck(field) {
       const rules = {
         location: ["location+activity"],
@@ -196,16 +203,17 @@ export default function DepositionChecker() {
         }}
       >
         <div style={{ color: dismissed ? "#666" : "#111" }}>
-          <div>Rule-based conflict strength</div>
+          <div>Human confidence (calculated by code)</div>
           <strong style={{ fontSize: languageOnlyDismissed ? 14 : 28 }}>
-            {languageOnlyDismissed
-              ? (r?.strength ?? "Insufficient context")
+            {unverified
+              ? "Unverified evidence"
+              : languageOnlyDismissed
+              ? "n/a"
               : typeof r?.humanConfidence === "number"
-                ? `${r.strength ?? "Rule rating"} · ${r.humanConfidence}/100`
+                ? `${r.humanConfidence}%`
                 : "Could not compare"}
           </strong>
 
-          <p style={{ fontSize: 13 }}>{r?.scoreReason}</p>
           <div style={{ marginTop: 8, fontSize: 14 }}>
             {(r?.evidenceDetails ?? []).map(({ rule, score }) => {
               const label = {
@@ -220,9 +228,9 @@ export default function DepositionChecker() {
               return <div key={rule}>{label} {outcome}: {score.toFixed(1)}</div>;
             })}
             <div>
-              Language score (15% of supported rating): {languageScore !== null ? languageScore.toFixed(2) : "Could not compare"}
+              Language score: {languageScore !== null ? languageScore.toFixed(2) : "Could not compare"}
             </div>
-            <div>Rule ratings describe evidence strength, not probability.</div>
+            <div>Applicable rule coverage: {getCoverageDisplay(r)}</div>
           </div>
 
           {r?.coverageCapped && (
@@ -233,10 +241,11 @@ export default function DepositionChecker() {
 
           {r?.basis === "LANGUAGE_ONLY" && (
             <p style={{ fontSize: 13, marginBottom: 0 }}>
-              Language only, no facts compared
+              Language-only estimate: code could not verify a factual conflict.
             </p>
           )}
 
+          <p style={{fontSize: 13}}>Heuristic score: 70% evidence + 30% language when evidence is available; not a calibrated probability.</p>
           {dismissed && (
             <p style={{ fontSize: 13, marginBottom: 0 }}>
               This is not a contradiction rating.
@@ -371,35 +380,27 @@ export default function DepositionChecker() {
         <div>
           <h3>Transcript 1</h3>
 
-          <pre
-            style={{
-              background: "#f5f5f5",
-              color: "#111",
-              padding: 12,
-              fontSize: 12,
-              whiteSpace: "pre-wrap",
-              textAlign: "left"
-            }}
-          >
-            {TRANSCRIPT_1}
-          </pre>
+          <textarea
+            aria-label="Transcript 1"
+            value={transcript1}
+            onChange={event => setTranscript1(event.target.value)}
+            disabled={loading}
+            rows={24}
+            style={{width: "100%", boxSizing: "border-box", background: "#f5f5f5", color: "#111", padding: 12, fontSize: 12, resize: "vertical"}}
+          />
         </div>
 
         <div>
           <h3>Transcript 2</h3>
 
-          <pre
-            style={{
-              background: "#f5f5f5",
-              color: "#111",
-              padding: 12,
-              fontSize: 12,
-              whiteSpace: "pre-wrap",
-              textAlign: "left"
-            }}
-          >
-            {TRANSCRIPT_2}
-          </pre>
+          <textarea
+            aria-label="Transcript 2"
+            value={transcript2}
+            onChange={event => setTranscript2(event.target.value)}
+            disabled={loading}
+            rows={24}
+            style={{width: "100%", boxSizing: "border-box", background: "#f5f5f5", color: "#111", padding: 12, fontSize: 12, resize: "vertical"}}
+          />
         </div>
       </div>
 

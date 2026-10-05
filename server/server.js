@@ -2,13 +2,7 @@ import "dotenv/config";
 import express from "express";
 import fs from "fs";
 import Anthropic from "@anthropic-ai/sdk";
-import { scoreValidatedQuotes } from "./deterministicConfidence.js";
-import { validateClaim } from "./evidenceValidator.js";
-import { TestimonyFact } from "./TestimonyFact.js";
-import {
-    compareFacts,
-    reconcile
-} from "./comparisonRules.js";
+import { assessCandidate } from "./humanConfidencePipeline.js";
 
 const AI_INSTRUCTIONS = fs.readFileSync(
     "./server/proper_prompts.md",
@@ -26,7 +20,11 @@ const app = express();
 app.use(express.json());
 
 app.post("/api/analyze", async (req, res) => {
-    const { transcript1, transcript2 } = req.body;
+    const { transcript1, transcript2 } = req.body ?? {};
+    if (typeof transcript1 !== "string" || typeof transcript2 !== "string" ||
+        !transcript1.trim() || !transcript2.trim()) {
+        return res.status(400).json({error: "Provide two non-empty transcripts."});
+    }
 
     try {
         const message = await anthropic.messages.create({
@@ -109,72 +107,8 @@ Analyze these two depositions according to the provided instructions.
             });
         }
 
-        parsed.contradictions = parsed.contradictions.map(
-            contradiction => {
-
-                const claim1Valid = validateClaim(
-                    contradiction.claim1,
-                    transcript1
-                );
-
-                const claim2Valid = validateClaim(
-                    contradiction.claim2,
-                    transcript2
-                );
-
-                console.log(
-                    "Claim 1 valid:",
-                    claim1Valid
-                );
-
-                console.log(
-                    "Claim 2 valid:",
-                    claim2Valid
-                );
-
-                const confidence = scoreValidatedQuotes(
-                    contradiction.claim1?.original, contradiction.claim2?.original,
-                    claim1Valid, claim2Valid
-                );
-                const evidenceScore = confidence.evidenceScore;
-                const evidenceDetails = confidence.evidenceDetails;
-                const evidenceCoverage = null;
-                const comparisons = claim1Valid && claim2Valid
-                    ? compareFacts(new TestimonyFact(contradiction.claim1), new TestimonyFact(contradiction.claim2))
-                    : {};
-
-                const reconciliation = reconcile(
-                    contradiction.type, evidenceScore, evidenceDetails, comparisons
-                );
-                console.log("Reconciliation flag:", reconciliation.flag, "Reasons:", reconciliation.reasons);
-
-                return {
-                    ...contradiction,
-
-                    claim1Valid,
-                    claim2Valid,
-
-                    // Preserve the response key; null means the code withheld a rating.
-                    humanConfidence: confidence.score,
-                    strength: confidence.strength,
-                    scoreReason: confidence.scoreReason,
-
-                    // Additional confidence information.
-                    evidenceScore: confidence.evidenceScore,
-                    evidenceDetails: confidence.evidenceDetails,
-                    coverageCapped: confidence.coverageCapped,
-                    coverageCap: confidence.coverageCap,
-                    flag: confidence.score === null ? "REVIEW" : reconciliation.flag,
-                    reasons: confidence.score === null ? [confidence.scoreReason, ...reconciliation.reasons] : reconciliation.reasons,
-                    languageScore: confidence.languageScore,
-                    basis: confidence.basis,
-
-                    evidenceCoverage,
-
-                    // Deterministic comparisons.
-                    comparisons
-                };
-            }
+        parsed.contradictions = parsed.contradictions.map(candidate =>
+            assessCandidate(candidate, transcript1, transcript2)
         );
 
         console.log(parsed);

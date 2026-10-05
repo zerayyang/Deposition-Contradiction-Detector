@@ -305,57 +305,41 @@ export function scoreKnowledgeEvidence(
     return null;
 }
 
+function explicitClock(fact) {
+    const text = fact.time ?? fact.original ?? "";
+    if (!/(?:\b|\d)(?:am|pm)\b/i.test(text) || /\b(?:around|about|maybe|approximately)\b/i.test(text)) return null;
+    const values = parseTime(text);
+    return Array.isArray(values) && values.length === 1 ? values[0] : null;
+}
+function differentExplicitMoments(fact1, fact2) {
+    const a = explicitClock(fact1), b = explicitClock(fact2);
+    return a !== null && b !== null && a !== b;
+}
+
+// Different descriptions are not automatically mutually exclusive.
 export function scoreStateEvidence(fact1, fact2) {
-
-    // Only score state when both claims provide a state.
-    if (fact1.state === null || fact2.state === null) {
-        return null;
-    }
-
-    const comparison = compareStates(
-        fact1.state,
-        fact2.state
-    );
-
-    if (comparison === "DIFFERENT") {
-        return 1;
-    }
-
-    if (comparison === "SAME") {
-        return 0;
-    }
-
-    return null;
+    if (fact1.state == null || fact2.state == null || differentExplicitMoments(fact1, fact2)) return null;
+    const a = fact1.state.toLowerCase().trim(), b = fact2.state.toLowerCase().trim();
+    if (a === b) return 0;
+    const opposites = [["awake", "asleep"], ["open", "closed"], ["alive", "dead"]];
+    return opposites.some(([x,y]) => (a === x && b === y) || (a === y && b === x)) ? 1 : null;
 }
 
-
-/// Convert activity comparison into deterministic evidence strength
+// Compare literal polarity while keeping the action and object intact.
 export function scoreActivityEvidence(fact1, fact2) {
-
-    // Only score activities when our code can safely compare them
-    if (!activitiesAreComparable(fact1, fact2)) {
-        return null;
-    }
-
-    const activity1 = normalizeActivity(fact1.activity);
-    const activity2 = normalizeActivity(fact2.activity);
-
-    const negative1 = hasNegation(fact1.activity);
-    const negative2 = hasNegation(fact2.activity);
-
-    // Same underlying activity with the same polarity is compatible
-    if (activity1 === activity2 && negative1 === negative2) {
-        return 0;
-    }
-
-    // Same underlying activity with opposite polarity is deterministic conflict evidence
-    if (activity1 === activity2 && negative1 !== negative2) {
-        return 1;
-    }
-
-    return null;
+    if (fact1.activity == null || fact2.activity == null || differentExplicitMoments(fact1, fact2)) return null;
+    const parse = value => {
+        const text = value.toLowerCase().trim().replace(/[.!?]+$/, "").replace(/^i /, "");
+        if (/\b(?:might|maybe|remember|recall|think|could|whether)\b/.test(text)) return null;
+        const match = text.match(/^(never |did not |didn't )?(signed|sign|entered|enter|left|leave|met|meet|visited|visit|called|call|went|go) (.+)$/);
+        if (!match) return {action: text, negative: false};
+        const base = {signed:"sign", entered:"enter", left:"leave", met:"meet", visited:"visit", called:"call", went:"go"};
+        return {action: `${base[match[2]] ?? match[2]} ${match[3]}`, negative: Boolean(match[1])};
+    };
+    const a = parse(fact1.activity), b = parse(fact2.activity);
+    if (!a || !b || a.action !== b.action) return null;
+    return a.negative === b.negative ? 0 : 1;
 }
-
 
 // Compare activities stated in two pieces of testimony
 export function compareActivities(activity1, activity2) {
@@ -518,17 +502,14 @@ function compareTimesWithPeriod(
         return "COMPATIBLE";
     }
 
-    // Close times are compatible.
-    if (nearestDifference <= 30) {
-        return "COMPATIBLE";
-    }
-
-    return "POSSIBLE_CONFLICT";
+    const approximate = /\b(?:around|about|maybe|approximately|roughly|think)\b/i.test(`${text1} ${text2}`);
+    if (!approximate) return "CONFLICT";
+    if (nearestDifference <= 30) return "COMPATIBLE";
+    return nearestDifference <= 90 ? "POSSIBLE_CONFLICT" : "CONFLICT";
 }
 
-// Time difference thresholds:
-// Exact: 0-30 = compatible, 31-60 = possible conflict, 61+ = conflict
-// Approximate: 0-45 = compatible, 46-90 = possible conflict, 91+ = conflict
+// Heuristic time tolerances: exact values must match; approximate gaps up to
+// 30 minutes are compatible, up to 90 possible, beyond 90 conflict. Not calibrated.
 export function compareTimes(time1, time2) {
     if (time1 === null || time2 === null) {
         return "UNKNOWN";
@@ -536,6 +517,8 @@ export function compareTimes(time1, time2) {
 
     const text1 = time1.toLowerCase().trim();
     const text2 = time2.toLowerCase().trim();
+    // Relative-day references in separate depositions need a common anchor.
+    if (/\b(?:today|tonight|tomorrow|yesterday)\b/.test(`${text1} ${text2}`)) return "UNKNOWN";
 
     const hasMeridiem1 = /(?:\b|\d)(?:am|pm)\b/.test(text1);
     const hasMeridiem2 = /(?:\b|\d)(?:am|pm)\b/.test(text2);
@@ -557,10 +540,11 @@ export function compareTimes(time1, time2) {
             "pm"
         );
 
-        if (amResult === pmResult) {
-            return amResult;
-        }
-
+        if (amResult === pmResult) return amResult;
+        // Approximate, unmarked evening times can be plausible near midnight.
+        // Keep the result tentative when one interpretation gives a possible conflict.
+        if ([amResult, pmResult].includes("POSSIBLE_CONFLICT") &&
+            ![amResult, pmResult].includes("COMPATIBLE")) return "POSSIBLE_CONFLICT";
         return "UNKNOWN";
     }
 
@@ -788,11 +772,18 @@ export function scoreLocationActivityEvidence(
         /\bleft home\b/.test(activity2) ||
         /\bleft the house\b/.test(activity2);
 
-    if (home1 && wentOut2) {
+    const continuous = fact => /\b(?:all (?:evening|night|day|afternoon)|entire (?:evening|night|day)|throughout (?:the )?(?:evening|night|day))\b/i.test(fact.original ?? "");
+    const exception = fact => /\b(?:except|unless)\b/i.test(fact.original ?? "");
+    if (exception(fact1) || exception(fact2)) return null;
+    const outsidePeriod = (home, out) => {
+        const time = explicitClock(out);
+        return /\ball evening\b/i.test(home.original ?? "") && time !== null && time < 1080;
+    };
+    if (home1 && wentOut2 && continuous(fact1) && !outsidePeriod(fact1, fact2)) {
         return 1;
     }
 
-    if (home2 && wentOut1) {
+    if (home2 && wentOut1 && continuous(fact2) && !outsidePeriod(fact2, fact1)) {
         return 1;
     }
 
@@ -806,7 +797,9 @@ export function calculateEvidenceScore(fact1, fact2) {
     const comparisons = compareFacts(fact1, fact2);
 
     const details = [
-        { rule: "time", score: scoreTimeEvidence(comparisons.time) },
+        { rule: "time", score: (fact1.activity && fact2.activity && fact1.activity.toLowerCase() !== fact2.activity.toLowerCase()) ||
+            (fact1.state && fact2.state && fact1.state.toLowerCase() !== fact2.state.toLowerCase())
+            ? null : scoreTimeEvidence(comparisons.time) },
         { rule: "quantity", score: scoreQuantityEvidence(fact1, fact2) },
         { rule: "activity polarity", score: scoreActivityEvidence(fact1, fact2) },
         { rule: "state", score: scoreStateEvidence(fact1, fact2) },
@@ -817,7 +810,7 @@ export function calculateEvidenceScore(fact1, fact2) {
     return {
         score: details.length === 0
             ? null
-            : details.reduce((sum, detail) => sum + detail.score, 0) / details.length,
+            : Math.max(...details.map(detail => detail.score)),
         details
     };
 }
@@ -844,112 +837,14 @@ export function reconcile(type, evidenceScore, evidenceDetails, comparisons) {
 
 // Calculate how much of the testimony our deterministic
 // system was actually able to evaluate
-export function calculateEvidenceCoverage(
-    fact1,
-    fact2
-) {
-    let availableEvidence = 0;
-    let totalEvidence = 0;
-
-    // Time
-    if (
-        fact1.time !== null ||
-        fact2.time !== null
-    ) {
-        totalEvidence++;
-
-        const score = scoreTimeEvidence(
-            compareTimes(
-                fact1.time,
-                fact2.time
-            )
-        );
-
-        if (score !== null) {
-            availableEvidence++;
-        }
-    }
-
-    // Quantity
-    if (
-        fact1.quantity !== null ||
-        fact2.quantity !== null
-    ) {
-        totalEvidence++;
-
-        const score = scoreQuantityEvidence(
-            fact1,
-            fact2
-        );
-
-        if (score !== null) {
-            availableEvidence++;
-        }
-    }
-
-    // Activity
-    if (
-        fact1.activity !== null ||
-        fact2.activity !== null
-    ) {
-        totalEvidence++;
-
-        const score = scoreActivityEvidence(
-            fact1,
-            fact2
-        );
-
-        if (score !== null) {
-            availableEvidence++;
-        }
-    }
-
-    // Location + activity
-    if (
-        (fact1.location !== null &&
-            fact2.activity !== null) ||
-        (fact2.location !== null &&
-            fact1.activity !== null)
-    ) {
-        totalEvidence++;
-
-        const score =
-            scoreLocationActivityEvidence(
-                fact1,
-                fact2
-            );
-
-        if (score !== null) {
-            availableEvidence++;
-        }
-    }
-
-    // Knowledge/contact
-    if (
-        fact1.original !== null &&
-        fact2.original !== null
-    ) {
-        totalEvidence++;
-
-        const score =
-            scoreKnowledgeEvidence(
-                fact1,
-                fact2
-            );
-
-        if (score !== null) {
-            availableEvidence++;
-        }
-    }
-
-    // State has no scorer, so it is intentionally
-    // excluded from coverage.
-
-    if (totalEvidence === 0) {
-        return 0;
-    }
-
-    return availableEvidence / totalEvidence;
+export function calculateEvidenceCoverage(fact1, fact2) {
+    const checks = [
+        [fact1.time != null && fact2.time != null, () => scoreTimeEvidence(compareTimes(fact1.time, fact2.time))],
+        [fact1.quantity != null && fact2.quantity != null && quantitiesAreComparable(fact1, fact2), () => scoreQuantityEvidence(fact1, fact2)],
+        [fact1.activity != null && fact2.activity != null, () => scoreActivityEvidence(fact1, fact2)],
+        [fact1.state != null && fact2.state != null, () => scoreStateEvidence(fact1, fact2)],
+        [/\b(?:heard|knew|know|met|meet)\b/i.test(fact1.original ?? "") && /\b(?:heard|knew|know|met|meet)\b/i.test(fact2.original ?? ""), () => scoreKnowledgeEvidence(fact1, fact2)],
+        [(fact1.location != null && fact2.activity != null) || (fact2.location != null && fact1.activity != null), () => scoreLocationActivityEvidence(fact1, fact2)]
+    ].filter(([applicable]) => applicable);
+    return checks.length ? checks.filter(([, check]) => check() !== null).length / checks.length : 0;
 }
-
-
