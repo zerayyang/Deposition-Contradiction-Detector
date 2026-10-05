@@ -115,10 +115,6 @@ export default function DepositionChecker() {
     }
   }
 
-  // Step 5:
-  // Separate flagged contradictions from dismissed results.
-  // DIRECT comes before INFERENTIAL.
-  // Within each type, HIGH comes before MEDIUM, then LOW.
   const flaggedResults = (results ?? [])
     .filter(
       (r) =>
