@@ -13,13 +13,16 @@ const run=row=>scoreFacts(new TestimonyFact(row.claim1),new TestimonyFact(row.cl
 const fired=(r,id)=>r.rulesFired.find(rule=>rule.id===id);
 const claim=(original,fields={})=>({original,activityPhrase:null,timePhrase:null,locationPhrase:null,personPhrase:null,objectPhrase:null,quantityPhrase:null,statePhrase:null,qualifierPhrases:[],...fields});
 const home=pair("sample-home");
+const homeTranscript=`Q: Where were you on the evening of November 3rd?\nA: ${home.claim1.original}`;
+const outTranscript=`Q: Walk through the evening of November 3rd again.\nA: ${home.claim2.original}`;
 let original=null;
 for(const [i,type] of ["DIRECT","INFERENTIAL","FALSE_POSITIVE"].entries()){
     const scored=assessCandidate({claim1:home.claim1,claim2:home.claim2,type,
-        severity:["HIGH","MEDIUM","LOW"][i],reasoning:`Opinion ${i}`,semanticAssist:{relationship:i?"MATCH":"UNRELATED"},confidence:i*50},home.claim1.original,home.claim2.original);
+        severity:["HIGH","MEDIUM","LOW"][i],reasoning:`Opinion ${i}`,semanticAssist:{relationship:i?"MATCH":"UNRELATED"},confidence:i*50},homeTranscript,outTranscript);
     const subset=Object.fromEntries(["score","band","status","evidenceStrength","commitment","rulesFired","languageDetails"].map(k=>[k,scored[k]]));
     if(original)assert.deepEqual(subset,original);else original=subset;
     assert.equal(scored.type,type);
+    assert.equal(scored.score,84);
 }
 const sleep=run(pair("sample-sleep"));
 assert.equal(fired(sleep,"time").verdict,"CONFLICT");

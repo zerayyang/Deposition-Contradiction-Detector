@@ -7,6 +7,7 @@ const verified = (id, fields, verdict, explanation, config, extra = {}) => resul
     strength: verdict === "CONFLICT" ? config.explicitStrength : 0, ...extra });
 const clauseWith = (fact, pattern) => clauses(fact.original).find(c => pattern.test(normalize(c.text)))?.text.trim() ?? null;
 const blocked = (context) => context.mismatch || context.personMismatch;
+const hypothetical = /\b(?:if|unless|suppose|supposing|assuming|hypothetically|would|wouldn't)\b/;
 const timeOf = (fact, context, side, config) => {
     if (!fact.time) return null;
     // Include only value qualifiers from the clause containing the extracted time.
@@ -97,14 +98,28 @@ function locationActivity(f1,f2,context,config) {
         if(!homeClause||!exitClause)continue;
         const h=normalize(homeClause),e=normalize(exitClause);
         if(!/\b(?:all|entire|whole|throughout|never)\b/.test(h)||/\b(?:except|mostly)\b/.test(h))continue;
-        if(/\b(?:never|not|didn't|don't|did not|do not)\b/.test(e)) {
-            if(/\b(?:remember|recall)\b/.test(e)&&/\bwhether\b/.test(e)) { /* uncertainty affects commitment, not lexical polarity */ }
-            else return verified(id,fields,"COMPATIBLE","Negated departure does not contradict remaining home.",config,{target1:reversed?exitClause:homeClause,target2:reversed?homeClause:exitClause});
-        }
-        if(blocked(context))return unknown(id,fields,"The source dates or person references differ.","MISSING_CONTEXT");
-        // Broad evening and explicit morning do not overlap.
-        if(/\bevening\b/.test(h)&&/(?:\d\s*am\b|\bmorning\b)/.test(normalize(out.time??out.original)))return verified(id,fields,"COMPATIBLE","The departure is outside the claimed evening.",config,{target1:reversed?exitClause:homeClause,target2:reversed?homeClause:exitClause});
-        if(/\b(?:today|tomorrow|yesterday)\b/.test(h+" "+e)&&!context.sameEvent)return unknown(id,fields,"Relative days need a shared source anchor.","MISSING_CONTEXT");
+        // Source sentences retain negation/conditions omitted by a short model excerpt.
+        const homeSource=normalize(home.sourceStatement || homeClause);
+        const exitSource=normalize(out.sourceStatement || exitClause);
+        if(hypothetical.test(homeSource)||hypothetical.test(exitSource))return unknown(id,fields,"A conditional or hypothetical statement does not establish an actual home/departure assertion.");
+        if(/\b(?:except|mostly|apart from|other than)\b/.test(homeSource))return unknown(id,fields,"An explicit exception prevents verifying uninterrupted home presence.");
+        const negatedHome=/\b(?:not|wasn't|weren't|isn't|aren't|never)\s+(?:always\s+|continuously\s+)?(?:at\s+)?home\b|\b(?:didn't|did not|don't|do not|never)\s+(?:stay|remain|be)\s+(?:at\s+)?home\b|\b(?:not true|isn't true|wasn't true|weren't true|never said|didn't say|did not say)\b/;
+        if(negatedHome.test(homeSource))return unknown(id,fields,"The home assertion is negated or denied; continuous presence is not established.");
+        if(blocked(context)||!context.sameEvent)return unknown(id,fields,"Home/departure comparisons need the same person and a shared source event/day anchor.","MISSING_CONTEXT");
+        const witnessHome=/\bi\s+(?:(?:was|am|have been|had been|stayed|remained)\s+(?:at\s+)?home|never\s+left\s+(?:the house|home))\b/;
+        const witnessDeparture=/\bi\s+(?:(?:never\s+)?(?:went out|stepped out|left (?:the house|home))|(?:didn't|did not|don't|do not|never)\s+(?:go out|step out|leave (?:the house|home)))\b/;
+        if(!witnessHome.test(homeSource)||!witnessDeparture.test(exitSource))return unknown(id,fields,"This rule requires source assertions about the witness's own presence and departure.");
+        const negatedDeparture=/\b(?:never|didn't|did not|don't|do not)\s+(?:go out|step out|leave (?:the house|home))\b|\bnever\s+(?:went out|stepped out|left (?:the house|home))\b/;
+        if(negatedDeparture.test(exitSource))return verified(id,fields,"COMPATIBLE","Negated departure does not contradict remaining home.",config,{target1:reversed?exitClause:homeClause,target2:reversed?homeClause:exitClause});
+        if(/\b(?:not true|isn't true|wasn't true|weren't true|never said|didn't say|did not say)\b/.test(exitSource))return unknown(id,fields,"The departure assertion is denied in its source sentence.");
+        if(/\b(?:never|not|didn't|don't|did not|do not)\b/.test(e)&&!(/\b(?:remember|recall)\b/.test(e)&&/\bwhether\b/.test(e)))return unknown(id,fields,"Unsupported negation prevents verifying an actual departure.");
+        // Compare the claimed daypart with the departure's own clause/time.
+        // Unrelated later clauses cannot change the departure's AM/PM.
+        const homePeriod=h.match(/\b(?:morning|afternoon|evening)\b/)?.[0];
+        const homeRange=homePeriod?parseTimeRange(homePeriod,{},config):null;
+        const departurePeriod=normalize(out.context).match(/\b(?:morning|afternoon|evening)\b/g)?.at(-1);
+        const departureRange=parseTimeRange(out.time??exitClause,{text:out.context},config)??(departurePeriod?parseTimeRange(departurePeriod,{},config):null);
+        if(homeRange&&departureRange&&!departureRange.missing&&!overlaps(homeRange,departureRange))return verified(id,fields,"COMPATIBLE","The departure is outside the claimed continuous daypart.",config,{target1:reversed?exitClause:homeClause,target2:reversed?homeClause:exitClause});
         return verified(id,fields,"CONFLICT","Explicit uninterrupted home presence excludes the stated departure within the compared account.",config,{target1:reversed?exitClause:homeClause,target2:reversed?homeClause:exitClause});
     }
     return unknown(id,fields,"No supported uninterrupted-home/departure pattern.");
@@ -142,5 +157,18 @@ function quantity(f1,f2,context,config){
 
 export const RULE_REGISTRY = [timeRange,stateExclusivity,timeline,activityPolarity,locationActivity,knowledge,quantity];
 export function evaluateRules(fact1,fact2,context,config=SCORING_CONFIG){
+    if(fact1.ambiguousSource||fact2.ambiguousSource){
+        return RULE_REGISTRY.map(rule=>{
+            const evaluation=rule(fact1,fact2,context,config);
+            return unknown(evaluation.id,evaluation.fieldsUsed,"Repeated witness quotes have no unambiguous source sentence or question anchor.","MISSING_CONTEXT");
+        });
+    }
+    // An extracted number/action cannot turn a hypothetical into an actual assertion.
+    if([fact1,fact2].some(fact=>hypothetical.test(normalize(fact.sourceStatement || fact.original)))){
+        return RULE_REGISTRY.map(rule=>{
+            const evaluation=rule(fact1,fact2,context,config);
+            return unknown(evaluation.id,evaluation.fieldsUsed,"Conditional or hypothetical source testimony cannot establish a factual comparison.");
+        });
+    }
     return RULE_REGISTRY.map(rule=>rule(fact1,fact2,context,config));
 }

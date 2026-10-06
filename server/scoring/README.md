@@ -4,11 +4,14 @@ Claude finds and classifies candidates. This engine never uses its type, severit
 
 Verified source quotes become literal facts. Registered rules compare supported facts and context. Conflict strength E comes from the strongest applicable conflict rule. Clause-scoped language produces commitment C for each claim; the pair uses the lower commitment. Default score: round(100 × E × (0.5 + 0.5 × C)). A derived conflict can be as strong as an explicit conflict. Approximate values widen their own ranges rather than also reducing commitment. Compatible comparisons receive a separate index capped at 15. Unsupported or ungrounded comparisons have no numeric score.
 
+Source validation requires an exact quote inside a witness answer when Q/A markers are present. Examiner questions cannot ground a claim. The pipeline retains the surrounding source sentence so cropped excerpts cannot hide supported negation, conditions, or exceptions. Repeated answer occurrences without a unique source anchor are not scored. Home/departure comparisons require a shared source event/day anchor; plain witness text is still accepted but may lack that context. These checks cover supported patterns and abstain when they cannot establish a comparison.
+
 All active weights, tolerances, caps and bands live in config.js. Values are provisional heuristics, not measured probabilities or likelihood of lying. The older comparisonRules.js exports remain for legacy regression checks; the active confidence pipeline uses this registry.
 
 Run:
 
 ```sh
+node server/sourceEvidence.test.js
 node server/scoring/scoring.test.js
 node server/comparisonRules.test.js
 node server/scoring/calibrate.js

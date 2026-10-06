@@ -248,7 +248,9 @@ const { assessCandidate } = await import("./humanConfidencePipeline.js");
 const outQuote = "I think I went out briefly.";
 const candidate = {type:"DIRECT",claim1:claim(homeQuote,{locationPhrase:"at home"}),
     claim2:claim(outQuote,{activityPhrase:"went out briefly"})};
-const result=assessCandidate(candidate,homeQuote,outQuote);
+const result=assessCandidate(candidate,
+    `Q: Where were you on November 3rd?\nA: ${homeQuote}`,
+    `Q: What happened on November 3rd?\nA: ${outQuote}`);
 const { scoreStateEvidence, scoreActivityEvidence, calculateEvidenceCoverage } = await import("./comparisonRules.js");
 assert.equal(scoreStateEvidence({...fact(""), state:"tired"}, {...fact(""), state:"hungry"}), null);
 assert.equal(scoreStateEvidence({...fact(""), state:"awake"}, {...fact(""), state:"asleep"}), 1);

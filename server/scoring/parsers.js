@@ -91,7 +91,7 @@ export function contextFor(fact1, fact2, provided = {}) {
     const mismatch = a.length > 0 && b.length > 0 && !sharedAnchor;
     const restricted = texts.map(t => /\b(?:before|after|since)\b/.test(t));
     return { ...provided, text1: texts[0], text2: texts[1],
-        sameEvent: provided.sameEvent ?? sharedAnchor,
+        sameEvent: fact1.ambiguousSource || fact2.ambiguousSource ? false : provided.sameEvent ?? sharedAnchor,
         mismatch: provided.mismatch ?? mismatch,
         asymmetricKnowledgeScope: restricted[0] !== restricted[1] && !provided.sameEvent,
         personMismatch: Boolean(fact1.person && fact2.person && normalize(fact1.person) !== normalize(fact2.person)) };

@@ -23,11 +23,13 @@
       "statePhrase": null,
       "qualifierPhrases": []
     },
-    "context": {},
+    "context": {
+      "sameEvent": true
+    },
     "expectedBand": null,
     "provisionalBand": "STRONG",
     "debatable": true,
-    "note": ""
+    "note": "Shared event context is explicit in this synthetic fixture; unanchored home/departure pairs are not evaluable."
   },
   {
     "id": "sample-sleep",
@@ -236,11 +238,13 @@
       "statePhrase": null,
       "qualifierPhrases": []
     },
-    "context": {},
+    "context": {
+      "sameEvent": true
+    },
     "expectedBand": null,
     "provisionalBand": "STRONG",
     "debatable": true,
-    "note": ""
+    "note": "Shared event context is explicit in this synthetic fixture; unanchored home/departure pairs are not evaluable."
   },
   {
     "id": "memory-departure",
@@ -266,11 +270,13 @@
       "statePhrase": null,
       "qualifierPhrases": []
     },
-    "context": {},
+    "context": {
+      "sameEvent": true
+    },
     "expectedBand": null,
     "provisionalBand": "MODERATE",
     "debatable": true,
-    "note": ""
+    "note": "Shared event context is explicit in this synthetic fixture; unanchored home/departure pairs are not evaluable."
   },
   {
     "id": "time-overlap",
@@ -484,11 +490,13 @@
       "statePhrase": null,
       "qualifierPhrases": []
     },
-    "context": {},
+    "context": {
+      "sameEvent": true
+    },
     "expectedBand": null,
     "provisionalBand": "WEAK",
     "debatable": true,
-    "note": ""
+    "note": "Shared event context is explicit in this synthetic fixture; unanchored home/departure pairs are not evaluable."
   },
   {
     "id": "signed-polarity",

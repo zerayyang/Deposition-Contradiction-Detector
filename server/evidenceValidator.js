@@ -1,3 +1,5 @@
+import { witnessQuoteMatches } from "./sourceEvidence.js";
+
 export function phraseExists(original, phrase) {
     // null means Claude found no evidence for this field, which is allowed
     if (phrase === null) {
@@ -14,9 +16,8 @@ export function phraseExists(original, phrase) {
 export function validateClaim(claim, transcript) {
     if (!claim || typeof claim.original !== "string" || !claim.original.trim() ||
         !Array.isArray(claim.qualifierPhrases)) return false;
-    // First verify that Claude's original quote
-    // actually exists in the real transcript.
-    if (!phraseExists(transcript, claim.original)) {
+    // Exact text must be witness evidence, not a premise in the examiner's question.
+    if (!witnessQuoteMatches(transcript, claim.original).length) {
         return false;
     }
 

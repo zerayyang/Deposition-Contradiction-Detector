@@ -1,17 +1,21 @@
 import { validateClaim } from "./evidenceValidator.js";
 import { TestimonyFact } from "./TestimonyFact.js";
 import { scoreFacts } from "./scoring/engine.js";
+import { witnessQuoteMatches } from "./sourceEvidence.js";
 
 function sourceContext(transcript, quote) {
-    const index = transcript.indexOf(quote);
-    if (index < 0 || transcript.indexOf(quote, index + quote.length) >= 0) return "";
-    const prefix = transcript.slice(0, index);
-    const questions = [...prefix.matchAll(/^Q:\s*(.*)$/gm)].map(match => match[1]);
+    const matches = witnessQuoteMatches(transcript, quote);
+    // Multiple answer occurrences have no unambiguous question anchor.
+    if (matches.length !== 1) return {text:"", statement:"", ambiguous:matches.length > 1};
+    const { questions: precedingQuestions, statement } = matches[0];
+    // An explicit topic/event reset cannot inherit an earlier date or daypart.
+    const resetIndex=precedingQuestions.findLastIndex(q=>/\b(?:another|different|separate)\s+(?:occasion|day|event|incident|matter)\b|\bunrelated matter\b/i.test(q));
+    const questions=precedingQuestions.slice(Math.max(0,resetIndex));
     const current = questions.at(-1) ?? "";
     // Carry only explicitly stated event/daypart anchors from preceding questions.
     const dateAnchor = questions.findLast(q => /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(q));
     const periodAnchor = questions.findLast(q => /\b(?:evening|night|morning|afternoon)\b/i.test(q));
-    return [...new Set([dateAnchor,periodAnchor,current].filter(Boolean))].join(" ");
+    return {text:[...new Set([dateAnchor,periodAnchor,current].filter(Boolean))].join(" "), statement, ambiguous:false};
 }
 
 // Orchestration preserves model metadata, but passes only validated literal facts to scoring.
@@ -24,8 +28,12 @@ export function assessCandidate(candidate, transcript1, transcript2) {
     const claim2Valid = validateClaim(candidate.claim2, transcript2);
     const fact1 = new TestimonyFact(claim1Valid ? candidate.claim1 : { original:"",qualifierPhrases:[] });
     const fact2 = new TestimonyFact(claim2Valid ? candidate.claim2 : { original:"",qualifierPhrases:[] });
-    fact1.context = claim1Valid ? sourceContext(transcript1, candidate.claim1.original) : "";
-    fact2.context = claim2Valid ? sourceContext(transcript2, candidate.claim2.original) : "";
+    for (const [fact, valid, transcript, claim] of [[fact1,claim1Valid,transcript1,candidate.claim1],[fact2,claim2Valid,transcript2,candidate.claim2]]) {
+        const source = valid ? sourceContext(transcript, claim.original) : {text:"",statement:"",ambiguous:false};
+        fact.context = source.text;
+        fact.sourceStatement = source.statement;
+        fact.ambiguousSource = source.ambiguous;
+    }
     const verified = claim1Valid && claim2Valid;
     const index = scoreFacts(fact1, fact2);
     if (!verified) Object.assign(index, {score:null,band:"NOT_EVALUABLE",status:"NOT_EVALUABLE",
