@@ -30,6 +30,8 @@ node start.mjs
 
 If you prefer to configure the key manually, copy `.env.example` to `.env` and replace the placeholder. A GitHub token or SSH key is not an Anthropic API key. `.env` is excluded from Git; do not share it.
 
+The results will take 45-50 seconds to load, please stay patient as the LLM needs time to process the information.
+
 ## What the app does
 
 1. **Claude reads the testimony.** It identifies pairs of claims and classifies them as `DIRECT`, `INFERENTIAL`, or `FALSE_POSITIVE`.
