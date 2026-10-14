@@ -24,5 +24,21 @@ dist-ssr
 *.sw?
 
 
-# Environment variables / secrets
+# Environment variables / secrets (keep safe templates versioned)
 .env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local caches, temporary work and test output
+/.cache/
+/tmp/
+/coverage/
+
+# Unused Supabase tutorial copies; active code is in src/lib/
+/Apps.tsx
+/utils/supabase.ts
