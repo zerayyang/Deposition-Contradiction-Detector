@@ -1,0 +1,66 @@
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "./lib/supabaseClient.js";
+
+function SignIn() {
+  const [signup, setSignup] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const submitting = useRef(false);
+
+  async function submit(event) {
+    event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
+    setBusy(true); setError(""); setMessage("");
+    try {
+      const credentials = { email: email.trim(), password };
+      const { data, error: failure } = signup
+        ? await supabase.auth.signUp({ ...credentials, options: { emailRedirectTo: window.location.origin } })
+        : await supabase.auth.signInWithPassword(credentials);
+      if (failure) throw failure;
+      setPassword("");
+      if (signup && !data.session) setMessage("Check your email to confirm your account, then sign in here.");
+    } catch (err) { setError(err.message); }
+    finally { submitting.current = false; setBusy(false); }
+  }
+
+  return <main className="login-page"><div className="login-intro"><div className="brand-mark">D</div><span className="eyebrow">DEPOSITION WORKSPACE</span><h1>Clarity in<br/>every account.</h1><p>Compare testimony. Trace the evidence.<br/>Review every finding in context.</p><div className="login-caption">Your testimony review, together in one workspace.</div></div><section className="login-card"><span className="eyebrow">WELCOME</span>
+    <h2>{signup ? "Create your account" : "Welcome back"}</h2>
+    <p>{signup ? "Create an account to start reviewing testimony." : "Sign in to open your case workspace."}</p>
+    <form className="cloud-form" onSubmit={submit}>
+      <label>Email<input type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required /></label>
+      <label>Password<input type="password" autoComplete={signup ? "new-password" : "current-password"} minLength={signup ? 8 : undefined} value={password} onChange={event => setPassword(event.target.value)} required /></label>
+      <button disabled={busy}>{busy ? "Please wait…" : signup ? "Create account" : "Sign in"}</button>
+      <button type="button" disabled={busy} onClick={() => { setSignup(!signup); setError(""); setMessage(""); }}>{signup ? "Already have an account?" : "Create an account"}</button>
+    </form>
+    {error && <p role="alert" className="error">{error}</p>}
+    {message && <p role="status">{message}</p>}
+  </section></main>;
+}
+
+export default function AuthGate({ children }) {
+  const [auth, setAuth] = useState({ loading: true, session: null, error: "" });
+  useEffect(() => {
+    if (!supabase) return;
+    let active = true;
+    let changed = false;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      changed = true;
+      if (active) setAuth({ loading: false, session, error: "" });
+    });
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (active && !changed) setAuth({ loading: false, session: data.session, error: error?.message ?? "" });
+    }).catch(error => {
+      if (active && !changed) setAuth({ loading: false, session: null, error: error.message });
+    });
+    return () => { active = false; subscription.unsubscribe(); };
+  }, []);
+
+  if (!supabase) return <main className="login-page"><section className="login-card"><h1>Connection needed</h1><p>Add the Supabase URL and publishable key to .env.local, then restart the app.</p></section></main>;
+  if (auth.loading) return <main className="session-loading" role="status">Opening your workspace…</main>;
+  if (auth.session) return children(auth.session);
+  return <><SignIn />{auth.error && <p role="alert" className="auth-error">{auth.error}</p>}</>;
+}
