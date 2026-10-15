@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deposition · Backend status</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;color:#193344;background:#f3f7f8}*{box-sizing:border-box}body{margin:0}main{max-width:860px;margin:64px auto;padding:0 24px}header{display:flex;align-items:center;gap:12px}.logo{background:#176f76;color:white;border-radius:12px;padding:10px 16px;font:700 25px Georgia,serif}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#54757d}h1{font-size:clamp(28px,5vw,42px);margin-bottom:12px;letter-spacing:-.04em}p{line-height:1.65;color:#526979}section{background:white;border:1px solid #dce7eb;border-radius:18px;padding:26px;margin-top:22px}.badge{display:inline-flex;align-items:center;gap:8px;background:#e7f4ef;color:#226548;padding:7px 12px;border-radius:30px;font-weight:600;font-size:14px}.dot{width:8px;height:8px;border-radius:100%;background:#32966a}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}a.button{display:inline-block;text-decoration:none;background:#176f76;color:white;padding:13px 19px;border-radius:10px;font-weight:600}a.secondary{background:#edf4f6;color:#175c65}a:focus-visible{outline:3px solid #eaa943;outline-offset:4px}code,pre{font-family:ui-monospace,monospace;font-size:13px;background:#f0f5f7;border-radius:7px}code{padding:3px 6px}pre{padding:16px;overflow:auto;line-height:1.6}h2{font-size:19px;margin-top:0}.flow{font-size:15px;font-weight:600;color:#1d666e}footer{font-size:13px;padding:18px 2px;color:#647985}@media(max-width:550px){main{margin:28px auto}section{padding:20px}.actions a{width:100%;text-align:center}}
+</style>
+</head>
+<body><main>
+<header><span class="logo" aria-hidden="true">D</span><div><strong>Deposition</strong><div class="eyebrow">Local development</div></div></header>
+<h1>Your backend is running.</h1>
+<p>This page was served by your Node.js / Express server. It receives transcript-analysis requests from your app.</p>
+<section><span class="badge"><span class="dot" aria-hidden="true"></span>HTTP server responding</span>
+<div class="actions"><a class="button" href="http://localhost:5173/">Open app · port 5173</a><a class="button secondary" href="/api/health">Check backend health</a></div>
+<p>The app link uses the default development port. If it does not open, run <code>npm run dev</code> in a second terminal and use the address Vite prints.</p></section>
+<section><h2>What does localhost:3000 mean?</h2>
+<p><strong>localhost</strong> is your own computer. <strong>3000</strong> is the port assigned to this backend. Your visual workspace usually runs on port <strong>5173</strong>.</p>
+<p class="flow">You → app on 5173 → backend on 3000 → Claude</p>
+<p>During analysis, the backend calls Claude, validates its extracted quotes, runs deterministic scoring, and adds local Chrono diagnostics.</p></section>
+<section><h2>Available routes</h2>
+<p><code>GET /api/health</code> checks whether this server can respond.</p>
+<p><code>POST /api/analyze</code> accepts two transcript strings from the app:</p>
+<pre>{"transcript1":"First transcript…","transcript2":"Second transcript…"}</pre>
+<p>Analysis can incur Claude API charges. Opening this page or checking health makes no Claude calls.</p></section>
+<footer>This page confirms local HTTP availability only. Claude credits, Supabase and other external services are not checked. A refresh checks the server again.</footer>
+</main></body></html>

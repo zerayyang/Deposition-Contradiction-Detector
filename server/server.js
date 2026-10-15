@@ -22,6 +22,13 @@ const app = express();
 
 app.use(express.json());
 
+const statusPage=fs.readFileSync(new URL("./status.html",import.meta.url),"utf8");
+app.get("/", (_req,res)=>res.set("Cache-Control","no-store").type("html").send(statusPage));
+app.get("/api/health", (_req,res)=>res.set("Cache-Control","no-store").json({
+    status:"ok",service:"deposition-backend",uptimeSeconds:Math.floor(process.uptime()),
+    externalServices:"not checked",callsClaude:false
+}));
+
 app.post("/api/analyze", async (req, res) => {
     const { transcript1, transcript2 } = req.body ?? {};
     if (typeof transcript1 !== "string" || typeof transcript2 !== "string" ||
