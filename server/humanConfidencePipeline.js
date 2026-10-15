@@ -14,7 +14,7 @@ function sourceContext(transcript, quote) {
     const questions=precedingQuestions.slice(Math.max(0,resetIndex));
     const current = questions.at(-1) ?? "";
     // Carry only explicitly stated event/daypart anchors from preceding questions.
-    const dateAnchor = questions.findLast(q => /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(q));
+    const dateAnchor = questions.findLast(q => /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|May|June|July|August|September|October|November|December|New Year['’]s (?:Eve|Day)|\d{4}[/-]\d{1,2}[/-]\d{1,2})\b/i.test(q));
     const periodAnchor = questions.findLast(q => /\b(?:evening|night|morning|afternoon)\b/i.test(q));
     return {text:[...new Set([dateAnchor,periodAnchor,current].filter(Boolean))].join(" "), statement, ambiguous:false};
 }

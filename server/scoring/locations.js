@@ -1,3 +1,4 @@
+import { dateScope, stripDates } from "./temporal.js";
 import { normalize, parseTimeRange } from "./parsers.js";
 
 // This vocabulary describes venues, not people or fixture-specific answers.
@@ -10,22 +11,12 @@ const venueFamilies = [
     ["cafe", /\b(?:cafe|café|coffee shop)\b/], ["bank", /\bbank\b/],
     ["courthouse", /\bcourthouse\b/], ["home", /^(?:home|my house)$/],
 ];
-const months = "january|february|march|april|may|june|july|august|september|october|november|december";
-const datePattern = new RegExp(`\\b(${months}) (\\d{1,2})(?:st|nd|rd|th)?(?:,? (\\d{4}))?\\b`, "g");
 const weekdays = /\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/g;
-
 function dateKey(text) {
-    const matches = [...normalize(text).matchAll(datePattern)];
-    const monthNames = months.split("|");
-    if (matches.some(m => {
-        const month = monthNames.indexOf(m[1]);
-        const days = new Date(Date.UTC(Number(m[3] ?? 2000), month + 1, 0)).getUTCDate();
-        return Number(m[2]) < 1 || Number(m[2]) > days;
-    })) return null;
-    const dates = matches.map(m => `${m[1]} ${Number(m[2])}${m[3] ? ` ${m[3]}` : ""}`);
-    // Multiple dates cannot identify which occurrence was meant.
-    const anchors = new Set(dates.length ? dates : normalize(text).match(weekdays) ?? []);
-    return anchors.size === 1 ? [...anchors][0] : null;
+    const scope=dateScope(text);
+    if(scope.present)return scope.key;
+    const anchors=new Set(normalize(text).match(weekdays)??[]);
+    return anchors.size===1?[...anchors][0]:null;
 }
 
 function venue(text) {
@@ -51,7 +42,7 @@ export function locationAssertion(fact, config) {
     if (!location) return null;
     const suffix = rest.slice(boundary).trim();
     // Remove date tokens before parsing clocks so September 11 isn't read as 11 AM.
-    const timeText = suffix.replace(datePattern, "").replace(weekdays, "").replace(/\b(?:on|at)\b/g, " ").trim();
+    const timeText = stripDates(suffix).replace(weekdays, "").replace(/\b(?:on|at)\b/g, " ").trim();
     if (!/^(?:(?:around|about|roughly|approximately|maybe|perhaps)\s+)*(?:\d{1,2}(?::\d{2})?\s*(?:am|pm)?|noon|midnight)$/.test(timeText)) return null;
     const time = parseTimeRange(timeText, {text: fact.context}, config);
     return { subject: match[1]?.trim() ?? "@witness", action: match[1] ? "saw" : "was at", location,

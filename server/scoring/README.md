@@ -50,3 +50,24 @@ The clock parser accepts dotted/spaced AM/PM and immediately attached dayparts. 
 ## Event-clock alternatives
 
 The event-time rule enumerates supported missing-AM/PM alternatives and scores only invariant relationships, using the smallest possible gap. Mixed interpretations remain unresolved. See [clock alternatives, expectations and saved replay](clock-alternatives.md). The ordinary parser and Chrono diagnostics retain their existing contracts.
+
+## Normalized calendar and clock components
+
+The API's additive `temporal.claim1` / `temporal.claim2` contain `fields` (year, month, day, hour, minute), a `YYYY/MM/DD HH/mm` display, and separate literal date/clock records with provenance. Unstated values are empty strings. No current date or Chrono synthetic defaults enter these fields. These are calendar scope plus clock components, not an absolute timestamp: midnight may belong to an overnight boundary and is not silently assigned to the following day.
+
+Calendar keys are now shared by event context and point-location comparisons. Supported inputs: year-first numeric dates with slashes/hyphens, full English month names with optional ordinal day/year, and explicit New Year's Eve/Day references. The fixed named occasions resolve to December 31/January 1, with no guessed year. Other holidays still need separate integration; the Canadian diagnostic dataset is not automatically consulted. A known year does not match an unstated year. Invalid/multiple dates do not establish a shared calendar day. Matching dates alone do not prove the same occurrence; other existing person/activity/source guards still apply. Supported dates are removed before clock parsing so their numbers cannot become hours. Ambiguous day-first/month-first numeric dates are unsupported.
+
+Run `node --test server/scoring/temporal.test.js`. Proposed fixture expectations:
+
+| Literal inputs | Expected result |
+| --- | --- |
+| December 31, 2026 at 11:45 pm | `2026/12/31 23/45` |
+| December 31 at 11 pm | `/12/31 23/` (no invented year/minute) |
+| 5:15 | Hour blank, minute 15; literal 12-hour value retained separately |
+| Tomorrow at 23:15 | Calendar blank; explicit clock 23/15 |
+| New Year's Eve | Month/day 12/31; year and event time blank |
+| between 11 and midnight / before midnight | Tokens retained; no collapsed point time |
+| Same arrival, 2026/12/31 vs December 31, 2026, 11 pm vs 7 pm | Existing time rule supports conflict |
+| Different years, invalid dates, or multiple dates | No shared-day inference |
+
+Original quotes remain unchanged and undergo existing grounding. Formula, weights, bands and Claude classification prompt are unchanged. Range overlap and boundary/negation interpretation remain separate work. Observed local regression/replay results are documented in `temporal-change.md`; fixture expectations are not calibrated score labels.

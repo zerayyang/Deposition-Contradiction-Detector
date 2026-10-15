@@ -1,3 +1,4 @@
+import { collectTemporal } from "./temporal.js";
 import { SCORING_CONFIG } from "./config.js";
 import { contextFor } from "./parsers.js";
 import { evaluateRules } from "./rules.js";
@@ -42,7 +43,7 @@ export function scoreFacts(fact1,fact2,providedContext={},config=SCORING_CONFIG)
     ];
     const present=new Set(fields.filter(field=>fact1[field]||fact2[field]));
     const compared=new Set(applicable.flatMap(r=>r.fieldsUsed).filter(field=>present.has(field)));
-    return {score,band:evidenceBand(score,config),status,notEvaluableReason,evidenceStrength,
+    return {temporal:{claim1:collectTemporal(fact1),claim2:collectTemporal(fact2)},score,band:evidenceBand(score,config),status,notEvaluableReason,evidenceStrength,
         commitment:{claim1:claim1.commitment,claim2:claim2.commitment,pair},rulesFired,rulesLimiting,
         languageDetails:{claim1:{applied:claim1.applied,ignored:claim1.ignored},claim2:{applied:claim2.applied,ignored:claim2.ignored}},
         factsCompared:{compared:compared.size,total:present.size},configVersion:config.version};

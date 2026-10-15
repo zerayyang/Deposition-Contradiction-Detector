@@ -1,3 +1,4 @@
+import { dateScope, stripDates } from "./temporal.js";
 import { SCORING_CONFIG } from "./config.js";
 
 export const normalize = text => String(text ?? "").toLowerCase().replace(/[’]/g, "'").trim();
@@ -18,8 +19,8 @@ export const clauses = text => {
 
 export function parseTimeRange(phrase, context = {}, config = SCORING_CONFIG) {
     // Normalize clock notation internally; literal evidence stays untouched.
-    const text = normalize(phrase).replace(/\b([ap])(?:\s*\.\s*|\s+)m\.?(?!\w)/g, "$1m");
-    if (!text || /\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b/.test(text) || /\b\d+\s*(?:seconds?|minutes?|hours?|days?|years?)\b/.test(text)) return null;
+    const text = normalize(stripDates(phrase)).replace(/\b([ap])(?:\s*\.\s*|\s+)m\.?(?!\w)/g, "$1m");
+    if (!text || /\d[/-]\d/.test(text) || /\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b/.test(text) || /\b\d+\s*(?:seconds?|minutes?|hours?|days?|years?)\b/.test(text)) return null;
     const named = /\bafternoon\b/.test(text) ? config.afternoonRange : /\bevening\b/.test(text) ? config.eveningRange : /\bmorning\b/.test(text) ? config.morningRange : null;
     const tokens = [...text.matchAll(/\b(?:midnight|noon)\b|\b(?:[01]?\d|2[0-3])(?::[0-5]\d)?\s*(?:am|pm)?\b/g)];
     if (!tokens.length) return named ? { earliest: named[0], latest: named[1], interval: true, approximate: false, widenedBy: 0 } : null;
@@ -117,8 +118,12 @@ export function contextFor(fact1, fact2, provided = {}) {
     const texts = [fact1, fact2].map(f => normalize(`${f.context ?? ""} ${f.original}`));
     const anchors = t => t.match(/\b(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|(?:january|february|march|april|may|june|july|august|september|october|november|december) \d+(?:st|nd|rd|th)?(?:,? \d{4})?)\b/g) ?? [];
     const a = anchors(texts[0]), b = anchors(texts[1]);
-    const sharedAnchor = a.some(x => b.includes(x));
-    const mismatch = a.length > 0 && b.length > 0 && !sharedAnchor;
+    const dates=texts.map(dateScope);
+    // Calendar scope takes precedence over shared weekday words. Unknown year
+    // remains blank, and multiple/invalid dates cannot establish a shared day.
+    const hasCalendar=dates.some(d=>d.present);
+    const sharedAnchor=hasCalendar?Boolean(dates[0].key&&dates[0].key===dates[1].key):a.some(x=>b.includes(x));
+    const mismatch=hasCalendar?dates.every(d=>d.present)&&!sharedAnchor:a.length>0&&b.length>0&&!sharedAnchor;
     const restricted = texts.map(t => /\b(?:before|after|since)\b/.test(t));
     return { ...provided, text1: texts[0], text2: texts[1],
         sameEvent: fact1.ambiguousSource || fact2.ambiguousSource ? false : provided.sameEvent ?? sharedAnchor,
