@@ -199,7 +199,8 @@ Reject a separate compatible-detail card whose justification is only that the ac
 
 - Report pairs that concern the same factual issue and conflict, with type DIRECT or INFERENTIAL.
 - Report independent apparent mismatches with type FALSE_POSITIVE after applying the consolidation rules; compatible supporting details already covered by another card belong in that card’s reasoning.
-- Do not report pairs that are merely differently worded, or that do not conflict even on the surface.
+- Preserve one independently assessed comparison when two answers assign materially different values, bounds, or precision to the same factual attribute of the same event, even if their permitted ranges overlap. If compatible, return it as FALSE_POSITIVE with the actual literal evidence and explain the overlap or boundary relationship. Do not omit this independent comparison merely because it is compatible. This does not require a separate card for supporting details of an already reported issue.
+- Do not report pairs that are merely differently worded or plainly identical in factual content. A substantive range-versus-point or restriction-versus-occurrence comparison is different from a wording-only change.
 - Do not report a candidate unless both sides are supported by actual testimony.
 - If there is nothing to report, return an empty `contradictions` array (still including `topicsReviewed`).
 

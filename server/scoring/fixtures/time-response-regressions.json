@@ -1,0 +1,224 @@
+{
+  "source": "live-five-single-20261015T010500Z/results.json",
+  "cases": [
+    {
+      "id": "exact-clockout-time",
+      "request": {
+        "transcript1": "Q: What time did you leave the office on Friday, May 9th?\nA: 5:15. I clocked out at 5:15.",
+        "transcript2": "Q: What time did you leave the office on Friday, May 9th?\nA: I clocked out at 6:45 that Friday."
+      },
+      "saved_status": "CONFLICT_SUPPORTED",
+      "candidate": {
+        "claim1": {
+          "original": "5:15. I clocked out at 5:15.",
+          "activityPhrase": "clocked out",
+          "timePhrase": "5:15",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": []
+        },
+        "claim2": {
+          "original": "I clocked out at 6:45 that Friday.",
+          "activityPhrase": "clocked out",
+          "timePhrase": "6:45 that Friday",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": []
+        },
+        "type": "DIRECT",
+        "severity": "MEDIUM",
+        "reasoning": "Both answers respond to the same question about leaving the office on Friday, May 9th, and give unhedged exact clock-out times 90 minutes apart. Neither transcript indicates more than one clock-out, so no supported reconciliation exists. Different exact values for the same single fact make this DIRECT. Follow-up: Did you clock out more than once that day, and do timekeeping records show the time?",
+        "semanticAssist": {
+          "relationship": "POSSIBLE_CONFLICT",
+          "activity1Suggestions": [],
+          "activity2Suggestions": []
+        }
+      },
+      "origin": "saved returned candidate",
+      "expected_status": "CONFLICT_SUPPORTED"
+    },
+    {
+      "id": "approx-clock-overlap-bar",
+      "request": {
+        "transcript1": "Q: What time did you arrive at the bar on Saturday the 14th?\nA: Around 8, maybe 8:30.",
+        "transcript2": "Q: What time did you arrive at the bar on Saturday the 14th?\nA: It was 8:30 or so."
+      },
+      "saved_status": "NOT_EVALUABLE",
+      "candidate": {
+        "claim1": {
+          "original": "Around 8, maybe 8:30.",
+          "activityPhrase": null,
+          "timePhrase": "Around 8, maybe 8:30",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": [
+            "Around",
+            "maybe"
+          ]
+        },
+        "claim2": {
+          "original": "It was 8:30 or so.",
+          "activityPhrase": null,
+          "timePhrase": "8:30 or so",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": [
+            "or so"
+          ]
+        },
+        "type": "FALSE_POSITIVE",
+        "severity": "MEDIUM",
+        "reasoning": "Both answers address the same arrival at the bar on Saturday the 14th. Transcript 1 gives an approximate range from about 8 to perhaps 8:30, and Transcript 2 gives an approximate time of about 8:30. The ranges overlap because 8:30 appears in both answers. Both statements can reasonably be true, so this surface difference in approximate times is not a conflict.",
+        "semanticAssist": {
+          "relationship": "MATCH",
+          "activity1Suggestions": [],
+          "activity2Suggestions": []
+        }
+      },
+      "origin": "saved returned candidate",
+      "expected_status": "COMPATIBLE_SUPPORTED"
+    },
+    {
+      "id": "approx-clock-overlap-game",
+      "request": {
+        "transcript1": "Q: When did you get home from the game on October 5th?\nA: Somewhere between 11 and midnight.",
+        "transcript2": "Q: When did you get home from the game on October 5th?\nA: Probably around 11:45."
+      },
+      "saved_status": null,
+      "candidate": {
+        "type": "FALSE_POSITIVE",
+        "severity": "MEDIUM",
+        "reasoning": "Local scoring fixture only; this candidate was not returned in the live run.",
+        "claim1": {
+          "original": "Somewhere between 11 and midnight.",
+          "timePhrase": "Somewhere between 11 and midnight.",
+          "activityPhrase": null,
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": []
+        },
+        "claim2": {
+          "original": "Probably around 11:45.",
+          "timePhrase": "Probably around 11:45.",
+          "activityPhrase": null,
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": []
+        }
+      },
+      "origin": "local hypothetical candidate; live response omitted this pair",
+      "expected_status": "COMPATIBLE_SUPPORTED"
+    },
+    {
+      "id": "approx-clock-nonoverlap-restaurant",
+      "request": {
+        "transcript1": "Q: What time did you arrive at the restaurant on August 9th?\nA: Around 6, I think. It was early.",
+        "transcript2": "Q: What time did you arrive at the restaurant on August 9th?\nA: Around 10 at night, maybe a little after."
+      },
+      "saved_status": "CONFLICT_SUPPORTED",
+      "candidate": {
+        "claim1": {
+          "original": "Around 6, I think. It was early.",
+          "activityPhrase": null,
+          "timePhrase": "Around 6",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": [
+            "Around",
+            "I think"
+          ]
+        },
+        "claim2": {
+          "original": "Around 10 at night, maybe a little after.",
+          "activityPhrase": null,
+          "timePhrase": "Around 10 at night, maybe a little after",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": [
+            "Around",
+            "maybe",
+            "a little after"
+          ]
+        },
+        "type": "INFERENTIAL",
+        "severity": "MEDIUM",
+        "reasoning": "Both answers address the same question: the witness's arrival time at the restaurant on August 9th. The answers place it around 6, described as early, and around 10 at night or a little after. These are about four hours apart, which ordinary approximation does not cover. Bare \"6\" lacks AM/PM, but either reading is separated from 10 PM. INFERENTIAL because the conflict depends on comparing approximate times. Follow-up: \"Was that 6 in the morning or evening, and what fixes your arrival time?\"",
+        "semanticAssist": {
+          "relationship": "POSSIBLE_CONFLICT",
+          "activity1Suggestions": [],
+          "activity2Suggestions": []
+        }
+      },
+      "origin": "saved returned candidate",
+      "expected_status": "CONFLICT_SUPPORTED"
+    },
+    {
+      "id": "negation-scope-midnight",
+      "request": {
+        "transcript1": "Q: When did you leave the party on New Year's Eve?\nA: I didn't leave before midnight.",
+        "transcript2": "Q: When did you leave the party on New Year's Eve?\nA: I left around 12:30."
+      },
+      "saved_status": "NOT_EVALUABLE",
+      "candidate": {
+        "claim1": {
+          "original": "I didn't leave before midnight.",
+          "activityPhrase": "didn't leave",
+          "timePhrase": "before midnight",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": []
+        },
+        "claim2": {
+          "original": "I left around 12:30.",
+          "activityPhrase": "left",
+          "timePhrase": "around 12:30",
+          "locationPhrase": null,
+          "personPhrase": null,
+          "objectPhrase": null,
+          "quantityPhrase": null,
+          "statePhrase": null,
+          "qualifierPhrases": [
+            "around"
+          ]
+        },
+        "type": "FALSE_POSITIVE",
+        "severity": "MEDIUM",
+        "reasoning": "Both answers address when the witness left the New Year's Eve party. Transcript 1 only denies leaving before midnight. Transcript 2 gives an approximate departure around 12:30. If 12:30 means 12:30 AM after the midnight boundary, the accounts are consistent and Transcript 2 adds detail, so the type is FALSE_POSITIVE. The answer does not state AM or PM, so a neutral follow-up would be: Do you mean 12:30 AM on January 1?",
+        "semanticAssist": {
+          "relationship": "MATCH",
+          "activity1Suggestions": [],
+          "activity2Suggestions": []
+        }
+      },
+      "origin": "saved returned candidate",
+      "expected_status": "COMPATIBLE_SUPPORTED"
+    }
+  ]
+}

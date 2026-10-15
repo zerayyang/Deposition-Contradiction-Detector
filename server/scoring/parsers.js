@@ -59,7 +59,7 @@ export function parseTimeRange(phrase, context = {}, config = SCORING_CONFIG) {
     }
     const interval = /\b(?:from|until|through|between)\b|\d\s*(?:to|-)\s*\d/.test(text) && values.length > 1;
     if (interval && values.at(-1) < values[0]) values[values.length - 1] += config.minutesPerDay;
-    const approximate = /\b(?:around|about|roughly|approximately|maybe|perhaps)\b/.test(text);
+    const approximate = /\b(?:around|about|roughly|approximately|maybe|perhaps)\b|\bor so\b/.test(text);
     const widenedBy = approximate ? config.timeToleranceMinutes : 0;
     let earliest = Math.min(...values), latest = Math.max(...values);
     // An unqualified until phrase is an endpoint, not an invented starting interval.

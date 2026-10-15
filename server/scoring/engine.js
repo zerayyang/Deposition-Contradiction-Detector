@@ -37,7 +37,7 @@ export function scoreFacts(fact1,fact2,providedContext={},config=SCORING_CONFIG)
     const notEvaluableReason=status!=="NOT_EVALUABLE"?null:!factsPresent&&!/\b(?:heard|knew|met|home|left|out)\b/i.test(`${fact1.original} ${fact2.original}`)?"NO_FACTS":evaluations.some(r=>r.reason==="MISSING_CONTEXT")?"MISSING_CONTEXT":"UNSUPPORTED_PATTERN";
     const rulesFired=applicable.map(({target1,target2,...r})=>{void target1;void target2;return r;});
     const rulesLimiting=[
-        ...evaluations.filter(r=>!r.applicable&&r.reason==="MISSING_CONTEXT").map(r=>({id:r.id,explanation:r.explanation})),
+        ...evaluations.filter(r=>!r.applicable&&(status==="NOT_EVALUABLE"||r.reason==="MISSING_CONTEXT")).map(r=>({id:r.id,reason:r.reason,explanation:r.explanation})),
         ...active.flatMap(r=>(r.limits??[]).map(explanation=>({id:r.id,explanation}))),
         ...[claim1,claim2].flatMap((c,index)=>[...c.applied.filter(x=>x.effect<0).map(x=>({id:"commitment",explanation:`Claim ${index+1}: '${x.phrase}' reduces commitment of the compared assertion.`})),...c.ignored.map(x=>({id:"ignored-language",explanation:`Claim ${index+1}: ignored '${x.phrase}': ${x.explanation}`}))])
     ];

@@ -1,3 +1,4 @@
+import { compareStructuredTimes } from "./timeExpressions.js";
 import { locationAssertion, compareLocations } from "./locations.js";
 import { SCORING_CONFIG } from "./config.js";
 import { normalize, clauses, parseTimeRange, parseClockAlternatives, alignClockRanges, parseQuantityRange, overlaps } from "./parsers.js";
@@ -31,12 +32,16 @@ function timeRange(f1, f2, context, config) {
     const id = "time", fields = ["time"];
     if (!f1.time || !f2.time) return unknown(id,fields,"Two clock phrases are needed.");
     if (blocked(context) || !context.sameEvent) return unknown(id,fields,"Clock comparisons need the same person and source event/day anchor.","MISSING_CONTEXT");
-    if (f1.activity && f2.activity && normalize(f1.activity) !== normalize(f2.activity)) return unknown(id,fields,"Different activities do not assert two times for the same event.");
     if (f1.state && f2.state && normalize(f1.state) !== normalize(f2.state)) return unknown(id,fields,"Different states may occur at different times; compare their temporal overlap instead.");
     if (f1.location && f2.location && normalize(f1.location) !== normalize(f2.location)) return unknown(id,fields,"Matching clock values alone do not establish location compatibility.");
     // Repeated sightings are not automatically one event merely because their day agrees.
     // Let the location rule establish the subject, venue and exact time together.
     if (locationAssertion(f1,config) || locationAssertion(f2,config)) return unknown(id,fields,"Presence/sighting times are evaluated together with their source locations.");
+    const structured=compareStructuredTimes(f1,f2,context,config);
+    if(structured)return structured.applicable?{id,...structured}:unknown(id,fields,structured.explanation);
+    if (f1.activity && f2.activity && normalize(f1.activity) !== normalize(f2.activity)) return unknown(id,fields,"Different activities do not assert two times for the same event.");
+    // Unsupported bounds/denials cannot fall through to ordinary event points.
+    if([f1,f2].some(f=>/\b(?:before|after|until|since|no earlier than|no later than)\s+(?:(?:around|about)\s+)?(?:\d|midnight\b|noon\b)/i.test(f.sourceStatement||f.original)))return unknown(id,fields,"Time bounds require a supported source restriction; they are not occurrence timestamps.");
     let a = timeOf(f1,context,1,config), b = timeOf(f2,context,2,config);
     if (a?.missing || b?.missing) {
         // A boundary/negated time clause is not a claim of occurrence at a point.
@@ -135,6 +140,7 @@ function movementPurposeConflict(f1,f2,context) {
 }
 function activityPolarity(f1,f2,context,config) {
     const id="activity polarity",fields=["activity"];
+    if([f1,f2].some(f=>/\b(?:before|after|until|since)\b/i.test(f.sourceStatement||f.original)))return unknown(id,fields,"A time-scoped denial is not a blanket activity denial.");
     const a=polarity(f1.activity),b=polarity(f2.activity);
     if(!a||!b||a.action!==b.action){
         const movement=movementPurposeConflict(f1,f2,context);

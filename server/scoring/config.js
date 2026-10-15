@@ -1,7 +1,7 @@
 // All scoring weights, caps, tolerances and display thresholds live here.
 // These are uncalibrated heuristic choices, not probabilities.
 export const SCORING_CONFIG = {
-    version: "evidence-index-v2",
+    version: "evidence-index-v3-time-expressions",
     commitmentBaseline: 0.80, // Neutral assertion commitment.
     certaintyBonus: 0.10, // Each scoped certainty marker, with diminishing returns.
     certaintyCap: 0.20, // Maximum certainty addition.

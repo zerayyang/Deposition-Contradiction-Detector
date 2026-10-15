@@ -76,7 +76,7 @@ assert.equal(parseTimeRange("around 7").missing,"AM_PM");
 const bad=assessCandidate({type:"DIRECT",claim1:claim("Invented"),claim2:home.claim2},home.claim1.original,home.claim2.original);
 assert.equal(bad.score,null);assert.equal(bad.notEvaluableReason,"UNVERIFIED_SOURCE");
 // Scoring implementation may not read any model-opinion fields.
-for(const file of ["engine.js","rules.js","language.js","parsers.js"]){
+for(const file of ["engine.js","rules.js","language.js","parsers.js","timeExpressions.js"]){
     const source=readFileSync(new URL(file,import.meta.url),"utf8");
     assert.ok(!/\.(?:type|severity|reasoning|semanticAssist|confidence)\b/.test(source),file);
 }

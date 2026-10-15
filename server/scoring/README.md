@@ -71,3 +71,7 @@ Run `node --test server/scoring/temporal.test.js`. Proposed fixture expectations
 | Different years, invalid dates, or multiple dates | No shared-day inference |
 
 Original quotes remain unchanged and undergo existing grounding. Formula, weights, bands and Claude classification prompt are unchanged. Range overlap and boundary/negation interpretation remain separate work. Observed local regression/replay results are documented in `temporal-change.md`; fixture expectations are not calibrated score labels.
+
+## Compound times, event windows and departure bounds
+
+The time rule supports possible consistency for compound estimates/window-versus-point comparisons and a source-grounded negated-before departure restriction. Unknown periods remain enumerated, not asserted as known. Unsupported rule reasons are visible when scoring is unavailable. See [implementation notes, fixture expectations and limits](time-expressions.md). Compatible means the accounts can coexist under a supported interpretation, not that the actual clock or overnight date is proven. Ordinary single-point ambiguity and unrelated event/source guards are retained. The AI reporting instructions now retain independent comparisons of different bounds/precision even when compatible; live compliance has not been measured by local scoring tests.

@@ -37,7 +37,7 @@ test('missing or different event anchors still prevent scoring and invalid evide
     assert.equal(r.notEvaluableReason,'UNVERIFIED_SOURCE');assert.equal(r.score,null);
 });
 test('unsupported ranges and time bounds are not converted into simple clock alternatives',()=>{
-    for(const a of ['between 11 and midnight','before 8','after 8','around 8, maybe 8:30'])assert.equal(clocks(a,'10 pm').status,'NOT_EVALUABLE',a);
+    for(const a of ['before 8','after 8','around 8, maybe 8:30'])assert.equal(clocks(a,'10 pm').status,'NOT_EVALUABLE',a);
 });
 test('exact source statements with boundary wording cannot masquerade as event times',()=>{
     const r=run(claim("I didn't arrive before 8.",'8'),claim('I arrived at 10 pm.','10 pm'));
