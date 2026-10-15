@@ -1,8 +1,10 @@
+import { DOCUMENT_LIMITS,checkFileBudget } from '../../shared/documentLimits.js';
+import { uploadResumable } from './resumableUpload.js';
 export const DOCUMENT_BUCKET = "case-originals";
-export const MAX_DOCUMENT_BYTES = 2 * 1024 * 1024;
+export const MAX_DOCUMENT_BYTES = DOCUMENT_LIMITS.fileBytes;
 
 export function documentMetadata(file) {
-  return file?.path ? { path: file.path, name: file.name, size: file.size, type: file.type } : null;
+  return file?.path ? { path: file.path, name: file.name, size: file.size, type: file.type, ...(file.extraction?{extraction:file.extraction}:{}), ...(file.pageMappingStale?{pageMappingStale:true}:{}) } : null;
 }
 
 export function createDocumentStore(client, userId, randomId = () => crypto.randomUUID()) {
@@ -16,16 +18,20 @@ export function createDocumentStore(client, userId, randomId = () => crypto.rand
     return path;
   }
   return {
-    async upload(caseId, file) {
+    async upload(caseId, file, options = {}) {
       const prefix = casePrefix(caseId);
       const extension = file.name?.match(/\.(pdf|txt|md)$/i)?.[1]?.toLowerCase();
       if (!extension) throw new Error("Choose a .pdf, .txt or .md transcript.");
-      if (!file.size || file.size > MAX_DOCUMENT_BYTES) throw new Error("Choose a non-empty file smaller than 2 MB.");
+      checkFileBudget(file);
+      options.signal?.throwIfAborted();
       const path = `${prefix}${randomId()}.${extension}`;
       const type = extension === "pdf" ? "application/pdf" : extension === "md" ? "text/markdown" : "text/plain";
       // Upload the original File bytes, not the editable extracted transcript.
-      const { error } = await bucket().upload(path, file, { contentType: type, upsert: false });
-      if (error) throw error;
+      if(file.size>6*1024*1024 || options.signal) await uploadResumable(client,path,file,type,options);
+      else {
+        const { error } = await bucket().upload(path, file, { contentType: type, upsert: false, ...(options.signal?{signal:options.signal}:{}) });
+        if (error) throw error;
+      }
       return { path, name: file.name, size: file.size, type };
     },
     async download(caseId, file) {

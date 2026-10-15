@@ -21,7 +21,7 @@ export function createCaseStore(client) {
       // Never send ownership or identifiers in the update payload.
       const payload = {
         transcript1: draft.texts[0], transcript2: draft.texts[1],
-        results: draft.results === null ? null : { findings: draft.results, elapsedSeconds: draft.seconds },
+        results: draft.results === null ? null : { findings: draft.results, elapsedSeconds: draft.seconds, ...(draft.analysis?{analysis:draft.analysis}:{}) },
         review_notes: { notes: draft.notes, reviewed: draft.reviewed, documents: [0,1].map(index => documentMetadata(draft.files?.[index])) },
       };
       const { data, error } = await client.from("cases").update(payload).eq("id", id).select("id").single();

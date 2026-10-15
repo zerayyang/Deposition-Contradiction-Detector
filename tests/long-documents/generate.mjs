@@ -1,0 +1,11 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {syntheticPdf} from './syntheticPdf.mjs';
+const section=(n,answer)=>`Q: Describe event ${n} on May 15.\nA: ${answer}\n`;
+const pages=Array.from({length:225},(_,i)=>section(i,`Record ${i}:\n`+Array.from({length:120},()=> 'complete testimony '.repeat(5)).join('\n')));
+pages[0]=pages[0].replace('Record 0:','I signed the north lease. Record 0:');
+const other=[...pages].reverse().map(text=>text.replace('I signed the north lease.','I never signed the north lease.'));
+const dir=new URL('./generated/',import.meta.url);await mkdir(dir,{recursive:true});
+for(const [name,texts] of [['first-225-pages.pdf',pages],['second-225-pages-reordered.pdf',other]])await writeFile(new URL(name,dir),syntheticPdf(texts));
+await writeFile(new URL('EXPECTED.md',dir),`# Fictional complete-document upload fixture\n\nBoth PDFs have 225 pages and exceed the old 2 MiB and 500,000-character limits. Every page contains selectable Q/A text.\n\nExpected: all 450 pages appear in extraction/analysis coverage. The first document affirms signing the north lease on PDF page 1. The second denies it on PDF page 225. Intended category: DIRECT (same event, affirmation versus denial). Exact numeric score is not calibrated and is not asserted. Repetitive filler is synthetic transport-test data, not realistic testimony. No other conflict is intentionally planted. Live model findings can differ; report discrepancies rather than editing labels.\n\nCreate a saved case, upload both complete PDFs, inspect page counts, and click Review analysis cost. Do not start paid requests without deliberately approving that preview. This generator and local tests make no provider requests and start no servers.\n\nFor expected failure/cancellation cases see ../README.md. Mocked regression success does not prove live AI accuracy.\n`);
+console.log('Created fictional PDFs and expected-results guide: '+fileURLToPath(dir));

@@ -22,7 +22,7 @@ test("rejects unsupported, empty or oversized files before making a storage requ
   await assert.rejects(store.upload("sample", textFile()), /Save this case/);
   await assert.rejects(store.upload("case-a", { name: "image.png", size: 10 }), /\.pdf/);
   await assert.rejects(store.upload("case-a", { name: "empty.txt", size: 0 }), /non-empty/);
-  await assert.rejects(store.upload("case-a", { name: "huge.txt", size: 2097153 }), /2 MB/);
+  await assert.rejects(store.upload("case-a", { name: "huge.txt", size: 52428801 }), /50 MiB/);
 });
 test("download checks account and case paths and surfaces access errors", async () => {
   const store = createDocumentStore({ storage: { from: () => ({ download: async () => ({ error: new Error("access denied") }) }) } }, "owner-a");
