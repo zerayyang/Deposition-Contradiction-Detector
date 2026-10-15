@@ -4,6 +4,7 @@ import fs from "fs";
 import { performance } from "node:perf_hooks";
 import { randomUUID } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
+import { summarizeChronoTime } from "./chronoTime.js";
 import { assessCandidate } from "./humanConfidencePipeline.js";
 
 const AI_INSTRUCTIONS = fs.readFileSync(
@@ -132,6 +133,10 @@ Analyze these two depositions according to the provided instructions.
         parsed.contradictions = parsed.contradictions.map(candidate =>
             assessCandidate(candidate, transcript1, transcript2)
         );
+
+        console.info("Chrono time interpretation", JSON.stringify({requestId,
+            findings:parsed.contradictions.map((candidate,index)=>({index,
+                times:summarizeChronoTime(candidate.chronoTimeAnalysis)}))}));
 
         console.info("Local processing completed", { requestId,
             processingMs: Math.round(performance.now() - processingStartedAt),

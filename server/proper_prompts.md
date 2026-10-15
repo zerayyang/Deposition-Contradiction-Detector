@@ -319,6 +319,15 @@ Fields:
 Classification may use ordinary meaning and context; literal extraction may not. Never mix literal evidence, interpretation, classification, semantic assistance, and confidence.
 
 
+### Downstream local time parsing
+
+The server passes validated `timePhrase` strings to a local Chrono parser after your response. Chrono does not supply your classification or the deterministic confidence score.
+
+- Preserve the entire relevant contiguous time expression, including range endpoints and attached daypart or boundary wording when present. Do not shorten a range to one endpoint or omit a time qualifier solely to help a parser match.
+- Keep uncertainty and negation in `original`; keep relevant literal qualifiers in `qualifierPhrases`. A parsed clock by itself does not establish whether an action occurred or what "before"/"after" means in the sentence.
+- Do not invent AM/PM, reference dates, parsed timestamps, Chrono results, or new JSON fields. Do not rewrite testimony into parser-friendly wording. If no literal time expression exists, use null as before.
+- You do not call Chrono directly. The backend performs that local step, and parsing failure is not a reason to suppress a supported factual issue.
+
 ## 9. Semantic Assistance (advisory only)
 
 For the human reviewer only. It must not contain numbers of any kind as confidence, probability, or similarity, and it is not an input to the application's confidence score.

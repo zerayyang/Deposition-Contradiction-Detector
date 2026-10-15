@@ -1,3 +1,4 @@
+import { interpretValidatedTime } from "./chronoTime.js";
 import { validateClaim } from "./evidenceValidator.js";
 import { TestimonyFact } from "./TestimonyFact.js";
 import { scoreFacts } from "./scoring/engine.js";
@@ -40,6 +41,7 @@ export function assessCandidate(candidate, transcript1, transcript2) {
         notEvaluableReason:"UNVERIFIED_SOURCE",evidenceStrength:null,rulesFired:[],rulesLimiting:[{id:"grounding",explanation:"Quote or extracted phrase failed exact source validation."}]});
     const review = !verified || index.status === "NOT_EVALUABLE";
     return {...candidate, ...index, claim1Valid,claim2Valid,
+        chronoTimeAnalysis:{claim1:interpretValidatedTime(fact1,claim1Valid),claim2:interpretValidatedTime(fact2,claim2Valid)},
         humanConfidence:index.score, evidenceScore:index.evidenceStrength,
         evidenceDetails:index.rulesFired.map(r=>({rule:r.id,score:r.strength,verdict:r.verdict})),
         languageScore:index.commitment.pair,
