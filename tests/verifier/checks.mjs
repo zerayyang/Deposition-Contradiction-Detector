@@ -1,4 +1,5 @@
 import { isDeepStrictEqual } from 'node:util';
+import { witnessQuoteMatches } from '../../server/sourceEvidence.js';
 import { assessCandidate } from '../../server/humanConfidencePipeline.js';
 
 export const types = ['DIRECT', 'INFERENTIAL', 'FALSE_POSITIVE'];
@@ -123,19 +124,73 @@ const witnessQuote = quote => typeof quote==='string'?quote.replace(/^A[.:] /u,'
 export function matchesTarget(candidate, targets) {
   return ['claim1','claim2'].every(key=>typeof candidate?.[key]?.original==='string' && witnessQuote(candidate[key].original).includes(witnessQuote(targets[key])));
 }
+// Containment in the other direction identifies a source fragment, not semantic
+// equivalence. Keep it out of grading until a human checks the omitted context.
+export function partialTarget(candidate, row) {
+  const spans = {};
+  let shortened = false;
+  for (const [key,input] of [['claim1',row.transcript1_text],['claim2',row.transcript2_text]]) {
+    const actual = witnessQuote(candidate?.[key]?.original);
+    const target = witnessQuote(row.target_claims?.[key]);
+    if (typeof actual !== 'string' || typeof target !== 'string' || !actual.trim() || !target.trim()) return null;
+    const actualMatches = witnessQuoteMatches(input, actual);
+    const targetMatches = witnessQuoteMatches(input, target);
+    if (!actualMatches.length || !targetMatches.length) return null;
+    const nested = actual.includes(target) || target.includes(actual);
+    if (!nested) return null;
+    const offset = target.indexOf(actual);
+    const partial = !actual.includes(target);
+    shortened ||= partial;
+    spans[key] = {partial, actual, target,
+      omittedBefore:partial?target.slice(0,offset):'',
+      omittedAfter:partial?target.slice(offset+actual.length):'',
+      ambiguousSource:actualMatches.length!==1 || targetMatches.length!==1};
+  }
+  return shortened ? {diagnosticOnly:true, requiresHumanReview:true, spans} : null;
+}
+export const expectsNotFlagged = row => Boolean(row.target_claims) && (row.expected_type==='FALSE_POSITIVE'||row.expected_evidence==='NOT_EVALUABLE');
+function quoteSimilarity(a,b) {
+  if(typeof a!=='string'||typeof b!=='string') return 0;
+  const aa=new Set(witnessQuote(a).toLowerCase().match(/[\p{L}\p{N}]+/gu)??[]);
+  const bb=new Set(witnessQuote(b).toLowerCase().match(/[\p{L}\p{N}]+/gu)??[]);
+  const union=new Set([...aa,...bb]);
+  return union.size?[...aa].filter(x=>bb.has(x)).length/union.size:0;
+}
+export function nearestExtras(extras,targets) {
+  return extras.map(x=>{
+    const claim1=quoteSimilarity(x.candidate?.claim1?.original,targets.claim1),claim2=quoteSimilarity(x.candidate?.claim2?.original,targets.claim2);
+    return {...x,diagnosticOnly:true,similarity:{claim1,claim2,mean:(claim1+claim2)/2}};
+  }).sort((a,b)=>b.similarity.mean-a.similarity.mean||a.index-b.index).slice(0,3);
+}
 export function checkResponse(body, row) {
   const errors = [];
-  if (!body || !Array.isArray(body.topicsReviewed) || !Array.isArray(body.contradictions)) return { errors: ['Invalid API response schema'], candidates: [], extraFindings: [], pass: false };
-  const scoped=Boolean(row.target_claims);
+  if (!body || !Array.isArray(body.topicsReviewed) || !Array.isArray(body.contradictions)) return { errors: ['Invalid API response schema'], candidates: [], extraFindings: [], outcome:'PROTOCOL_FAILURE',failureCategory:'protocol',pass: false };
+  const scoped=Boolean(row.target_claims),negative=expectsNotFlagged(row);
   const selected=body.contradictions.map((candidate,index)=>({candidate,index}));
   const targets=scoped?selected.filter(({candidate})=>matchesTarget(candidate,row.target_claims)):selected;
   const extraFindings=scoped?selected.filter(({candidate})=>!matchesTarget(candidate,row.target_claims)):[];
-  if (!targets.length) errors.push(scoped?'NO_TARGET_PAIR_FAIL: no finding matches both exact target quotes':'NO_PAIR_FAIL: empty contradictions array. The app may intentionally omit compatible findings; this one-pair verifier contract still requires a returned pair.');
+  const partialTargetFindings=scoped?extraFindings.flatMap(({candidate,index})=>{
+    const partial=partialTarget(candidate,row);
+    return partial?[{index,candidate,...partial,checks:checkCandidate(candidate,row)}]:[];
+  }):[];
+  const partialTargetReview=!targets.length&&partialTargetFindings.length>0;
+  const notFlagged=negative&&!targets.length&&!partialTargetReview;
+  const targetNotMatched=scoped&&!targets.length&&(!negative||partialTargetReview);
+  if(partialTargetReview) errors.push('PARTIAL_TARGET_REVIEW: exact source fragments omit approved target context; review required, no target accuracy credit');
+  else if(targetNotMatched) errors.push('TARGET_NOT_MATCHED: no finding matches both exact target quotes (match issue, not a classification failure)');
+  else if (!targets.length&&!notFlagged) errors.push('NO_PAIR_FAIL: empty contradictions array. The app may intentionally omit compatible findings; this one-pair verifier contract still requires a returned pair.');
   if (targets.length > 1) errors.push(scoped?`DUPLICATE_TARGET_PAIRS_FAIL: expected one target candidate, received ${targets.length}`:`EXTRA_PAIRS_FAIL: expected one candidate, received ${targets.length}`);
-  const candidates = targets.map(({candidate,index}) => ({ index, candidate, ...checkCandidate(candidate, row) }));
+  // Negative target policy requires FALSE_POSITIVE when an actual finding exists,
+  // even for a project-rule INFERENTIAL case with expected NOT_EVALUABLE evidence.
+  const candidates = targets.map(({candidate,index}) => ({ index, candidate, ...checkCandidate(candidate,negative?{...row,expected_type:'FALSE_POSITIVE'}:row) }));
+  if(negative)for(const c of candidates)if(['DIRECT','INFERENTIAL'].includes(c.candidate?.type))c.errors.push('NEGATIVE_TARGET_FLAGGED: DIRECT/INFERENTIAL finding on an expected negative target');
   errors.push(...candidates.flatMap(c => c.errors.map(e => `candidate ${c.index + 1}: ${e}`)));
   const judicialAgreement=row.judicial_expected_evidence===undefined?null:{informational:true,referenceEvidence:row.judicial_expected_evidence,relation:row.judicial_relation,basis:row.conflict_basis,actualEvidence:targets.length===1?evidence[targets[0].candidate?.status]??null:null,agrees:targets.length===1?evidence[targets[0].candidate?.status]===row.judicial_expected_evidence:null};
   const informational=candidates.flatMap(c => c.informational.map(e => `candidate ${c.index + 1}: ${e}`));
   if(extraFindings.length) informational.push(`${extraFindings.length} extra findings outside target_claims (not failures)`);
-  return { errors, informational, candidates, extraFindings, judicialAgreement, pass: errors.length === 0 };
+  if(notFlagged)informational.push('PASS: not flagged; no target classification or score was measured');
+  const classificationFailure=errors.some(e=>/Expected\/actual (type|evidence) mismatch|NEGATIVE_TARGET_FLAGGED/.test(e));
+  const failureCategory=targetNotMatched?'match_issue':classificationFailure?'classification':errors.length?'protocol':null;
+  const outcome=partialTargetReview?'PARTIAL_TARGET_REVIEW':notFlagged?'NOT_FLAGGED':targetNotMatched?'TARGET_NOT_MATCHED':classificationFailure?'CLASSIFICATION_FAILURE':errors.length?'PROTOCOL_FAILURE':'PASS';
+  return { errors, informational, candidates, extraFindings, partialTargetFindings, partialTargetReview, nearestExtraFindings:targetNotMatched?nearestExtras(extraFindings,row.target_claims):[],judicialAgreement,notFlagged,targetNotMatched,outcome,failureCategory,pass: errors.length === 0 };
 }

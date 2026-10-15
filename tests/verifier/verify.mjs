@@ -45,11 +45,12 @@ export async function runVerifier({rows,fetchImpl=globalThis.fetch,url='http://l
         break requests;
       }
     }
-    const stableFor = key => caseRuns.length===runs && caseRuns.every(validAttempt) && caseRuns.every(r => r.candidates[0].candidate[key] === caseRuns[0].candidates[0].candidate[key]);
-    const typeStable = stableFor('type'), bandStable = stableFor('band');
+    const labelFor=(r,key)=>r.notFlagged?'NOT_FLAGGED':r.candidates[0]?.candidate?.[key];
+    const stableFor = key => caseRuns.length===runs && caseRuns.every(r=>r.notFlagged&&r.pass||validAttempt(r)) && caseRuns.every(r => labelFor(r,key) === labelFor(caseRuns[0],key));
+    const typeStable = stableFor('type'), bandStable = caseRuns.some(r=>r.notFlagged)?null:stableFor('band');
     const actualLabels=caseRuns.map(r=>r.candidates.length===1?JSON.stringify([r.candidates[0].candidate?.type,r.candidates[0].candidate?.status]):null);
-    const humanRecheck=runs===3&&typeStable&&actualLabels.every(s=>s===actualLabels[0])&&caseRuns.every(r=>validAttempt(r)&&!r.candidates[0].labelMatch&&r.errors.length>0&&r.errors.every(isLabelError));
-    result.cases.push({row,runs:caseRuns,stable:typeStable,typeStable,bandStable,bandStabilityInformational:true,ordinalErrors:[],humanRecheck,reviewMessage:humanRecheck?'verifier disagrees in 3/3 runs, human should recheck the required label':null,pass:caseRuns.some(r=>!r.requestSucceeded)?null:typeStable&&caseRuns.every(r=>r.pass)});
+    const humanRecheck=runs===3&&typeStable&&actualLabels.every(s=>s===actualLabels[0])&&caseRuns.every(r=>!r.notFlagged&&validAttempt(r)&&!r.candidates[0].labelMatch&&r.errors.length>0&&r.errors.every(isLabelError));
+    result.cases.push({row,runs:caseRuns,outcome:caseRuns.some(r=>r.partialTargetReview)?'PARTIAL_TARGET_REVIEW':caseRuns.some(r=>r.targetNotMatched)?'TARGET_NOT_MATCHED':caseRuns.every(r=>r.notFlagged)?'NOT_FLAGGED':caseRuns.some(r=>r.failureCategory==='classification')?'CLASSIFICATION_FAILURE':null,stable:typeStable,typeStable,bandStable,bandStabilityInformational:true,ordinalErrors:[],humanRecheck,reviewMessage:humanRecheck?'verifier disagrees in 3/3 runs, human should recheck the required label':null,pass:caseRuns.some(r=>!r.requestSucceeded)?null:typeStable&&caseRuns.every(r=>r.pass)});
   }
   const allAttempts=result.cases.flatMap(c=>c.runs);
   const requestFailures=allAttempts.filter(r=>!r.requestSucceeded).length;
@@ -73,9 +74,15 @@ export async function runVerifier({rows,fetchImpl=globalThis.fetch,url='http://l
   result.ordinal=checkOrdinal(result.cases);
   const attemptedRuns=result.cases.reduce((n,c)=>n+c.runs.length,0),passedAttempts=result.cases.reduce((n,c)=>n+c.runs.filter(r=>r.pass).length,0);
   const evaluatedRuns=successfulRequests;
+  const notFlaggedAttempts=allAttempts.filter(r=>r.requestSucceeded&&r.notFlagged).length;
+  const targetNotMatchedAttempts=allAttempts.filter(r=>r.requestSucceeded&&r.targetNotMatched).length;
+  const partialTargetReviewAttempts=allAttempts.filter(r=>r.requestSucceeded&&r.partialTargetReview).length;
+  const classificationEvaluatedRuns=evaluatedRuns-notFlaggedAttempts-targetNotMatchedAttempts;
+  const classificationFailedAttempts=allAttempts.filter(r=>r.requestSucceeded&&r.failureCategory==='classification').length;
   const pct=n=>evaluatedRuns?Math.round(10000*n/evaluatedRuns)/100:null;
+  const classificationPct=n=>classificationEvaluatedRuns?Math.round(10000*n/classificationEvaluatedRuns)/100:null;
   let typeCorrect=0,evidenceCorrect=0,bandCorrect=0;
-  const evidenceCheckedAttempts=result.cases.reduce((n,c)=>n+(c.row.review_policy?.evidence_assertion==='informational'?0:c.runs.filter(r=>r.requestSucceeded).length),0);
+  const evidenceCheckedAttempts=result.cases.reduce((n,c)=>n+(c.row.review_policy?.evidence_assertion==='informational'?0:c.runs.filter(r=>r.requestSucceeded&&!r.notFlagged&&!r.targetNotMatched).length),0);
   for(const c of result.cases)for(const r of c.runs)if(validAttempt(r)){
     const checked=r.candidates[0];
     typeCorrect+=Number(checked.typeMatch);
@@ -83,7 +90,7 @@ export async function runVerifier({rows,fetchImpl=globalThis.fetch,url='http://l
     bandCorrect+=Number(checked.bandMatch);
   }
   const stableCases=result.cases.filter(c=>c.pass!==null&&c.stable).length;
-  result.summary={attemptedRuns,plannedRuns:selected.length*runs,passedAttempts,failedAttempts:result.cases.reduce((n,c)=>n+c.runs.filter(r=>r.pass===false).length,0),evaluatedRuns,requestFailures,successfulRequests,accuracyPercent:pct(passedAttempts),typeCorrect,typeAccuracyPercent:pct(typeCorrect),evidenceCorrect,evidenceCheckedAttempts,evidenceUncheckedAttempts:evaluatedRuns-evidenceCheckedAttempts,evidenceAccuracyPercent:evidenceCheckedAttempts?Math.round(10000*evidenceCorrect/evidenceCheckedAttempts)/100:null,bandCorrect,bandAccuracyInformational:true,bandStableCases:result.cases.filter(c=>c.bandStable).length,bandAccuracyPercent:pct(bandCorrect),stableCases,stabilityPercent:result.cases.filter(c=>c.pass!==null).length?Math.round(10000*stableCases/result.cases.filter(c=>c.pass!==null).length)/100:null,passedCases:result.cases.filter(c=>c.pass).length};
+  result.summary={notFlaggedAttempts,targetNotMatchedAttempts,partialTargetReviewAttempts,classificationFailedAttempts,classificationEvaluatedRuns,attemptedRuns,plannedRuns:selected.length*runs,passedAttempts,failedAttempts:result.cases.reduce((n,c)=>n+c.runs.filter(r=>r.pass===false).length,0),evaluatedRuns,requestFailures,successfulRequests,accuracyPercent:pct(passedAttempts),typeCorrect,typeAccuracyPercent:classificationPct(typeCorrect),evidenceCorrect,evidenceCheckedAttempts,evidenceUncheckedAttempts:classificationEvaluatedRuns-evidenceCheckedAttempts,evidenceAccuracyPercent:evidenceCheckedAttempts?Math.round(10000*evidenceCorrect/evidenceCheckedAttempts)/100:null,bandCorrect,bandAccuracyInformational:true,bandStableCases:result.cases.filter(c=>c.bandStable).length,bandAccuracyPercent:classificationPct(bandCorrect),stableCases,stabilityPercent:result.cases.filter(c=>c.pass!==null).length?Math.round(10000*stableCases/result.cases.filter(c=>c.pass!==null).length)/100:null,passedCases:result.cases.filter(c=>c.pass).length};
   result.pass=!errors.length&&result.invariants.pass&&attemptedRuns>0&&result.ordinal.failed===0&&result.cases.every(c=>c.pass);
   return result;
 }
