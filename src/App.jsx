@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import AnalysisStatus from "./AnalysisStatus.jsx";
 import AuthGate from "./SupabaseCases.jsx";
 import { supabase } from "./lib/supabaseClient.js";
 import { readTranscriptDocument } from "./lib/readTranscript.js";
@@ -90,6 +91,7 @@ function Dashboard({ session }) {
   const [pendingPlan, setPendingPlan] = useState(null);
   const [preparing, setPreparing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState("");
+  const [analysisTiming, setAnalysisTiming] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("ALL");
@@ -243,7 +245,7 @@ function Dashboard({ session }) {
     if(inFlight.current || !pendingPlan) return;
     const {plan,body,id}=pendingPlan; setPendingPlan(null); inFlight.current=true;
     const controller=new AbortController();request.current=controller;
-    setLoading(true);setSaveError("");setError("");setElapsed(0);setFilter("ALL");
+    setAnalysisTiming(null);setLoading(true);setSaveError("");setError("");setElapsed(0);setFilter("ALL");
     setAnalysisProgress(`0 of ${plan.requestCount} comparisons completed`);
     const start=performance.now();let latest=null,latestProgress=null;
     timer.current=setInterval(()=>setElapsed(Math.floor((performance.now()-start)/1000)),1000);
@@ -252,9 +254,10 @@ function Dashboard({ session }) {
       await persist(id,draft);controller.signal.throwIfAborted();
       updateDraft(id,{results:null,analysis:{status:"running",planned:plan.requestCount,completed:0,attempted:0,failed:0},seconds:null,reviewed:{},notes:{},dirty:true});
       const data=await runAnalysis(body,plan,{signal:controller.signal,onEvent:event=>{
-        if(event.event === 'progress') {latestProgress=event;setAnalysisProgress(`${event.completed} of ${event.total} comparisons completed · request ${event.attempted}`);}
+        if(event.event === 'progress') {latestProgress=event;updateDraft(id,{analysis:{...(latest?.analysis ?? {status:'running',planned:plan.requestCount,failed:0}),completed:event.completed,attempted:event.attempted}});setAnalysisProgress(`${event.completed} of ${event.total} comparisons completed · request ${event.attempted}`);}
         if(event.event === 'checkpoint' || event.event === 'result') {
           latest=event;
+          setAnalysisTiming({processed:event.analysis.completed + event.analysis.failed,elapsed:(performance.now()-start)/1000});
           updateDraft(id,{results:event.contradictions,analysis:event.analysis,seconds:(performance.now()-start)/1000,dirty:true});
           setAnalysisProgress(`${event.analysis.completed} of ${event.analysis.planned} comparisons completed · ${event.analysis.failed} failed`);
         }
@@ -294,7 +297,7 @@ function Dashboard({ session }) {
     </aside>
     <main className="workspace-main"><header className="workspace-header"><div><span className="eyebrow">TESTIMONY REVIEW</span><div className="case-title"><h1>{caseTitle}</h1><span className="private-badge">♙ Private case</span></div><p>Deposition review</p></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save sample as case" : "Save case"}</button>{activeId !== "sample" && <CaseActions disabled={blocked} onDelete={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }} />}</div></header>
       {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review before paid analysis</h2><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p><p>Every section is compared across both documents, including differently ordered sections. Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start {pendingPlan.plan.requestCount} paid request{pendingPlan.plan.requestCount===1?'':'s'}</button></div>}
-      {draft.analysis && <section className="analysis-status" role="status"><b>Analysis: {draft.analysis.status}</b> · {draft.analysis.completed}/{draft.analysis.planned} section comparisons completed. {draft.analysis.status!=='complete' && 'This is not a complete review.'}<details><summary>Coverage, failures and usage</summary><pre>{JSON.stringify(draft.analysis,null,2)}</pre></details></section>}
+      <AnalysisStatus analysis={draft.analysis} active={loading} elapsed={loading ? elapsed : draft.seconds} timing={analysisTiming} />
       <section className="documents-toolbar" aria-label="Transcript documents">{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onOpen={file => documents.download(activeId, file)} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}<div className="analyze-block"><button className="analyze-button" disabled={blocked} onClick={prepareAnalysis}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : "Review analysis cost"}</button><p role="status">{loading ? `◌ ${elapsed}s elapsed · ${analysisProgress}` : draft.seconds !== null ? `${draft.analysis?.status ?? (draft.results ? "Completed (legacy)" : "Request ended")} · ${draft.seconds.toFixed(1)} seconds` : "Ready when you are"}</p><small>Analysis sends these texts to Anthropic.</small>{(loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div></section>
       <p className="session-note">Transcripts and results save when you analyze. Click Save case after editing transcripts, notes or review marks. PDF and text originals save privately and reopen after refresh. PDFs need selectable text; scanned pages need OCR. Try the fictional samples: <a href="/examples/riley-morgan-first-deposition.pdf" download>First PDF</a> · <a href="/examples/riley-morgan-second-deposition.pdf" download>Second PDF</a> · <a href="/examples/expected-results.html" target="_blank" rel="noopener noreferrer">Expected results</a>.</p>
       {error && <p className="error" role="alert">{error}</p>}
