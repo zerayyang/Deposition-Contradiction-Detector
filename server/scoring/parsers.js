@@ -17,7 +17,8 @@ export const clauses = text => {
 };
 
 export function parseTimeRange(phrase, context = {}, config = SCORING_CONFIG) {
-    const text = normalize(phrase);
+    // Normalize clock notation internally; literal evidence stays untouched.
+    const text = normalize(phrase).replace(/\b([ap])(?:\s*\.\s*|\s+)m\.?(?!\w)/g, "$1m");
     if (!text || /\b(?:january|february|march|april|may|june|july|august|september|october|november|december)\b/.test(text) || /\b\d+\s*(?:seconds?|minutes?|hours?|days?|years?)\b/.test(text)) return null;
     const named = /\bafternoon\b/.test(text) ? config.afternoonRange : /\bevening\b/.test(text) ? config.eveningRange : /\bmorning\b/.test(text) ? config.morningRange : null;
     const tokens = [...text.matchAll(/\b(?:midnight|noon)\b|\b(?:[01]?\d|2[0-3])(?::[0-5]\d)?\s*(?:am|pm)?\b/g)];
@@ -26,7 +27,9 @@ export function parseTimeRange(phrase, context = {}, config = SCORING_CONFIG) {
     const explicitPeriods = [...text.matchAll(/(?:\d)\s*(am|pm)\b/g)].map(m => m[1]);
     const uniquePeriod = new Set(explicitPeriods).size === 1 ? explicitPeriods[0] : null;
     const periodContext = normalize(context.period ?? context.text);
-    const contextualPeriod = /\b(?:pm|evening|night|tonight|late)\b/.test(periodContext) ? "pm" : /\b(?:am|morning)\b/.test(periodContext) ? "am" : null;
+    const contextPeriods=new Set((periodContext.match(/\b(?:am|pm|morning|afternoon|evening|night|tonight)\b/g)??[])
+        .map(word=>["am","morning"].includes(word)?"am":"pm"));
+    const contextualPeriod=contextPeriods.size===1?[...contextPeriods][0]:null;
     const values = [];
     for (const token of tokens) {
         const t = token[0].trim();
@@ -35,7 +38,18 @@ export function parseTimeRange(phrase, context = {}, config = SCORING_CONFIG) {
         const m = t.match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?$/);
         if (!m) return null;
         let hour = Number(m[1]);
-        const period = m[3] ?? uniquePeriod ?? contextualPeriod;
+        // Only an immediately attached daypart qualifies this clock. Another
+        // clause such as "it rained at night" cannot resolve an earlier "8".
+        const suffix=text.slice(token.index+token[0].trimEnd().length);
+        const daypart=suffix.match(/^\s+(?:at (night)|in the (morning|afternoon|evening))\b/);
+        let attachedPeriod=null;
+        if(daypart?.[1]){
+            // Night spans midnight: 1–5 needs more context rather than forced PM.
+            if(hour>=1&&hour<=5)return {missing:"AM_PM"};
+            attachedPeriod=hour===12?"am":"pm";
+        }else if(daypart?.[2])attachedPeriod=daypart[2]==="morning"?"am":"pm";
+        if(m[3]&&attachedPeriod&&m[3]!==attachedPeriod)return null;
+        const period = m[3] ?? attachedPeriod ?? uniquePeriod ?? contextualPeriod;
         if (hour >= 1 && hour <= 12 && !period) return { missing: "AM_PM" };
         if (period && hour > 12) return null;
         if (period === "pm" && hour < 12) hour += 12;
@@ -50,6 +64,22 @@ export function parseTimeRange(phrase, context = {}, config = SCORING_CONFIG) {
     // An unqualified until phrase is an endpoint, not an invented starting interval.
     if (/\buntil\b/.test(text) && values.length === 1) earliest = latest = values[0];
     return { earliest: earliest - widenedBy, latest: latest + widenedBy, interval, approximate, widenedBy };
+}
+
+// Preserve parseTimeRange's conservative public contract. Only the event-clock
+// comparison rule opts into these alternatives; other rules never get a guessed time.
+export function parseClockAlternatives(phrase, context = {}, config = SCORING_CONFIG) {
+    const resolved=parseTimeRange(phrase,context,config);
+    if(!resolved)return null;
+    if(!resolved.missing)return [resolved];
+    const text=normalize(phrase);
+    // Only one plain event clock, with supported approximation/trailing context.
+    // Bounds, compound clock estimates and ranges need their own semantics.
+    const simple=/^(?:(?:around|about|roughly|approximately|maybe|perhaps|probably|at)\s+)*\d{1,2}(?::\d{2})?(?:\s+(?:or so|that (?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|day)))?[.!?]?$/;
+    if(!simple.test(text))return null;
+    const alternatives=["am","pm"].map(period=>parseTimeRange(phrase,{...context,period},config));
+    if(alternatives.some(r=>!r||r.missing||r.interval))return null;
+    return alternatives;
 }
 
 export function alignClockRanges(a, b, config = SCORING_CONFIG) {

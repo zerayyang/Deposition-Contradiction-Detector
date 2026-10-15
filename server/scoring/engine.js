@@ -20,8 +20,12 @@ export function scoreFacts(fact1,fact2,providedContext={},config=SCORING_CONFIG)
     const winner=conflicts.reduce((best,r)=>!best||r.strength>best.strength?r:best,null);
     const status=winner?"CONFLICT_SUPPORTED":applicable.length?"COMPATIBLE_SUPPORTED":"NOT_EVALUABLE";
     const active=winner?[winner]:applicable;
-    const claim1=analyzeCommitment(fact1,active.map(r=>r.target1),config);
-    const claim2=analyzeCommitment(fact2,active.map(r=>r.target2),config);
+    // Source-derived rules use the same verified sentence for commitment, so
+    // a cropped quote cannot hide an assertion hedge such as "I think".
+    const commitmentFact = fact => active.some(r=>r.id==="point-location"||r.sourceCommitment)
+        ? {...fact,original:fact.sourceStatement || fact.original} : fact;
+    const claim1=analyzeCommitment(commitmentFact(fact1),active.map(r=>r.target1),config);
+    const claim2=analyzeCommitment(commitmentFact(fact2),active.map(r=>r.target2),config);
     const pair=Math.min(claim1.commitment,claim2.commitment);
     const evidenceStrength=winner?.strength??(applicable.length?0:null);
     // The mix and band thresholds are uncalibrated placeholders pending owner labels.

@@ -13,6 +13,7 @@ Run:
 ```sh
 node server/sourceEvidence.test.js
 node server/scoring/scoring.test.js
+node --test server/scoring/locations.test.js
 node server/comparisonRules.test.js
 node server/scoring/calibrate.js
 ```
@@ -33,3 +34,19 @@ gold.json contains 22 draft pairs. expectedBand is reserved for owner-assigned l
 | Prior awareness vs knew of him | 45 | NOT_EVALUABLE | — | MISSING_CONTEXT: the literal pair does not establish aligned awareness periods. |
 
 These are deterministic fixture results, not a fresh Claude analysis. Null scores do not mean false positive and do not dismiss Claude's category. The four removed numeric scores were language-only estimates without a verified conflict. Review surprises: bedtime's provisional STRONG band is MODERATE; a memory-hedged departure remains STRONG at 79 rather than provisional MODERATE. Increasing time tolerance changes one fixture band; changing weight mix alone changes none in this small draft set. These are review signals, not grounds to tune until suggestions match.
+
+## Same-time locations
+
+The `point-location` rule independently parses affirmative sighting/presence assertions from verified source sentences. Matching subject, date and exact time plus different supported venue families can support a location conflict; ambiguous aliases, containment, approximate clocks and different visits do not. See [examples, expected results and limits](location-examples.md). The provisional `locationConflictStrength` is separate from the unchanged formula weights; location co-location is not independently verified. Matching clocks alone no longer assert compatibility for different extracted locations. Existing saved findings need a new analysis to receive the updated result.
+
+## Movement purpose clauses
+
+The activity rule now handles a blanket denial of entering/exiting versus affirmative movement for a stated purpose, using the source sentence and shared event context. Purpose-limited denials remain unresolved. See [examples, observed replay and limitations](action-examples.md) and run `node --test server/scoring/actions.test.js`.
+
+## Explicit time notation
+
+The clock parser accepts dotted/spaced AM/PM and immediately attached dayparts. Unrelated answer wording cannot resolve a missing period; ambiguous clocks remain unresolved. See [time examples, expectations and observed replay](time-examples.md). Run `node --test server/scoring/timeNotation.test.js`.
+
+## Event-clock alternatives
+
+The event-time rule enumerates supported missing-AM/PM alternatives and scores only invariant relationships, using the smallest possible gap. Mixed interpretations remain unresolved. See [clock alternatives, expectations and saved replay](clock-alternatives.md). The ordinary parser and Chrono diagnostics retain their existing contracts.

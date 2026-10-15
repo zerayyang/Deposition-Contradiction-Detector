@@ -1,7 +1,7 @@
 // All scoring weights, caps, tolerances and display thresholds live here.
 // These are uncalibrated heuristic choices, not probabilities.
 export const SCORING_CONFIG = {
-    version: "evidence-index-v1",
+    version: "evidence-index-v2",
     commitmentBaseline: 0.80, // Neutral assertion commitment.
     certaintyBonus: 0.10, // Each scoped certainty marker, with diminishing returns.
     certaintyCap: 0.20, // Maximum certainty addition.
@@ -23,6 +23,7 @@ export const SCORING_CONFIG = {
     minimumConflictStrength: 0.70, // Non-overlapping ranges have at least this support.
     explicitStrength: 1, // Verified opposing factual assertions.
     derivedStrength: 1, // Equally verified derived conflicts get equal strength.
+    locationConflictStrength: 0.85, // Different venue types at the same exact time; identity/co-location remains unverified.
     timeToleranceMinutes: 30, // Widen each approximate clock endpoint by this amount.
     timeGapForFullStrength: 90, // Range gap at which temporal support reaches full strength.
     midnightAlignmentWindow: 120, // Align only clock ranges near the same midnight boundary.

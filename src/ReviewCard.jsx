@@ -1,5 +1,5 @@
 const percent = value => Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Unavailable";
-const ruleNames = {time:"Time comparison",state:"Opposing states",timeline:"Timeline conflict","activity polarity":"Action affirmed vs denied","location+activity":"Home presence vs departure",knowledge:"Awareness or meeting",quantity:"Amount comparison"};
+const ruleNames = {time:"Time comparison",state:"Opposing states",timeline:"Timeline conflict","activity polarity":"Action affirmed vs denied","location+activity":"Home presence vs departure","point-location":"Same-time location comparison",knowledge:"Awareness or meeting",quantity:"Amount comparison"};
 const reasonLabels = {NO_FACTS:"The code has no supported facts to compare.",UNSUPPORTED_PATTERN:"This comparison is outside the patterns the code can verify.",MISSING_CONTEXT:"The comparison needs clearer person, event, day or time context.",UNVERIFIED_SOURCE:"A quote or extracted phrase could not be verified against the source."};
 
 export function ScoreGuide() {

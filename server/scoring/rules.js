@@ -1,5 +1,6 @@
+import { locationAssertion, compareLocations } from "./locations.js";
 import { SCORING_CONFIG } from "./config.js";
-import { normalize, clauses, parseTimeRange, alignClockRanges, parseQuantityRange, overlaps } from "./parsers.js";
+import { normalize, clauses, parseTimeRange, parseClockAlternatives, alignClockRanges, parseQuantityRange, overlaps } from "./parsers.js";
 
 const result = (id, fieldsUsed, explanation, extra = {}) => ({ id, applicable:false, verdict:"UNKNOWN", strength:0, basis:"EXPLICIT", fieldsUsed, explanation, ...extra });
 const unknown = (id, fields, explanation, reason = "UNSUPPORTED_PATTERN") => result(id, fields, explanation, { reason });
@@ -8,12 +9,16 @@ const verified = (id, fields, verdict, explanation, config, extra = {}) => resul
 const clauseWith = (fact, pattern) => clauses(fact.original).find(c => pattern.test(normalize(c.text)))?.text.trim() ?? null;
 const blocked = (context) => context.mismatch || context.personMismatch;
 const hypothetical = /\b(?:if|unless|suppose|supposing|assuming|hypothetically|would|wouldn't)\b/;
-const timeOf = (fact, context, side, config) => {
+const timeOf = (fact, context, side, config, parse = parseTimeRange) => {
     if (!fact.time) return null;
     // Include only value qualifiers from the clause containing the extracted time.
     const clause = clauses(fact.original).find(c => normalize(c.text).includes(normalize(fact.time)));
     const valueQualifiers = clause?.text.match(/\b(?:around|about|roughly|approximately|maybe|perhaps)\b/gi) ?? [];
-    return parseTimeRange(`${valueQualifiers.join(" ")} ${fact.time}`, { text: context[`text${side}`], period:context.period }, config);
+    // Recover only a daypart immediately attached to the extracted phrase.
+    // Other wording in the answer cannot fill missing AM/PM.
+    const original=normalize(fact.original),needle=normalize(fact.time),index=original.indexOf(needle);
+    const attached=index>=0?original.slice(index+needle.length).match(/^\s+(?:at night|in the (?:morning|afternoon|evening))\b/)?.[0]??"":"";
+    return parse(`${valueQualifiers.join(" ")} ${fact.time}${attached}`, { text:fact.context, period:context.period }, config);
 };
 const gapStrength = (gap, fullGap, config) => Math.min(config.explicitStrength, config.minimumConflictStrength + (config.explicitStrength - config.minimumConflictStrength) * gap / fullGap);
 const clock = value => {
@@ -28,8 +33,33 @@ function timeRange(f1, f2, context, config) {
     if (blocked(context) || !context.sameEvent) return unknown(id,fields,"Clock comparisons need the same person and source event/day anchor.","MISSING_CONTEXT");
     if (f1.activity && f2.activity && normalize(f1.activity) !== normalize(f2.activity)) return unknown(id,fields,"Different activities do not assert two times for the same event.");
     if (f1.state && f2.state && normalize(f1.state) !== normalize(f2.state)) return unknown(id,fields,"Different states may occur at different times; compare their temporal overlap instead.");
+    if (f1.location && f2.location && normalize(f1.location) !== normalize(f2.location)) return unknown(id,fields,"Matching clock values alone do not establish location compatibility.");
+    // Repeated sightings are not automatically one event merely because their day agrees.
+    // Let the location rule establish the subject, venue and exact time together.
+    if (locationAssertion(f1,config) || locationAssertion(f2,config)) return unknown(id,fields,"Presence/sighting times are evaluated together with their source locations.");
     let a = timeOf(f1,context,1,config), b = timeOf(f2,context,2,config);
-    if (a?.missing || b?.missing) return unknown(id,fields,"AM/PM is unresolved.","MISSING_CONTEXT");
+    if (a?.missing || b?.missing) {
+        // A boundary/negated time clause is not a claim of occurrence at a point.
+        const source=[[f1,a],[f2,b]].filter(([,range])=>range?.missing).map(([f])=>normalize(f.sourceStatement||f.original)).join(" ");
+        if(/\b(?:before|after|until|since|no earlier|no later|by)\b/.test(source))return unknown(id,fields,"Time bounds need boundary/negation interpretation, not event-clock alternatives.");
+        const aa=timeOf(f1,context,1,config,parseClockAlternatives),bb=timeOf(f2,context,2,config,parseClockAlternatives);
+        if(!aa||!bb||[...aa,...bb].some(r=>r.interval))return unknown(id,fields,"AM/PM is unresolved for a range or unsupported clock expression.","MISSING_CONTEXT");
+        const alternativeComparisons=aa.flatMap(x=>bb.map(y=>{
+            const [left,right]=alignClockRanges(x,y,config),compatible=overlaps(left,right);
+            return {ranges:[left,right],verdict:compatible?"COMPATIBLE":"CONFLICT",
+                gap:compatible?0:Math.max(left.earliest-right.latest,right.earliest-left.latest)};
+        }));
+        const verdicts=new Set(alternativeComparisons.map(c=>c.verdict));
+        if(verdicts.size!==1)return unknown(id,fields,"AM/PM interpretations disagree: some overlap and others conflict.","MISSING_CONTEXT");
+        const compatible=verdicts.has("COMPATIBLE"),minimumGapMinutes=Math.min(...alternativeComparisons.map(c=>c.gap));
+        return verified(id,fields,compatible?"COMPATIBLE":"CONFLICT",
+            compatible?"Every supported AM/PM combination overlaps.":"Every supported AM/PM combination conflicts; no period was selected.",config,{
+                strength:compatible?0:gapStrength(minimumGapMinutes,config.timeGapForFullStrength,config),basis:"DERIVED",
+                alternativeComparisons,minimumGapMinutes,target1:f1.time,target2:f2.time,
+                limits:["Missing AM/PM was enumerated, not guessed. Evidence strength uses the smallest supported gap.",
+                    ...aa.flatMap(r=>limitRange(r,f1.time,true)),...bb.flatMap(r=>limitRange(r,f2.time,true))]
+            });
+    }
     if (!a || !b || a.interval || b.interval) return unknown(id,fields,"This rule compares event-time ranges; continuous intervals need a timeline rule.");
     [a,b] = alignClockRanges(a,b,config);
     const compatible = overlaps(a,b), gap = compatible ? 0 : Math.max(a.earliest-b.latest,b.earliest-a.latest);
@@ -80,13 +110,47 @@ function polarity(text) {
     const bases={signed:"sign",entered:"enter",left:"leave",met:"meet",visited:"visit",called:"call",went:"go"};
     return { action:`${bases[m[2]]??m[2]} ${m[3].trim()}`,negative:Boolean(m[1]) };
 }
+// A positive purpose clause entails movement; a purpose-limited denial does not.
+// Read the containing witness sentence so a short extraction cannot hide scope.
+function movementAssertion(fact) {
+    const source=normalize(fact.sourceStatement || fact.original);
+    const activity=normalize(fact.activity).replace(/[.!?]+$/, "");
+    if(!activity)return null;
+    const sentences=source.split(/[.!?](?:\s|$)/).map(s=>s.trim()).filter(s=>s.includes(activity));
+    if(sentences.length!==1)return null;
+    const sentence=sentences[0];
+    // These modifiers can restrict, coordinate, or deny the movement assertion.
+    if(/\b(?:if|unless|except|only|without|before|after|until|since|while|but|and|or|not|said|say)\b/.test(sentence.replace(/^i\s+(?:did not|do not)\s+/, "i ")))return null;
+    const m=sentence.match(/^i\s+(?:(?:think|believe)\s+i\s+)?(never |didn't |did not |don't |do not )?(went|go)\s+(inside|outside)(?:\s+to\s+([a-z]+\b.*))?$/);
+    if(!m)return null;
+    return {direction:m[3],negative:Boolean(m[1]),purpose:Boolean(m[4]),target:sentence};
+}
+function movementPurposeConflict(f1,f2,context) {
+    if(blocked(context)||!context.sameEvent)return null;
+    const a=movementAssertion(f1),b=movementAssertion(f2);
+    if(!a||!b||a.direction!==b.direction||a.negative===b.negative)return null;
+    const negative=a.negative?a:b,positive=a.negative?b:a;
+    if(negative.purpose||!positive.purpose)return null;
+    return {target1:a.target,target2:b.target,sourceCommitment:true};
+}
 function activityPolarity(f1,f2,context,config) {
     const id="activity polarity",fields=["activity"];
     const a=polarity(f1.activity),b=polarity(f2.activity);
-    if(!a||!b||a.action!==b.action)return unknown(id,fields,"Activity and object must match after supported verb normalization.");
+    if(!a||!b||a.action!==b.action){
+        const movement=movementPurposeConflict(f1,f2,context);
+        if(movement)return verified(id,fields,"CONFLICT","An affirmative movement with a stated purpose conflicts with a blanket denial of that same movement in the shared source event.",config,movement);
+        return unknown(id,fields,"Activity and object must match after supported verb normalization.");
+    }
+    if(/^go (?:inside|outside)$/.test(a.action)){
+        for(const [fact,parsed] of [[f1,a],[f2,b]]){
+            if(!fact.sourceStatement)continue;
+            const source=movementAssertion(fact);
+            if(!source||source.negative!==parsed.negative||(source.negative&&source.purpose))return unknown(id,fields,"The full movement source does not support the extracted polarity or contains a purpose-limited denial.");
+        }
+    }
     if(blocked(context))return unknown(id,fields,"Person or event scopes differ.","MISSING_CONTEXT");
     if ((f1.time||f2.time)&&!context.sameEvent)return unknown(id,fields,"Time-scoped activity needs a shared event.","MISSING_CONTEXT");
-    return verified(id,fields,a.negative!==b.negative?"CONFLICT":"COMPATIBLE","Compared the same action/object with whole-word polarity.",config,{target1:f1.activity,target2:f2.activity});
+    return verified(id,fields,a.negative!==b.negative?"CONFLICT":"COMPATIBLE","Compared the same action/object with whole-word polarity.",config,{target1:f1.activity,target2:f2.activity,sourceCommitment:/^go (?:inside|outside)$/.test(a.action)});
 }
 
 function locationActivity(f1,f2,context,config) {
@@ -125,6 +189,17 @@ function locationActivity(f1,f2,context,config) {
     return unknown(id,fields,"No supported uninterrupted-home/departure pattern.");
 }
 
+function pointLocation(f1,f2,context,config) {
+    const id="point-location", fields=["location","person","activity","time"];
+    // This rule normalizes ordinal dates itself (March 2nd equals March 2).
+    if(context.personMismatch)return unknown(id,fields,"Location source people differ.","MISSING_CONTEXT");
+    const comparison=compareLocations(f1,f2,config);
+    if(!comparison.verdict)return unknown(id,fields,comparison.explanation,comparison.reason);
+    return verified(id,fields,comparison.verdict,comparison.explanation,config,{
+        basis:"DERIVED", strength:comparison.verdict==="CONFLICT"?config.locationConflictStrength:0,
+        target1:comparison.a.target,target2:comparison.b.target,limits:comparison.limits??[] });
+}
+
 function knowledgeParts(fact) {
     const out=[];
     for(const clause of clauses(fact.original)){
@@ -155,7 +230,7 @@ function quantity(f1,f2,context,config){
     return verified(id,fields,positive?"CONFLICT":"COMPATIBLE",positive?`Quantity ranges do not overlap; remaining gap is ${gap}.`:"Quantity ranges overlap.",config,{basis:"DERIVED",strength:positive?gapStrength(gap,config.quantityGapForFullStrength,config):0,target1:f1.quantity,target2:f2.quantity,limits:[...limitRange(a,f1.quantity),...limitRange(b,f2.quantity)],ranges:[a,b]});
 }
 
-export const RULE_REGISTRY = [timeRange,stateExclusivity,timeline,activityPolarity,locationActivity,knowledge,quantity];
+export const RULE_REGISTRY = [timeRange,stateExclusivity,timeline,activityPolarity,locationActivity,pointLocation,knowledge,quantity];
 export function evaluateRules(fact1,fact2,context,config=SCORING_CONFIG){
     if(fact1.ambiguousSource||fact2.ambiguousSource){
         return RULE_REGISTRY.map(rule=>{

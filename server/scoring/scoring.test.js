@@ -52,7 +52,7 @@ assert.ok(month.ignored.some(x=>x.phrase==="May"));
 const timeline=run(pair("timeline-desk")),explicit=run(pair("signed-polarity"));
 assert.equal(fired(timeline,"timeline").basis,"DERIVED");
 assert.ok(timeline.score>=explicit.score);
-for(const id of ["no-facts","unsupported-states","ambiguous-clock","sample-knowledge"]){
+for(const id of ["no-facts","unsupported-states","sample-knowledge"]){
     const r=run(pair(id));assert.equal(r.score,null);assert.equal(r.status,"NOT_EVALUABLE");assert.ok(r.notEvaluableReason);
 }
 const scopedOutsideField = pair("sample-sleep");
@@ -85,3 +85,8 @@ console.log("All deterministic scoring contract tests passed.");
 const sequentialStates=scoreFacts(new TestimonyFact(claim("I was awake at 6 PM",{statePhrase:"awake",timePhrase:"6 PM"})),new TestimonyFact(claim("I was asleep at 10 PM",{statePhrase:"asleep",timePhrase:"10 PM"})),{sameEvent:true});
 assert.equal(sequentialStates.status,"COMPATIBLE_SUPPORTED");
 assert.ok(!sequentialStates.rulesFired.some(r=>r.verdict==="CONFLICT"));
+
+// Missing AM/PM can now be evaluated if every possible interpretation clashes.
+const ambiguousInvariant=run(pair("ambiguous-clock"));
+assert.equal(ambiguousInvariant.status,"CONFLICT_SUPPORTED");
+assert.equal(fired(ambiguousInvariant,"time").alternativeComparisons.length,2);
