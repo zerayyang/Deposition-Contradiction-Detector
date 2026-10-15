@@ -1,14 +1,15 @@
+import { testimonyMarkers } from './testimonyMarkers.js';
 // Preserve literal offsets. In Q/A transcripts, only answer spans are evidence.
 export function witnessQuoteMatches(transcript, quote) {
     if (typeof transcript !== "string" || typeof quote !== "string" || !quote) return [];
-    const markers = [...transcript.matchAll(/^[ \t]*(?:\d+[ \t]+)?(QUESTION|ANSWER|Q|A)[.:][ \t]*/gim)];
+    const markers = testimonyMarkers(transcript);
     const answers = [];
     const questions = [];
     for (let i = 0; i < markers.length; i++) {
         const marker = markers[i];
-        const start = marker.index + marker[0].length;
+        const start = marker.contentStart;
         const end = markers[i + 1]?.index ?? transcript.length;
-        if (/^(?:Q|QUESTION)$/i.test(marker[1])) {
+        if (marker.role === "Q") {
             questions.push(transcript.slice(start, end).trim());
         } else {
             answers.push({start, end, questions:[...questions]});

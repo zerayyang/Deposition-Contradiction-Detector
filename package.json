@@ -15,7 +15,7 @@
     "tests:unit": "node --test tests/author/*.test.mjs tests/verifier/*.test.mjs",
     "tests:level2": "node tests/author/level2.mjs",
     "tests:author:level2": "node tests/author/level2.mjs",
-    "tests:documents": "node --test tests/long-documents/workflow.test.mjs src/lib/*.test.js"
+    "tests:documents": "node --test tests/long-documents/*.test.mjs src/lib/*.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

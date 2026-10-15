@@ -25,3 +25,8 @@ These commands do not start local servers or make paid requests. All provider, s
 - **Upload**: 50 MiB application ceiling, original bytes intact, authenticated fixed 6 MiB TUS chunks and cancellable transfers. Bucket/global restrictions still apply. Synthetic credentials exist only inside mocks.
 
 Passing these checks establishes transport/coverage/provenance behavior under fixtures. It does not establish live model recall, real deposition accuracy, hosting capacity, provider access or calibrated scoring. Actual checks run and remaining limits are recorded in `docs/long-depositions.md`.
+
+## Transcript-label regressions
+
+Run `node --test tests/long-documents/question-boundaries.test.mjs`.
+Expected: numbered `11 Q` / `12 A`, punctuated `Q.`/`A.`, spaced `Q .`/`A .`, colon and existing lowercase punctuated labels share the same boundary parser. Exact source offsets do not change; examiner questions never become witness evidence. A numbered long answer carries only its actual preceding question. An unmatched Q marker never consumes the rest of a file or scans across later questions. All core text remains covered. Ordinary unnumbered prose beginning with “A” is not reinterpreted as an answer label. No model calls or numeric calibration targets are involved.

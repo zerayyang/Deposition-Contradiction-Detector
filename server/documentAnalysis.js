@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { DOCUMENT_LIMITS as LIMITS,checkTextBudget,utf8Bytes } from '../shared/documentLimits.js';
 import { assessCandidate } from './humanConfidencePipeline.js';
+import { testimonyMarkers } from './testimonyMarkers.js';
 import { witnessQuoteMatches } from './sourceEvidence.js';
 
 export const MODEL = Object.freeze({id:'claude-opus-5-5',contextTokens:1000000,maxOutputTokens:128000,
@@ -9,7 +10,6 @@ export const MODEL = Object.freeze({id:'claude-opus-5-5',contextTokens:1000000,m
 export const OUTPUT_TOKENS=10000; // Preserve the existing per-call output budget.
 export const digest=text=>createHash('sha256').update(text).digest('hex');
 const round=n=>Math.round(n*10000)/10000;
-const questionPattern=/^[ \t]*(?:\d+[ \t]+)?(?:Q|QUESTION)[.:][ \t]*/gim;
 function byteEnd(text,start,bytes) {
   let low=start,high=Math.min(text.length,start+bytes);
   while(low<high){const mid=Math.ceil((low+high)/2);if(utf8Bytes(text.slice(start,mid))<=bytes)low=mid;else high=mid-1;}
@@ -17,7 +17,8 @@ function byteEnd(text,start,bytes) {
   return low;
 }
 export function sectionDocument(text,{chunkBytes=LIMITS.chunkBytes,overlapBytes=LIMITS.overlapBytes}={}) {
-  const questions=[...text.matchAll(questionPattern)].map(m=>m.index);
+  const markers=testimonyMarkers(text);
+  const questions=markers.filter(m=>m.role==='Q').map(m=>m.index);
   const chunks=[];let coreStart=0;
   while(coreStart<text.length) {
     let coreEnd=byteEnd(text,coreStart,chunkBytes);
@@ -34,8 +35,10 @@ export function sectionDocument(text,{chunkBytes=LIMITS.chunkBytes,overlapBytes=
     const q=questions.findLast(n=>n<coreStart);
     let questionContext='';
     if(q!==undefined&&q<start) {
-      const tail=text.slice(q),answer=/^[ \t]*(?:\d+[ \t]+)?(?:A|ANSWER)[.:][ \t]*/im.exec(tail);
-      questionContext=text.slice(q,answer?q+answer.index:coreStart);
+      const next=markers[markers.findIndex(m=>m.index===q)+1];
+      // Never scan through later questions or treat an unmatched marker's tail
+      // (potentially hundreds of pages) as a single continued-answer question.
+      if(next?.role==='A')questionContext=text.slice(q,next.index);
       if(utf8Bytes(questionContext)>LIMITS.questionBytes)throw new Error('A source question exceeds the context budget; no text was truncated. Increase the supported budget before analysis.');
     }
     chunks.push({id:chunks.length,start,end:coreEnd,coreStart,coreEnd,questionContext,text:text.slice(start,coreEnd)});
