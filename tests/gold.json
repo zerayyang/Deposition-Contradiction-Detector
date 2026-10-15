@@ -1,0 +1,1039 @@
+[
+  {
+    "id": "sample-home",
+    "transcript1_text": "Q: Where were you on the evening of November 3rd?\nA: I was at home all evening. I ordered pizza around 7pm and watched TV.",
+    "transcript2_text": "Q: Walk me through the evening of November 3rd again.\nA: I was home. I think I went out briefly to get some groceries, maybe around 7:30, but came right back.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "MODERATE",
+    "tricky_feature": "[home_at_home] 'home' vs 'at home' are equivalent, but 'all evening' is in tension with a hedged brief outing",
+    "rationale": "Staying home all evening conflicts with going out during that evening. “I think” and “maybe” reduce confidence about whether he went out, not the contradiction type; reduced confidence does not come from the outing’s duration.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": true,
+      "human_verified": true,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "5e75b6fbca4fe29f273182522d73cc44be7d7677329538a8be1030ef0af89315",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "affirm-deny-call",
+    "transcript1_text": "Q: Did you call Lisa on the night of March 4th?\nA: Yes, I called her around nine.",
+    "transcript2_text": "Q: Did you call Lisa on the night of March 4th?\nA: No. I didn't call her at all that night.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[affirm_deny] yes versus no on the same call on the same night",
+    "rationale": "One answer says yes and the other says no to the same call on the same date, and the approximate 'around nine' does not affect whether the call happened, so this is a direct conflict.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "54fdff0c6a8e3ef288a55d08bccb7b828d518f05e78cb7b5788371eb4ac2d1d8",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "affirm-deny-handgun",
+    "transcript1_text": "Q: Do you own a handgun?\nA: Yes, a 9mm. I keep it in the nightstand.",
+    "transcript2_text": "Q: Do you own a handgun?\nA: No, I've never owned a gun in my life.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "depends on implemented rules",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[affirm_deny] current ownership affirmed versus lifetime ownership denied",
+    "rationale": "A lifetime denial of ever owning a gun directly contradicts the claim of currently owning a 9mm handgun.",
+    "status": "approved",
+    "code_support": {
+      "audited_at": "2026-10-14",
+      "basis": "Static inspection of active deterministic rule registry and parser probes only; no live app response or verifier result used to assign expected labels.",
+      "sources": [
+        "server/scoring/rules.js",
+        "server/scoring/parsers.js",
+        "server/scoring/engine.js"
+      ],
+      "field": "ownership",
+      "coverage": "NONE",
+      "matching_rules": [],
+      "missing_support": [
+        "Ownership/possession affirmation and denial are absent from activity polarity verbs and state exclusivity families."
+      ],
+      "expectation": "depends on implemented rules"
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "informational",
+      "approval_scope": "TYPE_ONLY"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_ONLY",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "c543ffbf21fa6f7e7311311102bf555ae7d4d5ee30949be28ccab732927ce0ae",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "exact-car-color",
+    "transcript1_text": "Q: What color was the car you drove to the meeting on June 2nd?\nA: Red.",
+    "transcript2_text": "Q: What color was the car you drove to the meeting on June 2nd?\nA: It was white.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "depends on implemented rules",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[exact_values] mutually exclusive colors for the same car on the same date",
+    "rationale": "Red and white are mutually exclusive answers about the same car on the same occasion.",
+    "status": "approved",
+    "code_support": {
+      "audited_at": "2026-10-14",
+      "basis": "Static inspection of active deterministic rule registry and parser probes only; no live app response or verifier result used to assign expected labels.",
+      "sources": [
+        "server/scoring/rules.js",
+        "server/scoring/parsers.js",
+        "server/scoring/engine.js"
+      ],
+      "field": "color",
+      "coverage": "NONE",
+      "matching_rules": [],
+      "missing_support": [
+        "No color-value comparison rule or supported color exclusivity family exists."
+      ],
+      "expectation": "depends on implemented rules"
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "informational",
+      "approval_scope": "TYPE_ONLY"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_ONLY",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "9a4039e5a504bcd81d58e8fceb27732cfa0bcae150278479fcfb1ad04d20994f",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "exact-clockout-time",
+    "transcript1_text": "Q: What time did you leave the office on Friday, May 9th?\nA: 5:15. I clocked out at 5:15.",
+    "transcript2_text": "Q: What time did you leave the office on Friday, May 9th?\nA: I clocked out at 6:45 that Friday.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[exact_values] two exact clock-out times for the same date",
+    "rationale": "The two answers give exact, different clock-out times, 5:15 and 6:45, for the same day.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "ordinal_pattern": "time",
+      "ordinal_role": "EXACT_DIRECT"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "9b32402f933eac44257cdfaecbe96e9286769a071aac578b009204dd89dab682",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "exact-same-headcount",
+    "transcript1_text": "Q: How many people were at the dinner on April 12th?\nA: Six.",
+    "transcript2_text": "Q: How many people were at the dinner on April 12th?\nA: There were six of us.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "COMPATIBLE",
+    "expected_score_band": "WEAK",
+    "tricky_feature": "[exact_values] [compatible] the same exact value is given in different wording",
+    "rationale": "Both answers give the same headcount of six, so the different wording creates no contradiction.",
+    "status": "approved",
+    "code_support": {
+      "audited_at": "2026-10-14",
+      "basis": "Static inspection of active deterministic rule registry and parser probes only; no live app response or verifier result used to assign expected labels.",
+      "sources": [
+        "server/scoring/rules.js",
+        "server/scoring/parsers.js",
+        "server/scoring/engine.js"
+      ],
+      "field": "quantity",
+      "coverage": "SUPPORTED_FAMILY",
+      "matching_rules": [
+        "quantity"
+      ],
+      "missing_support": [],
+      "qualification": "The generic quantity parser reads literal Six and six as 6; application is still contingent on validated extraction and matched units/referents. Only type is approved."
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "informational",
+      "approval_scope": "TYPE_ONLY"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_ONLY",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "87e4d985ee5d31a5a6d04b3a41138497812089fd45b1fde122ff7ca10d83aa72",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "approx-clock-overlap-bar",
+    "transcript1_text": "Q: What time did you arrive at the bar on Saturday the 14th?\nA: Around 8, maybe 8:30.",
+    "transcript2_text": "Q: What time did you arrive at the bar on Saturday the 14th?\nA: It was 8:30 or so.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "COMPATIBLE",
+    "expected_score_band": "WEAK",
+    "tricky_feature": "[approx_clock_overlap] [compatible] the 8-8:30 range includes 'about 8:30'",
+    "rationale": "The first answer's range of 8 to 8:30 includes the second answer's estimate of about 8:30, so the approximate times overlap.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "1e6099e500c13db43fdad83e07896640bd8b6e0cb1b25bf80981785c4c186f89",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "approx-clock-overlap-game",
+    "transcript1_text": "Q: When did you get home from the game on October 5th?\nA: Somewhere between 11 and midnight.",
+    "transcript2_text": "Q: When did you get home from the game on October 5th?\nA: Probably around 11:45.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "COMPATIBLE",
+    "expected_score_band": "WEAK",
+    "tricky_feature": "[approx_clock_overlap] [compatible] a point estimate falls inside a stated range",
+    "rationale": "An estimate of around 11:45 falls within the range of 11 to midnight, so the answers are consistent.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "0f57ccf8822231231c595dcd1bc53acdc28e5fb5f1d263b8676c097bac602907",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "approx-clock-nonoverlap-restaurant",
+    "transcript1_text": "Q: What time did you arrive at the restaurant on August 9th?\nA: Around 6, I think. It was early.",
+    "transcript2_text": "Q: What time did you arrive at the restaurant on August 9th?\nA: Around 10 at night, maybe a little after.",
+    "expected_type": "INFERENTIAL",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[approx_clock_nonoverlap] approximate times about four hours apart",
+    "rationale": "Both times are approximations, so the type is inferential, but 'around 6' and 'around 10 at night' are far enough apart that the conflict is strong.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "ordinal_pattern": "time",
+      "ordinal_role": "APPROXIMATE_INFERENTIAL"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "4986f9d3b12a3958c776735b373345f605361f78cef0fae2b2c0181aaa0d7900",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "assertion-hedge-vehicle",
+    "transcript1_text": "Q: Which vehicle did you drive to work on July 7th?\nA: Honestly, I drove my blue pickup that day.",
+    "transcript2_text": "Q: Which vehicle did you drive to work on July 7th?\nA: I took the silver sedan on July 7th, not the pickup.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[assertion_hedge_direct] 'Honestly' qualifies the act of asserting, not which vehicle was driven",
+    "rationale": "'Honestly' is a sincerity marker on the act of speaking and does not make the value uncertain, so blue pickup versus silver sedan 'not the pickup' remains a direct conflict.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "8d18b67f8875dfeeaa25661d2938089bd8335f60f8428ebf19ef61c8fd9a9b1a",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "assertion-hedge-lease",
+    "transcript1_text": "Q: Did you sign the lease on February 1st?\nA: To be frank with you, yes, I signed it that morning.",
+    "transcript2_text": "Q: Did you sign the lease on February 1st?\nA: I did not sign that lease on February 1st.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[assertion_hedge_direct] [affirm_deny] 'To be frank with you' frames the speech act around an explicit yes that is later denied",
+    "rationale": "The phrase 'to be frank' describes how the speaker is answering rather than hedging the fact, so an explicit yes versus an explicit no on the same lease and date is direct.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "87aee36f06abe57ef2c00776fa525f93059d1fcf01905378dbeff6c8ded60cb2",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "unrelated-hedge-shift",
+    "transcript1_text": "Q: What time did your shift end on December 12th?\nA: My shift ended at 11:00 p.m. I'm not sure who else was working, maybe Carla.",
+    "transcript2_text": "Q: What time did your shift end on December 12th?\nA: My shift ended at 7:00 p.m. on the 12th.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[unrelated_hedge_ignored] [exact_values] the uncertainty is about coworkers, not the end time of the shift",
+    "rationale": "The hedge 'I'm not sure' applies only to who else was working, so the exact end times of 11:00 p.m. and 7:00 p.m. for the same shift remain a direct conflict.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "b1eac337cad20376e14f0781d0d901dfbadc8d34fc85cec17533e926eb0a70fd",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "unrelated-hedge-diner",
+    "transcript1_text": "Q: Were you at the Riverside Diner on the morning of January 20th?\nA: No, I wasn't there. I think it was raining that morning, but I'm not certain.",
+    "transcript2_text": "Q: Were you at the Riverside Diner on the morning of January 20th?\nA: Yes, I was at the Riverside Diner that morning, around eight.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[unrelated_hedge_ignored] [affirm_deny] the hedge is about the weather, while the presence denial is unqualified",
+    "rationale": "The uncertainty applies only to the weather, so an unqualified denial of being at the diner versus an affirmation of being there that same morning is direct.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "4e4f0e60dad04dfe123fed0067d13cb295e8528fe41a84f0b2ceac496ef4c6e3",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "value-approx-cash",
+    "transcript1_text": "Q: How much cash did you withdraw on September 3rd?\nA: About two hundred dollars, give or take.",
+    "transcript2_text": "Q: How much cash did you withdraw on September 3rd?\nA: I took out $500 that day.",
+    "expected_type": "INFERENTIAL",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "MODERATE",
+    "tricky_feature": "[value_approx_inferential] an approximate amount compared with an exact amount well outside a plausible margin",
+    "rationale": "Because 'about two hundred, give or take' is approximate, the comparison requires judging the margin, but $500 seems well outside it, so this is a moderate inferential conflict.",
+    "status": "approved",
+    "code_support": {
+      "audited_at": "2026-10-14",
+      "basis": "Static inspection of active deterministic rule registry and parser probes only; no live app response or verifier result used to assign expected labels.",
+      "sources": [
+        "server/scoring/rules.js",
+        "server/scoring/parsers.js",
+        "server/scoring/engine.js"
+      ],
+      "field": "quantity/currency",
+      "coverage": "PARTIAL",
+      "matching_rules": [
+        "quantity"
+      ],
+      "missing_support": [
+        "Currency-unit alias normalization: dollars and $ differ.",
+        "Whole extracted phrases may retain give or take punctuation in the parsed unit."
+      ],
+      "qualification": "The quantity family exists; bare literal two hundred and 500 parse, but currency-normalized whole-phrase comparison is not guaranteed. Only type is approved."
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "informational",
+      "approval_scope": "TYPE_ONLY"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_ONLY",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "fd9403d4d72470d834eb1b9ad10275aaa0d91e1ff8ed02c5885a8f97fda1555d",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "value-approx-gym-duration",
+    "transcript1_text": "Q: How long were you at the gym on the evening of March 22nd?\nA: Maybe twenty minutes, tops.",
+    "transcript2_text": "Q: How long were you at the gym on the evening of March 22nd?\nA: About an hour and a half.",
+    "expected_type": "INFERENTIAL",
+    "expected_evidence": "depends on implemented rules",
+    "expected_score_band": "MODERATE",
+    "tricky_feature": "[value_approx_inferential] approximate durations, one with an upper bound, that do not reconcile",
+    "rationale": "Both durations are estimates, but 'twenty minutes, tops' sets an upper bound that is far below about ninety minutes, which suggests a moderate inferential conflict.",
+    "status": "approved",
+    "code_support": {
+      "audited_at": "2026-10-14",
+      "basis": "Static inspection of active deterministic rule registry and parser probes only; no live app response or verifier result used to assign expected labels.",
+      "sources": [
+        "server/scoring/rules.js",
+        "server/scoring/parsers.js",
+        "server/scoring/engine.js"
+      ],
+      "field": "duration",
+      "coverage": "NONE_FOR_THIS_PATTERN",
+      "matching_rules": [],
+      "related_rules": [
+        "quantity"
+      ],
+      "missing_support": [
+        "No conversion of an hour and a half into 90 minutes.",
+        "No consistent minute/hour unit conversion or tops upper-bound handling."
+      ],
+      "expectation": "depends on implemented rules"
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "informational",
+      "approval_scope": "TYPE_ONLY"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_ONLY",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "f1957b4593304c76b9e9f5cc026afd3aa6720953e582285dc62d569f484468b6",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "negation-scope-midnight",
+    "transcript1_text": "Q: When did you leave the party on New Year's Eve?\nA: I didn't leave before midnight.",
+    "transcript2_text": "Q: When did you leave the party on New Year's Eve?\nA: I left around 12:30.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "COMPATIBLE",
+    "expected_score_band": "WEAK",
+    "tricky_feature": "[negation] [compatible] the negation covers only leaving before midnight",
+    "rationale": "Denying leaving before midnight is consistent with leaving around 12:30, so the negative wording does not create a contradiction.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "8e50313232414b5fd607f334625791a7530488d957e81f2cb70cd5dfc5b37b33",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "negation-direct-store",
+    "transcript1_text": "Q: Did you go inside the store on the night of June 18th?\nA: I didn't go inside. I stayed in the car.",
+    "transcript2_text": "Q: Did you go inside the store on the night of June 18th?\nA: I went inside to buy cigarettes that night.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[negation] [affirm_deny] the negation's scope matches exactly the act that is later affirmed",
+    "rationale": "The denial of going inside and the affirmation of going inside concern the same act, place, and night, which makes this a direct polarity conflict.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "4a77d498292a386bcc8789024615051b6a1f02ae1527a4b2b9b6f83acff7d29c",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "home-vs-at-home-same",
+    "transcript1_text": "Q: Where were you on the night of February 9th?\nA: I was home.",
+    "transcript2_text": "Q: Where were you on the night of February 9th?\nA: I was at home the whole night.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "COMPATIBLE",
+    "expected_score_band": "WEAK",
+    "tricky_feature": "[home_at_home] [compatible] 'home' and 'at home' are equivalent wording",
+    "rationale": "'Home' and 'at home' state the same location, and 'the whole night' only adds detail, so there is no contradiction.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "174ef0f92b9e8841cf2af186db0967224fe132d7c82e9f906929e4aa2a09416f",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "awareness-direct-company",
+    "transcript1_text": "Q: Before the incident on April 2nd, had you heard of Brightline Logistics?\nA: No, I'd never heard of them.",
+    "transcript2_text": "Q: Before the incident on April 2nd, had you heard of Brightline Logistics?\nA: Sure, I'd heard of Brightline before April. Their trucks are all over town.",
+    "expected_type": "DIRECT",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "STRONG",
+    "tricky_feature": "[awareness] [affirm_deny] awareness is both denied and affirmed for the same aligned time window",
+    "rationale": "Both answers address awareness of the same company before the same date, and one denies it while the other affirms it, so this is direct.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "22420af12e6e2e66b1fdc04d17631b84d9802703771234dc5f765b50d0396ca3",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "awareness-vs-acquaintance",
+    "transcript1_text": "Q: Did you know Karen Wells?\nA: I knew who she was. Everybody in the office did.",
+    "transcript2_text": "Q: Did you know Karen Wells?\nA: I never actually met her.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "COMPATIBLE",
+    "expected_score_band": "WEAK",
+    "tricky_feature": "[awareness] [compatible] knowing who someone is differs from personally meeting them",
+    "rationale": "Knowing who someone is through the office is consistent with never having met her personally.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "d21c80ba77b8b8b17fc3dd17c57b8f9c9cd063dab361e780f8eb8c0afb6856da",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "misc-vague-weekend",
+    "transcript1_text": "Q: Did anything unusual happen at the house that weekend?\nA: Stuff happens, you know. Hard to say.",
+    "transcript2_text": "Q: Did anything unusual happen at the house that weekend?\nA: It was a pretty normal weekend, I guess.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "NOT_EVALUABLE",
+    "expected_score_band": null,
+    "tricky_feature": "[misc_vague] the first answer is a noncommittal miscellaneous statement with no specific claim",
+    "rationale": "'Stuff happens, hard to say' asserts no specific event, so there is nothing definite to compare with 'pretty normal', and a contradiction would be unsupported.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "51e7ab36b6bef4acc9a4e3ef041e4f7bed5c4776dcecf172cfb5b9549bd1c26a",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "misc-vague-after-dinner",
+    "transcript1_text": "Q: What did you do after dinner on March 15th?\nA: The usual things.",
+    "transcript2_text": "Q: What did you do after dinner on March 15th?\nA: I went for a walk and then read for a while.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "NOT_EVALUABLE",
+    "expected_score_band": null,
+    "tricky_feature": "[misc_vague] 'the usual things' lacks the specificity needed to compare with concrete activities",
+    "rationale": "'The usual things' does not specify any activity, so it cannot be compared with walking and reading, and no contradiction can be established.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "8ef5e7272a02e2c9d9389840ed72e2f63c79515730b29f295ff278e3ab36d126",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "compatible-wedding-meal",
+    "transcript1_text": "Q: What did you eat at the wedding on June 21st?\nA: Chicken.",
+    "transcript2_text": "Q: What did you eat at the wedding on June 21st?\nA: I had the chicken and some salad.",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "COMPATIBLE",
+    "expected_score_band": "WEAK",
+    "tricky_feature": "[compatible] the later answer adds an item without excluding the earlier one",
+    "rationale": "Mentioning only chicken does not exclude also eating salad, so the more detailed answer is consistent with the first.",
+    "status": "approved",
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "human_review": {
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "method": "explicit-chat-batch",
+      "content_sha256": "efb43dd8aa6a019f041b97b0e1f211cb1469d5724fe02df151637b748a7f3bd7",
+      "decision": "approve",
+      "batch_id": "owner-reviewed-batch-2026-10-14"
+    }
+  },
+  {
+    "id": "l2-clinton-1998-20261014-review-a-general-alone-memory",
+    "transcript1_text": "Q. At any time have you and Monica Lewinsky ever been alone together in any room in the White House?\n\nA. I think I testified to that earlier. I think that there is a, it is – I have no specific recollection, but it seems to me that she was on duty on a couple of occasions working for the legislative affairs office and brought me some things to sign, something on the weekend. That's – I have a general memory of that.\nQ. Do you remember anything that was said in any of those meetings?\n\nA. No. You know, we just have conversation, I don't remember.\n",
+    "transcript2_text": "\tMr. President, were you physically intimate with Monica Lewinsky?\n\n\tPRESIDENT CLINTON:  Mr. Benton, I think maybe I can save the - - you and the grand jury a lot of time, if I read a statement which I think will make it clear what the nature of my relationship with Ms. Lewinsky was, and how it related to the testimony I gave, what I was trying to do in that testimony.  And I think it will perhaps make it possible for you to ask even more relevant questions, from your point of view.  And, with your permission, I'd like to read that statement.\n\n\tMR. BITTMAN:  Absolutely.  Please, Mr. President.\n\n\tPRESIDENT CLINTON:  (Reading from statement.)  \"When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong.  These encounters did not consist of sexual intercourse.  They did not constitute sexual relations as I understood that term to be defined, at my January 17th, 1998 deposition, but they did involve inappropriate, inimate contact.  These inappropriate encounters ended at my insistence in early 1997.  I also had occasional telephone conversations with Miss Lewinsky that included inappropriate sexual banter.  ",
+    "expected_type": "INFERENTIAL",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "MODERATE",
+    "tricky_feature": "No specific recollection is not a categorical denial; later statement lacks precise room identity and may reflect changed recollection.",
+    "rationale": "The later specific admission of being alone during intimate encounters is in tension with the earlier nonspecific recollection of work deliveries, but the January memory qualification and missing room detail make the conflict inferential and contestable.",
+    "status": "approved",
+    "source_refs": {
+      "level": 2,
+      "bundle_id": "clinton-1998-20261014-review-a",
+      "proposal_sha256": "63612bac66d35578992865385d7e532e424c2172af7441f8454055ab7c585da6",
+      "testimony1": {
+        "document_id": "clinton-1998-20261014-review-a-testimony1",
+        "source": "William Jefferson Clinton, Paula Jones deposition, January 17 1998; published excerpts only; https://famous-trials.com/clinton/883-clintontestimony ; retrieved October 14 2026",
+        "text_sha256": "38fdbf17e836e3a2121e9a9fcc9ccc4ac37f762b5faaa775d275820f13e1b3fb",
+        "start": 32463,
+        "end": 33014,
+        "location": "Published deposition excerpts, any room in White House; Pres. Depo. p. 59 as cited by Wright; saved UTF-8 snapshot lines 385–391 (not original transcript line numbers)"
+      },
+      "testimony2": {
+        "document_id": "clinton-1998-20261014-review-a-testimony2",
+        "source": "William Jefferson Clinton, grand-jury testimony August 17 1998; CBS Part 1 partial, published September 21 1998; https://www.cbsnews.com/news/text-of-clinton-testimony/ ; retrieved October 14 2026",
+        "text_sha256": "9fae624adfc93c9a5ad68b3982720dddfc835e85befb0aa4899a7b9c92e3189f",
+        "start": 14992,
+        "end": 16185,
+        "location": "CBS Part 1, repeated complete statement opening; grand-jury testimony pp. 9–10 as cited by Wright; saved UTF-8 snapshot lines 307–313 (not original transcript line numbers)"
+      },
+      "review_metadata_sha256": "db2220ad893f5c316ce4fb623a9bbfdc77afd6c22509a424c39038e225572cc4"
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "target_claims": {
+      "claim1": "A. I think I testified to that earlier. I think that there is a, it is – I have no specific recollection, but it seems to me that she was on duty on a couple of occasions working for the legislative affairs office and brought me some things to sign, something on the weekend. That's – I have a general memory of that.",
+      "claim2": "When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong."
+    },
+    "judicial_relation": "supports",
+    "conflict_basis": "judicial_reference",
+    "type_basis": "project_rule",
+    "judicial_expected_evidence": "CONFLICT",
+    "verification_policy": {
+      "exclude": false,
+      "reason": "Included; project-rule type and saved-input evidence labels retained. Judicial agreement is informational."
+    },
+    "human_review": {
+      "method": "explicit-chat-batch",
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "content_sha256": "9474165c80e3ccf339330abf57c6131e4f8b5bcbc78a9c43542bf229ae8c975c",
+      "decision": "approve",
+      "approval_source": "explicit user instruction through chat"
+    }
+  },
+  {
+    "id": "l2-clinton-1998-20261014-review-a-hallway-scope-gap",
+    "transcript1_text": "Q. At any time were you and Monica Lewinsky alone in the hallway between the Oval Office and this kitchen area?\n\nA. I don't believe so, unless we were walking back to the back dining room with the pizzas. I just, I don't remember. I don't believe we were alone in the hallway, no.",
+    "transcript2_text": "\tMr. President, were you physically intimate with Monica Lewinsky?\n\n\tPRESIDENT CLINTON:  Mr. Benton, I think maybe I can save the - - you and the grand jury a lot of time, if I read a statement which I think will make it clear what the nature of my relationship with Ms. Lewinsky was, and how it related to the testimony I gave, what I was trying to do in that testimony.  And I think it will perhaps make it possible for you to ask even more relevant questions, from your point of view.  And, with your permission, I'd like to read that statement.\n\n\tMR. BITTMAN:  Absolutely.  Please, Mr. President.\n\n\tPRESIDENT CLINTON:  (Reading from statement.)  \"When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong.  These encounters did not consist of sexual intercourse.  They did not constitute sexual relations as I understood that term to be defined, at my January 17th, 1998 deposition, but they did involve inappropriate, inimate contact.  These inappropriate encounters ended at my insistence in early 1997.  I also had occasional telephone conversations with Miss Lewinsky that included inappropriate sexual banter.  ",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "NOT_EVALUABLE",
+    "expected_score_band": null,
+    "tricky_feature": "Hallway-specific qualified denial versus alone somewhere; CBS Part 1 does not identify the location of encounters.",
+    "rationale": "The saved August admission does not place either person in the specified hallway, so this pair cannot establish or refute that location-specific claim despite Wright’s broader conclusion.",
+    "status": "approved",
+    "source_refs": {
+      "level": 2,
+      "bundle_id": "clinton-1998-20261014-review-a",
+      "proposal_sha256": "97c011513adb2f8528d85bf12cc668cb710dc797f5210f8bad18143ba1d41b77",
+      "testimony1": {
+        "document_id": "clinton-1998-20261014-review-a-testimony1",
+        "source": "William Jefferson Clinton, Paula Jones deposition, January 17 1998; published excerpts only; https://famous-trials.com/clinton/883-clintontestimony ; retrieved October 14 2026",
+        "text_sha256": "38fdbf17e836e3a2121e9a9fcc9ccc4ac37f762b5faaa775d275820f13e1b3fb",
+        "start": 32094,
+        "end": 32374,
+        "location": "Published deposition excerpts, hallway question; Pres. Depo. p. 58 as cited by Wright; saved UTF-8 snapshot lines 378–380 (not original transcript line numbers)"
+      },
+      "testimony2": {
+        "document_id": "clinton-1998-20261014-review-a-testimony2",
+        "source": "William Jefferson Clinton, grand-jury testimony August 17 1998; CBS Part 1 partial, published September 21 1998; https://www.cbsnews.com/news/text-of-clinton-testimony/ ; retrieved October 14 2026",
+        "text_sha256": "9fae624adfc93c9a5ad68b3982720dddfc835e85befb0aa4899a7b9c92e3189f",
+        "start": 14992,
+        "end": 16185,
+        "location": "CBS Part 1, repeated complete statement opening; grand-jury testimony pp. 9–10 as cited by Wright; saved UTF-8 snapshot lines 307–313 (not original transcript line numbers)"
+      },
+      "review_metadata_sha256": "4113a0207236c131fe8f5759528d03b9e37136a926a8b8f09409b3e5ae7d9752"
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "target_claims": {
+      "claim1": "I don't believe we were alone in the hallway, no.",
+      "claim2": "When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong."
+    },
+    "judicial_relation": "context_only",
+    "conflict_basis": "not_determinable_from_input",
+    "type_basis": "project_rule",
+    "judicial_expected_evidence": "CONFLICT",
+    "verification_policy": {
+      "exclude": false,
+      "reason": "Included; project-rule type and saved-input evidence labels retained. Judicial agreement is informational."
+    },
+    "human_review": {
+      "method": "explicit-chat-batch",
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "content_sha256": "55879c35c961e1a1811c8c16ed077ad134467640a21e3bb8b68471ce504ea980",
+      "decision": "approve",
+      "approval_source": "explicit user instruction through chat"
+    }
+  },
+  {
+    "id": "l2-clinton-1998-20261014-review-a-oval-office-scope-gap",
+    "transcript1_text": "Q. Mr. President, before the break, we were talking about Monica Lewinsky. At any time were you and Monica Lewinsky alone together in the Oval Office?\nA. I don't recall, but as I said, when she worked at the legislative affairs office, they always had somebody there on the weekends. I typically worked some on the weekends. Sometimes they'd bring me things on the weekends. She – it seems to me she brought things to me once or twice on the weekends. In that case, whatever time she would be in there, drop it off, exchange a few words and go, she was there.\nI don't have any specific recollections of what the issues were, what was going on, but when the Congress is there, we're working all the time, and typically I would do some work on one of the days of the weekends in the afternoon.\nQ. So I understand, your testimony is that it was possible, then, that you were alone with her, but you have no specific recollection of that ever happening?\n\nA. Yes, that's correct. It's possible that she, in, while she was working there, brought something to me and that at the time she brought it to me, she was the only person there. That's possible.",
+    "transcript2_text": "\tMr. President, were you physically intimate with Monica Lewinsky?\n\n\tPRESIDENT CLINTON:  Mr. Benton, I think maybe I can save the - - you and the grand jury a lot of time, if I read a statement which I think will make it clear what the nature of my relationship with Ms. Lewinsky was, and how it related to the testimony I gave, what I was trying to do in that testimony.  And I think it will perhaps make it possible for you to ask even more relevant questions, from your point of view.  And, with your permission, I'd like to read that statement.\n\n\tMR. BITTMAN:  Absolutely.  Please, Mr. President.\n\n\tPRESIDENT CLINTON:  (Reading from statement.)  \"When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong.  These encounters did not consist of sexual intercourse.  They did not constitute sexual relations as I understood that term to be defined, at my January 17th, 1998 deposition, but they did involve inappropriate, inimate contact.  These inappropriate encounters ended at my insistence in early 1997.  I also had occasional telephone conversations with Miss Lewinsky that included inappropriate sexual banter.  ",
+    "expected_type": "FALSE_POSITIVE",
+    "expected_evidence": "NOT_EVALUABLE",
+    "expected_score_band": null,
+    "tricky_feature": "January concedes possible private deliveries and lacks specific recollection; August gives no room; judge cites later unavailable grand-jury pages.",
+    "rationale": "Because January allows the possibility of being alone and the supplied August passage names no room, an Oval Office contradiction cannot be evaluated from this pair; Wright relied on additional testimony missing from CBS Part 1.",
+    "status": "approved",
+    "source_refs": {
+      "level": 2,
+      "bundle_id": "clinton-1998-20261014-review-a",
+      "proposal_sha256": "13f2dd38ac4b8c3bcb56568cf2900066eaf558e3fdeced03076743edabb1e287",
+      "testimony1": {
+        "document_id": "clinton-1998-20261014-review-a-testimony1",
+        "source": "William Jefferson Clinton, Paula Jones deposition, January 17 1998; published excerpts only; https://famous-trials.com/clinton/883-clintontestimony ; retrieved October 14 2026",
+        "text_sha256": "38fdbf17e836e3a2121e9a9fcc9ccc4ac37f762b5faaa775d275820f13e1b3fb",
+        "start": 25323,
+        "end": 26469,
+        "location": "Published deposition excerpts, Oval Office and possible delivery; Pres. Depo. pp. 52–53 as cited by Wright; saved UTF-8 snapshot lines 327–332 (not original transcript line numbers)"
+      },
+      "testimony2": {
+        "document_id": "clinton-1998-20261014-review-a-testimony2",
+        "source": "William Jefferson Clinton, grand-jury testimony August 17 1998; CBS Part 1 partial, published September 21 1998; https://www.cbsnews.com/news/text-of-clinton-testimony/ ; retrieved October 14 2026",
+        "text_sha256": "9fae624adfc93c9a5ad68b3982720dddfc835e85befb0aa4899a7b9c92e3189f",
+        "start": 14992,
+        "end": 16185,
+        "location": "CBS Part 1, repeated complete statement opening; grand-jury testimony pp. 9–10 as cited by Wright; saved UTF-8 snapshot lines 307–313 (not original transcript line numbers)"
+      },
+      "review_metadata_sha256": "1e6e81452e358a442080de76c4e96a8acb2f028f66349d499c95b091c8fc0625"
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "target_claims": {
+      "claim1": "A. Yes, that's correct. It's possible that she, in, while she was working there, brought something to me and that at the time she brought it to me, she was the only person there. That's possible.",
+      "claim2": "When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong."
+    },
+    "judicial_relation": "context_only",
+    "conflict_basis": "not_determinable_from_input",
+    "type_basis": "project_rule",
+    "judicial_expected_evidence": "CONFLICT",
+    "verification_policy": {
+      "exclude": false,
+      "reason": "Included; project-rule type and saved-input evidence labels retained. Judicial agreement is informational."
+    },
+    "human_review": {
+      "method": "explicit-chat-batch",
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "content_sha256": "16cd9f9727e1425073053b03394bb49bc7b03e50290e8ce7b77801c2febc6a92",
+      "decision": "approve",
+      "approval_source": "explicit user instruction through chat"
+    }
+  },
+  {
+    "id": "l2-clinton-1998-20261014-review-a-affair-denial-citation-corrected",
+    "transcript1_text": "Q. Did you have an extramarital sexual affair with Monica Lewinsky?\n\nA. No.\nQ. If she told someone that she had a sexual affair with you beginning in November of 1995, would that be a lie?\n\nA. It's certainly not the truth. It would not be the truth.\n\nQ. I think I used the term \"sexual affair.\" And so the record is completely clear, have you ever had sexual relations with Monica Lewinsky, as that term is defined in Deposition Exhibit 1, as modified by the Court.\n\nMR. BENNETT: I object because I don't know that he can remember.\nJUDGE WRIGHT: Well, it's real short. He can – I will permit the question and you may show the witness definition number one.\n\nA. I have never had sexual relations with Monica Lewinsky. I've never had an affair with her.",
+    "transcript2_text": "\tMr. President, were you physically intimate with Monica Lewinsky?\n\n\tPRESIDENT CLINTON:  Mr. Benton, I think maybe I can save the - - you and the grand jury a lot of time, if I read a statement which I think will make it clear what the nature of my relationship with Ms. Lewinsky was, and how it related to the testimony I gave, what I was trying to do in that testimony.  And I think it will perhaps make it possible for you to ask even more relevant questions, from your point of view.  And, with your permission, I'd like to read that statement.\n\n\tMR. BITTMAN:  Absolutely.  Please, Mr. President.\n\n\tPRESIDENT CLINTON:  (Reading from statement.)  \"When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong.  These encounters did not consist of sexual intercourse.  They did not constitute sexual relations as I understood that term to be defined, at my January 17th, 1998 deposition, but they did involve inappropriate, inimate contact.  These inappropriate encounters ended at my insistence in early 1997.  I also had occasional telephone conversations with Miss Lewinsky that included inappropriate sexual banter.  ",
+    "expected_type": "INFERENTIAL",
+    "expected_evidence": "CONFLICT",
+    "expected_score_band": "MODERATE",
+    "tricky_feature": "Broad affair denial versus inappropriate intimate contact; later statement disclaims intercourse and defined sexual relations; no specific acts supplied.",
+    "rationale": "The broad denial of an affair is in tension with the later admission of inappropriate intimate encounters, but classification requires interpreting affair and preserving the express definitional disclaimers; this is a provisional inference rather than a direct admission of defined sexual relations.",
+    "status": "approved",
+    "source_refs": {
+      "level": 2,
+      "bundle_id": "clinton-1998-20261014-review-a",
+      "proposal_sha256": "da9547a6cda71fc5248acf32d0b6ac0abf13a039a25bcfbbd652a2afcc558c49",
+      "testimony1": {
+        "document_id": "clinton-1998-20261014-review-a-testimony1",
+        "source": "William Jefferson Clinton, Paula Jones deposition, January 17 1998; published excerpts only; https://famous-trials.com/clinton/883-clintontestimony ; retrieved October 14 2026",
+        "text_sha256": "38fdbf17e836e3a2121e9a9fcc9ccc4ac37f762b5faaa775d275820f13e1b3fb",
+        "start": 47769,
+        "end": 48520,
+        "location": "Published deposition excerpts, affair/defined-relations exchange; Pres. Depo. p. 78 as cited by Wright; saved UTF-8 snapshot lines 608–620 (not original transcript line numbers)"
+      },
+      "testimony2": {
+        "document_id": "clinton-1998-20261014-review-a-testimony2",
+        "source": "William Jefferson Clinton, grand-jury testimony August 17 1998; CBS Part 1 partial, published September 21 1998; https://www.cbsnews.com/news/text-of-clinton-testimony/ ; retrieved October 14 2026",
+        "text_sha256": "9fae624adfc93c9a5ad68b3982720dddfc835e85befb0aa4899a7b9c92e3189f",
+        "start": 14992,
+        "end": 16185,
+        "location": "CBS Part 1, repeated complete statement opening; grand-jury testimony pp. 9–10 as cited by Wright; saved UTF-8 snapshot lines 307–313 (not original transcript line numbers)"
+      },
+      "review_metadata_sha256": "67e2b23c2cdcd9f5e0d83eb7b6905835db82ea12fda30aafb5e8da7dec90fd3c"
+    },
+    "review_policy": {
+      "band_assertion": "informational",
+      "evidence_assertion": "required",
+      "approval_scope": "TYPE_AND_EVIDENCE"
+    },
+    "target_claims": {
+      "claim1": "I've never had an affair with her.",
+      "claim2": "When I was alone with Ms. Lewinsky on certain occasions in early 1996, and once in early 1997, I engaged in conduct that was wrong."
+    },
+    "judicial_relation": "supports",
+    "conflict_basis": "judicial_reference",
+    "type_basis": "project_rule",
+    "judicial_expected_evidence": "CONFLICT",
+    "verification_policy": {
+      "exclude": false,
+      "reason": "Included; project-rule type and saved-input evidence labels retained. Judicial agreement is informational."
+    },
+    "human_review": {
+      "method": "explicit-chat-batch",
+      "reviewed_by": "AI",
+      "approved_by": "zerayyang",
+      "approval_date": "2026-10-14",
+      "explicit_human_approval": true,
+      "explicit_human_review": false,
+      "human_verified": false,
+      "approval_scope": "TYPE_AND_EVIDENCE",
+      "statement": "reviewed by AI, approved by zerayyang on 2026-10-14",
+      "content_sha256": "d1b64cf56adef8ad1e867b26411760d527f60ba38ccceef6e41b06638af9a3c4",
+      "decision": "approve",
+      "approval_source": "explicit user instruction through chat"
+    }
+  }
+]

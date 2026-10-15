@@ -1,0 +1,32 @@
+[
+  {
+    "id": "sample-home",
+    "transcript1_text": "Q: Where were you on the evening of November 3rd?\nA: I was at home all evening. I ordered pizza around 7pm and watched TV.",
+    "transcript2_text": "Q: Walk me through the evening of November 3rd again.\nA: I was home. I think I went out briefly to get some groceries, maybe around 7:30, but came right back."
+  },
+  {
+    "id": "sample-sleep",
+    "transcript1_text": "Q: What time did you go to sleep?\nA: Around 10, maybe 10:30. I had work the next morning.",
+    "transcript2_text": "Q: What time did you go to sleep?\nA: It was late. Midnight maybe. I had trouble sleeping."
+  },
+  {
+    "id": "sample-food",
+    "transcript1_text": "Q: Where were you on the evening of November 3rd?\nA: I ordered pizza around 7pm and watched TV.",
+    "transcript2_text": "Q: You mentioned last time you ordered pizza. Now you're saying groceries?\nA: I might have done both. I don't remember exactly, it was almost a year ago."
+  },
+  {
+    "id": "sample-neighbor",
+    "transcript1_text": "Q: Did you speak to anyone that night?\nA: No, I was alone. My wife was visiting her sister in Portland.",
+    "transcript2_text": "Q: Did anyone see you that evening?\nA: My neighbor, Tom, might have seen me. We waved or something in the parking lot."
+  },
+  {
+    "id": "sample-warehouse",
+    "transcript1_text": "Q: Have you ever been to the Hargrove Street warehouse?\nA: No, never. I don't even know where that is.",
+    "transcript2_text": "Q: Had you ever visited the Hargrove Street area?\nA: I mean, I've driven through that part of town. I didn't say I'd never been in that general area."
+  },
+  {
+    "id": "sample-knowledge",
+    "transcript1_text": "Q: Had you met Daniel Cho before November 3rd?\nA: No. I'd never heard of him before this whole thing started.",
+    "transcript2_text": "Q: And Daniel Cho — did you know him?\nA: I knew of him. We had mutual friends. I don't think I'd met him face to face."
+  }
+]

@@ -1,0 +1,10 @@
+# Generated reports can contain transcript evidence. Keep local unless explicitly shared.
+/report/*.html
+/report/*.pdf
+/report/*.json
+/report/runs/
+/author/runs/
+
+# Level 2 originals, extracts, reference analysis and proposal audits stay local.
+/author/level2-private/
+/gold.draft.json.level2.lock

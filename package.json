@@ -7,7 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tests:author": "node tests/author/author.mjs",
+    "tests:approve": "node tests/author/approve.mjs",
+    "tests:verify": "node tests/verifier/verify.mjs",
+    "tests:all": "node tests/all.mjs",
+    "tests:unit": "node --test tests/author/*.test.mjs tests/verifier/*.test.mjs",
+    "tests:level2": "node tests/author/level2.mjs",
+    "tests:author:level2": "node tests/author/level2.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
