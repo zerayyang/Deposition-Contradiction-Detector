@@ -3,11 +3,14 @@ import { DOCUMENT_LIMITS as LIMITS,checkTextBudget,utf8Bytes } from '../shared/d
 import { assessCandidate } from './humanConfidencePipeline.js';
 import { testimonyMarkers } from './testimonyMarkers.js';
 import { witnessQuoteMatches } from './sourceEvidence.js';
+import { pdfQuoteMap, groundPdfClaim } from './pdfQuoteGrounding.js';
 
 export const MODEL = Object.freeze({id:'claude-opus-5-5',contextTokens:1000000,maxOutputTokens:128000,
   inputUsdPerMillion:4,outputUsdPerMillion:20,checked:'2026-10-14',
   documentation:'https://platform.claude.com/docs/en/models/opus-5-5/overview'});
-export const OUTPUT_TOKENS=10000; // Preserve the existing per-call output budget.
+export const OUTPUT_TOKENS=10000; // Existing short-document budget.
+export const SECTION_OUTPUT_TOKENS=32000; // Includes adaptive thinking plus answer text.
+export const outputBudget=plan=>plan.outputTokens ?? (plan.mode==='single'?OUTPUT_TOKENS:SECTION_OUTPUT_TOKENS);
 export const digest=text=>createHash('sha256').update(text).digest('hex');
 const round=n=>Math.round(n*10000)/10000;
 function byteEnd(text,start,bytes) {
@@ -80,25 +83,26 @@ export function buildPlan(texts,documents,instructions,options={}) {
   const manifests=validateDocuments(texts,documents);
   const single=utf8Bytes(texts[0])+utf8Bytes(texts[1])<=(options.singleRequestBytes??LIMITS.singleRequestBytes);
   const chunks=texts.map(text=>single?[{id:0,start:0,end:text.length,coreStart:0,coreEnd:text.length,questionContext:'',text}]:sectionDocument(text,options));
+  const outputTokens=single?OUTPUT_TOKENS:SECTION_OUTPUT_TOKENS;
   const requestCount=chunks[0].length*chunks[1].length;
   if(requestCount>LIMITS.maxRequests)throw new Error(`This plan needs ${requestCount} requests, above the safety limit of ${LIMITS.maxRequests}. No paid analysis started.`);
   const pairs=[];let estimatedInputTokens=0,inputTokenUpperBudget=0;
   for(const a of chunks[0])for(const b of chunks[1]){
     const bytes=utf8Bytes(instructions)+utf8Bytes(userContent(a,b,!single));
     const upper=bytes+8192; // UTF-8 byte budget plus framing reserve, not a tokenizer count.
-    if(upper+OUTPUT_TOKENS>MODEL.contextTokens)throw new Error('A planned request exceeds the conservative model context budget; no text was truncated.');
+    if(upper+outputTokens>MODEL.contextTokens)throw new Error('A planned request exceeds the conservative model context budget; no text was truncated.');
     estimatedInputTokens+=Math.ceil(bytes/3);inputTokenUpperBudget+=upper;
     pairs.push({id:`${a.id}:${b.id}`,a:a.id,b:b.id});
   }
-  const cost={currency:'USD',estimated:round((estimatedInputTokens*MODEL.inputUsdPerMillion+requestCount*2500*MODEL.outputUsdPerMillion)/1e6),
-    conservativeBudget:round((inputTokenUpperBudget*MODEL.inputUsdPerMillion+requestCount*OUTPUT_TOKENS*MODEL.outputUsdPerMillion)/1e6),
-    estimatedInputTokens,inputTokenUpperBudget,outputTokensPerRequest:OUTPUT_TOKENS,
-    note:'Local UTF-8 estimate, not provider tokenization or a billing guarantee. Estimate assumes 2,500 output tokens/call; budget reserves 10,000 including thinking. Standard uncached pricing; retries disabled. In-flight cancelled work can still be billed.'};
+  const cost={currency:'USD',estimated:round((estimatedInputTokens*MODEL.inputUsdPerMillion+requestCount*(single?2500:10000)*MODEL.outputUsdPerMillion)/1e6),
+    conservativeBudget:round((inputTokenUpperBudget*MODEL.inputUsdPerMillion+requestCount*outputTokens*MODEL.outputUsdPerMillion)/1e6),
+    estimatedInputTokens,inputTokenUpperBudget,outputTokensPerRequest:outputTokens,
+    note:`Local UTF-8 estimate, not provider tokenization or a billing guarantee. Estimate assumes ${single?'2,500':'10,000'} output tokens/call; budget reserves ${outputTokens.toLocaleString('en-US')} including thinking. Standard uncached pricing; retries disabled. In-flight cancelled work can still be billed.`};
   const id=digest(JSON.stringify({texts:texts.map(digest),manifests,instructions:digest(instructions),model:MODEL,pairs,chunks:chunks.map(cc=>cc.map(c=>({...c,text:undefined}))),cost}));
-  return {id,model:MODEL,requestCount,mode:single?'single':'all-section-pairs',cost,chunks,pairs,manifests};
+  return {id,model:MODEL,outputTokens,requestCount,mode:single?'single':'all-section-pairs',cost,chunks,pairs,manifests};
 }
 export function previewPlan(plan) {
-  return {id:plan.id,model:plan.model,requestCount:plan.requestCount,mode:plan.mode,cost:plan.cost,
+  return {id:plan.id,model:plan.model,outputTokens:outputBudget(plan),requestCount:plan.requestCount,mode:plan.mode,cost:plan.cost,
     documents:plan.chunks.map((chunks,i)=>({sections:chunks.length,pageCount:plan.manifests[i]?.pageCount??null,sourceReferences:plan.manifests[i]?'PDF page map':'Text offsets only',coveredCharacters:chunks.at(-1)?.coreEnd??0})),
     notice:'Every section in document 1 is compared with every section in document 2. Complete means all planned requests succeeded, not guaranteed detection accuracy. No paid request has started.'};
 }
@@ -121,20 +125,21 @@ function findingKey(c) {
   return JSON.stringify([c.type,literal(c.claim1),literal(c.claim2)]);
 }
 export async function executePlan({plan,texts,instructions,callModel,signal,onEvent=()=>{}}) {
+  const quoteMaps=[null,null]; // Build an offset map only when an exact PDF quote needs layout recovery.
   const findings=new Map(),topics=new Set(),tasks=plan.pairs.map(p=>({...p,status:'pending'})),usage={input_tokens:0,output_tokens:0},issues=[];
   let completed=0,attempted=0,cancelled=false,duplicatesCombined=0;
-  const snapshot=status=>({topicsReviewed:[...topics],contradictions:[...findings.values()],analysis:{status,planId:plan.id,duplicatesCombined,planned:tasks.length,attempted,completed,failed:tasks.filter(t=>t.status==='failed').length,tasks:tasks.map(t=>({...t})),usage:{...usage,unavailableRequests:tasks.filter(t=>t.attempted&&!t.usageReported).length},issues:[...issues],
+  const snapshot=status=>({topicsReviewed:[...topics],contradictions:[...findings.values()],analysis:{status,planId:plan.id,duplicatesCombined,planned:tasks.length,attempted,completed,failed:tasks.filter(t=>t.status==='failed').length,partial:tasks.filter(t=>t.status==='partial').length,tasks:tasks.map(t=>({...t})),usage:{...usage,unavailableRequests:tasks.filter(t=>t.attempted&&!t.usageReported).length},issues:[...issues],
     coverage:plan.chunks.map((chunks,i)=>{
       const sections=chunks.map(c=>{
         const related=tasks.filter(t=>(i===0?t.a:t.b)===c.id);
-        const complete=related.filter(t=>t.status==='completed').length;
-        return {id:c.id,start:c.start,end:c.end,coreStart:c.coreStart,coreEnd:c.coreEnd,comparisonsCompleted:complete,comparisonsPlanned:related.length,
-          status:complete===related.length?'complete':complete?'partial':'not_analyzed'};
+        const complete=related.filter(t=>t.status==='completed').length,partial=related.filter(t=>t.status==='partial').length;
+        return {id:c.id,start:c.start,end:c.end,coreStart:c.coreStart,coreEnd:c.coreEnd,comparisonsCompleted:complete,comparisonsPartial:partial,comparisonsPlanned:related.length,
+          status:complete===related.length?'complete':complete||partial?'partial':'not_analyzed'};
       });
       const pages=plan.manifests[i]?.pages.map(p=>{
         const related=sections.filter(c=>c.coreEnd>p.start&&c.coreStart<p.end);
         return {pdfPage:p.pdfPage,pageLabel:p.pageLabel,textStatus:p.status,sectionIds:related.map(c=>c.id),
-          analysisStatus:related.every(c=>c.status==='complete')?'complete':related.some(c=>c.comparisonsCompleted>0)?'partial':'not_analyzed'};
+          analysisStatus:related.every(c=>c.status==='complete')?'complete':related.some(c=>c.comparisonsCompleted>0||c.comparisonsPartial>0)?'partial':'not_analyzed'};
       })??null;
       return {document:i+1,pageCount:plan.manifests[i]?.pageCount??null,totalCharacters:texts[i].length,sections,pages};
     }),
@@ -145,25 +150,49 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
     task.status='running';task.attempted=true;attempted++;onEvent({event:'progress',task:{...task},attempted,completed,total:tasks.length});
     try {
       const a=plan.chunks[0][task.a],b=plan.chunks[1][task.b];
-      const message=await callModel({model:MODEL.id,max_tokens:OUTPUT_TOKENS,system:instructions,messages:[{role:'user',content:userContent(a,b,plan.mode!=='single')}]},{signal,maxRetries:0});
+      const message=await callModel({model:MODEL.id,max_tokens:outputBudget(plan),system:instructions,messages:[{role:'user',content:userContent(a,b,plan.mode!=='single')}]},{signal,maxRetries:0,...(plan.mode==='single'?{}:{timeout:600000})});
       task.usageReported=Number.isFinite(message.usage?.input_tokens)&&Number.isFinite(message.usage?.output_tokens);
+      task.stopReason=message.stop_reason??null;
+      task.contentBlockTypes=(message.content??[]).map(block=>block.type);
+      task.usage={...message.usage};task.outputTokenLimit=outputBudget(plan);
       task.rawText=message.content?.filter(b=>b.type==='text').map(b=>b.text).join('')??'';
       usage.input_tokens+=message.usage?.input_tokens??0;usage.output_tokens+=message.usage?.output_tokens??0;
       const parsed=parseModelMessage(message);
-      // Process atomically: a malformed pair never drops the rest silently.
-      task.response=parsed; // Retain returned candidates even if downstream processing fails.
-      for(const c of parsed.contradictions)if(typeof c?.claim1?.original!=='string'||typeof c?.claim2?.original!=='string'||!a.text.includes(c.claim1.original)||!b.text.includes(c.claim2.original))throw new Error('A returned quotation is outside its submitted section. Raw candidates retained in task diagnostics; no successful coverage credit.');
-      const assessed=parsed.contradictions.map(c=>assessCandidate(c,texts[0],texts[1]));
-      for(const t of parsed.topicsReviewed)topics.add(t);
-      for(const c of assessed){
-        c.sourceReferences={claim1:sourceReferences(texts[0],c.claim1.original,plan.manifests[0]),claim2:sourceReferences(texts[1],c.claim2.original,plan.manifests[1])};
-        const variant={pairId:task.id,type:c.type,severity:c.severity,reasoning:c.reasoning,semanticAssist:c.semanticAssist};
-        const key=findingKey(c),existing=findings.get(key);
-        if(existing){existing.supportingAnalyses.push(variant);duplicatesCombined++;}
-        else findings.set(key,{...c,supportingAnalyses:[variant]});
-        if(!c.claim1Valid||!c.claim2Valid)issues.push({pairId:task.id,reason:'A returned quote/extraction failed source validation; retained unscored for review.'});
+      task.response=parsed; // Never erase the original model claims from the audit trail.
+      task.rejectedFindings=[];task.acceptedFindings=0;task.grounding=[];
+      for(const [candidateIndex,original] of parsed.contradictions.entries()) {
+        try {
+          const c={...original};const grounding={};
+          for(const [i,key] of ['claim1','claim2'].entries()){
+            const section=i===0?a:b;
+            if(plan.manifests[i]){
+              if(typeof c[key]?.original==='string'&&!section.text.includes(c[key].original))quoteMaps[i]??=pdfQuoteMap(texts[i],plan.manifests[i]);
+              const resolved=groundPdfClaim(c[key],texts[i],quoteMaps[i],section);
+              c[key]=resolved.claim;grounding[key]=resolved.audit;
+            }else if(typeof c[key]?.original!=='string'||!section.text.includes(c[key].original))throw new Error('A returned quotation is outside its submitted section.');
+          }
+          const assessed=assessCandidate(c,texts[0],texts[1]);
+          assessed.sourceGrounding=grounding;
+          assessed.sourceReferences={claim1:sourceReferences(texts[0],c.claim1.original,plan.manifests[0]),claim2:sourceReferences(texts[1],c.claim2.original,plan.manifests[1])};
+          const variant={pairId:task.id,type:c.type,severity:c.severity,reasoning:c.reasoning,semanticAssist:c.semanticAssist};
+          const key=findingKey(c),existing=findings.get(key);
+          if(existing){existing.supportingAnalyses.push(variant);duplicatesCombined++;}
+          else findings.set(key,{...assessed,supportingAnalyses:[variant]});
+          task.acceptedFindings++;
+          if(Object.values(grounding).some(g=>g.method==='PDF_LAYOUT_MAPPED'))task.grounding.push({candidateIndex,...grounding});
+          if(!assessed.claim1Valid||!assessed.claim2Valid)issues.push({pairId:task.id,candidateIndex,reason:'A returned quote/extraction failed source validation; retained unscored for review.'});
+        }catch(error){
+          task.rejectedFindings.push({candidateIndex,candidate:original,reason:error.message});
+          issues.push({pairId:task.id,candidateIndex,reason:error.message});
+        }
       }
-      task.status='completed';delete task.response;delete task.rawText;completed++;
+      for(const t of parsed.topicsReviewed)topics.add(t);
+      if(task.rejectedFindings.length){
+        task.status=task.acceptedFindings?'partial':'failed';
+        task.error=`${task.rejectedFindings.length} finding(s) failed source grounding or processing; ${task.acceptedFindings} retained. See rejected finding reasons.`;
+      }else{task.status='completed';completed++;}
+      // Keep raw/model claims when layout mapping or rejection requires an audit.
+      if(!task.rejectedFindings.length&&!task.grounding.length){delete task.response;delete task.rawText;}
     }catch(error){
       task.error=error.message;
       if(signal?.aborted){task.status='cancelled';cancelled=true;break;}
@@ -173,6 +202,6 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
   }
   cancelled ||= Boolean(signal?.aborted);
   for(const task of tasks)if(task.status==='pending')task.status=cancelled?'cancelled':'not_attempted';
-  const status=cancelled?'cancelled':completed===tasks.length&&!issues.length?'complete':completed?'partial':'failed';
+  const status=cancelled?'cancelled':completed===tasks.length&&!issues.length?'complete':completed||tasks.some(t=>t.status==='partial')?'partial':'failed';
   const result=snapshot(status);onEvent({event:'result',...result});return result;
 }

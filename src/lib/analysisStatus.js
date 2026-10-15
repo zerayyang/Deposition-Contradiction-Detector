@@ -4,7 +4,8 @@ export function progressCounts(analysis) {
   const total = count(analysis.planned);
   const completed = Math.min(total, count(analysis.completed));
   const failed = Math.min(total - completed, count(analysis.failed));
-  return { total, completed, failed, processed: completed + failed };
+  const partial = Math.min(total - completed - failed, count(analysis.partial));
+  return { total, completed, failed, partial, processed: completed + failed + partial };
 }
 
 export function durationLabel(seconds) {
@@ -24,7 +25,8 @@ export function remainingLabel(analysis, active, elapsed, sample) {
 }
 
 export function friendlyFailure(error = '') {
-  if (/quotation.*outside|quote.*section/i.test(error)) return 'A quoted passage did not exactly match its source section.';
+  if (/max_tokens/i.test(error)) return 'The AI reached its output limit before finishing. This comparison needs another approved analysis.';
+  if (/quotation.*outside|quote.*section|quotation.*grounded|quotation.*passage/i.test(error)) return 'A quoted passage did not exactly match its source section.';
   if (/contradictions array/i.test(error)) return 'The AI response did not include the required findings list.';
   if (/timeout|timed out/i.test(error)) return 'The comparison took too long.';
   if (/credit|billing|payment/i.test(error)) return 'The AI provider reported a billing problem.';

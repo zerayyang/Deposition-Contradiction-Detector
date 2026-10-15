@@ -1,5 +1,4 @@
-import {buildPlan,previewPlan,executePlan,parseModelMessage} from './documentAnalysis.js';
-import {assessCandidate} from './humanConfidencePipeline.js';
+import {buildPlan,previewPlan,executePlan} from './documentAnalysis.js';
 export function createAnalysisHandlers({instructions,callModel}) {
   const prepare=body=>buildPlan([body?.transcript1,body?.transcript2],body?.documents,instructions);
   return {
@@ -10,12 +9,9 @@ export function createAnalysisHandlers({instructions,callModel}) {
       const controller=new AbortController();
       const close=()=>{if(!res.writableEnded)controller.abort();};res.on('close',close);
       try{
-        const a=plan.chunks[0][0],b=plan.chunks[1][0];
-        const {userContent,MODEL,OUTPUT_TOKENS}=await import('./documentAnalysis.js');
-        const message=await callModel({model:MODEL.id,max_tokens:OUTPUT_TOKENS,system:instructions,messages:[{role:'user',content:userContent(a,b)}]},{signal:controller.signal,maxRetries:0});
-        const parsed=parseModelMessage(message),seen=new Set();
-        parsed.contradictions=parsed.contradictions.filter(c=>{const k=JSON.stringify(c);if(seen.has(k))return false;seen.add(k);return true;}).map(c=>assessCandidate(c,req.body.transcript1,req.body.transcript2));
-        return res.json(parsed);
+        const result=await executePlan({plan,texts:[req.body.transcript1,req.body.transcript2],instructions,callModel,signal:controller.signal});
+        if(result.analysis.status==='failed')return res.status(500).json({error:'Failed to analyze depositions',details:result.analysis.tasks[0]?.error,analysis:result.analysis});
+        return res.json(result);
       }catch(e){if(!res.destroyed)return res.status(500).json({error:'Failed to analyze depositions',details:e.message});}
       finally{res.off('close',close);}
     },

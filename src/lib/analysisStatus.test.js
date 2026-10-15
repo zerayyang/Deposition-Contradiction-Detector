@@ -14,11 +14,15 @@ test('terminal and inactive states never show a countdown', () => {
  assert.equal(remainingLabel({...running,completed:6},true,20,null),'Finishing up…');
 });
 test('failures advance progress without becoming successful comparisons', () => {
- assert.deepEqual(progressCounts({...running,failed:2}),{total:6,completed:1,failed:2,processed:3});
- assert.deepEqual(progressCounts({planned:2,completed:2,failed:7}),{total:2,completed:2,failed:0,processed:2});
+ assert.deepEqual(progressCounts({...running,failed:2}),{total:6,completed:1,failed:2,partial:0,processed:3});
+ assert.deepEqual(progressCounts({planned:2,completed:2,failed:7}),{total:2,completed:2,failed:0,partial:0,processed:2});
 });
 test('failure messages are readable and never leak raw provider text', () => {
- assert.match(friendlyFailure('Model did not finish normally (max_tokens); response is incomplete.'),/could not be read completely/);
+ assert.match(friendlyFailure('Model did not finish normally (max_tokens); response is incomplete.'),/output limit/);
  assert.equal(friendlyFailure('SECRET raw payload'),'This comparison could not be completed.');
  assert.equal(durationLabel(null),'—');
+});
+
+test('partial comparisons advance processed count without inflating successful coverage', () => {
+ assert.deepEqual(progressCounts({planned:6,completed:1,failed:2,partial:2}),{total:6,completed:1,failed:2,partial:2,processed:5});
 });

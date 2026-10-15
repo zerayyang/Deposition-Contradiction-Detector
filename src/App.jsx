@@ -257,7 +257,7 @@ function Dashboard({ session }) {
         if(event.event === 'progress') {latestProgress=event;updateDraft(id,{analysis:{...(latest?.analysis ?? {status:'running',planned:plan.requestCount,failed:0}),completed:event.completed,attempted:event.attempted}});setAnalysisProgress(`${event.completed} of ${event.total} comparisons completed · request ${event.attempted}`);}
         if(event.event === 'checkpoint' || event.event === 'result') {
           latest=event;
-          setAnalysisTiming({processed:event.analysis.completed + event.analysis.failed,elapsed:(performance.now()-start)/1000});
+          setAnalysisTiming({processed:event.analysis.completed + event.analysis.failed + (event.analysis.partial ?? 0),elapsed:(performance.now()-start)/1000});
           updateDraft(id,{results:event.contradictions,analysis:event.analysis,seconds:(performance.now()-start)/1000,dirty:true});
           setAnalysisProgress(`${event.analysis.completed} of ${event.analysis.planned} comparisons completed · ${event.analysis.failed} failed`);
         }
