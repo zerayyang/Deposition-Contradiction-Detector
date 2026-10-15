@@ -9,5 +9,10 @@ export function testimonyMarkers(text) {
   for(const m of text.matchAll(/^[ \t]*\d+[ \t]+([QA])(?=[ \t]|\r?$)[ \t]*/gm)) {
     if(!markers.has(m.index))markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role:m[1]});
   }
+  // Explicit speaker turns end the preceding answer/question. Objections and
+  // court/counsel remarks must never be swallowed by the last witness answer.
+  for(const m of text.matchAll(/^[ \t]*(?:\d+[ \t]+)?((?:MR|MS|MRS|DR)\.[ \t]+[^:\n]+|THE[ \t]+(?:COURT|WITNESS|CLERK|REPORTER)|(?:COUNSEL|JUDGE|BAILIFF|COURT REPORTER)):[ \t]*/gim)) {
+    if(!markers.has(m.index))markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role:/^THE\s+WITNESS$/i.test(m[1])?'A':'S'});
+  }
   return [...markers.values()].sort((a,b)=>a.index-b.index);
 }

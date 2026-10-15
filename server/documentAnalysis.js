@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto';
 import { DOCUMENT_LIMITS as LIMITS,checkTextBudget,utf8Bytes } from '../shared/documentLimits.js';
 import { assessCandidate } from './humanConfidencePipeline.js';
 import { testimonyMarkers } from './testimonyMarkers.js';
-import { witnessQuoteMatches } from './sourceEvidence.js';
 import { pdfQuoteMap, groundPdfClaim } from './pdfQuoteGrounding.js';
 
 export const MODEL = Object.freeze({id:'claude-opus-5-5',contextTokens:1000000,maxOutputTokens:128000,
@@ -106,10 +105,11 @@ export function previewPlan(plan) {
     documents:plan.chunks.map((chunks,i)=>({sections:chunks.length,pageCount:plan.manifests[i]?.pageCount??null,sourceReferences:plan.manifests[i]?'PDF page map':'Text offsets only',coveredCharacters:chunks.at(-1)?.coreEnd??0})),
     notice:'Every section in document 1 is compared with every section in document 2. Complete means all planned requests succeeded, not guaranteed detection accuracy. No paid request has started.'};
 }
-function sourceReferences(text,quote,manifest) {
-  return witnessQuoteMatches(text,quote).flatMap(({index})=>{
+function sourceReferences(text,quote,manifest,binding) {
+  const locations=binding.status==='BOUND'?[binding.selected]:binding.alternatives;
+  return locations.flatMap(({start:index,id})=>{
     const end=index+quote.length;
-    return manifest?manifest.pages.filter(p=>p.end>index&&p.start<end).map(p=>({start:index,end,pdfPage:p.pdfPage,pageLabel:p.pageLabel})):[{start:index,end,pdfPage:null,pageLabel:null}];
+    return manifest?manifest.pages.filter(p=>p.end>index&&p.start<end).map(p=>({start:index,end,pdfPage:p.pdfPage,pageLabel:p.pageLabel,occurrenceId:id})):[{start:index,end,pdfPage:null,pageLabel:null,occurrenceId:id}];
   });
 }
 export function parseModelMessage(message) {
@@ -122,7 +122,8 @@ export function parseModelMessage(message) {
 }
 function findingKey(c) {
   const literal=claim=>Object.fromEntries(['original','activityPhrase','timePhrase','locationPhrase','personPhrase','objectPhrase','quantityPhrase','statePhrase','qualifierPhrases'].map(k=>[k,claim?.[k]]));
-  return JSON.stringify([c.type,literal(c.claim1),literal(c.claim2)]);
+  const locations=Object.fromEntries(Object.entries(c.sourceBindings??{}).map(([key,binding])=>[key,{status:binding.status,ids:(binding.selected?[binding.selected]:binding.alternatives).map(m=>m.id)}]));
+  return JSON.stringify([c.type,literal(c.claim1),literal(c.claim2),locations]);
 }
 export async function executePlan({plan,texts,instructions,callModel,signal,onEvent=()=>{}}) {
   const quoteMaps=[null,null]; // Build an offset map only when an exact PDF quote needs layout recovery.
@@ -171,11 +172,14 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
               c[key]=resolved.claim;grounding[key]=resolved.audit;
             }else if(typeof c[key]?.original!=='string'||!section.text.includes(c[key].original))throw new Error('A returned quotation is outside its submitted section.');
           }
-          const assessed=assessCandidate(c,texts[0],texts[1]);
+          // Anchors are checked inside this submitted section, using only literal
+          // source context. Never select a repeated answer from model reasoning.
+          for(const i of [0,1])if(plan.manifests[i]&&['sourceQuestion','sourceAnswer'].some(k=>typeof c[`claim${i+1}`]?.[k]==='string'))quoteMaps[i]??=pdfQuoteMap(texts[i],plan.manifests[i]);
+          const assessed=assessCandidate(c,texts[0],texts[1],{claim1:{...a,map:quoteMaps[0]},claim2:{...b,map:quoteMaps[1]}});
           assessed.sourceGrounding=grounding;
-          assessed.sourceReferences={claim1:sourceReferences(texts[0],c.claim1.original,plan.manifests[0]),claim2:sourceReferences(texts[1],c.claim2.original,plan.manifests[1])};
-          const variant={pairId:task.id,type:c.type,severity:c.severity,reasoning:c.reasoning,semanticAssist:c.semanticAssist};
-          const key=findingKey(c),existing=findings.get(key);
+          assessed.sourceReferences={claim1:sourceReferences(texts[0],c.claim1.original,plan.manifests[0],assessed.sourceBindings.claim1),claim2:sourceReferences(texts[1],c.claim2.original,plan.manifests[1],assessed.sourceBindings.claim2)};
+          const variant={pairId:task.id,type:c.type,severity:c.severity,reasoning:c.reasoning,semanticAssist:c.semanticAssist,sourceAnchors:Object.fromEntries(['claim1','claim2'].map(key=>[key,{sourceQuestion:c[key]?.sourceQuestion??null,sourceAnswer:c[key]?.sourceAnswer??null}]))};
+          const key=findingKey(assessed),existing=findings.get(key);
           if(existing){existing.supportingAnalyses.push(variant);duplicatesCombined++;}
           else findings.set(key,{...assessed,supportingAnalyses:[variant]});
           task.acceptedFindings++;

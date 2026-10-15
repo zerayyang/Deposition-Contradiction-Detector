@@ -90,29 +90,7 @@ export function alignClockRanges(a, b, config = SCORING_CONFIG) {
     return [a, b];
 }
 
-const words = { zero:0, one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10, eleven:11, twelve:12, thirteen:13, fourteen:14, fifteen:15, sixteen:16, seventeen:17, eighteen:18, nineteen:19, twenty:20, thirty:30, forty:40, fifty:50, sixty:60, seventy:70, eighty:80, ninety:90, hundred:100, thousand:1000 };
-export function parseQuantityRange(phrase, config = SCORING_CONFIG) {
-    const text = normalize(phrase);
-    if (!text || /\b(?:am|pm|january|february|march|april|may|june|july|august|september|october|november|december)\b/.test(text)) return null;
-    const numberPattern = new RegExp(`\\b(?:\\d+(?:\\.\\d+)?|(?:${Object.keys(words).join("|")})(?:[ -](?:${Object.keys(words).join("|")}))*)\\b`, "g");
-    const matches = [...text.matchAll(numberPattern)];
-    const values = matches.map(m => {
-        if (/^\d/.test(m[0])) return Number(m[0]);
-        let result = 0, group = 0;
-        for (const word of m[0].split(/[ -]/)) {
-            if (word === "hundred") group = (group || 1) * 100;
-            else if (word === "thousand") { result += (group || 1) * 1000; group = 0; }
-            else group += words[word];
-        }
-        return result + group;
-    });
-    if (!values.length || values.length > 2) return null;
-    const approximate = /\b(?:about|around|roughly|approximately|maybe)\b/.test(text);
-    const earliest = Math.min(...values), latest = Math.max(...values);
-    const width = approximate ? Math.max(config.quantityToleranceMinimum, latest * config.quantityToleranceFraction) : 0;
-    const unit = text.replace(numberPattern, "").replace(/\b(?:about|around|roughly|approximately|maybe|or|to|between|and)\b/g, "").replace(/[-\s]+/g, " ").trim();
-    return { earliest: Math.max(0, earliest - width), latest: latest + width, widenedBy: width, unit };
-}
+export { parseQuantityRange } from "./quantities.js";
 
 export function contextFor(fact1, fact2, provided = {}) {
     const texts = [fact1, fact2].map(f => normalize(`${f.context ?? ""} ${f.original}`));
