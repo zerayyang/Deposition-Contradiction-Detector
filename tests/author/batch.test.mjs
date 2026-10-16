@@ -2,16 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
 import { applyBatch, planBatch } from './batch.mjs';
 import { atomicJson, digest, readJson, validateCase, validateGenerated } from './schema.mjs';
-const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (id = 'synthetic') => ({ id, transcript1_text: 'Synthetic question: open? Yes.', transcript2_text: 'Synthetic question: open? No.', expected_type: 'DIRECT', expected_evidence: 'CONFLICT', expected_score_band: 'STRONG', tricky_feature: 'synthetic author workflow fixture', rationale: 'Synthetic answers differ.', status: 'draft' });
 const decision = (extra = {}) => ({ batch_id: 'unit-batch', reviewed_by: 'AI', approved_by: 'zerayyang', approval_date: '2026-10-14', approval_source: 'explicit user batch instruction', approved_ids: ['synthetic'], draft_ids: ['held'], type_only_ids: [], case_updates: {}, hold_reasons: { held: 'Pending wording review.' }, ordinal_groups: {}, ...extra });
 const input = (d = decision()) => ({ drafts: [fixture(), fixture('held')], gold: [], decision: d });
 const reviewed = c => ({ ...c, status: 'approved', human_review: { explicit_human_review: true, method: 'interactive-readline', reviewer: 'zerayyang', decision: 'approve', content_sha256: digest(c) } });
 async function setup(run) {
-  const root = await fs.mkdtemp(path.join(here, '.batch-unit-'));
+  const root = await fs.mkdtemp(path.join(tmpdir(), 'deposition-batch-unit-'));
   try {
     await atomicJson(path.join(root, 'gold.json'), []);
     await atomicJson(path.join(root, 'gold.draft.json'), input().drafts);

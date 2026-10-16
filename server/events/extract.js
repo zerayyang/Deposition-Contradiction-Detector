@@ -88,7 +88,7 @@ function usageFor(message){
   return {known,inputTokens:known?u.input_tokens:null,outputTokens:known?u.output_tokens:null,
     cacheCreationInputTokens:u?.cache_creation_input_tokens??0,cacheReadInputTokens:u?.cache_read_input_tokens??0};
 }
-export async function executeEventExtraction({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map(),maxNewRequests=Infinity}) {
+export async function executeEventExtraction({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map(),retainedTasks=new Map(),maxNewRequests=Infinity}) {
   if(!plan||!builtPlans.has(plan)||plan.id!==planHash(plan)||plan.system!==system)throw new Error('Extraction plan changed or is stale; rebuild and review it.');
   if(approval?.planId!==plan.id||approval?.requestCount!==plan.requestCount||!Number.isFinite(approval?.maxUsd)||approval.maxUsd<plan.cost.conservativeBudget)throw new Error('Explicit approval of this exact plan, request count and conservative USD budget is required.');
   if(typeof callModel!=='function')throw new Error('Supply the existing model transport explicitly.');
@@ -98,20 +98,36 @@ export async function executeEventExtraction({plan,approval,callModel,signal,onE
   for(const task of tasks){const message=cachedResponses.get(hash(task.input));if(!message)continue;
     task.usage=usageFor(message);task.stopReason=message.stop_reason;
     task.rawText=message.content.filter(b=>b.type==='text').map(b=>b.text).join('');task.responseSha256=hash(task.rawText);
-    task.response=parseExtractionMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
-    if(task.issues.length)throw new Error('Saved completed extraction failed fresh validation. No new paid calls started.');
+    try{
+      task.response=parseExtractionMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
+      if(task.issues.length)throw new Error('Invalid completed extraction.');
+    }catch{throw new Error('Saved completed extraction failed fresh validation. No new paid calls started.');}
     task.status='COMPLETE';task.attempted=true;task.reused=true;
+  }
+  // Failed/partial chunks are replayed locally and never automatically retried.
+  for(const task of tasks){const saved=retainedTasks.get(hash(task.input));if(!saved||task.status==='COMPLETE')continue;
+    task.attempted=true;task.reused=true;task.usage=saved.usage??{known:false};task.stopReason=saved.stopReason??null;
+    task.rawText=saved.rawText??'';task.responseSha256=hash(task.rawText);
+    try{
+      task.response=parseExtractionMessage({stop_reason:task.stopReason,content:[{type:'text',text:task.rawText}]});
+      task.responseFormat=decodeEventJson(task.rawText).format;
+      Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
+      task.status=task.issues.length?'PARTIAL':'COMPLETE';
+    }catch(error){task.error=saved.error??error.message;task.errorCode=saved.errorCode??null;task.status='FAILED';}
   }
   const model=createMeasuredModel(callModel,{timeoutMs:plan.timeoutMs});let cancelled=false;
   const snapshot=()=>{
     const attempts=tasks.filter(t=>t.attempted),allKnown=attempts.every(t=>t.usage?.known),uncached=attempts.every(t=>!t.usage?.cacheCreationInputTokens&&!t.usage?.cacheReadInputTokens);
     const inputTokens=attempts.reduce((n,t)=>n+(t.usage?.inputTokens??0),0),outputTokens=attempts.reduce((n,t)=>n+(t.usage?.outputTokens??0),0);
-    const complete=tasks.every(t=>t.status==='COMPLETE'),some=tasks.some(t=>t.status==='COMPLETE'&&t.mode==='MODEL'||t.events.length);
-    return {status:cancelled?'CANCELLED':complete?'COMPLETE':some?'PARTIAL':'FAILED',planId:plan.id,
+    const readingFinished=tasks.every(t=>['COMPLETE','PARTIAL','FAILED'].includes(t.status));
+    const gaps=tasks.flatMap(t=>[...(['PARTIAL','FAILED'].includes(t.status)?[{taskId:t.id,documentId:plan.documents[t.documentIndex].documentId,start:t.coreStart,end:t.coreEnd,code:t.status,reason:t.status==='FAILED'?'This reading request failed or returned an invalid response. Inspect the saved report before approving another attempt.':t.issues[0]?.message??'A reading note failed validation.'}]:[]),...(t.reviewNotes??[]).map(n=>({taskId:t.id,documentId:plan.documents[t.documentIndex].documentId,unitId:n.unitId,start:n.start,end:n.end,code:n.code,reason:n.message}))]);
+    const complete=tasks.every(t=>t.status==='COMPLETE'),validatedChunk=tasks.some(t=>t.status==='COMPLETE'&&t.mode==='MODEL'),some=validatedChunk||tasks.some(t=>t.events.length);
+    return {status:cancelled?'CANCELLED':readingFinished&&gaps.length&&validatedChunk?'READING_GAPS':complete?'COMPLETE':some?'PARTIAL':'FAILED',planId:plan.id,readingPolicyVersion:2,readingFinished,budgetExhausted:tasks.some(t=>t.errorCode==='BUDGET_EXHAUSTED'),gaps,gapDigest:hash(gaps),
       documents:plan.documents.map((d,i)=>{
         const own=tasks.filter(t=>t.documentIndex===i),events=own.flatMap(t=>t.events),validation=validateEventRecords(events,d);
         const segments=own.map(t=>({start:t.coreStart,end:t.coreEnd,status:t.status==='COMPLETE'?'PROCESSED':t.attempted?'FAILED':'UNPROCESSED',eventIds:t.events.map(e=>e.id),reason:t.status==='COMPLETE'?null:t.error??t.issues[0]?.message??'Not processed.'}));
-        return {documentId:d.documentId,documentSha256:d.documentSha256,events,recordValidation:validation,sourceDiagnostics:d.sourceDiagnostics,
+        const ownGaps=gaps.filter(g=>g.documentId===d.documentId),finished=own.every(t=>['COMPLETE','PARTIAL','FAILED'].includes(t.status));
+        return {documentId:d.documentId,documentSha256:d.documentSha256,events,gaps:ownGaps,readingFinished:finished,recordValidation:validation,sourceDiagnostics:d.sourceDiagnostics,
           coverage:{status:segments.every(s=>s.status==='PROCESSED')?'COMPLETE':segments.some(s=>s.status==='PROCESSED')?'PARTIAL':'FAILED',segments},
           notice:'Coverage records assigned-range processing, not exhaustive event recall. These records are not a promoted comparison or scored finding.'};
       }),
@@ -126,7 +142,7 @@ export async function executeEventExtraction({plan,approval,callModel,signal,onE
   await emit({event:'start',plan:previewEventExtractionPlan(plan)});
   let newRequests=0;
   for(const task of tasks){
-    if(task.status==='COMPLETE')continue;
+    if(['COMPLETE','PARTIAL','FAILED'].includes(task.status))continue;
     if(newRequests>=maxNewRequests&&task.mode!=='LOCAL_NON_WITNESS')break;
     if(signal?.aborted){cancelled=true;break;}
     if(task.mode==='LOCAL_NON_WITNESS'){task.status='COMPLETE';continue;}
@@ -143,9 +159,9 @@ export async function executeEventExtraction({plan,approval,callModel,signal,onE
       task.response=parseExtractionMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;
       Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
       task.status=task.issues.length?'PARTIAL':'COMPLETE';
-    }catch(error){task.error=error.message??String(error);task.status=signal?.aborted?'CANCELLED':'FAILED';if(signal?.aborted)cancelled=true;}
+    }catch(error){task.error=error.message??String(error);task.errorCode=error.code??null;task.status=signal?.aborted?'CANCELLED':'FAILED';if(signal?.aborted)cancelled=true;}
     await emit({event:'checkpoint',result:snapshot()});
-    if(cancelled)break;
+    if(cancelled||task.errorCode==='BUDGET_EXHAUSTED')break;
   }
   cancelled ||= Boolean(signal?.aborted);
   for(const task of tasks)if(task.status==='PENDING')task.status=cancelled?'CANCELLED':'NOT_ATTEMPTED';

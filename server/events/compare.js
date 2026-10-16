@@ -78,6 +78,8 @@ function validateCoverage(document,text,allowPartial){
     if(s.status!=='PROCESSED'&&(typeof s.reason!=='string'||!s.reason.trim()))throw new Error('Incomplete extraction range lacks a reason.');
   }
   if(end!==text.length)throw new Error('Extraction coverage does not account for the complete source.');
+  const finishedWithGaps=document.readingFinished===true&&Array.isArray(document.gaps)&&document.gaps.length>0;
+  if(finishedWithGaps&&document.gaps.some(g=>!Number.isInteger(g.start)||!Number.isInteger(g.end)||g.start<0||g.end<=g.start||g.end>text.length))throw new Error('Invalid reading gap range.');
   const status=segments.every(s=>s.status==='PROCESSED')?'COMPLETE':segments.some(s=>s.status==='PROCESSED')?'PARTIAL':'FAILED';
   if(document.coverage.status!==status)throw new Error('Extraction coverage status contradicts its ranges.');
   for(const e of document.events)if(!segments.some(s=>s.eventIds.includes(e.id)&&e.sources?.some(source=>source.role==='WITNESS'&&source.end>s.start&&source.start<s.end)))throw new Error('Extracted event is not linked to its assigned witness core range.');
@@ -88,7 +90,7 @@ export function buildEventComparisonPlan({extractionPlan,extractionResult},{even
   if(eventsPerBlock>128)throw new Error('At most 128 primary events per block are supported; no events were discarded.');
   if(typeof sameWitnessConfirmed!=='boolean'||typeof allowPartialExtraction!=='boolean')throw new Error('Identity and partial-extraction flags must be explicit booleans.');
   if(outputTokens>MODEL.maxOutputTokens)throw new Error('Comparison output budget exceeds existing model policy.');
-  if(!['COMPLETE','PARTIAL','FAILED','CANCELLED'].includes(extractionResult?.status))throw new Error('Unknown extraction status.');
+  if(!['COMPLETE','READING_GAPS','PARTIAL','FAILED','CANCELLED'].includes(extractionResult?.status))throw new Error('Unknown extraction status.');
   if(extractionPlan?.documents?.length!==2||extractionResult?.documents?.length!==2||extractionResult.planId!==extractionPlan.id)throw new Error('Supply two original sources and the matching extraction result/plan.');
   if(extractionResult.status!=='COMPLETE'&&!allowPartialExtraction)throw new Error('Extraction is incomplete; explicit partial-extraction review is required.');
   const sourceDocuments=[],catalogs=[],indexes=[];

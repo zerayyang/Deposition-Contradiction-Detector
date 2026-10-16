@@ -1,15 +1,16 @@
+import {readingCanContinue} from '../shared/readingState.js';
 import {remainingPreview} from './analysisHandlers.js';
 import {createMeasuredModel} from './runtimeControls.js';
 import {buildPlan,previewPlan,executePlan,digest,MODEL,directRequest} from './documentAnalysis.js';
 import {prepareEventWorkflow,executeEventWorkflow} from './events/workflow.js';
 import {utf8Bytes} from '../shared/documentLimits.js';
 const cents=n=>Math.ceil(n*1e6)/1e6;
-const sourceBody=body=>Object.fromEntries(['transcript1','transcript2','documents','originalDocuments','caseId','workflow','phase','speakerRoles','sourceRolesReviewed','sameWitnessConfirmed','useApprovedMemory','eventState'].filter(k=>body[k]!==undefined).map(k=>[k,body[k]]));
+const sourceBody=body=>Object.fromEntries(['transcript1','transcript2','documents','originalDocuments','caseId','workflow','phase','speakerRoles','sourceRolesReviewed','sameWitnessConfirmed','witnessTestimonyConfirmed','acknowledgeExtractionGaps','extractionGapDigest','useApprovedMemory','eventState'].filter(k=>body[k]!==undefined).map(k=>[k,body[k]]));
 export function requestUpperCost(params){return cents(((utf8Bytes(JSON.stringify(params))+8192)*MODEL.inputUsdPerMillion+params.max_tokens*MODEL.outputUsdPerMillion)/1e6);}
 function observedCost(message,reserved){const u=message?.usage;if(!Number.isSafeInteger(u?.input_tokens)||!Number.isSafeInteger(u?.output_tokens)||u.input_tokens<0||u.output_tokens<0||u.cache_read_input_tokens||u.cache_creation_input_tokens)return reserved;return Math.max(0,(u.input_tokens*MODEL.inputUsdPerMillion+u.output_tokens*MODEL.outputUsdPerMillion)/1e6);}
 export function createCloudAnalysis({instructions,callModel,storeForRequest,codeFingerprint,maxRequests=512,maxBudgetUsd=25,readApprovedMemory=null,stepTimeoutMs=240000,legacyPlanOptions={}}){
  async function prepare(req,body){
-  if(body.workflow!=='events-v1'){const plan=buildPlan([body.transcript1,body.transcript2],body.documents,instructions,{...legacyPlanOptions,speakerRoles:body.speakerRoles,sourceRolesReviewed:body.sourceRolesReviewed});return {plan,preview:previewPlan(plan)};}
+  if(body.workflow!=='events-v1'){const plan=buildPlan([body.transcript1,body.transcript2],body.documents,instructions,{...legacyPlanOptions,speakerRoles:body.speakerRoles,sourceRolesReviewed:body.sourceRolesReviewed,witnessTestimonyConfirmed:body.witnessTestimonyConfirmed});return {plan,preview:previewPlan(plan)};}
   let approvedMemory=null,checkMemory=null;
   if(body.phase==='compare'&&body.useApprovedMemory){if(!readApprovedMemory)throw new Error('Approved memory unavailable.');approvedMemory=await readApprovedMemory(req,body);checkMemory=async()=>{const next=await readApprovedMemory(req,body);if(next.snapshotSha256!==approvedMemory.snapshotSha256)throw new Error('Approved memory changed; review a fresh plan.');};}
   const event=await prepareEventWorkflow(body,{codeFingerprint,maxRequests,maxBudgetUsd:Infinity,approvedMemory,checkMemory});return {event,plan:event.plan,preview:event.preview};
@@ -26,12 +27,12 @@ export function createCloudAnalysis({instructions,callModel,storeForRequest,code
   return {caseId,jobId,store,meta,latest,sequence,spent,claimed,cancelled,stale:meta.codeFingerprint!==codeFingerprint};
  }
  const decorate=(result,j)=>({...result,analysis:{...result.analysis,cloudJobId:j.jobId,cloudCaseId:j.caseId,execution:'durable-steps',recoveryEnabled:true,cloudSpentUsd:j.spent,cloudBudgetUsd:j.meta.maxUsd}});
- function final(result){if(!result)return false;return ['complete','awaiting_comparison','cancelled'].includes(result.analysis.status)||result.analysis.tasks?.some(t=>['failed','partial','cancelled'].includes(t.status));}
+ function final(result){if(!result)return false;if(result.analysis?.comparisonFinished===true)return true;if(readingCanContinue(result.analysis))return false;if(result.analysis?.workflow==='events-v1'&&result.analysis.phase==='extract'&&result.analysis.readingFinished===true)return true;return ['complete','awaiting_comparison','cancelled'].includes(result.analysis.status)||result.analysis.tasks?.some(t=>['failed','partial','cancelled'].includes(t.status));}
  function reply(j){const result=j.latest?decorate(j.latest,j):null;return {jobId:j.jobId,caseId:j.caseId,spentUsd:j.spent,maxUsd:j.meta.maxUsd,result,done:Boolean(j.cancelled)||final(result),waiting:Boolean(j.claimed),notice:j.claimed?'A request was started but has no durable result yet. It may still be billed. No automatic retry is allowed.':null};}
  const error=(res,e)=>res.status(400).json({error:e.message});
  return {
   async preview(req,res){try{let body=sourceBody(req.body);let resumed=null;if(req.body.cloudJobId){resumed=await load(req,{caseId:body.caseId,jobId:req.body.cloudJobId});if(resumed.claimed)throw new Error('A prior step is still claimed; check saved progress without retrying paid work.');if(resumed.cancelled||final(resumed.latest))throw new Error('This saved job has ended. Inspect its retained results before starting a new review.');if(body.transcript1!==resumed.meta.body.transcript1||body.transcript2!==resumed.meta.body.transcript2)throw new Error('Source text changed; do not resume a different document.');body={...resumed.meta.body,...(resumed.latest?.analysis.eventState?{eventState:resumed.latest.analysis.eventState}:{})};}const prepared=await prepare(req,body);if(resumed&&!prepared.event)prepared.preview=remainingPreview(prepared.plan,resumed.latest);
-   const params=prepared.event?prepared.plan.tasks.filter(t=>t.mode!=='LOCAL_NON_WITNESS'&&!prepared.event.cache.has(digest(JSON.stringify(t.input)))).map(t=>({model:MODEL.id,max_tokens:prepared.plan.outputTokens,system:prepared.plan.system,output_config:{format:prepared.plan.outputFormat,effort:prepared.plan.effort??'medium'},messages:[{role:'user',content:JSON.stringify(t.input)}]}))
+   const params=prepared.event?prepared.plan.tasks.filter(t=>t.mode!=='LOCAL_NON_WITNESS'&&!prepared.event.cache.has(digest(JSON.stringify(t.input)))&&!prepared.event.retained.has(digest(JSON.stringify(t.input)))).map(t=>({model:MODEL.id,max_tokens:prepared.plan.outputTokens,system:prepared.plan.system,output_config:{format:prepared.plan.outputFormat,effort:prepared.plan.effort??'medium'},messages:[{role:'user',content:JSON.stringify(t.input)}]}))
     :prepared.plan.pairs.filter(t=>!resumed?.latest?.analysis?.tasks?.some(old=>old.id===t.id&&old.status==='completed')).map(t=>directRequest(prepared.plan,prepared.plan.chunks[0][t.a],prepared.plan.chunks[1][t.b],instructions));
    prepared.preview.cost={...prepared.preview.cost,conservativeBudget:cents(params.reduce((n,p)=>n+requestUpperCost(p),0))};
    if(prepared.preview.requestCount>maxRequests)throw new Error('Plan exceeds hosted request allowance. No paid calls started.');return res.json({...prepared.preview,approvedBudgetUsd:Math.min(prepared.preview.cost.conservativeBudget,maxBudgetUsd),serverBudgetLimitUsd:maxBudgetUsd,...(resumed?{approvedBudgetUsd:Math.max(0,resumed.meta.maxUsd-resumed.spent),budgetFixed:true}:{}),execution:'durable-steps',recoveryEnabled:true,codeFingerprint,provenance:{codeFingerprint,promptSha256:digest(instructions),model:MODEL.id},notice:'One model request per hosted step; private checkpoints survive browser closure. Work pauses between steps when the tab closes. No automatic retries. Cost approval still applies.'});}catch(e){return error(res,e);}},
@@ -61,7 +62,7 @@ export function createCloudAnalysis({instructions,callModel,storeForRequest,code
    try{
     const invoke=async(params,options)=>{
      if(paid)throw new Error('Only one new model request is permitted per hosted step.');
-     signal.throwIfAborted();const reserved=requestUpperCost(params);if(j.spent+reserved>j.meta.maxUsd)throw new Error('The remaining approved budget cannot cover this request. No new paid call started.');
+     signal.throwIfAborted();const reserved=requestUpperCost(params);if(j.spent+reserved>j.meta.maxUsd)throw Object.assign(new Error('The remaining approved budget cannot cover this request. No new paid call started.'),{code:'BUDGET_EXHAUSTED'});
      if(!await j.store.put(j.caseId,j.jobId,`s${j.sequence}-reserve`,{reservedUsd:reserved,requestHash:digest(JSON.stringify(params))}))throw new Error('Paid reservation already exists; no duplicate call allowed.');
      paid++;costUsd=reserved;
      const message=await measured(params,{...options,signal,maxRetries:0});costUsd=observedCost(message,reserved);return message;

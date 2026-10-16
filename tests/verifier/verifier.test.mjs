@@ -5,8 +5,8 @@ import { validateGold,checkResponse,checkOrdinal } from './checks.mjs';
 import { assessCandidate } from '../../server/humanConfidencePipeline.js';
 import { escapeHTML } from './report.mjs';
 import { writeReports } from './report.mjs';
-import { mkdtemp,readFile,rm,mkdir } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { mkdtemp,readFile,rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const row={id:'protocol-fixture',transcript1_text:'A: I never signed the agreement.',transcript2_text:'A: I signed the agreement.',expected_type:'DIRECT',expected_evidence:'CONFLICT',expected_score_band:'STRONG',tricky_feature:'protocol test only',rationale:'Not an authored gold case',status:'approved'};
 const claim=original=>({original,activityPhrase:original.slice(2,-1),timePhrase:null,locationPhrase:null,personPhrase:null,objectPhrase:'the agreement',quantityPhrase:null,statePhrase:null,qualifierPhrases:[]});
@@ -62,9 +62,7 @@ test('individual metric denominator includes every attempt and rejects extra pai
   assert.equal(result.summary.typeAccuracyPercent,33.33);assert.equal(result.summary.stabilityPercent,0);
 });
 test('HTML shows comparisons, score breakdown, and escaped input; immutable archive rejects collisions',async()=>{
-  const parent=fileURLToPath(new URL('../report/',import.meta.url));
-  await mkdir(parent,{recursive:true});
-  const directory=await mkdtemp(join(parent,'.unit-report-'));
+  const directory=await mkdtemp(join(tmpdir(),'deposition-unit-report-'));
   try {
     const result=await runVerifier({rows:[fixture],invariants,fetchImpl:response({topicsReviewed:[],contradictions:[candidate]})});
     await writeReports(result,directory);

@@ -52,6 +52,10 @@ test('changed sources and roles block reuse; backend changes require fresh raw v
  const upgraded=await prepareEventWorkflow({...input,phase:'compare',eventState:{...state,codeFingerprint:'other'}});assert.equal(upgraded.extraction.status,'COMPLETE');
  const modified=structuredClone(state);modified.extraction.tasks[0].rawText=modified.extraction.tasks[0].rawText.replace('I was at home all evening.','Invented words.');
  await assert.rejects(()=>prepareEventWorkflow({...input,phase:'compare',eventState:modified}),/fresh validation/);
+ for(const patch of [{rawText:'{'},{stopReason:'max_tokens'}]){
+  const invalid=structuredClone(state);Object.assign(invalid.extraction.tasks[0],patch);
+  await assert.rejects(()=>prepareEventWorkflow({...input,phase:'compare',eventState:invalid,acknowledgeExtractionGaps:true,extractionGapDigest:'irrelevant'}),/fresh validation/);
+ }
 });
 test('browser-supplied accepted arrays and scores are ignored during replay',async()=>{
  const input=body(),extracted=await extract(input);extracted.analysis.eventState.extraction.documents[0].events=[];
@@ -59,10 +63,11 @@ test('browser-supplied accepted arrays and scores are ignored during replay',asy
 });
 test('partial extraction is visible and blocks comparison; only failed requests need fresh approval',async()=>{
  const input=body();let calls=0;const result=await extract(input,{callModel:async params=>{calls++;if(calls===2)throw new Error('Mock provider failure');return transport(params);}});
- assert.equal(result.analysis.status,'partial');assert.equal(result.analysis.eventState.extraction.documents[0].events.length,1);
- await assert.rejects(()=>prepareEventWorkflow({...input,phase:'compare',eventState:result.analysis.eventState}),/Finish complete/);
- const resume={...input,eventState:result.analysis.eventState},prepared=await prepareEventWorkflow(resume);assert.equal(prepared.preview.requestCount,1);assert.equal(prepared.preview.cachedRequests,1);
- let paid=0;const recovered=await executeEventWorkflow({prepared,body:resume,callModel:async params=>{paid++;return transport(params);}});assert.equal(paid,1);assert.equal(recovered.analysis.status,'awaiting_comparison');
+ assert.equal(result.analysis.status,'awaiting_gap_acknowledgement');assert.equal(result.analysis.eventState.extraction.status,'READING_GAPS');assert.equal(result.analysis.eventState.extraction.documents[0].events.length,1);
+ await assert.rejects(()=>prepareEventWorkflow({...input,phase:'compare',eventState:result.analysis.eventState}),/Acknowledge the listed reading gaps/);
+ const resume={...input,eventState:result.analysis.eventState},prepared=await prepareEventWorkflow(resume);assert.equal(prepared.preview.requestCount,0);assert.equal(prepared.preview.cachedRequests,1);assert.equal(prepared.preview.retainedGapRequests,1);
+ let paid=0;const recovered=await executeEventWorkflow({prepared,body:resume,callModel:async params=>{paid++;return transport(params);}});assert.equal(paid,0);assert.equal(recovered.analysis.status,'awaiting_gap_acknowledgement');
+ await assert.rejects(()=>prepareEventWorkflow({...resume,phase:'compare',acknowledgeExtractionGaps:true,extractionGapDigest:recovered.analysis.gapDigest}),/No validated reading notes/);
 });
 test('all completed responses restore before checkpoints and zero-request recovery makes no new calls',async()=>{
  const input=body(),extracted=await extract(input),resume={...input,eventState:extracted.analysis.eventState},prepared=await prepareEventWorkflow(resume);

@@ -178,7 +178,7 @@ test('provider errors do not retry; later sections may succeed and failed ranges
   assert.equal(options.maxRetries,0);if(++calls===1)throw new Error('Mock provider failure.');
   const input=JSON.parse(params.messages[0].content);return message(answer(plan.tasks.find(t=>t.coreStart===input.range.coreStart)));
  }});
- assert.equal(calls,plan.requestCount);assert.equal(result.status,'PARTIAL');assert.ok(result.documents[0].coverage.segments.some(s=>s.status==='FAILED'));
+ assert.equal(calls,plan.requestCount);assert.equal(result.status,'READING_GAPS');assert.ok(result.documents[0].coverage.segments.some(s=>s.status==='FAILED'));
  assert.equal(result.usage.estimatedUsd,null);assert.equal(result.usage.unavailableRequests,1);
 });
 test('cancellation before execution and during a hung call stops every later request',async()=>{

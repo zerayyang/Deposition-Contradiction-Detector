@@ -1,3 +1,4 @@
+import {readingCanContinue} from '../../shared/readingState.js';
 import {readApiJson} from './apiResponse.js';
 const base=(caseId,jobId)=>'/api/cloud/'+encodeURIComponent(caseId)+'/'+encodeURIComponent(jobId);
 export async function runCloudAnalysis(body,plan,{signal,onEvent=()=>{},fetchImpl=fetch,newId=()=>crypto.randomUUID(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}){
@@ -31,6 +32,9 @@ export async function runCloudAnalysis(body,plan,{signal,onEvent=()=>{},fetchImp
 export async function readCloudProgress(caseId,jobId,fetchImpl=fetch){return readApiJson(await fetchImpl(base(caseId,jobId)),'Saved hosted progress unavailable.');}
 
 export function resumableCloudJobId(analysis){
+ if(analysis?.comparisonFinished===true)return null;
+ if(analysis?.cloudJobId&&readingCanContinue(analysis))return analysis.cloudJobId;
+ if(analysis?.readingPolicyVersion===2&&analysis.readingFinished===true)return null;
  if(!analysis?.cloudJobId||['complete','failed','cancelled'].includes(analysis.status)||analysis.tasks?.some(t=>['failed','partial','cancelled'].includes(t.status)))return null;
  return analysis.cloudJobId;
 }

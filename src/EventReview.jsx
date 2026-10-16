@@ -1,3 +1,4 @@
+import {readingGapLabel,retainedNotesLabel,readingGapWarning,readingHasGaps,readingDocumentStats,readingDocumentLabel} from '../shared/readingState.js';
 import {useEffect,useRef,useState} from 'react';
 import {analysisBody,previewAnalysis,runAnalysis,eventRecoveryRequest} from './lib/analysisClient.js';
 import {documentMetadata} from './lib/documentStore.js';
@@ -15,13 +16,16 @@ export default function EventReview({caseId,draft,witnessTestimonyConfirmed=[fal
  const [memoryEnabled,setMemoryEnabled]=useState(saved?.comparison?.provenance?.approvedMemory?.enabled??false);
  const [sameWitness,setSameWitness]=useState(saved?.sameWitnessConfirmed??false);
  const [choices,setChoices]=useState([]);
+ const [acknowledgedGapDigest,setAcknowledgedGapDigest]=useState(null);
  const [rolesConfirmed,setRolesConfirmed]=useState(false);
  const [labels,setLabels]=useState(null),[plan,setPlan]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const controller=useRef(null),lock=useRef(false),approvalHeading=useRef(null);
  useEffect(()=>{if(plan)approvalHeading.current?.focus();},[plan]);
  useEffect(()=>()=>controller.current?.abort(),[]);
  const state=draft.analysis?.eventState;
- const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,witnessTestimonyConfirmed:continuing&&state?state.witnessTestimonyConfirmed??witnessTestimonyConfirmed:witnessTestimonyConfirmed,originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryEnabled,
+ const extractionGaps=state?.extraction?.gaps??[];
+ const gapAcknowledged=Boolean(state?.extraction?.gapDigest)&&acknowledgedGapDigest===state.extraction.gapDigest;
+ const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,witnessTestimonyConfirmed:continuing&&state?state.witnessTestimonyConfirmed??witnessTestimonyConfirmed:witnessTestimonyConfirmed,...(phase==='compare'?{acknowledgeExtractionGaps:gapAcknowledged,extractionGapDigest:state?.extraction?.gapDigest}:{}),originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryEnabled,
   ...(continuing&&resumableCloudJobId(draft.analysis)&&draft.analysis?.phase===phase?{cloudJobId:resumableCloudJobId(draft.analysis)}:{}),
   ...(continuing&&state?{eventState:state,...(draft.analysis.eventJobId?{eventJobId:draft.analysis.eventJobId}:{})}:{})});
  async function inspect(){
@@ -76,11 +80,12 @@ export default function EventReview({caseId,draft,witnessTestimonyConfirmed=[fal
  }
  const locked=busy||disabled;
  const hasBoth=draft.texts.every(text=>text.trim().length>0);
- const complete=!editingNew&&state?.comparison?.status==='COMPLETE';
- const readyToCompare=!editingNew&&state?.extraction.status==='COMPLETE';
- const stage=running?'Review in progress':readyToCompare?(state.comparison?'Review saved':'Ready to compare'):'Ready to read';
+ const complete=!editingNew&&(state?.comparison?.status==='COMPLETE'||draft.analysis?.comparisonFinished===true&&draft.analysis.tasks.every(t=>t.status==='completed'));
+ const readyToCompare=!editingNew&&['COMPLETE','READING_GAPS'].includes(state?.extraction?.status);
+ const incomplete=readingHasGaps(draft.analysis),documents=readingDocumentStats(draft.analysis);
+ const stage=incomplete?readingGapLabel:running?'Review in progress':readyToCompare?(state.comparison?'Review saved':'Ready to compare'):'Ready to read';
  return <section className="event-review" aria-label="Event review workflow" aria-busy={busy}>
-  <header className="event-review-heading"><div><h2>{complete?'Review your findings':readyToCompare?'Compare the accounts':'Compare your transcripts'}</h2><p>{complete?'The review is saved. Check the findings alongside their original quotations.':readyToCompare?'Your reading notes are saved. Review the comparison cost when you’re ready.':'First we read both transcripts. You approve the cost again before we compare them.'}</p></div><span className="event-step">{stage}</span></header>
+  <header className="event-review-heading"><div><h2>{incomplete?readingGapLabel:complete?'Review your findings':readyToCompare?'Compare the accounts':'Compare your transcripts'}</h2><p>{complete?'The review is saved. Check the findings alongside their original quotations.':readyToCompare?'Your reading notes are saved. Review the comparison cost when you’re ready.':'First we read both transcripts. You approve the cost again before we compare them.'}</p></div><span className="event-step">{stage}</span></header>
   {caseId==='sample'&&<p className="event-hint">Save this sample as a case to begin.</p>}
   {!hasBoth&&<p className="event-hint">Add both transcripts above to begin.</p>}
   <label className="event-confirmation"><input type="checkbox" checked={sameWitness} disabled={locked||Boolean(state)&&!editingNew} onChange={e=>setSameWitness(e.target.checked)}/><span>Both transcripts are from the same witness.</span></label>
@@ -89,11 +94,14 @@ export default function EventReview({caseId,draft,witnessTestimonyConfirmed=[fal
    <button className="event-button-secondary" disabled={locked||Boolean(state)&&!editingNew} onClick={inspect}>Check speakers · free</button>
    {labels&&<><div className="speaker-quick-grid">{labels.map((doc,i)=><div className="event-speaker-group" key={i}><h3>Transcript {i+1}</h3><label className="event-speaker-row"><span>Giving testimony</span><select aria-label={`Transcript ${i+1} witness`} disabled={locked||Boolean(state)&&!editingNew} value={choices[i]?.witness??''} onChange={e=>{setChoices(old=>old.map((c,n)=>n===i?{...c,witness:e.target.value}:c));setRolesConfirmed(false);}}><option value="">Choose witness</option>{doc.hasAnswers&&<option value="__QA__">Answers marked A / THE WITNESS</option>}{doc.labels.map(name=><option key={name} value={name}>{name}</option>)}</select></label><label className="event-speaker-row"><span>Asking questions</span><select aria-label={`Transcript ${i+1} questioner`} disabled={locked||Boolean(state)&&!editingNew} value={choices[i]?.questioner??'__NONE__'} onChange={e=>{setChoices(old=>old.map((c,n)=>n===i?{...c,questioner:e.target.value}:c));setRolesConfirmed(false);}}>{doc.hasQuestions&&<option value="__QA__">Questions marked Q</option>}<option value="__NONE__">No named questioner confirmed</option>{doc.labels.map(name=><option key={name} value={name}>{name}</option>)}</select></label><small>{doc.labels.length} named labels found. Headings and court staff are handled separately.</small></div>)}</div><p>All other named turns will be treated as other speech. Confirm this matches the documents; use individual roles for multiple witnesses or questioners.</p><button className="event-button-secondary" disabled={locked||Boolean(state)&&!editingNew} onClick={()=>{try{setRoles(confirmedSpeakerRoles(labels,choices));setRolesConfirmed(true);setError('');}catch(e){setError(e.message);}}}>{rolesConfirmed?'Speakers confirmed ✓':'Confirm speakers'}</button><details><summary>Edit individual roles</summary>{labels.map((doc,i)=><div className="event-speaker-group" key={i}><h3>Transcript {i+1}</h3>{doc.labels.map(name=><label className="event-speaker-row" key={name}><span>{name}</span><select disabled={locked||Boolean(state)&&!editingNew} value={roles[i][name]??''} onChange={e=>{setRoles(old=>old.map((m,n)=>n===i?{...m,[name]:e.target.value}:m));setRolesConfirmed(false);}}><option value="">Choose role</option><option value="WITNESS">Giving testimony</option><option value="QUESTIONER">Asking questions</option><option value="OTHER">Other speaker</option></select></label>)}</div>)}</details></>}
   </details>
+  {documents.length>0&&<div aria-label="Reading coverage by document">{documents.map(doc=><p key={doc.document}><strong>{readingDocumentLabel(doc)}</strong></p>)}</div>}
+  {incomplete&&<aside className="event-gap-review" role="note"><strong>{retainedNotesLabel}</strong><p>{readingGapWarning}</p></aside>}
+  {extractionGaps.length>0&&<section className="event-gap-review" aria-label="Reading gaps"><h3>Reading incomplete—review required</h3><p>These sections could not be fully interpreted. Valid notes are retained; missing information may hide contradictions.</p><ul>{extractionGaps.map((g,i)=><li key={i}>{g.documentId} · characters {g.start}–{g.end}: {g.reason}</li>)}</ul>{readyToCompare&&!complete&&<label className="event-confirmation"><input type="checkbox" disabled={locked} checked={gapAcknowledged} onChange={e=>setAcknowledgedGapDigest(e.target.checked?state.extraction.gapDigest:null)}/><span>I acknowledge these reading gaps and want to compare only the validated notes.</span></label>}</section>}
   {!plan&&<div className="event-main-action">
    {(!state||editingNew)&&<button className="event-button-primary" disabled={locked||caseId==='sample'||!hasBoth} onClick={()=>prepare('extract',false)}>Review reading cost <span aria-hidden="true">→</span></button>}
    {complete&&<a className="event-button-primary" href="#review-findings">View findings <span aria-hidden="true">↓</span></a>}
-   {readyToCompare&&!complete&&<button className="event-button-primary" disabled={locked} onClick={()=>prepare('compare',true)}>{state.comparison?'Review cost to continue':'Review comparison cost'} <span aria-hidden="true">→</span></button>}
-   {!editingNew&&state&&state.extraction.status!=='COMPLETE'&&<button className="event-button-primary" disabled={locked} onClick={()=>prepare('extract',true)}>Review cost to continue <span aria-hidden="true">→</span></button>}
+   {readyToCompare&&!complete&&<button className="event-button-primary" disabled={locked||(extractionGaps.length>0&&!gapAcknowledged)} onClick={()=>prepare('compare',true)}>{incomplete?retainedNotesLabel:state.comparison?'Review cost to continue':'Review comparison cost'} <span aria-hidden="true">→</span></button>}
+   {!editingNew&&state&&!['COMPLETE','READING_GAPS'].includes(state.extraction.status)&&<button className="event-button-primary" disabled={locked} onClick={()=>prepare('extract',true)}>Review cost to continue <span aria-hidden="true">→</span></button>}
    {running&&<button className="event-button-secondary" onClick={()=>controller.current?.abort()}>Cancel review</button>}
    <span className="event-hint">{complete?'Opening saved findings is free.':'Nothing is charged until you approve.'}</span>
   </div>}

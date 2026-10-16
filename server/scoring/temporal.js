@@ -34,7 +34,7 @@ export function collectTemporal(fact) {
     const withoutDates=stripDates(timeText);
     const pattern=/\b(midnight|noon)\b|\b(\d{1,2})(?::([0-5]\d))?\s*([ap]\s*\.?\s*m\.?)|\b(\d{1,2}):([0-5]\d)\b/gi;
     for(const m of withoutDates.matchAll(pattern)){
-        let hour='',minute='',hour12='';
+        let hour='',minute,hour12='';
         if(m[1]){hour=m[1].toLowerCase()==='midnight'?'00':'12';minute='00';}
         else {
             const raw=Number(m[2]??m[5]),period=m[4]?.toLowerCase().replace(/[.\s]/g,'');

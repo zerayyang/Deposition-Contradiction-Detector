@@ -35,14 +35,14 @@ test('real HTTP server: metadata invariance, distinct pair retention, null groun
   const second={...base,claim1:{...base.claim1,original:'I never called the manager.',activityPhrase:'never called the manager',objectPhrase:'the manager'},claim2:{...base.claim2,original:'I called the manager.',activityPhrase:'called the manager',objectPhrase:'the manager'}};
   const invalid={...base,claim1:{...base.claim1,original:'Invented source'}};
   const responses=[...variants.map(candidate=>({topicsReviewed:[],contradictions:[candidate]})),{topicsReviewed:[],contradictions:[base,second,invalid]},{topicsReviewed:[],contradictions:[base,base]}];
-  const child=fork(fileURLToPath(new URL('./stub-server.mjs',import.meta.url)),[],{env:{...process.env,VERIFIER_STUB_RESPONSES:JSON.stringify(responses)},stdio:['ignore','pipe','pipe','ipc']});
+  const child=fork(fileURLToPath(new URL('./stub-server.mjs',import.meta.url)),[],{env:{...process.env,NODE_ENV:'test',ANTHROPIC_API_KEY:'FAKE_OFFLINE_STUB_CREDENTIAL_NOT_A_REAL_KEY',VERIFIER_STUB_RESPONSES:JSON.stringify(responses)},stdio:['ignore','pipe','pipe','ipc']});
   let logs='';
   child.stdout.on('data',chunk=>{logs=(logs+chunk).slice(-20000);});
   child.stderr.on('data',chunk=>{logs=(logs+chunk).slice(-20000);});
   t.after(()=>{if(child.connected)child.send({type:'close'});child.kill('SIGTERM');});
   const port=await new Promise((resolve,reject)=>{
     const timer=setTimeout(()=>reject(new Error(`Stub server readiness timeout: ${logs}`)),10000);
-    child.once('message',message=>{clearTimeout(timer);if(message?.type==='ready')resolve(message.port);else reject(new Error(`Unexpected child message ${JSON.stringify(message)}`));});
+    child.once('message',message=>{clearTimeout(timer);if(message?.type==='ready')resolve(message.port);else reject(new Error(message?.type==='error'&&/listen EPERM/.test(message.error??'')?'Local stub loopback check failed: binding 127.0.0.1 was denied (EPERM). Run this test with loopback permission; it has not passed.':`Unexpected child message ${JSON.stringify(message)}`));});
     child.once('error',error=>{clearTimeout(timer);reject(error);});
     child.once('exit',code=>{clearTimeout(timer);reject(new Error(`Stub server exited ${code}: ${logs}`));});
   });

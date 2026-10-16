@@ -58,7 +58,7 @@ function reportPreview(quote,unit){
 }
 function reject(code,message,source,unit){const error=new Error(message);error.code=code;if(source)error.reportDiagnostic=reportPreview(source.quote,unit);throw error;}
 export function materializeExtraction(response,task,document) {
-  const issues=[],rejected=[],proposed=[],anchorAudit=[];
+  const issues=[],reviewNotes=[],rejected=[],proposed=[],anchorAudit=[];
   const add=(code,message,extra={})=>issues.push({code,message,...extra});
   const counts=new Map();for(const e of response.events)counts.set(e?.id,(counts.get(e?.id)??0)+1);
   const namespace=`d${task.documentIndex}:t${task.index}:`,eventId=id=>namespace+'e:'+encodeURIComponent(id);
@@ -123,10 +123,10 @@ export function materializeExtraction(response,task,document) {
       }
     }else{
       if(review.eventIds.length||!review.reason)add('INVALID_EMPTY_REVIEW','NO_EVENT/UNRESOLVED needs a reason and no event IDs.',{unitId:unit.id});
-      if(review.status==='UNRESOLVED')add('UNIT_UNRESOLVED',review.reason??'Answer remains unresolved.',{unitId:unit.id});
+      if(review.status==='UNRESOLVED'&&!review.eventIds.length&&review.reason)reviewNotes.push({code:'UNIT_UNRESOLVED',message:review.reason,unitId:unit.id,start:Math.max(unit.start,task.coreStart),end:Math.min(unit.end,task.coreEnd)});
     }
   }
   for(const unit of owned)if(!seen.has(unit.id))add('MISSING_UNIT_REVIEW','Assigned answer was not accounted for.',{unitId:unit.id});
   for(const item of accepted)if(!referenced.has(item.event.id))add('UNACCOUNTED_EVENT','A validated event is missing from the assigned-answer dispositions.',{eventId:item.event.id});
-  return {events:accepted.map(p=>p.event),rejected,issues,anchorAudit,unitReviews:structuredClone(response.units)};
+  return {events:accepted.map(p=>p.event),rejected,issues,reviewNotes,anchorAudit,unitReviews:structuredClone(response.units)};
 }

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { COVERAGE_TAGS, atomicJson, archiveDraft, digest, extractResponseText, readJson, sameContent, selectTemperature, validateCase, validateCases, validateGenerated } from './schema.mjs';
@@ -93,7 +94,7 @@ test('review equality detects differences in labels, rationale, and source text'
   }
 });
 test('atomic replacement and archival retain a recoverable old draft', async () => {
-  const dir = await fs.mkdtemp(path.join(here, '.author-unit-'));
+  const dir = await fs.mkdtemp(path.join(tmpdir(), 'deposition-author-unit-'));
   const file = path.join(dir, 'draft.json');
   try {
     await atomicJson(file, [fixture()]);
