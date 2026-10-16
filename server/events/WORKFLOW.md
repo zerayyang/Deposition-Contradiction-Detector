@@ -1,7 +1,6 @@
 # Stage 5: website event review
 
-The app now offers **Source-linked events** (default) and **Existing direct
-comparison**. The old `/api/analyze`, `/api/analyze/stream` and plan API remain
+The app now offers **Read, then compare** (default) and **Direct comparison (previous method)** under Comparison options. The old `/api/analyze`, `/api/analyze/stream` and plan API remain
 compatible, including short inputs and independent verifier clients. Existing
 saved results stay readable. Selecting a workflow makes no model request.
 
@@ -111,3 +110,5 @@ configuration, hosting, dependencies or database schema is changed.
 
 No feedback, training, retrieval memory or automatic learning is added here. Those
 are later stages requiring separate approval and independent evaluation.
+
+UI cleanup after Stage 6: uploads come first, with one primary review action below. Who is speaking?, Saved progress & options, reading notes and technical attributes expand on demand. Reading and comparison still have separate explicit cost approvals. Estimated and conservative USD amounts remain visible before payment. The witness checkbox is aligned and properly labelled. A completed review links to findings rather than suggesting another paid run.

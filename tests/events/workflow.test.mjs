@@ -142,6 +142,7 @@ test('event controls and finding cards render saved source-linked records withou
  return import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));}
  const input=body(),extracted=await extract(input),result=await compare(input,extracted),{default:EventReview}=await component('EventReview.jsx'),{ReviewCard}=await component('ReviewCard.jsx');
  const html=renderToStaticMarkup(React.createElement(EventReview,{caseId:'case',draft:{texts:[input.transcript1,input.transcript2],files:[],analysis:extracted.analysis},fetchImpl:()=>{throw new Error('Rendering must not fetch');},onCheckpoint:()=>{},onBusy:()=>{},onTick:()=>{},onTiming:()=>{}}));
- assert.match(html,/Review comparison cost/);assert.match(html,/Review extracted events/);assert.match(html,/Scripted proposed presence event/);assert.ok(!html.includes('"rawText"'));
+ assert.match(html,/Review comparison cost/);assert.match(html,/Review reading notes and sources/);assert.match(html,/Scripted proposed presence event/);assert.ok(!html.includes('"rawText"'));
+ const completedHtml=renderToStaticMarkup(React.createElement(EventReview,{caseId:'case',draft:{texts:[input.transcript1,input.transcript2],files:[],analysis:result.analysis},fetchImpl:()=>{throw new Error('No calls while rendering');},onCheckpoint:()=>{},onBusy:()=>{},onTick:()=>{},onTiming:()=>{}}));assert.match(completedHtml,/href="#review-findings"/);
  const card=renderToStaticMarkup(React.createElement(ReviewCard,{result:result.contradictions[0]}));assert.match(card,/Source-linked event details/);assert.match(card,/Witness context/);
 });

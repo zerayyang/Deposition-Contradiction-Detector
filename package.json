@@ -19,7 +19,8 @@
     "start": "node server/server.js",
     "tests:reliability": "node --test tests/reliability/*.test.mjs server/contextReliability.test.js src/lib/recovery.test.js",
     "tests:load": "node tests/reliability/load.mjs",
-    "tests:events": "node --test tests/events/*.test.mjs"
+    "tests:events": "node --test tests/events/*.test.mjs",
+    "tests:feedback": "node --test tests/feedback/*.test.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
@@ -34,6 +35,7 @@
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10",
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
