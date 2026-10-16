@@ -18,11 +18,13 @@
     "tests:documents": "node --test tests/long-documents/*.test.mjs src/lib/*.test.js",
     "start": "node server/server.js",
     "tests:reliability": "node --test tests/reliability/*.test.mjs server/contextReliability.test.js src/lib/recovery.test.js",
-    "tests:load": "node tests/reliability/load.mjs"
+    "tests:load": "node tests/reliability/load.mjs",
+    "tests:events": "node --test tests/events/*.test.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
     "@supabase/supabase-js": "^2.117.3",
+    "ajv": "^6.15.0",
     "chrono-node": "^2.10.3",
     "date-holidays": "^3.37.0",
     "dotenv": "^18.0.5",

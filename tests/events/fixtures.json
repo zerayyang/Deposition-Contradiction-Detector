@@ -1,0 +1,978 @@
+[
+  {
+    "id": "presence-denial",
+    "description": "Short denial adopts a question context.",
+    "text": "Q: Were you at the Elm Cafe on February 6?\nA: No, I wasn't there.",
+    "documentId": "presence-denial-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "presence-denial-document",
+      "documentSha256": "0b63cfffb2b8e4e3ecdfec97ac0044df2c1d00809511710ac1492c1866833561",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "presence",
+          "summary": "Proposed presence assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "DENIED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "place",
+              "state": "STATED",
+              "value": "the Elm Cafe",
+              "basis": "QUESTION_CONTEXT",
+              "sourceIds": [
+                "e1-q"
+              ]
+            },
+            {
+              "name": "occasion",
+              "state": "STATED",
+              "value": "February 6",
+              "basis": "QUESTION_CONTEXT",
+              "sourceIds": [
+                "e1-q"
+              ]
+            },
+            {
+              "name": "other_people",
+              "state": "UNSTATED",
+              "value": null,
+              "basis": "NONE",
+              "sourceIds": []
+            }
+          ],
+          "qualifiers": [],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "Were you at the Elm Cafe on February 6?",
+              "start": 3,
+              "end": 42,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "No, I wasn't there.",
+              "start": 46,
+              "end": 65,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 65,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Place/date stay question-derived; companions unknown. Proposed later comparison with presence-affirmation is DIRECT only if witness/event identity is established; not graded in Part 1."
+    }
+  },
+  {
+    "id": "presence-affirmation",
+    "description": "Explicit presence affirmation.",
+    "text": "Q: Were you at the Elm Cafe on February 6?\nA: Yes, I was at the Elm Cafe on February 6.",
+    "documentId": "presence-affirmation-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "presence-affirmation-document",
+      "documentSha256": "bf923a5d5ad84ccf677226b505bb6e6bafdd5cee9cd93026cab929b40d243b0b",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "presence",
+          "summary": "Proposed presence assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "AFFIRMED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "place",
+              "state": "STATED",
+              "value": "the Elm Cafe",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "occasion",
+              "state": "STATED",
+              "value": "February 6",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "other_people",
+              "state": "UNSTATED",
+              "value": null,
+              "basis": "NONE",
+              "sourceIds": []
+            }
+          ],
+          "qualifiers": [],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "Were you at the Elm Cafe on February 6?",
+              "start": 3,
+              "end": 42,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "Yes, I was at the Elm Cafe on February 6.",
+              "start": 46,
+              "end": 87,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 87,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Missing year and companions remain unstated; no numeric score target."
+    }
+  },
+  {
+    "id": "signing-uncertain",
+    "description": "An assertion hedge is retained.",
+    "text": "Q: Did you sign the Pine Street lease?\nA: I think I signed the Pine Street lease.",
+    "documentId": "signing-uncertain-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "signing-uncertain-document",
+      "documentSha256": "7ea7ee4e14ca6ce00ecebebfc008d742013c57f72cc2564a76a1edb80f0228a7",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "signing",
+          "summary": "Proposed signing assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "UNCERTAIN",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "action",
+              "state": "STATED",
+              "value": "signed",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "object",
+              "state": "STATED",
+              "value": "the Pine Street lease",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "event_time",
+              "state": "UNSTATED",
+              "value": null,
+              "basis": "NONE",
+              "sourceIds": []
+            }
+          ],
+          "qualifiers": [
+            {
+              "kind": "hedge",
+              "phrase": "I think",
+              "sourceId": "e1-a",
+              "scope": "ASSERTION",
+              "attributeNames": []
+            }
+          ],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "Did you sign the Pine Street lease?",
+              "start": 3,
+              "end": 38,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "I think I signed the Pine Street lease.",
+              "start": 42,
+              "end": 81,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": true,
+          "unresolvedReasons": [
+            "Witness expresses uncertainty about signing; date is unstated."
+          ]
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 81,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Uncertain affirmation is not a denial. A later comparison with signing-denial may be DIRECT with an assertion hedge; Part 1 does not classify pairs or calculate confidence."
+    }
+  },
+  {
+    "id": "signing-denial",
+    "description": "Explicit action denial.",
+    "text": "Q: Did you sign the Pine Street lease?\nA: I did not sign the Pine Street lease.",
+    "documentId": "signing-denial-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "signing-denial-document",
+      "documentSha256": "a93eaec1b0233f35d8feb85bbdad0a5656582f155c350d4140176618f71fbf16",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "signing",
+          "summary": "Proposed signing assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "DENIED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "action",
+              "state": "STATED",
+              "value": "did not sign",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "object",
+              "state": "STATED",
+              "value": "the Pine Street lease",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "event_time",
+              "state": "UNSTATED",
+              "value": null,
+              "basis": "NONE",
+              "sourceIds": []
+            }
+          ],
+          "qualifiers": [],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "Did you sign the Pine Street lease?",
+              "start": 3,
+              "end": 38,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "I did not sign the Pine Street lease.",
+              "start": 42,
+              "end": 79,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 79,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "No date or year may be invented. Do not treat any other lease as the same object."
+    }
+  },
+  {
+    "id": "approximate-time",
+    "description": "Approximation is attached to a value.",
+    "text": "Q: When did you leave the meeting?\nA: I left around 8 PM.",
+    "documentId": "approximate-time-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "approximate-time-document",
+      "documentSha256": "e76cabea092d0de11e191dd850d3cba27748f9cec172f7183726b87b76f3930c",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "departure",
+          "summary": "Proposed departure assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "AFFIRMED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "action",
+              "state": "STATED",
+              "value": "left",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "event_time",
+              "state": "STATED",
+              "value": "around 8 PM",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            }
+          ],
+          "qualifiers": [
+            {
+              "kind": "approximation",
+              "phrase": "around",
+              "sourceId": "e1-a",
+              "scope": "VALUE",
+              "attributeNames": [
+                "event_time"
+              ]
+            }
+          ],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "When did you leave the meeting?",
+              "start": 3,
+              "end": 34,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "I left around 8 PM.",
+              "start": 38,
+              "end": 57,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 57,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Retain literal time and approximation. No precise bounds, calendar date or INFERENTIAL pair label is produced here."
+    }
+  },
+  {
+    "id": "approximate-quantity",
+    "description": "Quantity remains literal.",
+    "text": "Q: How many folders did you deliver?\nA: I delivered about twelve folders.",
+    "documentId": "approximate-quantity-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "approximate-quantity-document",
+      "documentSha256": "d6cdc21862e1714bbc4565f7a86c56880a9afdfc2fec12f99daf79c3f67b896f",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "delivery",
+          "summary": "Proposed delivery assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "AFFIRMED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "action",
+              "state": "STATED",
+              "value": "delivered",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "quantity",
+              "state": "STATED",
+              "value": "about twelve",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "object",
+              "state": "STATED",
+              "value": "folders",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            }
+          ],
+          "qualifiers": [
+            {
+              "kind": "approximation",
+              "phrase": "about",
+              "sourceId": "e1-a",
+              "scope": "VALUE",
+              "attributeNames": [
+                "quantity"
+              ]
+            }
+          ],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "How many folders did you deliver?",
+              "start": 3,
+              "end": 36,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "I delivered about twelve folders.",
+              "start": 40,
+              "end": 73,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 73,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Do not silently normalize to exact 12; different amounts require later contextual comparison."
+    }
+  },
+  {
+    "id": "explicit-correction",
+    "description": "Both the original and correction survive.",
+    "text": "Q: When did you leave?\nA: I left at 8 PM. Correction: I left at 9 PM.",
+    "documentId": "explicit-correction-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "explicit-correction-document",
+      "documentSha256": "50e80685826608ee4ff9530158e8bfb6deb2a88dc1ca045ef5dcc3c2d29183a5",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "departure",
+          "summary": "Proposed departure assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "AFFIRMED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "event_time",
+              "state": "STATED",
+              "value": "8 PM",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            }
+          ],
+          "qualifiers": [],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "When did you leave?",
+              "start": 3,
+              "end": 22,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "I left at 8 PM.",
+              "start": 26,
+              "end": 41,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        },
+        {
+          "id": "e2",
+          "kind": "departure",
+          "summary": "Proposed departure assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "AFFIRMED",
+            "sourceIds": [
+              "e2-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "event_time",
+              "state": "STATED",
+              "value": "9 PM",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e2-a"
+              ]
+            }
+          ],
+          "qualifiers": [
+            {
+              "kind": "correction",
+              "phrase": "Correction",
+              "sourceId": "e2-a",
+              "scope": "ASSERTION",
+              "attributeNames": []
+            }
+          ],
+          "relations": [
+            {
+              "kind": "CORRECTS",
+              "targetEventId": "e1",
+              "explanation": "The witness explicitly corrects the earlier time."
+            }
+          ],
+          "sources": [
+            {
+              "id": "e2-q",
+              "role": "QUESTION",
+              "quote": "When did you leave?",
+              "start": 3,
+              "end": 22,
+              "pageRefs": []
+            },
+            {
+              "id": "e2-a",
+              "role": "WITNESS",
+              "quote": "Correction: I left at 9 PM.",
+              "start": 42,
+              "end": 69,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 69,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1",
+              "e2"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Preserve both statements and the correction link. Do not emit a contradiction merely because both times occur."
+    }
+  },
+  {
+    "id": "ambiguous-person",
+    "description": "A suggested person is not an established identity.",
+    "text": "Q: Did you see Morgan at the depot on April 9?\nA: I might have seen someone, but I could not tell who.",
+    "documentId": "ambiguous-person-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "ambiguous-person-document",
+      "documentSha256": "ad8b1cd9ed4083efa6929fb11e5fb6e4af9e8c550531e4517ed573fb2ea922cd",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "observation",
+          "summary": "Proposed observation assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "UNCERTAIN",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "person",
+              "state": "AMBIGUOUS",
+              "value": null,
+              "basis": "NONE",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "place",
+              "state": "STATED",
+              "value": "the depot",
+              "basis": "QUESTION_CONTEXT",
+              "sourceIds": [
+                "e1-q"
+              ]
+            },
+            {
+              "name": "occasion",
+              "state": "STATED",
+              "value": "April 9",
+              "basis": "QUESTION_CONTEXT",
+              "sourceIds": [
+                "e1-q"
+              ]
+            }
+          ],
+          "qualifiers": [
+            {
+              "kind": "hedge",
+              "phrase": "might",
+              "sourceId": "e1-a",
+              "scope": "ASSERTION",
+              "attributeNames": []
+            }
+          ],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "Did you see Morgan at the depot on April 9?",
+              "start": 3,
+              "end": 46,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "I might have seen someone, but I could not tell who.",
+              "start": 50,
+              "end": 102,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": true,
+          "unresolvedReasons": [
+            "Witness could not identify the person."
+          ]
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 102,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "A name in counsel's question is not proof that the witness saw that person; comparison remains unresolved."
+    }
+  },
+  {
+    "id": "unfamiliar-event-kind",
+    "description": "Novel kinds and attributes require no new production rule.",
+    "text": "Q: What did you hand to Lena?\nA: I handed the brass key to Lena.",
+    "documentId": "unfamiliar-event-kind-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "unfamiliar-event-kind-document",
+      "documentSha256": "6d413ddc22fe24b8b3f4e3cd8dd90f990b4990717720cdb3f4b23cdf39640390",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "equipment_handover",
+          "summary": "Proposed equipment_handover assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "AFFIRMED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "action",
+              "state": "STATED",
+              "value": "handed",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "object",
+              "state": "STATED",
+              "value": "the brass key",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            },
+            {
+              "name": "recipient",
+              "state": "STATED",
+              "value": "Lena",
+              "basis": "WITNESS_WORDS",
+              "sourceIds": [
+                "e1-a"
+              ]
+            }
+          ],
+          "qualifiers": [],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "What did you hand to Lena?",
+              "start": 3,
+              "end": 29,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "I handed the brass key to Lena.",
+              "start": 33,
+              "end": 64,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 64,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Schema accepts new event names; this does not add a scoring rule or establish semantic truth."
+    }
+  },
+  {
+    "id": "repeated-answer",
+    "description": "Exact offsets distinguish repeated Yes answers.",
+    "text": "Q: Did you attend in 2020?\nA: Yes.\nQ: Did you attend in 2021?\nA: Yes.",
+    "documentId": "repeated-answer-document",
+    "bundle": {
+      "schemaVersion": 1,
+      "documentId": "repeated-answer-document",
+      "documentSha256": "4f6bb594e85349d3fc6b89f15622346e6f6f9cc8419dce0f320040b33d4f1cb2",
+      "events": [
+        {
+          "id": "e1",
+          "kind": "attendance",
+          "summary": "Proposed attendance assertion; inspect the preserved sources.",
+          "assertion": {
+            "polarity": "AFFIRMED",
+            "sourceIds": [
+              "e1-a"
+            ]
+          },
+          "attributes": [
+            {
+              "name": "occasion",
+              "state": "STATED",
+              "value": "2021",
+              "basis": "QUESTION_CONTEXT",
+              "sourceIds": [
+                "e1-q"
+              ]
+            }
+          ],
+          "qualifiers": [],
+          "relations": [],
+          "sources": [
+            {
+              "id": "e1-q",
+              "role": "QUESTION",
+              "quote": "Did you attend in 2021?",
+              "start": 38,
+              "end": 61,
+              "pageRefs": []
+            },
+            {
+              "id": "e1-a",
+              "role": "WITNESS",
+              "quote": "Yes.",
+              "start": 65,
+              "end": 69,
+              "pageRefs": []
+            }
+          ],
+          "reviewRequired": false,
+          "unresolvedReasons": []
+        }
+      ],
+      "coverage": {
+        "status": "COMPLETE",
+        "segments": [
+          {
+            "start": 0,
+            "end": 69,
+            "status": "PROCESSED",
+            "eventIds": [
+              "e1"
+            ],
+            "reason": null
+          }
+        ]
+      }
+    },
+    "expected": {
+      "valid": true,
+      "notes": "Only the second answer is linked to 2021. A question from the first occurrence must fail validation."
+    }
+  }
+]
