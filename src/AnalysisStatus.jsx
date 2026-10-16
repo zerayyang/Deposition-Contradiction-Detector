@@ -4,14 +4,15 @@ export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }
   if (!analysis) return null;
   const { total, completed, failed, partial, processed } = progressCounts(analysis);
   const running = analysis.status === 'running';
-  const titles = { complete: 'Analysis complete', partial: 'Review partly complete', failed: 'Analysis could not finish', cancelled: 'Analysis cancelled' };
+  const titles = { complete: 'Analysis complete', partial: 'Review partly complete', failed: 'Analysis could not finish', cancelled: 'Analysis cancelled', awaiting_comparison: 'Events saved · comparison approval needed', interrupted: 'Review interrupted' };
+  const unit=analysis.workflow==='events-v1'&&analysis.phase==='extract'?'extraction requests':'comparisons';
   const title = running ? (active ? 'Reviewing your documents' : 'Review interrupted') : (titles[analysis.status] ?? 'Review status');
   const remaining = remainingLabel(analysis, active, elapsed, timing);
   const failures = (analysis.tasks ?? []).filter(task => task.status === 'failed' || task.status === 'partial');
   const coverage = analysis.coverage ?? [];
   const reviewIssues = (analysis.issues ?? []).filter(issue => !failures.some(task => task.id === issue.pairId));
   return <section className="analysis-status" aria-label="Analysis progress">
-    <div className="analysis-status-heading"><h2>{title}</h2><span>{processed} of {total} comparisons finished</span></div>
+    <div className="analysis-status-heading"><h2>{title}</h2><span>{processed} of {total} {unit} finished</span></div>
     <progress aria-label="Comparisons finished" value={processed} max={total || 1} />
     <div className="analysis-status-stats"><span>{completed} successful</span>{failed > 0 && <span>{failed} failed</span>}{partial > 0 && <span>{partial} partly completed</span>}{Number.isFinite(elapsed) && <span>Elapsed: {elapsedLabel(elapsed)}</span>}</div>
     {remaining && <p role="status" className="analysis-remaining">{remaining}</p>}

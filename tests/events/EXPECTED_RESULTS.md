@@ -135,3 +135,40 @@ require human-reviewed evaluation of live outputs, not transport pass counts.
 | Real Part 3 → Part 4 interface, mocked transports | Actual extracted event/result structures feed matching unchanged, with source/provenance checks. |
 | Two synthetic 225-page manifests | All 50,625 event pairs accounted; distant selected comparison cites original pages 225 and 1. |
 | Local checks | No paid calls, server startup, private sources or author/verifier artifacts. |
+
+
+## Stage 5 mocked website workflow (`workflow.test.mjs`)
+
+Run `npm run tests:events`. The new fictional home/departure pair is a scripted
+DIRECT comparison under an explicitly confirmed shared witness and Monday evening.
+This is not an author-approved case, live AI result or calibrated numeric target.
+Its code-rule output only checks reuse of the existing engine. Injected INFERENTIAL
+and FALSE_POSITIVE labels check that changing AI metadata cannot set the number;
+those injected labels are not claims that the example belongs in those categories.
+
+Expected tooling behavior:
+
+- Extraction and comparison require separate count/budget approvals. Extraction
+  pauses with saved events, never silently starting comparison.
+- Original exact quotations, offsets, source roles and existing score formulas
+  survive save/load. Browser-supplied accepted arrays cannot replace raw validation.
+- Unconfirmed identity or unresolved meaning has null numeric aliases. Unsupported
+  patterns remain NOT_EVALUABLE; a null score is not evidence of compatibility.
+- Suppressed FALSE_POSITIVE comparisons stay in the audit, not a fabricated finding.
+  Unrelated declarations and unresolved matching decisions remain model judgments.
+- Changed inputs, code, roles or corrupt completed responses stop reuse safely.
+  Partial extraction blocks comparison. Failed tasks require fresh approval.
+- Resume restores completed work before checkpoints; cached responses make no paid
+  calls. Only remaining requests appear in the new spending count.
+- Cancellation, provider errors, invalid JSON/source citations and checkpoint failure
+  retain incomplete status; a failed durable write blocks the next model call.
+- Owned recovery cannot be opened by another user. Named/titled speakers require
+  explicit caller review, never an inferred witness identity.
+- Existing private case JSON retains event state without a schema migration. Legacy
+  request contracts stay unchanged. Source metadata cannot override original texts.
+- Offline React controls/cards and escaped printable reports render the audit without
+  exposing raw diagnostic JSON in the ordinary UI. This is not a live browser/API
+  accuracy or hosting-duration test.
+
+These checks do not approve labels, prove event recall or measure model accuracy.
+No private documents, author/verifier outputs or paid services are read or called.

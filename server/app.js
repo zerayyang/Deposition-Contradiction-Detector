@@ -1,4 +1,5 @@
 import express from 'express';
+import {createEventHandlers} from './events/handlers.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import {DOCUMENT_LIMITS} from '../shared/documentLimits.js';
@@ -20,8 +21,8 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   if(!allowed(req.identity.id))return res.status(429).set('Retry-After','60').json({error:'Too many requests. Wait one minute and try again.'});
   // Admit heavy requests BEFORE parsing JSON, so rejected parallel uploads
   // cannot each allocate the entire request-body budget.
-  const storageRequest=/^\/analysis\/jobs(?:\/|$)/.test(req.path);
-  if(storageRequest||req.method==='POST'&&['/analysis/plan','/analyze','/analyze/stream'].includes(req.path)){
+  const storageRequest=/^\/(?:analysis|events)\/jobs(?:\/|$)/.test(req.path);
+  if(storageRequest||req.method==='POST'&&['/analysis/plan','/analyze','/analyze/stream','/events/plan','/events/stream','/events/sources'].includes(req.path)){
    const gate=storageRequest?recoveryAdmission:admission;
    try{await gate.run(req.identity.id,()=>new Promise(resolve=>{const done=()=>{res.off('finish',done);res.off('close',done);resolve();};res.once('finish',done);res.once('close',done);next();}));}
    catch(e){if(!res.headersSent)res.status(e.status??500).set('Retry-After','30').json({error:e.status?e.message:'Analysis could not start.'});}
@@ -34,6 +35,9 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   if(error.type==='entity.too.large')return res.status(413).json({error:'Analysis request exceeds the server size budget. No document was truncated and no model request started.'});
   if(error instanceof SyntaxError)return res.status(400).json({error:'Invalid JSON request.'});next(error);
  });
+ const events=createEventHandlers({callModel,jobStore,codeFingerprint,maxRequests,maxBudgetUsd,log});
+ app.post('/api/events/sources',events.sources);app.post('/api/events/plan',events.preview);app.post('/api/events/stream',events.stream);
+ app.get('/api/events/jobs',events.list);app.get('/api/events/jobs/:id',events.recover);app.post('/api/events/jobs/:id/cancel',events.cancel);app.delete('/api/events/jobs/:id',events.remove);
  const handlers=createAnalysisHandlers({instructions,callModel,jobStore,codeFingerprint,maxRequests,maxBudgetUsd,log});
  app.post('/api/analysis/plan',handlers.preview);app.post('/api/analyze',handlers.analyze);app.post('/api/analyze/stream',handlers.stream);
  app.get('/api/analysis/jobs',handlers.list);app.get('/api/analysis/jobs/:id',handlers.recover);app.delete('/api/analysis/jobs/:id',handlers.remove);app.post('/api/analysis/jobs/:id/cancel',handlers.cancel);

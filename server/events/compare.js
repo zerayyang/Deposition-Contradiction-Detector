@@ -113,7 +113,7 @@ export function buildEventComparisonPlan({extractionPlan,extractionResult},{even
   }
   const upstreamIncomplete=extractionResult.status!=='COMPLETE'||sourceDocuments.some(d=>d.extractionCoverage.segments.some(s=>s.status!=='PROCESSED'));
   const base={version:1,pipelineSha256,model:MODEL,system,classificationSha256:digest(definitions),promptSha256:digest(instructions),schemaSha256:digest(comparisonWireSchema),
-    extractionPlanId:extractionPlan.id,extractionResultSha256:digest(extractionResult),documents:sourceDocuments,catalogs,tasks,requestCount,pairCount,outputTokens,timeoutMs,sameWitnessConfirmed,upstreamIncomplete,
+    extractionPlanId:extractionPlan.id,extractionResultSha256:digest({...extractionResult,elapsedMs:0}),documents:sourceDocuments,catalogs,tasks,requestCount,pairCount,outputTokens,timeoutMs,sameWitnessConfirmed,upstreamIncomplete,
     cost:{currency:'USD',estimated:round((Math.ceil(inputBytes/3)*MODEL.inputUsdPerMillion+requestCount*Math.min(2500,outputTokens)*MODEL.outputUsdPerMillion)/1e6),
       conservativeBudget:round(((inputBytes+requestCount*8192)*MODEL.inputUsdPerMillion+requestCount*outputTokens*MODEL.outputUsdPerMillion)/1e6),
       note:'Local UTF-8 estimate at existing uncached rates, not verified billing. Output reserve includes thinking. No retries; cancelled in-flight work can still be billed.'}};
@@ -136,12 +136,19 @@ function combineComparisons(tasks){
   for(const g of merged){const key=baseKey(g);if(!types.has(key))types.set(key,new Set());types.get(key).add(g.type);}
   return merged.map(g=>{const alternatives=[...types.get(baseKey(g))];return {...g,typeDisagreement:alternatives.length>1,typeAlternatives:alternatives,reviewRequired:g.reviewRequired||alternatives.length>1};});
 }
-export async function executeEventComparison({plan,approval,callModel,signal,onEvent=()=>{}}){
+export async function executeEventComparison({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map()}){
   if(!knownPlans.has(plan)||plan.system!==system)throw new Error('Comparison requires a fresh immutable plan built by this module.');
   if(approval?.planId!==plan.id||approval?.requestCount!==plan.requestCount||!Number.isFinite(approval?.maxUsd)||approval.maxUsd<plan.cost.conservativeBudget)throw new Error('Explicit approval of this comparison plan, request count and budget is required.');
   if(typeof callModel!=='function')throw new Error('Model transport is required.');
   const model=createMeasuredModel(callModel,{timeoutMs:plan.timeoutMs}),started=performance.now();let cancelled=false;
   const tasks=plan.tasks.map(t=>({...t,status:'PENDING',comparisons:[],pairs:[],unrelated:[],issues:[],rejected:[],accountedPairs:0}));
+  for(const task of tasks){const message=cachedResponses.get(digest(task.input));if(!message)continue;
+    const u=message.usage;task.usage={known:Number.isSafeInteger(u?.input_tokens)&&u.input_tokens>=0&&Number.isSafeInteger(u?.output_tokens)&&u.output_tokens>=0,inputTokens:u?.input_tokens,outputTokens:u?.output_tokens,cacheCreation:u?.cache_creation_input_tokens??0,cacheRead:u?.cache_read_input_tokens??0};
+    task.stopReason=message.stop_reason;task.rawText=message.content.filter(b=>b.type==='text').map(b=>b.text).join('');task.responseSha256=digest(task.rawText);
+    task.response=parseComparisonMessage(message);Object.assign(task,validateComparisonResponse(task.response,task));
+    if(task.issues.length)throw new Error('Saved completed comparison failed fresh validation. No new paid calls started.');
+    task.status='COMPLETE';task.attempted=true;task.reused=true;
+  }
   const snapshot=()=>{
     const attempted=tasks.filter(t=>t.attempted),known=attempted.every(t=>t.usage?.known),uncached=attempted.every(t=>!t.usage?.cacheCreation&&!t.usage?.cacheRead);
     const input=attempted.reduce((n,t)=>n+(t.usage?.inputTokens??0),0),output=attempted.reduce((n,t)=>n+(t.usage?.outputTokens??0),0);
@@ -154,11 +161,12 @@ export async function executeEventComparison({plan,approval,callModel,signal,onE
       usage:{attempted:attempted.length,inputTokens:known?input:null,outputTokens:known?output:null,unavailableRequests:attempted.filter(t=>!t.usage?.known).length,
         estimatedUsd:known&&uncached?round((input*MODEL.inputUsdPerMillion+output*MODEL.outputUsdPerMillion)/1e6):null,note:'Configured-rate USD estimate, not verified billing or Codex credits.'},
       provenance:{pipeline:'event-comparison-v1',pipelineSha256:plan.pipelineSha256,schemaSha256:plan.schemaSha256,classificationSha256:plan.classificationSha256,promptSha256:plan.promptSha256,extractionPlanId:plan.extractionPlanId,extractionResultSha256:plan.extractionResultSha256,model:plan.model.id},
-      elapsedMs:Math.round(performance.now()-started),notice:'Proposed AI categories and relationships, source-verified only. No numeric confidence is computed. Active website integration remains a later step.'};
+      elapsedMs:Math.round(performance.now()-started),notice:'Proposed AI categories and relationships, source-verified only. No numeric confidence is computed. The website scoring adapter is separate from this comparison engine.'};
   };
   const emit=async e=>{try{await onEvent(structuredClone(e));}catch(error){error.comparisonResult=structuredClone(snapshot());throw error;}};
   await emit({event:'start',plan:previewEventComparisonPlan(plan)});
   for(const task of tasks){
+    if(task.status==='COMPLETE')continue;
     if(signal?.aborted){cancelled=true;break;}
     task.status='RUNNING';await emit({event:'progress',taskId:task.id,planned:plan.requestCount});
     if(signal?.aborted){cancelled=true;task.status='CANCELLED';break;}

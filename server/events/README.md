@@ -30,9 +30,10 @@ sourceDiagnostics; see SOURCE_HANDLING.md. Unknown named roles remain rejections
 Part 2 source handling is documented in SOURCE_HANDLING.md. Part 3 adds an
 isolated, approval-gated model extraction engine; see EXTRACTION.md.
 Part 4 adds isolated global event-block matching and source-linked classification;
-see COMPARISON.md. The current UI and API still use the existing analysis workflow.
-Confidence integration, database migrations, feedback, retrieval memory and live
-evaluation remain later stages. The current presence regex is retained as a
+see COMPARISON.md. Stage 5 connects the engines to an explicitly approved website workflow, saved
+cases, recovery, reports and the unchanged deterministic scoring engine; see
+WORKFLOW.md. The legacy API remains available. Database migrations, feedback,
+retrieval memory and live evaluation remain later stages. The current presence regex is retained as a
 checkpointed prototype; do not expand it into a hardcoded taxonomy or delete working
 production logic before a replacement passes independent checks.
 
@@ -49,3 +50,5 @@ Part 4 files: `compare.js`, `comparisonProtocol.js`, `COMPARISON_PROMPT.md` and
 `COMPARISON.md`. Matching/classification uses a fixed approved workflow, not
 self-delegating agents. Existing category definitions are loaded without edits;
 source verification stays deterministic and numeric scoring is not invoked.
+
+Stage 5 files: `workflow.js`, `handlers.js`, `sourceRoles.js`, `scoringAdapter.js` and `WORKFLOW.md`. The existing engines also accept prevalidated cached-response replay for safe resume.

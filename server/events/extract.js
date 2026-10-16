@@ -83,11 +83,20 @@ function usageFor(message){
   return {known,inputTokens:known?u.input_tokens:null,outputTokens:known?u.output_tokens:null,
     cacheCreationInputTokens:u?.cache_creation_input_tokens??0,cacheReadInputTokens:u?.cache_read_input_tokens??0};
 }
-export async function executeEventExtraction({plan,approval,callModel,signal,onEvent=()=>{}}) {
+export async function executeEventExtraction({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map()}) {
   if(!plan||!builtPlans.has(plan)||plan.id!==planHash(plan)||plan.system!==system)throw new Error('Extraction plan changed or is stale; rebuild and review it.');
   if(approval?.planId!==plan.id||approval?.requestCount!==plan.requestCount||!Number.isFinite(approval?.maxUsd)||approval.maxUsd<plan.cost.conservativeBudget)throw new Error('Explicit approval of this exact plan, request count and conservative USD budget is required.');
   if(typeof callModel!=='function')throw new Error('Supply the existing model transport explicitly.');
   const started=performance.now(),tasks=plan.tasks.map(t=>({...t,status:'PENDING',events:[],rejected:[],issues:[]}));
+  // Restore every completed task before emitting a checkpoint, so a crash
+  // during replay cannot erase later completed work and cause repeat charges.
+  for(const task of tasks){const message=cachedResponses.get(hash(task.input));if(!message)continue;
+    task.usage=usageFor(message);task.stopReason=message.stop_reason;
+    task.rawText=message.content.filter(b=>b.type==='text').map(b=>b.text).join('');task.responseSha256=hash(task.rawText);
+    task.response=parseExtractionMessage(message);Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
+    if(task.issues.length)throw new Error('Saved completed extraction failed fresh validation. No new paid calls started.');
+    task.status='COMPLETE';task.attempted=true;task.reused=true;
+  }
   const model=createMeasuredModel(callModel,{timeoutMs:plan.timeoutMs});let cancelled=false;
   const snapshot=()=>{
     const attempts=tasks.filter(t=>t.attempted),allKnown=attempts.every(t=>t.usage?.known),uncached=attempts.every(t=>!t.usage?.cacheCreationInputTokens&&!t.usage?.cacheReadInputTokens);
@@ -111,6 +120,7 @@ export async function executeEventExtraction({plan,approval,callModel,signal,onE
   const emit=async event=>{try{await onEvent(structuredClone(event));}catch(error){error.extractionResult=snapshot();throw error;}};
   await emit({event:'start',plan:previewEventExtractionPlan(plan)});
   for(const task of tasks){
+    if(task.status==='COMPLETE')continue;
     if(signal?.aborted){cancelled=true;break;}
     if(task.mode==='LOCAL_NON_WITNESS'){task.status='COMPLETE';continue;}
     task.status='RUNNING';
