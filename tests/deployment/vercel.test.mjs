@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,globSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {runtimeConfiguration} from '../../server/configuration.js';
 
@@ -28,4 +28,13 @@ test('Vite preset routes API requests to the 60-second function; dev proxy remai
  assert.equal(config.functions['api/index.js'].maxDuration,60);
  assert.deepEqual(config.rewrites,[{source:'/api/(.*)',destination:'/api/index'}]);
  assert.match(readFileSync(new URL('vite.config.js',root),'utf8'),/['"]\/api['"]:\s*['"]http:\/\/127\.0\.0\.1:3000['"]/);
+});
+
+test('Vercel includeFiles is a single glob string and bundles runtime file reads',()=>{
+ const config=JSON.parse(readFileSync(new URL('vercel.json',root),'utf8'));
+ const pattern=config.functions['api/index.js'].includeFiles;
+ assert.equal(typeof pattern,'string','Vercel rejects an array for includeFiles');
+ const files=globSync(pattern,{cwd:root});
+ for(const required of ['server/proper_prompts.md','server/status.html','server/configuration.js','server/authentication.js','server/sourceContext.js','shared/documentLimits.js','package-lock.json'])assert.ok(files.includes(required),`Missing runtime resource: ${required}`);
+ assert.ok(!files.some(file=>file.startsWith('tests/')||file.startsWith('.env')||file.startsWith('.analysis-jobs/')));
 });

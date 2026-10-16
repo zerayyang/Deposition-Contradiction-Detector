@@ -23,3 +23,5 @@ Deployment remains a separate check: configure Vercel environment variables,
 inspect the deployed page and `/api/health`, and test an authenticated plan preview.
 A real analysis costs Claude credits and needs separate explicit approval.
 No local check establishes that a deployed environment has valid credentials.
+
+- Vercel file inclusion uses the provider-required single glob string, includes the prompt/status/shared runtime resources and lockfile, and excludes private local inputs. An array is invalid even when Vite builds successfully.
