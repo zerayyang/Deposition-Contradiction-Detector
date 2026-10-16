@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
-import {createHash} from 'node:crypto';
+import {captureBuildIdentity} from './buildIdentity.js';
+import {MODEL} from './documentAnalysis.js';
 import {createApp} from './app.js';
 import {createApprovedMemoryReader} from './memory/approvedMemory.js';
 import {createJobStore} from './jobStore.js';
@@ -18,13 +19,11 @@ const log=event=>process.stdout.write(JSON.stringify({timestamp:new Date().toISO
 const authenticate=createAuthentication({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY,allowLocal:!process.env.VERCEL&&!production&&host==='127.0.0.1',allowedUserIds});
 if(!process.env.ANTHROPIC_API_KEY)throw new Error('ANTHROPIC_API_KEY is required.');
 const instructions=fs.readFileSync(new URL('./proper_prompts.md',import.meta.url),'utf8');
-const hash=createHash('sha256');
-for(const dir of ['server','shared'])for(const name of fs.readdirSync(path.join(root,dir),{recursive:true}).filter(n=>n.endsWith('.js')).sort())hash.update(name).update(fs.readFileSync(path.join(root,dir,name)));
-hash.update(fs.readFileSync(path.join(root,'package-lock.json')));
-const codeFingerprint=hash.digest('hex');
+const runtimeIdentity=captureBuildIdentity(root,{model:MODEL.id,instructions,commit:process.env.VERCEL_GIT_COMMIT_SHA});
+const codeFingerprint=runtimeIdentity.codeFingerprint;
 const anthropic=new Anthropic({apiKey:process.env.ANTHROPIC_API_KEY,maxRetries:0,timeout:600000});
 const callModel=createMeasuredModel((params,options)=>anthropic.messages.create(params,options),{timeoutMs,log});
-const app=createApp({readApprovedMemory:createApprovedMemoryReader({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}),instructions,callModel,authenticate,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
+const app=createApp({readApprovedMemory:createApprovedMemoryReader({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}),instructions,callModel,authenticate,runtimeIdentity,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
 export default app;
 
 // Keep the existing local entry point, but never bind a port in Vercel.

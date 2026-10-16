@@ -14,9 +14,10 @@ function remainingPreview(plan,result){
  conservativeBudget:(inputTokenUpperBudget*plan.model.inputUsdPerMillion+pairs.length*output*plan.model.outputUsdPerMillion)/1e6};
  return {...previewPlan(plan),requestCount:pairs.length,totalRequestCount:plan.requestCount,resuming:true,cost};
 }
-export function createAnalysisHandlers({instructions,callModel,jobStore=null,codeFingerprint='local-test',maxRequests=12,maxBudgetUsd=25,log=()=>{}}) {
+export function createAnalysisHandlers({instructions,callModel,jobStore=null,codeFingerprint='local-test',runtimeIdentity=null,maxRequests=12,maxBudgetUsd=25,log=()=>{}}) {
  const runningJobs=new Map();
- const prepare=body=>buildPlan([body?.transcript1,body?.transcript2],body?.documents,instructions);
+ const provenance=runtimeIdentity??{codeFingerprint,promptSha256:digest(instructions)};
+ const prepare=body=>buildPlan([body?.transcript1,body?.transcript2],body?.documents,instructions,{speakerRoles:body?.speakerRoles,sourceRolesReviewed:body?.sourceRolesReviewed});
  const guard=preview=>{if(preview.requestCount>maxRequests||preview.cost.conservativeBudget>maxBudgetUsd)throw new Error(`Analysis exceeds this server's request or spending allowance (${maxRequests} requests / USD ${maxBudgetUsd}). No paid calls started.`);};
  const load=async req=>{
   if(!jobStore)throw new Error('Recovery storage is unavailable.');
@@ -24,13 +25,14 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
   if(jobStore.isActive(record.id))throw new Error('This analysis is still running. Wait or cancel its original connection.');
   if(record.caseId!==req.body.caseId)throw new Error('Recovery belongs to a different case.');
   if(record.provenance.codeFingerprint!==codeFingerprint)throw new Error('The server code changed since this run. Its saved results remain available, but cannot be resumed under different rules.');
-  const body={transcript1:record.texts[0],transcript2:record.texts[1],documents:record.documents},plan=prepare(body);
+  const body={transcript1:record.texts[0],transcript2:record.texts[1],documents:record.documents,speakerRoles:record.provenance.speakerRoles??[{},{}],sourceRolesReviewed:true},plan=prepare(body);
   if(plan.id!==record.planId)throw new Error('The prompt or plan changed. Export saved results before planning a new analysis.');
+  if(req.body.speakerRoles!==undefined&&JSON.stringify(prepare({...body,speakerRoles:req.body.speakerRoles,sourceRolesReviewed:req.body.sourceRolesReviewed}).speakerRoles)!==JSON.stringify(plan.speakerRoles))throw new Error('Reviewed source roles changed; do not resume under different witness assignments.');
   if(req.body.transcript1!==undefined&&(req.body.transcript1!==record.texts[0]||req.body.transcript2!==record.texts[1]))throw new Error('Edited inputs cannot resume an older analysis.');
   return {record,plan,body};
  };
  return {
-  async preview(req,res){try{const loaded=req.body?.resumeJobId?await load(req):null,plan=loaded?.plan??prepare(req.body),preview=loaded?remainingPreview(plan,loaded.record.result):previewPlan(plan);guard(preview);return res.json({...preview,...(loaded?{resumeJobId:loaded.record.id}:{})});}catch(e){return res.status(400).json({error:e.message});}},
+  async preview(req,res){try{const loaded=req.body?.resumeJobId?await load(req):null,plan=loaded?.plan??prepare(req.body),preview=loaded?remainingPreview(plan,loaded.record.result):previewPlan(plan);guard(preview);return res.json({...preview,provenance,...(loaded?{resumeJobId:loaded.record.id}:{})});}catch(e){return res.status(400).json({error:e.message});}},
   async list(req,res){try{if(!jobStore)return res.json({jobs:[],recoveryEnabled:false});const records=await jobStore.list(identity(req),req.query.caseId);return res.json({recoveryEnabled:true,jobs:records.filter(r=>r.provenance.workflow!=='events-v1').map(r=>({id:r.id,caseId:r.caseId,state:r.state,updatedAt:r.updatedAt,completed:r.result?.analysis?.completed??0,planned:r.result?.analysis?.planned??null,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'}))});}catch{return res.status(500).json({error:'Recovery records could not be listed.'});}},
   async recover(req,res){try{const r=await jobStore.get(req.params.id,identity(req));return res.json({id:r.id,caseId:r.caseId,state:r.state,notice:r.notice??null,texts:r.texts,documents:r.documents,originalDocuments:r.originalDocuments,result:r.result,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'});}catch{return res.status(404).json({error:'Recovery record not found or unavailable.'});}},
   async cancel(req,res){try{
@@ -44,7 +46,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
    let plan;try{plan=prepare(req.body);guard(previewPlan(plan));}catch(e){return res.status(400).json({error:e.message});}
    if(plan.requestCount!==1)return res.status(428).json({error:'This document pair requires a multi-request plan. Preview /api/analysis/plan and explicitly approve it before starting /api/analyze/stream.',plan:previewPlan(plan)});
    const controller=new AbortController(),close=()=>{if(!res.writableEnded)controller.abort();};res.on('close',close);
-   try{const result=await executePlan({plan,texts:[req.body.transcript1,req.body.transcript2],instructions,callModel,signal:controller.signal});
+   try{const result=await executePlan({plan,texts:[req.body.transcript1,req.body.transcript2],instructions,callModel,provenance,signal:controller.signal});
     // Preserve the established short JSON API's unverified-candidate contract.
     // Strict streamed/PDF findings still require source grounding; rejected raw
     // candidates remain in that analysis audit, never presented as verified.
@@ -52,7 +54,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
      const candidate=rejected.candidate;
      if(typeof candidate?.claim1?.original!=='string'||typeof candidate?.claim2?.original!=='string')continue;
      if(req.body.transcript1.includes(candidate.claim1.original)&&req.body.transcript2.includes(candidate.claim2.original))continue;
-     const assessed=assessCandidate(candidate,req.body.transcript1,req.body.transcript2);
+     const assessed=assessCandidate(candidate,req.body.transcript1,req.body.transcript2,{claim1:{speakerRoles:plan.speakerRoles[0]},claim2:{speakerRoles:plan.speakerRoles[1]}});
      if(assessed.status==='NOT_EVALUABLE'&&assessed.notEvaluableReason==='UNVERIFIED_SOURCE')result.contradictions.push({...assessed,reviewOnly:true,sourceReferences:{claim1:[],claim2:[]},sourceRejection:{pairId:task.id,candidateIndex:rejected.candidateIndex,reason:rejected.reason}});
     }
     if(result.contradictions.length&&result.analysis.status==='failed')result.analysis.status='partial';
@@ -67,7 +69,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
     if(body.approvedPlanId!==plan.id&&req.body.approvedPlanId!==plan.id)return res.status(409).json({error:'The analysis plan changed or was not approved. Preview and approve the current request count and cost first.'});
     if(!preview.requestCount)return res.status(409).json({error:'All comparisons are already complete. Recover the saved results instead of paying again.'});
     if(jobStore&&!record){if(typeof req.body.caseId!=='string'||!req.body.caseId||req.body.caseId.length>200)throw new Error('Save a case before starting recoverable analysis.');
-     record=await jobStore.create({ownerId:identity(req),caseId:req.body.caseId,texts:[body.transcript1,body.transcript2],documents:body.documents,originalDocuments:req.body.originalDocuments?.map(d=>d?Object.fromEntries(['path','name','size','type','extraction','pageMappingStale'].map(k=>[k,d[k]])):null),planId:plan.id,provenance:{model:plan.model.id,promptSha256:digest(instructions),codeFingerprint}});}
+     record=await jobStore.create({ownerId:identity(req),caseId:req.body.caseId,texts:[body.transcript1,body.transcript2],documents:body.documents,originalDocuments:req.body.originalDocuments?.map(d=>d?Object.fromEntries(['path','name','size','type','extraction','pageMappingStale'].map(k=>[k,d[k]])):null),planId:plan.id,provenance:{model:plan.model.id,promptSha256:digest(instructions),codeFingerprint,speakerRoles:plan.speakerRoles}});}
    }catch(e){return res.status(400).json({error:e.message});}
    const controller=new AbortController(),close=()=>{if(!res.writableEnded)controller.abort();};res.on('close',close);
    res.status(200).set({'Content-Type':'application/x-ndjson','Cache-Control':'no-store','X-Accel-Buffering':'no'});res.flushHeaders?.();
@@ -76,7 +78,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
    const heartbeat=setInterval(()=>{if(!res.destroyed)res.write(JSON.stringify({event:'heartbeat'})+'\n');},15000);
    const originalResult=record?.result;
    try{
-    await executePlan({plan,resume:originalResult,texts:[body.transcript1,body.transcript2],instructions,callModel:(params,options)=>callModel(params,{...options,auditRunId:record?.id}),signal:controller.signal,onEvent:async event=>{
+    await executePlan({plan,provenance,resume:originalResult,texts:[body.transcript1,body.transcript2],instructions,callModel:(params,options)=>callModel(params,{...options,auditRunId:record?.id}),signal:controller.signal,onEvent:async event=>{
      if(event.analysis)event.analysis={...event.analysis,recoveryEnabled:Boolean(record)};
      if(event.analysis&&record)event.analysis={...event.analysis,jobId:record.id,recoveryEnabled:true,provenance:{...event.analysis.provenance,codeFingerprint}};
      // The server saves before sending a checkpoint or beginning the next paid call.
