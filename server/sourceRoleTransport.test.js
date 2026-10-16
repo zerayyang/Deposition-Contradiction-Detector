@@ -45,3 +45,36 @@ test('stream recovery preserves role maps and refuses changed assignments before
  const original=response();await handlers.preview({...req,body:{caseId:body.caseId,resumeJobId:stored.id}},original);assert.equal(original.statusCode,200);assert.equal(original.body.id,preview.body.id);
  const changed=response();await handlers.preview({...req,body:{caseId:body.caseId,resumeJobId:stored.id,speakerRoles:[{}, {'PRESIDENT VALE':'OTHER'}],sourceRolesReviewed:true}},changed);assert.equal(changed.statusCode,400);assert.match(changed.body.error,/roles changed/);assert.equal(calls,1);
 });
+
+test('model context index preserves interruptions and null questions without guessing opening roles',async()=>{
+ const first='Q: Did you sign?\nA: Yes.';
+ const second='Did you sign?\nPRESIDENT VALE: I will read.\nMR. REED: Please do.\nPRESIDENT VALE: I signed the form.';
+ const options={speakerRoles:[{},{'PRESIDENT VALE':'WITNESS','MR. REED':'OTHER'}],sourceRolesReviewed:true};
+ const plan=buildPlan([first,second],[],instructions,options),rows=plan.chunks[1][0].sourceContext;
+ assert.equal(rows.length,2);assert.ok(rows.every(row=>row.question===null));
+ assert.equal(second.slice(rows[1].answerStart,rows[1].answerEnd),'I signed the form.');
+ await executePlan({plan,texts:[first,second],instructions,callModel:async params=>{
+  const text=params.messages[0].content;assert.match(text,/<source_context_index>/);assert.match(text,/"question":null/);return message({...candidate,claim1:claim('Yes.')});
+ }});
+});
+
+test('section overlap never resurrects an old question after another speaker interrupted',()=>{
+ const first='Q: Did you sign?\nA: Yes.';
+ const second='Q: Did you sign the form on Monday?\nPRESIDENT VALE: I will read my statement.\nMR. REED: Please do.\nPRESIDENT VALE: I signed the form.';
+ const options={speakerRoles:[{},{'PRESIDENT VALE':'WITNESS','MR. REED':'OTHER'}],sourceRolesReviewed:true,singleRequestBytes:1,chunkBytes:55,overlapBytes:0};
+ const plan=buildPlan([first,second],[],instructions,options);
+ const later=second.lastIndexOf('PRESIDENT VALE:');
+ const after=plan.chunks[1].filter(c=>c.coreStart>=later);
+ assert.ok(after.length>0);assert.ok(after.every(c=>c.questionContext===''));
+ assert.ok(after.every(c=>c.sourceContext.every(t=>t.question===null)));
+ // Original coverage is exact and complete, including interrupted turns.
+ assert.equal(plan.chunks[1].map(c=>second.slice(c.coreStart,c.coreEnd)).join(''),second);
+});
+test('continuing an uninterrupted answer retains its own literal question, not the previous topic',()=>{
+ const t='Q: Did you sign the form?\nA: '+('I signed the form. '.repeat(12))+'\nQ: Did you deliver it?\nA: '+('I delivered it. '.repeat(10));
+ const plan=buildPlan([t,t],[],instructions,{singleRequestBytes:1,chunkBytes:80,overlapBytes:0});
+ const continued=plan.chunks[0].filter(c=>c.coreStart>t.indexOf('A:')&&c.coreStart<t.indexOf('Q: Did you deliver'));
+ assert.ok(continued.length>0);assert.ok(continued.every(c=>c.questionContext==='Q: Did you sign the form?\n'));
+ const fresh=plan.chunks[0].find(c=>c.coreStart===t.indexOf('Q: Did you deliver'));
+ assert.ok(fresh);assert.equal(fresh.questionContext,'');
+});

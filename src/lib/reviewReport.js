@@ -1,3 +1,4 @@
+import {sourceBindingMessage} from './sourceStatus.js';
 import { elapsedLabel, friendlyFailure } from './analysisStatus.js';
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labels = {DIRECT:'Direct',INFERENTIAL:'Inferential',FALSE_POSITIVE:'False positive',CONFLICT_SUPPORTED:'Conflict supported by code',COMPATIBLE_SUPPORTED:'Compatibility supported by code',NOT_EVALUABLE:'Not evaluable'};
@@ -12,7 +13,7 @@ function references(refs,binding) {
 }
 function sourceContext(binding) {
   if(!binding)return '<p class="muted">Older result: no occurrence-specific source binding was saved.</p>';
-  if(binding.status!=='BOUND')return `<p class="warning">Source occurrence unresolved (${escape(binding.status)}). ${escape(binding.eligibleCount)} eligible witness occurrences; no question or answer was selected.</p>`;
+  if(binding.status!=='BOUND')return `<p class="warning">Source occurrence unresolved (${escape(binding.status)}). ${escape(binding.eligibleCount)} eligible witness occurrences; no question or answer was selected. ${escape(sourceBindingMessage(binding))}</p>`;
   const selected=binding.selected;
   return `<details><summary>Located witness question and full answer · text offsets ${escape(selected.start)}–${escape(selected.end)}</summary><h4>Question</h4><blockquote>${escape(selected.question||'No explicit question supplied.')}</blockquote><h4>Witness answer</h4><blockquote>${escape(selected.answer)}</blockquote></details>`;
 }

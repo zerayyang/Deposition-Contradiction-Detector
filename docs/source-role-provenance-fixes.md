@@ -67,3 +67,50 @@ reviewed source-role metadata, and report source failures separately from suppor
 classification/evidence results. Never mark status-only matches as verified passes.
 No classification definition, prompt rule, scoring formula, weight or approved label
 was changed in this fix.
+
+## Follow-up: governing anchors after reviewed roles
+
+The live reviewed-role run confirmed role transport, but its six saved findings
+remained rejected: the model supplied an opening thematic question as if it
+immediately governed a later witness statement across another speaker's turn.
+The opening was not role-attributed, and interruptions deliberately clear context.
+The saved failures remain failures; no anchors or approved expectations were edited.
+
+The legacy model input now includes a deterministic source_context_index for
+named witness turns and answers without governing questions, using original
+UTF-16 ranges. It contains no duplicate testimony, inferred identities, categories,
+or scores. Null question remains null. Its bytes enter the existing cost/context
+budget calculations, and all document sections remain compared. The prompt now
+explicitly requires a null question anchor for those turns, while retaining an
+exact witness-answer anchor and any genuine scope uncertainty.
+
+Source binding returns structured diagnostic codes for missing governing question,
+nonverbatim question/answer anchors, excluded quotes and invalid anchors. Separate
+claim1LiteralValid/claim2LiteralValid fields distinguish exact witness wording from
+fully verified source context. Existing claim-valid flags and numeric gating remain
+unchanged. UI witness-context text and exported reports explain the distinction.
+No fabricated question or failed anchor is silently stripped. A future model call
+must demonstrate that the instruction improves output; local checks alone do not.
+
+Additional independent fictional regressions exercise an unlabeled opening,
+a non-questioner interruption, no inherited question, exact original offsets,
+wrong/invented anchors and safe report rendering. Proposed outcomes are source
+rejection/null scores for bad anchors, even when witness wording exists. A fresh
+null anchor can locate a witness turn but establishes no missing question or scope.
+
+## Independently identified section carry-over defect
+
+The verifier reproduced a contradictory legacy section prefix using the fictional
+interrupted witness fixture and 55-byte chunks with zero overlap: the new context
+index said no governing question, but sectionDocument still attached the last old
+Q in preceding_question. The splitter now derives carry-over only from the actual
+source-parsed witness turn covering the section start and that turn's uninterrupted
+governing question. Other-speaker turns, unattributed openings and fresh question
+boundaries cannot inherit an older topic. Long uninterrupted answers still retain
+their own full literal question. Original source/core coverage remains unchanged.
+
+Final local result: 375/375 regression checks passed, changed-file lint passed and
+production build passed with the existing bundle-size warning. The six saved live
+findings were never rewritten or promoted; live prompt efficacy and missing-target
+recall remain unproven. This follow-up made zero paid calls and has not restarted
+the running backend or deployed automatically.

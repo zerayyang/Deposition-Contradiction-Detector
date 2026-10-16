@@ -55,3 +55,26 @@ test('unresolved sources and forged bindings never activate a numeric score',()=
  const score=assessCandidate(bound,t,other);assert.equal(score.status,'CONFLICT_SUPPORTED');
  assert.deepEqual(assessCandidate({...bound,type:'FALSE_POSITIVE',severity:'LOW',reasoning:'Different model opinion'},t,other).score,score.score);
 });
+
+test('an unlabeled excerpt opening and interrupted questions cannot become governing anchors',()=>{
+ const t='Did you sign the form on Monday?\nPRESIDENT VALE: I will read my statement.\nMR. REED: Please do.\nPRESIDENT VALE: I signed the form.';
+ const options={speakerRoles:{'PRESIDENT VALE':'WITNESS','MR. REED':'OTHER'}};
+ const c=claim('I signed the form.',{sourceQuestion:'Did you sign the form on Monday?',sourceAnswer:'I signed the form.'});
+ const binding=resolveWitnessSource(t,c,options);assert.equal(binding.matchCount,1);assert.equal(binding.status,'ANCHOR_MISMATCH');assert.equal(binding.diagnostics[0].code,'NO_GOVERNING_QUESTION');assert.equal(binding.alternatives[0].questionStart,null);
+ const first='Q: On Monday, did you sign the form?\nA: I did not sign the form.';
+ const result=assessCandidate({type:'DIRECT',claim1:claim('I did not sign the form.'),claim2:c},first,t,{claim2:options});
+ assert.equal(result.claim2LiteralValid,true);assert.equal(result.claim2Valid,false);assert.equal(result.score,null);assert.equal(result.humanConfidence,null);assert.equal(result.notEvaluableReason,'UNVERIFIED_SOURCE');
+ const noAnchor=resolveWitnessSource(t,{...c,sourceQuestion:null},options);assert.equal(noAnchor.status,'BOUND');assert.equal(noAnchor.selected.question,'');
+ // The stored invalid anchor is never silently stripped or reinterpreted.
+ assert.equal(resolveWitnessSource(t,c,options).status,'ANCHOR_MISMATCH');
+ const interrupted='Q: Did you sign the form on Monday?\nPRESIDENT VALE: I will read my statement.\nMR. REED: Please do.\nPRESIDENT VALE: I signed the form.';
+ assert.equal(resolveWitnessSource(interrupted,c,options).diagnostics[0].code,'NO_GOVERNING_QUESTION');
+});
+test('question and answer mismatches are diagnosed independently without relaxing literal checks',()=>{
+ const t='Q: Did you sign?\nA: I signed the form.';
+ const c=claim('I signed the form.',{sourceQuestion:'Did you approve?',sourceAnswer:'I signed the form.'});
+ assert.equal(resolveWitnessSource(t,c).diagnostics[0].code,'QUESTION_ANCHOR_MISMATCH');
+ const wrong=resolveWitnessSource(t,{...c,sourceQuestion:null,sourceAnswer:'I signed a different form.'});assert.equal(wrong.diagnostics[0].code,'ANSWER_ANCHOR_MISMATCH');
+ assert.equal(resolveWitnessSource(t,{...c,sourceQuestion:null,sourceAnswer:4}).diagnostics[0].code,'INVALID_ANCHOR');
+ assert.equal(resolveWitnessSource(t,{...c,sourceQuestion:null,sourceAnswer:'signed the form.'}).diagnostics[0].code,'ANSWER_ANCHOR_EXCLUDES_QUOTE');
+});

@@ -35,17 +35,31 @@ function containsAnchor(text, anchor, start, end, map) {
 export function resolveWitnessSource(transcript, claim, options={}) {
     const start=options.start??0,end=options.end??transcript.length;
     const matches=witnessQuoteMatches(transcript,claim?.original,options).filter(m=>m.index>=start&&m.index+claim.original.length<=end);
+    const diagnostics=[];
+    const issue=(code,field,m)=>diagnostics.push({code,field,occurrenceStart:m?.index??null});
     let eligible;
     const anchors=['sourceQuestion','sourceAnswer'].filter(k=>claim?.[k]!==null&&claim?.[k]!==undefined);
-    if(anchors.some(k=>typeof claim[k]!=='string'||!claim[k].trim()))eligible=[];
-    else eligible=matches.filter(m=>anchors.every(k=>k==='sourceQuestion'
-        ? m.question&&containsAnchor(transcript,claim[k],m.question.start,m.question.end,options.map)
-        : containsAnchor(transcript,claim[k],m.start,m.end,options.map)&&(claim[k].includes(claim.original)||options.map&&answerAnchorCoversQuote(claim[k],claim.original,options.map,transcript,m))));
+    if(anchors.some(k=>typeof claim[k]!=='string'||!claim[k].trim())){
+        eligible=[];for(const k of anchors)if(typeof claim[k]!=='string'||!claim[k].trim())issue('INVALID_ANCHOR',k);
+    }else eligible=matches.filter(m=>{
+        let valid=true;
+        for(const k of anchors){
+            if(k==='sourceQuestion'){
+                if(!m.question){issue('NO_GOVERNING_QUESTION',k,m);valid=false;}
+                else if(!containsAnchor(transcript,claim[k],m.question.start,m.question.end,options.map)){issue('QUESTION_ANCHOR_MISMATCH',k,m);valid=false;}
+            }else if(!containsAnchor(transcript,claim[k],m.start,m.end,options.map)){
+                issue('ANSWER_ANCHOR_MISMATCH',k,m);valid=false;
+            }else if(!(claim[k].includes(claim.original)||options.map&&answerAnchorCoversQuote(claim[k],claim.original,options.map,transcript,m))){
+                issue('ANSWER_ANCHOR_EXCLUDES_QUOTE',k,m);valid=false;
+            }
+        }
+        return valid;
+    });
     const status=!matches.length?'NOT_FOUND':!eligible.length?'ANCHOR_MISMATCH':eligible.length===1?'BOUND':'AMBIGUOUS';
     const location=m=>({id:`witness:${m.index}:${m.index+claim.original.length}`,start:m.index,end:m.index+claim.original.length,
         answerStart:m.start,answerEnd:m.end,speaker:m.speaker??null,roleOrigin:m.roleOrigin,questionStart:m.question?.start??null,questionEnd:m.question?.end??null});
     const selected=status==='BOUND'?eligible[0]:null;
-    return {status,method:anchors.length?'LITERAL_CONTEXT':'UNIQUE_WITNESS_QUOTE',matchCount:matches.length,
+    return {status,diagnostics:status==='ANCHOR_MISMATCH'?diagnostics:[],method:anchors.length?'LITERAL_CONTEXT':'UNIQUE_WITNESS_QUOTE',matchCount:matches.length,
         eligibleCount:eligible.length,selected:selected?{...location(selected),question:selected.question?.text??'',answer:transcript.slice(selected.start,selected.end).trim()}:null,
         alternatives:(eligible.length?eligible:matches).map(location)};
 }
