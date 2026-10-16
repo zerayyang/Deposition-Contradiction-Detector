@@ -2,8 +2,26 @@
 // removed. No case folding, punctuation changes, synonyms, or word correction.
 export function pdfQuoteMap(text, manifest) {
   const ignored = new Uint8Array(text.length);
-  for (const page of manifest?.pages ?? []) {
-    const lines = [...text.slice(page.start,page.end).matchAll(/[^\n]+/g)].map(m=>({text:m[0],start:page.start+m.index}));
+  const pages=(manifest?.pages??[]).map(page=>({...page,lines:[...text.slice(page.start,page.end).matchAll(/[^\n]+/g)].map(m=>({text:m[0],start:page.start+m.index}))}));
+  const headerCounts=new Map(),footerCounts=new Map();
+  for(const page of pages){
+    const first=page.lines[0]?.text.replace(/^\s*(?:[1-9]|1\d|2[0-5])\s+/,'').trim();
+    if(first&&/^(?:CONFIDENTIAL(?:\s|$)|.*\s-\sby\s|Proceedings$)/i.test(first)){
+      page.header=first;headerCounts.set(first,(headerCounts.get(first)??0)+1);
+    }
+    const at=page.lines.findLastIndex((line,index)=>index>=page.lines.length-9&&/^Page \d+\s*$/.test(line.text.trim()));
+    if(at>=0&&page.lines.length-at>=4){
+      const tail=page.lines.slice(at+1).map(l=>l.text.trim()).filter(Boolean);
+      if(!tail.some(l=>/^(?:\d{1,2}\s+)?[QA][.:]?\s/.test(l))){
+        page.footer={at,signature:tail.join('\n')};
+        footerCounts.set(page.footer.signature,(footerCounts.get(page.footer.signature)??0)+1);
+      }
+    }
+  }
+  for (const page of pages) {
+    const lines=page.lines;
+    if(page.header&&headerCounts.get(page.header)>=3)ignored.fill(1,lines[0].start,lines[0].start+lines[0].text.length);
+    if(page.footer&&footerCounts.get(page.footer.signature)>=3)ignored.fill(1,lines[page.footer.at].start,page.end);
     const numbered = lines.flatMap(line=>{
       const match=line.text.match(/^(\s*)([1-9]|1\d|2[0-5])\s+/);
       return match ? [{...line,number:Number(match[2]),prefix:match[0].length}] : [];

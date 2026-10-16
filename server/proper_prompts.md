@@ -195,6 +195,16 @@ If the candidate merely explains what happened during an already disputed action
 
 Reject a separate compatible-detail card whose justification is only that the actual conflict is covered elsewhere: that is a signal to consolidate, not a reason to add a card. Retain a separate FALSE_POSITIVE only when the testimony establishes an independent apparent mismatch not already handled by the main result. This is not a one-card-per-topic limit: independently conflicting assertions still require separate results.
 
+### Final source-context check before emitting a label
+
+For each retained comparison, reconstruct the witness's proposition from the nearest question, the full answer, and any correction or qualifier. A short answer such as "Yes" adopts only the proposition actually asked; state that proposition in reasoning. Keep the original quote literal: do not insert the examiner's wording into a witness quotation. Choose a sufficiently informative contiguous answer excerpt when one is available rather than a generic fragment that occurs throughout the document.
+
+Before comparing numerical statements, establish that they concern the same entity, attribute, units, scope, and relevant period. Distinguish a whole site from a component, an actual valuation from a hypothetical addition, and an estimate from an exact value. Do not manufacture precise bounds for vague quantities. If an apparent numerical conflict depends on unresolved scope or time, explain that condition rather than declaring the quantities conclusively incompatible. Apply the existing DIRECT / INFERENTIAL / FALSE_POSITIVE definitions after this check; an assertion hedge alone does not change DIRECT into INFERENTIAL.
+
+Different testimony dates alone neither prove a conflict nor reconcile it. Answers explicitly about current knowledge or current conditions may refer to different dates; accounts of the same historical event must still be compared against that event's period. Do not assume an unmentioned acquisition, correction, changed role, or later event to reconcile a pair.
+
+Check both directions: uncertainty is not a denial; reviewing is not necessarily relying; hearing of is not necessarily meeting; shared responsibility is not necessarily exclusive responsibility. Conversely, a compatible nearby detail does not cancel a separate incompatible assertion. Use only distinctions supported by the actual questions and answers. Report each independent issue once within the supplied sections, retaining material qualifications and corrections. These checks do not authorize changing source wording or emitting a model-generated numeric confidence score.
+
 ## 4. What to Report
 
 - Report pairs that concern the same factual issue and conflict, with type DIRECT or INFERENTIAL.
@@ -232,6 +242,8 @@ Top-level structure:
     {
       "claim1": {
         "original": "Witness's exact relevant testimony from Transcript 1",
+        "sourceQuestion": null,
+        "sourceAnswer": null,
         "activityPhrase": null,
         "timePhrase": null,
         "locationPhrase": null,
@@ -243,6 +255,8 @@ Top-level structure:
       },
       "claim2": {
         "original": "Witness's exact relevant testimony from Transcript 2",
+        "sourceQuestion": null,
+        "sourceAnswer": null,
         "activityPhrase": null,
         "timePhrase": null,
         "locationPhrase": null,
@@ -294,6 +308,10 @@ Do not add confidence, probability, percentage, or score fields anywhere.
 - Choose an excerpt long enough to retain the qualifier, negation, exception, or correction that changes its meaning. Do not quote "I went out" alone from "I don't remember whether I went out." If necessary, quote the entire contiguous answer and extract the relevant literal phrases from it.
 - Keep analysis out of `claim1` and `claim2`. Interpretation belongs only in `reasoning` and `semanticAssist`.
 - Do not use outside information as evidence.
+
+### Literal source-location anchors
+
+For each claim in Q/A testimony, supply `sourceQuestion` as a distinctive exact contiguous excerpt of the immediately governing question, and `sourceAnswer` as a sufficiently long exact contiguous witness-answer excerpt containing `original`. These are location anchors only, not new assertions. Exclude Q/A labels and speaker labels from both anchors. Preserve their wording, punctuation, and whitespace. Use null when unavailable (for example plain pasted witness text); never invent a question. Do not use counsel or court speech as a witness answer. If the same question and answer repeat, include distinguishing literal context within that actual question/answer where available; the application will keep unresolved occurrences ambiguous rather than choose the first match. These fields never supply numeric confidence. Literal fact fields must still come from `original`, not from the question. State any adopted proposition and its scope in reasoning.
 
 ## 8. Literal Evidence Extraction
 

@@ -1,0 +1,71 @@
+import { elapsedLabel, friendlyFailure } from './analysisStatus.js';
+const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const labels = {DIRECT:'Direct',INFERENTIAL:'Inferential',FALSE_POSITIVE:'False positive',CONFLICT_SUPPORTED:'Conflict supported by code',COMPATIBLE_SUPPORTED:'Compatibility supported by code',NOT_EVALUABLE:'Not evaluable'};
+const label = value => labels[value] ?? value ?? 'Unavailable';
+const list = value => Array.isArray(value) ? value : [];
+const jsonForHtml = value => JSON.stringify(value).replace(/[<>&\u2028\u2029]/g, c => `\\u${c.charCodeAt(0).toString(16).padStart(4,'0')}`);
+function references(refs,binding) {
+  const unique=[...new Set(list(refs).map(ref=>ref.pdfPage ? `PDF page ${ref.pdfPage} (label ${ref.pageLabel ?? ref.pdfPage})` : `text offsets ${ref.start}–${ref.end}`))];
+  if(!unique.length)return 'Source reference unavailable; check the original document.';
+  const warning=binding?.status==='BOUND'?' · One witness occurrence located.':unique.length>1?' · Multiple source locations: confirm the intended occurrence.':'';
+  return unique.length>4?`${unique.slice(0,3).map(escape).join(' · ')}<details><summary>All ${unique.length} source pages — occurrence unresolved</summary>${unique.map(escape).join(' · ')}</details>${warning}`:unique.map(escape).join(' · ')+warning;
+}
+function sourceContext(binding) {
+  if(!binding)return '<p class="muted">Older result: no occurrence-specific source binding was saved.</p>';
+  if(binding.status!=='BOUND')return `<p class="warning">Source occurrence unresolved (${escape(binding.status)}). ${escape(binding.eligibleCount)} eligible witness occurrences; no question or answer was selected.</p>`;
+  const selected=binding.selected;
+  return `<details><summary>Located witness question and full answer · text offsets ${escape(selected.start)}–${escape(selected.end)}</summary><h4>Question</h4><blockquote>${escape(selected.question||'No explicit question supplied.')}</blockquote><h4>Witness answer</h4><blockquote>${escape(selected.answer)}</blockquote></details>`;
+}
+export function reportGroups(findings) {
+  const groups=new Map();
+  list(findings).forEach((finding,index)=>{
+    // Group only identical quotes, category AND source offsets. Every observation
+    // remains visible; extraction/score disagreements are never averaged away.
+    const key=JSON.stringify([finding.type,finding.claim1?.original,finding.claim2?.original,finding.sourceReferences??null]);
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push({finding,index});
+  });
+  return [...groups.values()];
+}
+export function buildReviewReport({title='Untitled case',draft={},generatedAt=new Date().toISOString()}) {
+  const findings=list(draft.results),analysis=draft.analysis,groups=reportGroups(findings);
+  const status=analysis?.status ?? 'legacy';
+  const complete=status==='complete';
+  const tasks=list(analysis?.tasks),rejected=tasks.flatMap(task=>list(task.rejectedFindings).map(f=>({...f,taskId:task.id})));
+  const counts=Object.fromEntries(['DIRECT','INFERENTIAL','FALSE_POSITIVE'].map(type=>[type,findings.filter(f=>f.type===type).length]));
+  const article=({finding:f,index})=>{
+    const hasScore=Number.isFinite(f.score)&&['CONFLICT_SUPPORTED','COMPATIBLE_SUPPORTED'].includes(f.status);
+    const score=hasScore?`${f.score} / 100${f.status==='COMPATIBLE_SUPPORTED'?' (compatibility index)':''}`:'No numeric score';
+    const quotes=['claim1','claim2'].map((key,i)=>`<div><h4>Transcript ${i+1} · ${escape(draft.files?.[i]?.name??'Pasted testimony')}</h4><blockquote>${escape(f[key]?.original??'No quote supplied')}</blockquote><div class="source">${references(f.sourceReferences?.[key],f.sourceBindings?.[key])}</div>${sourceContext(f.sourceBindings?.[key])}${f.sourceGrounding?.[key]?.method==='PDF_LAYOUT_MAPPED'?'<p class="muted">PDF layout mapped; the exact original source text is shown above.</p>':''}</div>`).join('');
+    const rules=list(f.rulesFired).map(rule=>`<li>${escape(rule.id)}: ${escape(rule.verdict)} — ${escape(rule.explanation??'')}</li>`).join('');
+    return `<article><h3>Finding ${index+1} <span class="badge">${escape(label(f.type))}</span></h3><div class="quotes">${quotes}</div><h4>AI explanation</h4><p>${escape(f.reasoning??'No explanation supplied.')}</p><div class="score"><strong>Code check:</strong> ${escape(label(f.status))} · ${escape(score)}${hasScore?` · Band: ${escape(f.band??'Unavailable')}`:''}<p>Evidence strength: ${escape(f.evidenceStrength??'Unavailable')} · Claim commitment: ${escape(f.commitment?.claim1??'Unavailable')} / ${escape(f.commitment?.claim2??'Unavailable')}</p>${!hasScore?`<p>Reason: ${escape(f.notEvaluableReason??'No supported numeric result was returned.')}</p>`:''}${rules?`<ul>${rules}</ul>`:''}</div><label class="check"><input type="checkbox" ${draft.reviewed?.[index]?'checked':''}> Marked reviewed${draft.reviewed?.[index]?' in app':''}</label><label class="notes">Review notes<textarea rows="3">${escape(draft.notes?.[index]??'')}</textarea></label></article>`;
+  };
+  const sections=[['DIRECT','Direct comparisons'],['INFERENTIAL','Inferential comparisons'],['FALSE_POSITIVE','Other comparisons — AI marked false positive'],['OTHER','Unrecognized categories — review required']].map(([type,name])=>{
+    const selected=groups.filter(g=>type==='OTHER'?!['DIRECT','INFERENTIAL','FALSE_POSITIVE'].includes(g[0].finding.type):g[0].finding.type===type);
+    if(type==='OTHER'&&!selected.length)return '';
+    return `<section><h2>${name}</h2>${selected.length?selected.map(g=>g.length===1?article(g[0]):`<div class="duplicate"><p>${g.length} observations with identical quote pairs and source references. All retained below.</p>${article(g[0])}<details><summary>Other ${g.length-1} observations, including their separate explanations and scores</summary>${g.slice(1).map(article).join('')}</details></div>`).join(''):'<p>No returned findings in this category. This does not establish that the documents contain no such issue.</p>'}</section>`;
+  }).join('');
+  const coverage=list(analysis?.coverage).map((doc,i)=>{
+    const pages=list(doc.pages),sections=list(doc.sections),n=doc.document??i+1;
+    return `<li>Transcript ${n}: ${pages.length?`${pages.filter(p=>p.analysisStatus==='complete').length} of ${doc.pageCount??pages.length} PDF pages fully compared; ${pages.filter(p=>p.analysisStatus==='partial').length} partly compared`:`${sections.filter(s=>s.status==='complete').length} of ${sections.length} sections fully compared`}.</li>`;
+  }).join('');
+  const taskRows=tasks.filter(t=>t.status!=='completed').map(t=>`<tr><td>${escape(t.id)}</td><td>${escape(t.status)}</td><td>${escape(friendlyFailure(t.stopReason==='max_tokens'?'max_tokens':t.error))}</td><td>${escape(t.acceptedFindings??0)}</td><td>${escape(list(t.rejectedFindings).length)}</td></tr>`).join('');
+  const rejectedCards=rejected.map(r=>`<article class="warning"><h3>Rejected finding ${Number(r.candidateIndex)+1} · comparison ${escape(r.taskId)}</h3><p><b>Unverified — excluded from accepted findings.</b> ${escape(r.reason)}</p><div class="quotes">${['claim1','claim2'].map((key,i)=>`<div><h4>Model-proposed quote ${i+1}</h4><blockquote>${escape(r.candidate?.[key]?.original??'Missing quotation')}</blockquote></div>`).join('')}</div><p>Proposed AI category: ${escape(label(r.candidate?.type))}. This is not an accepted result.</p></article>`).join('');
+  const snapshot={schemaVersion:1,title,generatedAt,transcript1:draft.texts?.[0]??'',transcript2:draft.texts?.[1]??'',results:{findings,analysis:analysis??null,elapsedSeconds:draft.seconds??null},documents:draft.files??[],notes:draft.notes??{},reviewed:draft.reviewed??{}};
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-report-controls'; base-uri 'none'; form-action 'none'"><title>${escape(title)} — Review report</title><style>
+body{font:15px/1.55 system-ui,sans-serif;color:#18303e;background:#f4f7f9;margin:0}main{max-width:1100px;margin:auto;padding:32px}h1{font-size:32px;margin-bottom:8px}h2{margin-top:32px}h3{font-size:20px}h4{margin:12px 0 6px}.toolbar{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;justify-content:center;border-bottom:1px solid #d8e2e8}button{padding:10px 16px;border:1px solid #126d73;border-radius:8px;background:#126d73;color:white;font:inherit;cursor:pointer}.summary,.warning,article{background:white;border:1px solid #cfdee5;border-radius:12px;padding:20px;margin:16px 0}.warning{background:#fff4dc;border-color:#dfbf79}.stats{display:flex;gap:24px;flex-wrap:wrap}.badge{font-size:13px;background:#e9f3f4;padding:5px 9px;border-radius:5px}.quotes{display:grid;grid-template-columns:1fr 1fr;gap:20px}.quotes>div{min-width:0}blockquote{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f7fa;padding:16px;font-family:Georgia,serif;font-size:17px}.source,.muted{font-size:12px;color:#536879}.score{padding:12px;background:#f5f8fa}.score p{margin:5px 0}.notes{display:block;margin-top:10px}textarea{display:block;box-sizing:border-box;width:100%;font:inherit;padding:10px;border:1px solid #c6d5dd;border-radius:6px}table{border-collapse:collapse;width:100%}td,th{padding:8px;text-align:left;border-bottom:1px solid #d8e2e8}details{margin:12px 0}.duplicate{border-left:3px solid #8bb8bd;padding-left:14px}input{margin-right:6px}@media(max-width:650px){.quotes{grid-template-columns:1fr}main{padding:16px}.toolbar{flex-wrap:wrap}}@media print{body{background:white;font-size:11px}.toolbar{display:none}main{max-width:none;padding:0}article{break-inside:avoid;border-radius:0}details{display:block}details>*{display:block}blockquote{font-size:12px}textarea{height:auto;min-height:55px}.warning{border:2px solid #8a641e}h2{break-after:avoid}@page{margin:15mm}}
+</style></head><body><nav class="toolbar"><button id="print">Print / Save as PDF</button><button id="diagnostics">Download diagnostics</button><button id="html">Download report</button></nav><main><header><p class="muted">DEPOSITION REVIEW · LOCAL SNAPSHOT · ${escape(generatedAt)}</p><h1>${escape(title)}</h1><p>All returned findings, with AI labels and independent code checks shown separately.</p></header><div class="${complete?'summary':'warning'}"><strong>${complete?'All planned comparisons completed — detection completeness is not guaranteed.':status==='legacy'?'Coverage unavailable for this older saved result.':'INCOMPLETE REVIEW — do not treat this as a complete comparison.'}</strong><p>Status: ${escape(status)} · Elapsed: ${escape(elapsedLabel(draft.seconds))}</p><div class="stats"><span>${counts.DIRECT} direct</span><span>${counts.INFERENTIAL} inferential</span><span>${counts.FALSE_POSITIVE} false positive</span><span>${rejected.length} rejected</span></div><p>${findings.length} retained observations; ${groups.length} distinct exact quote/source groups. No accuracy percentage is available without independently approved expected answers.</p><ul>${coverage}</ul></div><p>The code score is a heuristic evidence-support index, not the probability of lying. No numeric score means the code cannot evaluate this comparison; it does not prove compatibility. Notes edited here do not update the saved case. Print to retain your report annotations.</p>${sections}<section><h2>Incomplete comparisons and rejected findings</h2>${taskRows?`<table><thead><tr><th>Comparison</th><th>Status</th><th>Reason</th><th>Retained</th><th>Rejected</th></tr></thead><tbody>${taskRows}</tbody></table>`:'<p>No failed or partial comparison was recorded.</p>'}${rejectedCards||'<p>No rejected findings recorded.</p>'}</section><footer><p>Generated locally from existing results. Opening or printing this report makes no AI requests. Diagnostic downloads include the source transcripts and saved responses for local debugging.</p></footer></main><script type="application/json" id="snapshot">${jsonForHtml(snapshot)}</script><script nonce="report-controls">
+const snapshot=JSON.parse(document.getElementById('snapshot').textContent);
+const download=(data,type,name)=>{const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
+let printDetails=[];window.addEventListener('beforeprint',()=>{printDetails=[...document.querySelectorAll('details')].map(el=>[el,el.open]);printDetails.forEach(([el])=>{el.open=true;});});window.addEventListener('afterprint',()=>{printDetails.forEach(([el,open])=>{el.open=open;});});
+document.getElementById('print').onclick=()=>window.print();
+document.getElementById('diagnostics').onclick=()=>download(JSON.stringify(snapshot,null,2),'application/json','deposition-review-diagnostics.json');
+document.getElementById('html').onclick=()=>{const copy=document.documentElement.cloneNode(true);document.querySelectorAll('textarea').forEach((el,i)=>{copy.querySelectorAll('textarea')[i].textContent=el.value;});document.querySelectorAll('input[type=checkbox]').forEach((el,i)=>{copy.querySelectorAll('input[type=checkbox]')[i].toggleAttribute('checked',el.checked);});copy.querySelectorAll('script[nonce]').forEach(el=>el.setAttribute('nonce','report-controls'));download('<!doctype html>'+copy.outerHTML,'text/html','deposition-review-report.html');};
+</script></body></html>`;
+}
+export function openReviewReport(snapshot, browser=window) {
+  const report=buildReviewReport(snapshot);
+  const opened=browser.open('','_blank');
+  if(!opened)throw new Error('The browser blocked the report tab. Allow pop-ups for this local app and click Review report again.');
+  opened.opener=null;opened.document.open();opened.document.write(report);opened.document.close();
+}

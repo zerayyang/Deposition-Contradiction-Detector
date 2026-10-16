@@ -16,7 +16,7 @@ export async function runAnalysis(body,plan,{signal,onEvent=()=>{},fetchImpl=fet
   const abort=()=>{void reader.cancel();};signal?.addEventListener('abort',abort,{once:true});
   try{
     for(;;){signal?.throwIfAborted();const {value,done}=await reader.read();buffer+=decoder.decode(value??new Uint8Array(),{stream:!done});
-      let at;while((at=buffer.indexOf('\n'))>=0){signal?.throwIfAborted();const line=buffer.slice(0,at);buffer=buffer.slice(at+1);if(!line.trim())continue;const event=JSON.parse(line);if(event.event==='error')throw new Error(event.error);onEvent(event);if(event.event==='result')result=event;}
+      let at;while((at=buffer.indexOf('\n'))>=0){signal?.throwIfAborted();const line=buffer.slice(0,at);buffer=buffer.slice(at+1);if(!line.trim())continue;const event=JSON.parse(line);if(event.event==='error')throw new Error(event.error);await onEvent(event);if(event.event==='result')result=event;}
       signal?.throwIfAborted();if(done)break;
     }
     if(buffer.trim()||!result)throw new Error('Connection ended before the final result. Retained checkpoints are partial, not complete.');

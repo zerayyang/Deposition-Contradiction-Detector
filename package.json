@@ -15,7 +15,10 @@
     "tests:unit": "node --test tests/author/*.test.mjs tests/verifier/*.test.mjs",
     "tests:level2": "node tests/author/level2.mjs",
     "tests:author:level2": "node tests/author/level2.mjs",
-    "tests:documents": "node --test tests/long-documents/*.test.mjs src/lib/*.test.js"
+    "tests:documents": "node --test tests/long-documents/*.test.mjs src/lib/*.test.js",
+    "start": "node server/server.js",
+    "tests:reliability": "node --test tests/reliability/*.test.mjs server/contextReliability.test.js src/lib/recovery.test.js",
+    "tests:load": "node tests/reliability/load.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

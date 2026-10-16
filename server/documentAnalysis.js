@@ -125,11 +125,19 @@ function findingKey(c) {
   const locations=Object.fromEntries(Object.entries(c.sourceBindings??{}).map(([key,binding])=>[key,{status:binding.status,ids:(binding.selected?[binding.selected]:binding.alternatives).map(m=>m.id)}]));
   return JSON.stringify([c.type,literal(c.claim1),literal(c.claim2),locations]);
 }
-export async function executePlan({plan,texts,instructions,callModel,signal,onEvent=()=>{}}) {
+export async function executePlan({plan,texts,instructions,callModel,signal,onEvent=()=>{},resume=null}) {
+  const started=performance.now();
   const quoteMaps=[null,null]; // Build an offset map only when an exact PDF quote needs layout recovery.
-  const findings=new Map(),topics=new Set(),tasks=plan.pairs.map(p=>({...p,status:'pending'})),usage={input_tokens:0,output_tokens:0},issues=[];
-  let completed=0,attempted=0,cancelled=false,duplicatesCombined=0;
-  const snapshot=status=>({topicsReviewed:[...topics],contradictions:[...findings.values()],analysis:{status,planId:plan.id,duplicatesCombined,planned:tasks.length,attempted,completed,failed:tasks.filter(t=>t.status==='failed').length,partial:tasks.filter(t=>t.status==='partial').length,tasks:tasks.map(t=>({...t})),usage:{...usage,unavailableRequests:tasks.filter(t=>t.attempted&&!t.usageReported).length},issues:[...issues],
+  if(resume&&resume.analysis?.planId!==plan.id)throw new Error('Saved progress belongs to a different plan.');
+  const findings=new Map((resume?.contradictions??[]).map(f=>[findingKey(f),structuredClone(f)]));
+  const topics=new Set(resume?.topicsReviewed??[]),usage={input_tokens:resume?.analysis?.usage?.input_tokens??0,output_tokens:resume?.analysis?.usage?.output_tokens??0},issues=[];
+  const tasks=plan.pairs.map(p=>{
+    const old=resume?.analysis?.tasks?.find(t=>t.id===p.id);
+    if(old?.status==='completed'&&!resume.analysis.issues?.some(issue=>issue.pairId===p.id))return structuredClone(old);
+    return {...p,status:'pending',...(old?{previousAttempts:[...(old.previousAttempts??[]),structuredClone({...old,previousAttempts:undefined})]}:{})};
+  });
+  let completed=tasks.filter(t=>t.status==='completed').length,attempted=resume?.analysis?.attempted??0,cancelled=false,duplicatesCombined=resume?.analysis?.duplicatesCombined??0;
+  const snapshot=status=>({topicsReviewed:[...topics],contradictions:[...findings.values()],analysis:{status,planId:plan.id,timing:{elapsedMs:Math.round((resume?.analysis?.timing?.elapsedMs??0)+performance.now()-started)},duplicatesCombined,planned:tasks.length,attempted,completed,failed:tasks.filter(t=>t.status==='failed').length,partial:tasks.filter(t=>t.status==='partial').length,tasks:tasks.map(t=>({...t})),usage:{...usage,unavailableRequests:tasks.filter(t=>t.attempted&&!t.usageReported).length},issues:[...issues],
     coverage:plan.chunks.map((chunks,i)=>{
       const sections=chunks.map(c=>{
         const related=tasks.filter(t=>(i===0?t.a:t.b)===c.id);
@@ -144,19 +152,24 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
       })??null;
       return {document:i+1,pageCount:plan.manifests[i]?.pageCount??null,totalCharacters:texts[i].length,sections,pages};
     }),
+    provenance:{model:plan.model.id,promptSha256:digest(instructions),pipelineVersion:'durable-context-v1'},
     notice:'Coverage lists planned ranges and completed comparison counts. It is not a guarantee that the model found every issue.'}});
-  onEvent({event:'start',plan:previewPlan(plan)});
+  await onEvent({event:'start',plan:previewPlan(plan)});
   for(const task of tasks) {
+    if(task.status==='completed')continue;
     if(signal?.aborted){cancelled=true;break;}
-    task.status='running';task.attempted=true;attempted++;onEvent({event:'progress',task:{...task},attempted,completed,total:tasks.length});
+    task.status='running';task.startedAt=new Date().toISOString();task.attempted=true;attempted++;await onEvent({event:'progress',task:{...task},attempted,completed,total:tasks.length,analysis:snapshot('running').analysis});
     try {
       const a=plan.chunks[0][task.a],b=plan.chunks[1][task.b];
+      const modelStarted=performance.now();
       const message=await callModel({model:MODEL.id,max_tokens:outputBudget(plan),system:instructions,messages:[{role:'user',content:userContent(a,b,plan.mode!=='single')}]},{signal,maxRetries:0,...(plan.mode==='single'?{}:{timeout:600000})});
+      task.modelDurationMs=Math.round(performance.now()-modelStarted);
       task.usageReported=Number.isFinite(message.usage?.input_tokens)&&Number.isFinite(message.usage?.output_tokens);
       task.stopReason=message.stop_reason??null;
       task.contentBlockTypes=(message.content??[]).map(block=>block.type);
       task.usage={...message.usage};task.outputTokenLimit=outputBudget(plan);
       task.rawText=message.content?.filter(b=>b.type==='text').map(b=>b.text).join('')??'';
+      task.responseSha256=digest(task.rawText);
       usage.input_tokens+=message.usage?.input_tokens??0;usage.output_tokens+=message.usage?.output_tokens??0;
       const parsed=parseModelMessage(message);
       task.response=parsed; // Never erase the original model claims from the audit trail.
@@ -195,17 +208,18 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
         task.status=task.acceptedFindings?'partial':'failed';
         task.error=`${task.rejectedFindings.length} finding(s) failed source grounding or processing; ${task.acceptedFindings} retained. See rejected finding reasons.`;
       }else{task.status='completed';completed++;}
-      // Keep raw/model claims when layout mapping or rejection requires an audit.
-      if(!task.rejectedFindings.length&&!task.grounding.length){delete task.response;delete task.rawText;}
+      // Preserve provider text and its digest for every task, including empty findings.
+      task.responseSha256=digest(task.rawText);
     }catch(error){
       task.error=error.message;
       if(signal?.aborted){task.status='cancelled';cancelled=true;break;}
       task.status='failed';
     }
-    onEvent({event:'checkpoint',...snapshot('running')});
+    task.durationMs=Date.now()-Date.parse(task.startedAt);
+    await onEvent({event:'checkpoint',...snapshot('running')});
   }
   cancelled ||= Boolean(signal?.aborted);
   for(const task of tasks)if(task.status==='pending')task.status=cancelled?'cancelled':'not_attempted';
   const status=cancelled?'cancelled':completed===tasks.length&&!issues.length?'complete':completed||tasks.some(t=>t.status==='partial')?'partial':'failed';
-  const result=snapshot(status);onEvent({event:'result',...result});return result;
+  const result=snapshot(status);await onEvent({event:'result',...result});return result;
 }

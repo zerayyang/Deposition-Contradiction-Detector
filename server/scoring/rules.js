@@ -1,3 +1,4 @@
+import { conditionalAssertion } from "../sourceContext.js";
 import { compareStructuredTimes } from "./timeExpressions.js";
 import { locationAssertion, compareLocations } from "./locations.js";
 import { SCORING_CONFIG } from "./config.js";
@@ -9,7 +10,7 @@ const verified = (id, fields, verdict, explanation, config, extra = {}) => resul
     strength: verdict === "CONFLICT" ? config.explicitStrength : 0, ...extra });
 const clauseWith = (fact, pattern) => clauses(fact.original).find(c => pattern.test(normalize(c.text)))?.text.trim() ?? null;
 const blocked = (context) => context.mismatch || context.personMismatch;
-const hypothetical = /\b(?:if|unless|suppose|supposing|assuming|hypothetically|would|wouldn't)\b/;
+
 const timeOf = (fact, context, side, config, parse = parseTimeRange) => {
     if (!fact.time) return null;
     // Include only value qualifiers from the clause containing the extracted time.
@@ -171,7 +172,7 @@ function locationActivity(f1,f2,context,config) {
         // Source sentences retain negation/conditions omitted by a short model excerpt.
         const homeSource=normalize(home.sourceStatement || homeClause);
         const exitSource=normalize(out.sourceStatement || exitClause);
-        if(hypothetical.test(homeSource)||hypothetical.test(exitSource))return unknown(id,fields,"A conditional or hypothetical statement does not establish an actual home/departure assertion.");
+        if(conditionalAssertion(home)||conditionalAssertion(out))return unknown(id,fields,"A conditional or hypothetical statement does not establish an actual home/departure assertion.");
         if(/\b(?:except|mostly|apart from|other than)\b/.test(homeSource))return unknown(id,fields,"An explicit exception prevents verifying uninterrupted home presence.");
         const negatedHome=/\b(?:not|wasn't|weren't|isn't|aren't|never)\s+(?:always\s+|continuously\s+)?(?:at\s+)?home\b|\b(?:didn't|did not|don't|do not|never)\s+(?:stay|remain|be)\s+(?:at\s+)?home\b|\b(?:not true|isn't true|wasn't true|weren't true|never said|didn't say|did not say)\b/;
         if(negatedHome.test(homeSource))return unknown(id,fields,"The home assertion is negated or denied; continuous presence is not established.");
@@ -245,7 +246,7 @@ export function evaluateRules(fact1,fact2,context,config=SCORING_CONFIG){
         });
     }
     // An extracted number/action cannot turn a hypothetical into an actual assertion.
-    if([fact1,fact2].some(fact=>hypothetical.test(normalize(fact.sourceStatement || fact.original)))){
+    if([fact1,fact2].some(fact=>conditionalAssertion(fact))){
         return RULE_REGISTRY.map(rule=>{
             const evaluation=rule(fact1,fact2,context,config);
             return unknown(evaluation.id,evaluation.fieldsUsed,"Conditional or hypothetical source testimony cannot establish a factual comparison.");

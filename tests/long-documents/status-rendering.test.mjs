@@ -18,5 +18,5 @@ test('rendered mixed outcome shows partial counts and actionable failure without
 });
 test('running view waits for timing and unverified-source review stays visible',()=>{
  const html=renderToStaticMarkup(createElement(Component,{analysis:{status:'running',planned:2,completed:0,issues:[{pairId:'0:0',reason:'unverified'}]},active:true,elapsed:10}));
- assert.match(html,/Calculating time remaining/);assert.match(html,/findings need source review/);
+ assert.match(html,/Waiting for the first comparison/);assert.match(html,/findings need source review/);
 });

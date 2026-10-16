@@ -64,3 +64,19 @@ test('layout recovery cannot promote an examiner question into witness evidence'
  const result=await executePlan({plan:buildPlan([text,other],[document(text)],'rules'),texts:[text,other],instructions:'rules',callModel:async()=>message([candidate('I signed the north lease.','I never signed the north lease.')])});
  assert.equal(result.contradictions[0].claim1Valid,false);assert.equal(result.contradictions[0].score,null);assert.equal(result.analysis.status,'partial');
 });
+
+test('confirmed repeated page furniture maps a continued answer across a PDF boundary without changing words',async()=>{
+ const pageTexts=[
+ '1 CONFIDENTIAL - SAMPLE WITNESS\n2 Q Describe the decision.\n3 A The price was high.\n4 More detail.\nPage 10\nReporting Company\n123-456-7890\nFILED: Court filing',
+ '1 CONFIDENTIAL - SAMPLE WITNESS\n2 I agreed to lower it.\n3 Q Why?\n4 A It needed review.\nPage 11\nReporting Company\n123-456-7890\nFILED: Court filing',
+ '1 CONFIDENTIAL - SAMPLE WITNESS\n2 Q Anything else?\n3 A No.\n4 Q Finished?\n5 A Yes.\nPage 12\nReporting Company\n123-456-7890\nFILED: Court filing'];
+ // The contiguous comparison crosses only reporting metadata, not More detail.
+ pageTexts[0]=pageTexts[0].replace('3 A The price was high.\n4 More detail.','3 Q What happened then?\n4 A The price was high.');
+ let offset=0;const pages=pageTexts.map((text,i)=>{if(i)offset+=2;const p={pdfPage:i+1,pageLabel:String(i+10),start:offset,end:offset+text.length,status:'TEXT'};offset=p.end;return p;});
+ const text=pageTexts.join('\n\n'),extraction={textSha256:digest(text),textLength:text.length,pageCount:3,pages};
+ const got=groundPdfClaim(claim('The price was high. I agreed to lower it.'),text,pdfQuoteMap(text,extraction),{start:0,end:text.length,text});
+ assert.equal(got.audit.method,'PDF_LAYOUT_MAPPED');assert.match(got.claim.original,/Page 10/);assert.match(got.claim.original,/CONFIDENTIAL/);
+ assert.equal(text.slice(got.audit.start,got.audit.end),got.claim.original);
+ const unique={...extraction,pages:pages.slice(0,2)};
+ assert.throws(()=>groundPdfClaim(claim('The price was high. I agreed to lower it.'),text,pdfQuoteMap(text,unique),{start:0,end:text.length,text}),/grounded/);
+});

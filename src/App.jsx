@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { openReviewReport } from "./lib/reviewReport.js";
+import RecoveryPanel from "./RecoveryPanel.jsx";
+import { recoveredDraft, recoveryRequest, beginAnalysisDraft } from "./lib/recovery.js";
 import AnalysisStatus from "./AnalysisStatus.jsx";
 import AuthGate from "./SupabaseCases.jsx";
 import { supabase } from "./lib/supabaseClient.js";
 import { readTranscriptDocument } from "./lib/readTranscript.js";
 import { analysisBody, previewAnalysis, runAnalysis } from "./lib/analysisClient.js";
 import { checkFileBudget } from "../shared/documentLimits.js";
-import { createDocumentStore } from "./lib/documentStore.js";
+import { documentMetadata, createDocumentStore } from "./lib/documentStore.js";
 import { createCaseStore } from "./lib/caseStore.js";
 import { ReviewCard, ScoreGuide } from "./ReviewCard.jsx";
 import { TRANSCRIPT_1, TRANSCRIPT_2 } from "./sampleTranscripts.js";
@@ -91,6 +94,7 @@ function Dashboard({ session }) {
   const [pendingPlan, setPendingPlan] = useState(null);
   const [preparing, setPreparing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState("");
+  const [reportError, setReportError] = useState("");
   const [analysisTiming, setAnalysisTiming] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
@@ -102,7 +106,11 @@ function Dashboard({ session }) {
   const inFlight = useRef(false);
   const draft = drafts[activeId] ?? blankDraft();
   const caseTitle = activeId === "sample" ? "Marcus Webb" : cases.find(row => row.id === activeId)?.title ?? "Untitled case";
-  const updateDraft = (id, values) => setDrafts(previous => ({ ...previous, [id]: { ...(previous[id] ?? blankDraft()), ...values } }));
+  const updateDraft = useCallback((id, values) => setDrafts(previous => ({ ...previous, [id]: { ...(previous[id] ?? blankDraft()), ...values } })),[]);
+  const apiFetch=useCallback(async(url,options={})=>{
+    const {data,error}=await supabase.auth.getSession();if(error||!data.session)throw new Error('Sign in again before analyzing.');
+    return fetch(url,{...options,headers:{...options.headers,Authorization:`Bearer ${data.session.access_token}`}});
+  },[]);
   const patch = values => updateDraft(activeId, { ...values, dirty: true });
   const blocked = loading || preparing || Boolean(pendingPlan) || saving || opening || caseBusy || deleting || uploading || readingFile;
 
@@ -116,6 +124,7 @@ function Dashboard({ session }) {
   async function persist(id, snapshot) {
     await store.save(id, snapshot);
     updateDraft(id, { dirty: false });
+    setSaveError("");
   }
   async function uploadOriginal(index, text, chosen, extraction, options) {
     if (loading || saving || opening || caseBusy || deleting || uploading || uploadLock.current) throw new Error("Please wait for the current action to finish.");
@@ -135,10 +144,7 @@ function Dashboard({ session }) {
       await store.save(activeId, next);
       committed = true;
       updateDraft(activeId, { ...next, dirty: false });
-      if (previous?.path) {
-        try { await documents.remove(activeId, previous); }
-        catch { setCaseError("The new file is saved. Its older original could not be cleaned up; deleting this case will retry cleanup."); }
-      }
+      if (previous?.path) setCaseError("The replaced original was kept privately for older analysis recovery. Deleting this case removes its originals.");
     } catch (err) {
       if (uploaded && !committed) {
         try { await documents.remove(activeId, uploaded); }
@@ -207,6 +213,8 @@ function Dashboard({ session }) {
     if (!deleteTarget || blocked || deleteLock.current) return;
     deleteLock.current = true; setDeleting(true); setDeleteError("");
     try {
+      const recovery=await recoveryRequest(apiFetch,`?caseId=${encodeURIComponent(deleteTarget.id)}`);
+      for(const job of recovery.jobs)await recoveryRequest(apiFetch,`/${job.id}`,{method:'DELETE'});
       await store.remove(deleteTarget.id);
       try { await documents.removeCaseFiles(deleteTarget.id); }
       catch { setCaseError("The case was deleted, but some original files could not be cleaned up. Storage cleanup needs to be retried."); }
@@ -228,55 +236,68 @@ function Dashboard({ session }) {
     const { error: failure } = await supabase.auth.signOut();
     if (failure) setCaseError(failure.message);
   }
-  async function prepareAnalysis() {
+  async function prepareAnalysis(resumeJobId=null,recoveryRecord=null) {
     if(blocked || inFlight.current) return;
     if(activeId === "sample") { setError("Save this sample as a case before analyzing."); return; }
     setPreparing(true); setError("");
     const controller = new AbortController(); request.current = controller;
     try {
-      const body=analysisBody(draft.texts,draft.files);
-      const plan=await previewAnalysis(body,{signal:controller.signal});
+      const source=recoveryRecord?recoveredDraft(draft,recoveryRecord):draft;
+      const body={...analysisBody(source.texts,source.files),caseId:activeId,originalDocuments:source.files.map(documentMetadata),...(resumeJobId?{resumeJobId}:{})};
+      const plan=await previewAnalysis(body,{signal:controller.signal,fetchImpl:apiFetch});
       if(!Number.isInteger(plan.requestCount)||plan.requestCount<1||typeof plan.id!=="string")throw new Error("The server returned an invalid analysis plan.");
-      setPendingPlan({plan,body,id:activeId});
+      setPendingPlan({plan,body,id:activeId,snapshot:source});
     } catch(err) {if(err.name !== "AbortError") setError(err.message);}
     finally {setPreparing(false);}
   }
   async function analyze() {
     if(inFlight.current || !pendingPlan) return;
-    const {plan,body,id}=pendingPlan; setPendingPlan(null); inFlight.current=true;
+    const {plan,body,id,snapshot:source}=pendingPlan; setPendingPlan(null); inFlight.current=true;
     const controller=new AbortController();request.current=controller;
     setAnalysisTiming(null);setLoading(true);setSaveError("");setError("");setElapsed(0);setFilter("ALL");
     setAnalysisProgress(`0 of ${plan.requestCount} comparisons completed`);
-    const start=performance.now();let latest=null,latestProgress=null;
+    const base=beginAnalysisDraft(source,plan.resuming);
+    const start=performance.now();let latest=null,latestProgress=null,runStarted=false;
     timer.current=setInterval(()=>setElapsed(Math.floor((performance.now()-start)/1000)),1000);
     try {
       // Save complete source inputs before any paid call. Failed saves block analysis.
-      await persist(id,draft);controller.signal.throwIfAborted();
-      updateDraft(id,{results:null,analysis:{status:"running",planned:plan.requestCount,completed:0,attempted:0,failed:0},seconds:null,reviewed:{},notes:{},dirty:true});
-      const data=await runAnalysis(body,plan,{signal:controller.signal,onEvent:event=>{
-        if(event.event === 'progress') {latestProgress=event;updateDraft(id,{analysis:{...(latest?.analysis ?? {status:'running',planned:plan.requestCount,failed:0}),completed:event.completed,attempted:event.attempted}});setAnalysisProgress(`${event.completed} of ${event.total} comparisons completed · request ${event.attempted}`);}
+      await persist(id,source);controller.signal.throwIfAborted();
+      updateDraft(id,{...base,results:base.results,analysis:{...base.analysis,status:"running",planned:plan.totalRequestCount??plan.requestCount,completed:(plan.totalRequestCount??plan.requestCount)-plan.requestCount,attempted:0,failed:0,partial:0},seconds:null,dirty:true});
+      const data=await runAnalysis(body,plan,{signal:controller.signal,fetchImpl:apiFetch,onEvent:async event=>{
+        if(event.event==='start'||event.event==='progress')runStarted=true;
+        if(event.event === 'progress') {latestProgress=event;updateDraft(id,{analysis:event.analysis??{...(latest?.analysis ?? {status:'running',planned:plan.requestCount,failed:0}),completed:event.completed,attempted:event.attempted}});setAnalysisProgress(`${event.completed} of ${event.total} comparisons completed · request ${event.attempted}`);}
         if(event.event === 'checkpoint' || event.event === 'result') {
           latest=event;
-          setAnalysisTiming({processed:event.analysis.completed + event.analysis.failed + (event.analysis.partial ?? 0),elapsed:(performance.now()-start)/1000});
+          const processed=event.analysis.completed+event.analysis.failed+(event.analysis.partial??0);
+          setAnalysisTiming({processed,processedThisRun:processed-((plan.totalRequestCount??plan.requestCount)-plan.requestCount),remaining:event.analysis.planned-processed,elapsed:(performance.now()-start)/1000});
           updateDraft(id,{results:event.contradictions,analysis:event.analysis,seconds:(performance.now()-start)/1000,dirty:true});
           setAnalysisProgress(`${event.analysis.completed} of ${event.analysis.planned} comparisons completed · ${event.analysis.failed} failed`);
+          try{await persist(id,{...base,results:event.contradictions,analysis:event.analysis,seconds:(performance.now()-start)/1000});}
+          catch(e){setSaveError(`Cloud save failed: ${e.message}. The server checkpoint remains available under Saved analysis recovery.`);}
         }
       }});
       const order={DIRECT:0,INFERENTIAL:1,FALSE_POSITIVE:2},severity={HIGH:0,MEDIUM:1,LOW:2};
-      const completed={...draft,results:[...data.contradictions].sort((a,b)=>(order[a.type]??3)-(order[b.type]??3)||(severity[a.severity]??3)-(severity[b.severity]??3)),analysis:data.analysis,seconds:(performance.now()-start)/1000,reviewed:{},notes:{},selected:0};
+      const sorted=[...data.contradictions].sort((a,b)=>(order[a.type]??3)-(order[b.type]??3)||(severity[a.severity]??3)-(severity[b.severity]??3));
+      const completed={...recoveredDraft(base,{id:data.analysis.jobId,state:data.analysis.status,texts:source.texts,originalDocuments:source.files,result:{...data,contradictions:sorted}}),seconds:(performance.now()-start)/1000};
       updateDraft(id,{...completed,dirty:true});
       try{await persist(id,completed);}catch(err){setSaveError(`Results retained in this tab but not saved: ${err.message}. Click Save case.`);}
       if(data.analysis.status !== 'complete')setError(`Analysis ${data.analysis.status}. Review completed comparisons and failed sections; this is not a complete review.`);
     } catch(err) {
+      if(!runStarted&&!latest){updateDraft(id,source);setError(`Analysis did not start: ${err.message}. Previous results and documents were kept.`);return;}
       const status=controller.signal.aborted?'cancelled':latest?'partial':'failed';
-      const analysis={...(latest?.analysis??{planned:plan.requestCount,completed:0,attempted:0,failed:0}),status,attempted:latestProgress?.attempted??latest?.analysis?.attempted??0,
+      const analysis={...(latest?.analysis??latestProgress?.analysis??{planned:plan.requestCount,completed:0,attempted:0,failed:0}),status,attempted:latestProgress?.attempted??latest?.analysis?.attempted??0,
         tasks:latest?.analysis?.tasks?.map(t=>['running','pending'].includes(t.status)?{...t,attempted:t.attempted||t.id===latestProgress?.task?.id,status:controller.signal.aborted?'cancelled':'not_attempted'}:t),
         interruption:err.message,notice:'Final completion was not received. In-flight provider work may still be billed.'};
-      const partial={...draft,results:latest?.contradictions??[],analysis,seconds:(performance.now()-start)/1000,reviewed:{},notes:{},selected:0};
+      const partial={...recoveredDraft(base,{id:analysis.jobId,state:status,texts:source.texts,originalDocuments:source.files,result:{analysis,contradictions:latest?.contradictions??base.results??[]}}),seconds:(performance.now()-start)/1000};
       updateDraft(id,{...partial,dirty:true});
       try{await persist(id,partial);}catch(e){setSaveError(`Partial results are in this tab only: ${e.message}. Click Save case.`);}
       setError(`Analysis ${status}. ${latest?'Completed comparison results were retained.':'No new completed comparisons were received.'} ${controller.signal.aborted?'':err.message}`);
     } finally {clearInterval(timer.current);inFlight.current=false;setLoading(false);}
+  }
+  async function recoverAnalysis(record){
+    if(record.caseId!==activeId)throw new Error('Recovery belongs to a different case.');
+    if(draft.dirty&&!window.confirm('Replace the displayed work with the saved server checkpoint? Save your edits first if needed.'))throw new Error('Recovery cancelled.');
+    const recovered=recoveredDraft(draft,record);updateDraft(activeId,recovered);await persist(activeId,recovered);
   }
   const findings = (draft.results ?? []).map((result, index) => ({ result, index }));
   const visible = findings.filter(({ result }) => filter === "ALL" || result.type === filter);
@@ -295,11 +316,13 @@ function Dashboard({ session }) {
       {caseError && <p className="sidebar-error" role="alert">{caseError}</p>}
       <div className="sidebar-footer"><div className="account-avatar">{session.user.email?.slice(0,2).toUpperCase()}</div><div><span className="account-email">{session.user.email}</span><button className="link-button" disabled={blocked} onClick={signOut}>Sign out</button></div></div>
     </aside>
-    <main className="workspace-main"><header className="workspace-header"><div><span className="eyebrow">TESTIMONY REVIEW</span><div className="case-title"><h1>{caseTitle}</h1><span className="private-badge">♙ Private case</span></div><p>Deposition review</p></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save sample as case" : "Save case"}</button>{activeId !== "sample" && <CaseActions disabled={blocked} onDelete={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }} />}</div></header>
-      {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review before paid analysis</h2><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p><p>Every section is compared across both documents, including differently ordered sections. Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start {pendingPlan.plan.requestCount} paid request{pendingPlan.plan.requestCount===1?'':'s'}</button></div>}
+    <main className="workspace-main"><header className="workspace-header"><div><span className="eyebrow">TESTIMONY REVIEW</span><div className="case-title"><h1>{caseTitle}</h1><span className="private-badge">♙ Private case</span></div><p>Deposition review</p></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked || !draft.analysis && !Array.isArray(draft.results)} onClick={() => { try { openReviewReport({title:caseTitle,draft}); setReportError(""); } catch (err) { setReportError(err.message); } }}>Review report</button><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save sample as case" : "Save case"}</button>{activeId !== "sample" && <CaseActions disabled={blocked} onDelete={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }} />}</div></header>
+      {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review before paid analysis</h2><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p><p>{pendingPlan.plan.resuming?"Only unfinished comparisons will run again. Previously completed comparisons are retained.":"Every section is compared across both documents, including differently ordered sections."} Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start {pendingPlan.plan.requestCount} paid request{pendingPlan.plan.requestCount===1?'':'s'}</button></div>}
       <AnalysisStatus analysis={draft.analysis} active={loading} elapsed={loading ? elapsed : draft.seconds} timing={analysisTiming} />
-      <section className="documents-toolbar" aria-label="Transcript documents">{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onOpen={file => documents.download(activeId, file)} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}<div className="analyze-block"><button className="analyze-button" disabled={blocked} onClick={prepareAnalysis}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : "Review analysis cost"}</button><p role="status">{loading ? `◌ ${elapsed}s elapsed · ${analysisProgress}` : draft.seconds !== null ? `${draft.analysis?.status ?? (draft.results ? "Completed (legacy)" : "Request ended")} · ${draft.seconds.toFixed(1)} seconds` : "Ready when you are"}</p><small>Analysis sends these texts to Anthropic.</small>{(loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div></section>
+      <RecoveryPanel caseId={activeId} disabled={blocked} fetchImpl={apiFetch} onRecover={recoverAnalysis} onResume={prepareAnalysis} />
+      <section className="documents-toolbar" aria-label="Transcript documents">{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onOpen={file => documents.download(activeId, file)} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}<div className="analyze-block"><button className="analyze-button" disabled={blocked} onClick={()=>prepareAnalysis()}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : "Review analysis cost"}</button><p role="status">{loading ? `◌ ${elapsed}s elapsed · ${analysisProgress}` : draft.seconds !== null ? `${draft.analysis?.status ?? (draft.results ? "Completed (legacy)" : "Request ended")} · ${draft.seconds.toFixed(1)} seconds` : "Ready when you are"}</p><small>Analysis sends these texts to Anthropic.</small>{(loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div></section>
       <p className="session-note">Transcripts and results save when you analyze. Click Save case after editing transcripts, notes or review marks. PDF and text originals save privately and reopen after refresh. PDFs need selectable text; scanned pages need OCR. Try the fictional samples: <a href="/examples/riley-morgan-first-deposition.pdf" download>First PDF</a> · <a href="/examples/riley-morgan-second-deposition.pdf" download>Second PDF</a> · <a href="/examples/expected-results.html" target="_blank" rel="noopener noreferrer">Expected results</a>.</p>
+      {reportError && <p className="error" role="alert">{reportError}</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {saveError && <p className="error" role="alert">{saveError}</p>}
       <section className="review-layout"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{findings.length}</span></div><div className="finding-filters" aria-label="Filter findings">{[["ALL","All"],["DIRECT","Direct"],["INFERENTIAL","Inferential"],["FALSE_POSITIVE","False positive"]].map(([value,text]) => <button key={value} aria-pressed={filter === value} className={filter === value ? "active" : ""} onClick={() => { setFilter(value); setCopyMessage(""); }}>{text}</button>)}</div>

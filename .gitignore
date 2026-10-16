@@ -42,3 +42,6 @@ dist-ssr
 # Unused Supabase tutorial copies; active code is in src/lib/
 /Apps.tsx
 /utils/supabase.ts
+
+# Private durable analysis records (never commit testimony)
+/.analysis-jobs/

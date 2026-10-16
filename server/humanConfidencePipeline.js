@@ -1,3 +1,4 @@
+import { boundedQuestionContext } from "./sourceContext.js";
 import { interpretValidatedTime } from "./chronoTime.js";
 import { validateClaim } from "./evidenceValidator.js";
 import { TestimonyFact } from "./TestimonyFact.js";
@@ -9,14 +10,7 @@ function sourceContext(transcript, quote, binding) {
     // Multiple answer occurrences have no unambiguous question anchor.
     if (matches.length !== 1) return {text:"", statement:"", ambiguous:binding.status !== 'BOUND'};
     const { questions: precedingQuestions, statement } = matches[0];
-    // An explicit topic/event reset cannot inherit an earlier date or daypart.
-    const resetIndex=precedingQuestions.findLastIndex(q=>/\b(?:another|different|separate)\s+(?:occasion|day|event|incident|matter)\b|\bunrelated matter\b/i.test(q));
-    const questions=precedingQuestions.slice(Math.max(0,resetIndex));
-    const current = questions.at(-1) ?? "";
-    // Carry only explicitly stated event/daypart anchors from preceding questions.
-    const dateAnchor = questions.findLast(q => /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|May|June|July|August|September|October|November|December|New Year['’]s (?:Eve|Day)|\d{4}[/-]\d{1,2}[/-]\d{1,2})\b/i.test(q));
-    const periodAnchor = questions.findLast(q => /\b(?:evening|night|morning|afternoon)\b/i.test(q));
-    return {text:[...new Set([dateAnchor,periodAnchor,current].filter(Boolean))].join(" "), statement, ambiguous:false};
+    return {text:boundedQuestionContext(precedingQuestions), statement, ambiguous:false};
 }
 
 // Orchestration preserves model metadata, but passes only validated literal facts to scoring.
@@ -34,6 +28,7 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
     for (const [fact, valid, transcript, claim, binding] of [[fact1,claim1Valid,transcript1,candidate.claim1,sourceBindings.claim1],[fact2,claim2Valid,transcript2,candidate.claim2,sourceBindings.claim2]]) {
         const source = valid ? sourceContext(transcript, claim.original, binding) : {text:"",statement:"",ambiguous:false};
         fact.context = source.text;
+        fact.sourceQuestion = binding.selected?.question ?? "";
         fact.sourceStatement = source.statement;
         fact.ambiguousSource = source.ambiguous;
     }

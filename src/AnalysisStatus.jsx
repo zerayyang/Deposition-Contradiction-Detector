@@ -1,4 +1,4 @@
-import { durationLabel, friendlyFailure, progressCounts, remainingLabel } from './lib/analysisStatus.js';
+import { elapsedLabel, friendlyFailure, progressCounts, remainingLabel } from './lib/analysisStatus.js';
 
 export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }) {
   if (!analysis) return null;
@@ -13,9 +13,9 @@ export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }
   return <section className="analysis-status" aria-label="Analysis progress">
     <div className="analysis-status-heading"><h2>{title}</h2><span>{processed} of {total} comparisons finished</span></div>
     <progress aria-label="Comparisons finished" value={processed} max={total || 1} />
-    <div className="analysis-status-stats"><span>{completed} successful</span>{failed > 0 && <span>{failed} failed</span>}{partial > 0 && <span>{partial} partly completed</span>}{Number.isFinite(elapsed) && <span>Elapsed: {durationLabel(elapsed)}</span>}</div>
+    <div className="analysis-status-stats"><span>{completed} successful</span>{failed > 0 && <span>{failed} failed</span>}{partial > 0 && <span>{partial} partly completed</span>}{Number.isFinite(elapsed) && <span>Elapsed: {elapsedLabel(elapsed)}</span>}</div>
     {remaining && <p role="status" className="analysis-remaining">{remaining}</p>}
-    {running && active && <small>Time remaining updates after each comparison. Document length and AI response speed can change the estimate.</small>}
+    {running && active && <small>An estimate appears after the first comparison, then updates as comparisons finish. Document length and AI response speed can change the estimate.</small>}
     {analysis.status !== 'complete' && <p>{running && active ? 'Results will appear as comparisons finish. The review is still in progress.' : 'This is not a complete review. Any finished results have been retained.'}</p>}
     {(coverage.length > 0 || failures.length > 0 || reviewIssues.length > 0) && <details><summary>Review details</summary>
       {coverage.map((document, index) => {
