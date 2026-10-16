@@ -51,8 +51,10 @@ continued across boundaries must retain its governing source context in later st
 Part 1 cannot infer omitted context. Original source text is always the authority.
 
 Unsupported speaker formats, ambiguous source occurrences, source-role disagreements,
-invalid JSON and unsupported interpretations must remain visible failures. Current
-source validation reuses the existing witness parser; it does not fix named speakers.
+invalid JSON and unsupported interpretations must remain visible failures. Part 2
+source handling accepts exact named roles only from trusted caller metadata; the
+model cannot assign itself witness authority. Unmapped named speakers stay unresolved.
+See SOURCE_HANDLING.md. There is no automatic cover-sheet identity inference.
 
 ## Memory and evaluation separation
 

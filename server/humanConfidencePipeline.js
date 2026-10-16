@@ -5,8 +5,8 @@ import { TestimonyFact } from "./TestimonyFact.js";
 import { scoreFacts } from "./scoring/engine.js";
 import { witnessQuoteMatches, resolveWitnessSource } from "./sourceEvidence.js";
 
-function sourceContext(transcript, quote, binding) {
-    const matches = witnessQuoteMatches(transcript, quote).filter(m=>binding.status==='BOUND'&&m.index===binding.selected.start);
+function sourceContext(transcript, quote, binding, options={}) {
+    const matches = witnessQuoteMatches(transcript, quote, options).filter(m=>binding.status==='BOUND'&&m.index===binding.selected.start);
     // Multiple answer occurrences have no unambiguous question anchor.
     if (matches.length !== 1) return {text:"", statement:"", ambiguous:binding.status !== 'BOUND'};
     const { questions: precedingQuestions, statement } = matches[0];
@@ -21,12 +21,12 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
     }
     const sourceBindings={claim1:resolveWitnessSource(transcript1,candidate.claim1,sourceOptions.claim1),
         claim2:resolveWitnessSource(transcript2,candidate.claim2,sourceOptions.claim2)};
-    const claim1Valid = validateClaim(candidate.claim1, transcript1)&&!['NOT_FOUND','ANCHOR_MISMATCH'].includes(sourceBindings.claim1.status);
-    const claim2Valid = validateClaim(candidate.claim2, transcript2)&&!['NOT_FOUND','ANCHOR_MISMATCH'].includes(sourceBindings.claim2.status);
+    const claim1Valid = validateClaim(candidate.claim1, transcript1, sourceOptions.claim1)&&!['NOT_FOUND','ANCHOR_MISMATCH'].includes(sourceBindings.claim1.status);
+    const claim2Valid = validateClaim(candidate.claim2, transcript2, sourceOptions.claim2)&&!['NOT_FOUND','ANCHOR_MISMATCH'].includes(sourceBindings.claim2.status);
     const fact1 = new TestimonyFact(claim1Valid ? candidate.claim1 : { original:"",qualifierPhrases:[] });
     const fact2 = new TestimonyFact(claim2Valid ? candidate.claim2 : { original:"",qualifierPhrases:[] });
-    for (const [fact, valid, transcript, claim, binding] of [[fact1,claim1Valid,transcript1,candidate.claim1,sourceBindings.claim1],[fact2,claim2Valid,transcript2,candidate.claim2,sourceBindings.claim2]]) {
-        const source = valid ? sourceContext(transcript, claim.original, binding) : {text:"",statement:"",ambiguous:false};
+    for (const [fact, valid, transcript, claim, binding, options] of [[fact1,claim1Valid,transcript1,candidate.claim1,sourceBindings.claim1,sourceOptions.claim1],[fact2,claim2Valid,transcript2,candidate.claim2,sourceBindings.claim2,sourceOptions.claim2]]) {
+        const source = valid ? sourceContext(transcript, claim.original, binding, options) : {text:"",statement:"",ambiguous:false};
         fact.context = source.text;
         fact.sourceQuestion = binding.selected?.question ?? "";
         fact.sourceStatement = source.statement;

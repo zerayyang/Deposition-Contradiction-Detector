@@ -13,11 +13,11 @@ export function phraseExists(original, phrase) {
     return original.includes(phrase);
 }
 
-export function validateClaim(claim, transcript) {
+export function validateClaim(claim, transcript, options={}) {
     if (!claim || typeof claim.original !== "string" || !claim.original.trim() ||
         !Array.isArray(claim.qualifierPhrases)) return false;
     // Exact text must be witness evidence, not a premise in the examiner's question.
-    if (!witnessQuoteMatches(transcript, claim.original).length) {
+    if (!witnessQuoteMatches(transcript, claim.original, options).length) {
         return false;
     }
 

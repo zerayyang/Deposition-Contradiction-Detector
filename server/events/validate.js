@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import Ajv from 'ajv';
 import {witnessQuoteMatches} from '../sourceEvidence.js';
-import {testimonyMarkers} from '../testimonyMarkers.js';
+import {parseTestimonySource} from '../testimonySource.js';
 
 export const eventSchema=JSON.parse(fs.readFileSync(new URL('./schema.v1.json',import.meta.url),'utf8'));
 const ajv=new Ajv({allErrors:true,jsonPointers:true,removeAdditional:false,useDefaults:false,coerceTypes:false});
@@ -11,16 +11,18 @@ const reserved=/^(?:score|confidence|probability|humanConfidence|evidenceScore|e
 export const documentDigest=text=>createHash('sha256').update(text).digest('hex');
 
 // Never edit or discard proposed records. Return every structural/source error.
-// Semantic interpretation, named-witness extensions and comparison belong to later stages.
-export function validateEventBundle(bundle,{documentId,text,pages=null}={}) {
+// Semantic interpretation and comparison belong to later stages.
+export function validateEventBundle(bundle,{documentId,text,pages=null,speakerRoles={}}={}) {
  const errors=[];
  const add=(path,code,message)=>errors.push({path,code,message});
  if(typeof documentId!=='string'||typeof text!=='string')return {valid:false,errors:[{path:'',code:'SOURCE_REQUIRED',message:'Supply the original document ID and text.'}],eventResults:[],coverage:null};
  if(!validateShape(bundle))return {valid:false,errors:validateShape.errors.map(e=>({path:e.dataPath,code:'SCHEMA',message:e.message})),eventResults:[],coverage:null};
  if(bundle.documentId!==documentId)add('/documentId','DOCUMENT_MISMATCH','Record belongs to another document.');
  if(bundle.documentSha256!==documentDigest(text))add('/documentSha256','DOCUMENT_CHANGED','Original text differs from the extraction input.');
- const markers=testimonyMarkers(text);
- const questionSpans=markers.flatMap((m,i)=>m.role==='Q'?[{start:m.contentStart,end:markers[i+1]?.index??text.length}]:[]);
+ let sourceIndex;
+ try{sourceIndex=parseTestimonySource(text,{speakerRoles});}
+ catch(error){return {valid:false,errors:[{path:'/speakerRoles',code:'SOURCE_OPTIONS',message:error.message}],eventResults:[],coverage:null};}
+ const questionSpans=sourceIndex.turns.filter(turn=>turn.role==='QUESTION').map(turn=>({start:turn.contentStart,end:turn.end}));
  const eventIds=new Set(),eventResults=[],sourceIds=new Set(),pageMap=new Map((Array.isArray(pages)?pages:[]).map(p=>[p.pdfPage,p]));
  if(pages!==null&&(!Array.isArray(pages)||pageMap.size!==pages.length||pages.some(p=>!Number.isInteger(p.pdfPage)||p.pdfPage<1||!Number.isInteger(p.start)||!Number.isInteger(p.end)||p.start<0||p.end<=p.start||p.end>text.length)))add('/pages','INVALID_PAGE_MAP','Page references need a valid caller-supplied extraction map.');
  const documentValid=errors.length===0;
@@ -33,7 +35,7 @@ export function validateEventBundle(bundle,{documentId,text,pages=null}={}) {
    if(sourceIds.has(source.id))add(path+'/id','DUPLICATE_ID','Source IDs must be unique within a document.');sourceIds.add(source.id);sources.set(source.id,source);
    if(source.end<=source.start||source.end>text.length||text.slice(source.start,source.end)!==source.quote)add(path,'QUOTE_MISMATCH','Offsets must reproduce the exact original quotation.');
    const inRole=source.role==='WITNESS'
-    ?witnessQuoteMatches(text,source.quote).some(m=>m.index===source.start&&source.end<=m.end)
+    ?witnessQuoteMatches(text,source.quote,{speakerRoles}).some(m=>m.index===source.start&&source.end<=m.end)
     :questionSpans.some(s=>source.start>=s.start&&source.end<=s.end);
    if(!inRole)add(path+'/role','SOURCE_ROLE','Quotation is not inside a supported source span of the declared role. Unsupported speaker formats need review.');
    if(source.pageRefs.length&&pages===null)add(path+'/pageRefs','PAGE_MAP_REQUIRED','Do not invent page numbers without an extraction map.');
@@ -44,7 +46,7 @@ export function validateEventBundle(bundle,{documentId,text,pages=null}={}) {
   }
   // A question context must actually govern an answer in the same proposed event.
   for(const question of event.sources.filter(source=>source.role==='QUESTION')){
-   const governs=event.sources.filter(source=>source.role==='WITNESS').some(source=>witnessQuoteMatches(text,source.quote).some(match=>match.index===source.start&&match.question&&question.start>=match.question.start&&question.end<=match.question.end));
+   const governs=event.sources.filter(source=>source.role==='WITNESS').some(source=>witnessQuoteMatches(text,source.quote,{speakerRoles}).some(match=>match.index===source.start&&match.question&&question.start>=match.question.start&&question.end<=match.question.end));
    if(!governs)add(base+'/sources','QUESTION_NOT_GOVERNING','Question context must govern a preserved witness source in this event.');
   }
   const resolve=(ids,path)=>ids.map(id=>{const source=sources.get(id);if(!source)add(path,'UNKNOWN_SOURCE','Every source ID must refer to this event\'s preserved sources.');return source;}).filter(Boolean);
@@ -94,6 +96,6 @@ export function validateEventBundle(bundle,{documentId,text,pages=null}={}) {
  const expectedStatus=segments.every(s=>s.status==='PROCESSED')?'COMPLETE':segments.some(s=>s.status==='PROCESSED')?'PARTIAL':'FAILED';
  if(bundle.coverage.status!==expectedStatus)add('/coverage/status','COVERAGE_STATUS','Status must reflect processed versus unprocessed ranges.');
  const accountingValid=!errors.some(error=>error.path.startsWith('/coverage')||error.code==='SOURCE_OUTSIDE_PROCESSED_RANGE');
- return {valid:errors.length===0,errors,eventResults,coverage:{totalCharacters:text.length,processedCharacters:accountingValid?processedCharacters:null,unprocessedCharacters:accountingValid?unprocessedCharacters:null,status:accountingValid?expectedStatus:'INVALID',accountingValid},
+ return {valid:errors.length===0,errors,eventResults,sourceDiagnostics:sourceIndex.diagnostics,coverage:{totalCharacters:text.length,processedCharacters:accountingValid?processedCharacters:null,unprocessedCharacters:accountingValid?unprocessedCharacters:null,status:accountingValid?expectedStatus:'INVALID',accountingValid},
   notice:'Validation checks record shape, literal sources and accounting only. It does not prove semantic labels, source truth, exhaustive event recall, matching events or numeric confidence.'};
 }

@@ -1,24 +1,10 @@
-import { testimonyMarkers } from './testimonyMarkers.js';
+import { parseTestimonySource } from './testimonySource.js';
 // Preserve literal offsets. In Q/A transcripts, only answer spans are evidence.
-export function witnessQuoteMatches(transcript, quote) {
+export function witnessQuoteMatches(transcript, quote, options={}) {
     if (typeof transcript !== "string" || typeof quote !== "string" || !quote) return [];
-    const markers = testimonyMarkers(transcript);
-    const answers = [];
-    const questions = [];
-    let question = null;
-    for (let i = 0; i < markers.length; i++) {
-        const marker = markers[i];
-        const start = marker.contentStart;
-        const end = markers[i + 1]?.index ?? transcript.length;
-        if (marker.role === "Q") {
-            question = {start, end, text:transcript.slice(start, end).trim()};
-            questions.push(question.text);
-        } else if (marker.role === "A") {
-            answers.push({start, end, question, questions:[...questions]});
-        }
-    }
-    // Plain witness-text input remains supported without inventing question context.
-    if (!markers.length) answers.push({start:0, end:transcript.length, questions:[]});
+    const answers = parseTestimonySource(transcript,options).turns
+        .filter(turn=>turn.role==='WITNESS')
+        .map(turn=>({...turn,start:turn.contentStart}));
     const matches = [];
     for (let index = transcript.indexOf(quote); index >= 0; index = transcript.indexOf(quote, index + quote.length)) {
         const answer = answers.find(span => index >= span.start && index + quote.length <= span.end);
@@ -48,7 +34,7 @@ function containsAnchor(text, anchor, start, end, map) {
 }
 export function resolveWitnessSource(transcript, claim, options={}) {
     const start=options.start??0,end=options.end??transcript.length;
-    const matches=witnessQuoteMatches(transcript,claim?.original).filter(m=>m.index>=start&&m.index+claim.original.length<=end);
+    const matches=witnessQuoteMatches(transcript,claim?.original,options).filter(m=>m.index>=start&&m.index+claim.original.length<=end);
     let eligible;
     const anchors=['sourceQuestion','sourceAnswer'].filter(k=>claim?.[k]!==null&&claim?.[k]!==undefined);
     if(anchors.some(k=>typeof claim[k]!=='string'||!claim[k].trim()))eligible=[];
@@ -57,7 +43,7 @@ export function resolveWitnessSource(transcript, claim, options={}) {
         : containsAnchor(transcript,claim[k],m.start,m.end,options.map)&&(claim[k].includes(claim.original)||options.map&&answerAnchorCoversQuote(claim[k],claim.original,options.map,transcript,m))));
     const status=!matches.length?'NOT_FOUND':!eligible.length?'ANCHOR_MISMATCH':eligible.length===1?'BOUND':'AMBIGUOUS';
     const location=m=>({id:`witness:${m.index}:${m.index+claim.original.length}`,start:m.index,end:m.index+claim.original.length,
-        answerStart:m.start,answerEnd:m.end,questionStart:m.question?.start??null,questionEnd:m.question?.end??null});
+        answerStart:m.start,answerEnd:m.end,speaker:m.speaker??null,roleOrigin:m.roleOrigin,questionStart:m.question?.start??null,questionEnd:m.question?.end??null});
     const selected=status==='BOUND'?eligible[0]:null;
     return {status,method:anchors.length?'LITERAL_CONTEXT':'UNIQUE_WITNESS_QUOTE',matchCount:matches.length,
         eligibleCount:eligible.length,selected:selected?{...location(selected),question:selected.question?.text??'',answer:transcript.slice(selected.start,selected.end).trim()}:null,
