@@ -1,7 +1,13 @@
 // Preserve source offsets. Speaker roles are caller-supplied metadata, never
 // taken from a model claim. Unknown named turns are boundaries, not testimony.
 export const normalizeSpeakerLabel=label=>label.trim().replace(/\s+/g,' ').toUpperCase();
-const courtRole=/^(?:THE\s+(?:COURT|CLERK|REPORTER)|COUNSEL|JUDGE|BAILIFF|COURT REPORTER)$/i;
+const courtRole=/^(?:(?:THE\s+)?(?:COURT(?: OFFICER| REPORTER)?|CLERK|REPORTER|VIDEOGRAPHER|STENOGRAPHER)|COUNSEL|JUDGE|BAILIFF)$/i;
+export function documentLabel(label){
+ const key=normalizeSpeakerLabel(label),compact=key.replace(/(?<=\b[A-Z]) (?=[A-Z]\b)/g,'');
+ return ['BEFORE','PEOPLEOFTHESTATEOF','VIDEOTAPEDDEPOSITIONOF','VIDEOTAPEDEPOSITIONOF'].includes(key.replace(/\s+/g,''))||/^(?:IN THE MATTER OF|COUNTY OF .+|BEFORE|FILED|BY|RE|DATED|CASE NAME|DATE OF DEPOSITION|WITNESSES?[’']? NAME|DISCLAIMER|PEOPLE OF THE STATE OF(?: .+)?|VIDEOTAPED DEPOSITION OF(?: .+)?)$/.test(compact)
+  ||/^(?:EXAMINATION )?BY (?:MR|MS|MRS|DR)\. [\p{L}\p{M} .’'-]+$/u.test(key);
+}
+const titledName=/^(?:[Mm][Rr]|[Mm][Ss]|[Mm][Rr][Ss]|[Dd][Rr])\.[ \t]+(?:[\p{Lu}][\p{L}\p{M}’'.-]*)(?:[ \t]+(?:[\p{Lu}][\p{L}\p{M}’'.-]*|de|van|von)){0,4}$/u;
 export function checkedSpeakerRoles(options={}) {
   if(!options||typeof options!=='object'||Array.isArray(options))throw new TypeError('Source options must be an object.');
   const roles=options.speakerRoles===undefined?{}:options.speakerRoles;
@@ -10,7 +16,7 @@ export function checkedSpeakerRoles(options={}) {
   for(const [label,role] of Object.entries(roles)) {
     const key=normalizeSpeakerLabel(label);
     if(!key||/[\r\n:]/.test(label)||!['WITNESS','QUESTIONER','OTHER'].includes(role))throw new TypeError('Invalid speaker label or role.');
-    if(courtRole.test(key)&&role!=='OTHER')throw new TypeError('Court and officer labels cannot be witness/questioner mappings.');
+    if((courtRole.test(key)||documentLabel(label))&&role!=='OTHER')throw new TypeError('Court and officer labels cannot be witness/questioner mappings.');
     if(/^(?:Q|A|QUESTION|ANSWER|THE WITNESS)$/.test(key))throw new TypeError('Reserved transcript labels cannot be remapped.');
     if(result.has(key)&&result.get(key)!==role)throw new TypeError('Conflicting roles for the same speaker label.');
     result.set(key,role);
@@ -36,15 +42,17 @@ export function testimonyMarkers(text,options={}) {
     // Preserve ordinary Q/A syntax unless this is an exact declared label or
     // the specific initial-plus-name form.
     if(markers.has(m.index)&&!roles.has(key)&&!(/^[QA]\.[ \t]+[\p{Lu}][\p{L}\p{M}'’.-]*$/u.test(label)))continue;
-    const known=/^(?:(?:MR|MS|MRS|DR)\.[ \t]+.+|THE[ \t]+(?:COURT|WITNESS|CLERK|REPORTER)|COUNSEL|JUDGE|BAILIFF|COURT REPORTER)$/i.test(label);
+    const documentHeading=documentLabel(label);
+    const known=titledName.test(label)||courtRole.test(key)||key==='THE WITNESS'||documentHeading;
     const upper=/^[\p{Lu}][\p{Lu}\p{M} .'’-]*$/u.test(label);
     const name=/^[\p{Lu}][\p{L}\p{M}'’.-]*(?:[ \t]+[\p{Lu}][\p{L}\p{M}'’.-]*)*$/u.test(label);
+    if(/^(?:MR|MS|MRS|DR)\./i.test(label)&&!titledName.test(label)&&!roles.has(key))continue;
     if(!known&&!upper&&!name&&!roles.has(key))continue;
     const mapped=roles.get(key);
     const role=key==='THE WITNESS'?'A':mapped==='WITNESS'?'A':mapped==='QUESTIONER'?'Q':'S';
     const roleKnown=Boolean(mapped||known);
     markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role,speaker:label,
-      speakerKey:key,roleOrigin:mapped?'CALLER_METADATA':key==='THE WITNESS'?'EXPLICIT_WITNESS':known?'COURTROOM_LABEL':'UNRESOLVED',roleKnown});
+      speakerKey:key,roleOrigin:mapped?'CALLER_METADATA':key==='THE WITNESS'?'EXPLICIT_WITNESS':documentHeading?'DOCUMENT_LABEL':known?'COURTROOM_LABEL':'UNRESOLVED',roleKnown});
   }
   return [...markers.values()].sort((a,b)=>a.index-b.index);
 }

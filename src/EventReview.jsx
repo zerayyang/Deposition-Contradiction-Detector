@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {analysisBody,previewAnalysis,runAnalysis,eventRecoveryRequest} from './lib/analysisClient.js';
 import {documentMetadata} from './lib/documentStore.js';
+import {initialSpeakerChoices,confirmedSpeakerRoles} from './lib/speakerReview.js';
 import {readApiJson} from './lib/apiResponse.js';
 
 export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,onTick,onTiming,onPlanning=()=>{},disabled}){
@@ -12,6 +13,8 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  const [roles,setRoles]=useState(()=>saved?.speakerRoles??[{},{}]);
  const [memoryEnabled,setMemoryEnabled]=useState(saved?.comparison?.provenance?.approvedMemory?.enabled??false);
  const [sameWitness,setSameWitness]=useState(saved?.sameWitnessConfirmed??false);
+ const [choices,setChoices]=useState([]);
+ const [rolesConfirmed,setRolesConfirmed]=useState(false);
  const [labels,setLabels]=useState(null),[plan,setPlan]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const controller=useRef(null),lock=useRef(false),approvalHeading=useRef(null);
  useEffect(()=>{if(plan)approvalHeading.current?.focus();},[plan]);
@@ -22,7 +25,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  async function inspect(){
   if(lock.current)return;lock.current=true;
   setError('');setBusy(true);onBusy(true);
-  try{const response=await fetchImpl('/api/events/sources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript1:draft.texts[0],transcript2:draft.texts[1]})});const data=await readApiJson(response,'Could not inspect source speakers.');setLabels(data.documents);}
+  try{const response=await fetchImpl('/api/events/sources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({transcript1:draft.texts[0],transcript2:draft.texts[1]})});const data=await readApiJson(response,'Could not inspect source speakers.');setLabels(data.documents);setChoices(initialSpeakerChoices(data.documents));setRolesConfirmed(false);}
   catch(e){setError(e.message);if(/speaker|role/i.test(e.message))setSpeakersOpen(true);}finally{lock.current=false;setBusy(false);onBusy(false);}
  }
  async function prepare(phase,continuing){
@@ -80,9 +83,9 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
   {!hasBoth&&<p className="event-hint">Add both transcripts above to begin.</p>}
   <label className="event-confirmation"><input type="checkbox" checked={sameWitness} disabled={locked||Boolean(state)&&!editingNew} onChange={e=>setSameWitness(e.target.checked)}/><span>Both transcripts are from the same witness.</span></label>
   {!sameWitness&&<p className="event-hint">Not sure? You can continue, but some checks will need review.</p>}
-  <details className="event-speakers" open={speakersOpen} onToggle={e=>setSpeakersOpen(e.currentTarget.open)}><summary>Who is speaking?</summary><p>For named speakers, choose who is giving testimony and who is asking questions.</p>
+  <details className="event-speakers" open={speakersOpen} onToggle={e=>setSpeakersOpen(e.currentTarget.open)}><summary>Who is speaking?</summary><p>Confirm the witness and questioner once for each transcript. Detailed editing is optional.</p>
    <button className="event-button-secondary" disabled={locked||Boolean(state)&&!editingNew} onClick={inspect}>Check speakers · free</button>
-   {labels?.map((doc,i)=><div className="event-speaker-group" key={i}><h3>Transcript {i+1}</h3>{doc.labels.length===0?<p>No named speakers need assigning. This does not confirm the witness’s identity.</p>:doc.labels.map(name=><label className="event-speaker-row" key={name}><span>{name}</span><select disabled={locked||Boolean(state)&&!editingNew} value={roles[i][name]??''} onChange={e=>setRoles(old=>old.map((m,n)=>n===i?{...m,[name]:e.target.value}:m))}><option value="">Choose role</option><option value="WITNESS">Giving testimony</option><option value="QUESTIONER">Asking questions</option><option value="OTHER">Other speaker</option></select></label>)}</div>)}
+   {labels&&<><div className="speaker-quick-grid">{labels.map((doc,i)=><div className="event-speaker-group" key={i}><h3>Transcript {i+1}</h3><label className="event-speaker-row"><span>Giving testimony</span><select aria-label={`Transcript ${i+1} witness`} disabled={locked||Boolean(state)&&!editingNew} value={choices[i]?.witness??''} onChange={e=>{setChoices(old=>old.map((c,n)=>n===i?{...c,witness:e.target.value}:c));setRolesConfirmed(false);}}><option value="">Choose witness</option>{doc.hasAnswers&&<option value="__QA__">Answers marked A / THE WITNESS</option>}{doc.labels.map(name=><option key={name} value={name}>{name}</option>)}</select></label><label className="event-speaker-row"><span>Asking questions</span><select aria-label={`Transcript ${i+1} questioner`} disabled={locked||Boolean(state)&&!editingNew} value={choices[i]?.questioner??'__NONE__'} onChange={e=>{setChoices(old=>old.map((c,n)=>n===i?{...c,questioner:e.target.value}:c));setRolesConfirmed(false);}}>{doc.hasQuestions&&<option value="__QA__">Questions marked Q</option>}<option value="__NONE__">No named questioner confirmed</option>{doc.labels.map(name=><option key={name} value={name}>{name}</option>)}</select></label><small>{doc.labels.length} named labels found. Headings and court staff are handled separately.</small></div>)}</div><p>All other named turns will be treated as other speech. Confirm this matches the documents; use individual roles for multiple witnesses or questioners.</p><button className="event-button-secondary" disabled={locked||Boolean(state)&&!editingNew} onClick={()=>{try{setRoles(confirmedSpeakerRoles(labels,choices));setRolesConfirmed(true);setError('');}catch(e){setError(e.message);}}}>{rolesConfirmed?'Speakers confirmed ✓':'Confirm speakers'}</button><details><summary>Edit individual roles</summary>{labels.map((doc,i)=><div className="event-speaker-group" key={i}><h3>Transcript {i+1}</h3>{doc.labels.map(name=><label className="event-speaker-row" key={name}><span>{name}</span><select disabled={locked||Boolean(state)&&!editingNew} value={roles[i][name]??''} onChange={e=>{setRoles(old=>old.map((m,n)=>n===i?{...m,[name]:e.target.value}:m));setRolesConfirmed(false);}}><option value="">Choose role</option><option value="WITNESS">Giving testimony</option><option value="QUESTIONER">Asking questions</option><option value="OTHER">Other speaker</option></select></label>)}</div>)}</details></>}
   </details>
   {!plan&&<div className="event-main-action">
    {(!state||editingNew)&&<button className="event-button-primary" disabled={locked||caseId==='sample'||!hasBoth} onClick={()=>prepare('extract',false)}>Review reading cost <span aria-hidden="true">→</span></button>}
