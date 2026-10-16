@@ -1,26 +1,34 @@
 import {parseTestimonySource} from '../testimonySource.js';
 import {assessCandidate} from '../humanConfidencePipeline.js';
-// This bridge does not add evidence rules. Only unique, literal, witness-backed
-// attributes in the existing seven-field vocabulary may enter those rules.
+import {literalActivityPhrase} from '../scoring/rules.js';
+// This bridge adds no evidence rules. Existing rules receive only literal
+// witness-backed attributes or a complete answer accepted by their activity grammar.
 const fields=['activity','time','location','person','object','quantity','state'];
-function claimFor(source,event){
+function claimFor(source,event,document,index){
  const claim={original:source.quote,qualifierPhrases:[]};
  for(const field of fields){
   const values=[...new Set((event?.attributes??[]).filter(a=>a.name===field&&a.state==='STATED'&&a.basis==='WITNESS_WORDS'&&a.sourceIds.includes(source.id)&&source.quote.includes(a.value)).map(a=>a.value))];
   claim[field+'Phrase']=values.length===1?values[0]:null;
  }
+ // Attribute names are open-ended. A complete literal answer can supply the
+ // existing activity grammar without guessing which custom attribute is an action.
+ // Cropped answers must not hide a negation, correction or qualification.
+ const turn=index.turns.find(t=>t.role==='WITNESS'&&source.start>=t.contentStart&&source.end<=t.end);
+ if(!claim.activityPhrase&&turn&&document.text.slice(turn.contentStart,turn.end).trim()===source.quote.trim()
+  &&!(event?.attributes??[]).some(a=>a.name==='activity'&&a.state==='AMBIGUOUS'))claim.activityPhrase=literalActivityPhrase(source.quote);
  claim.qualifierPhrases=(event?.qualifiers??[]).filter(q=>q.sourceId===source.id&&source.quote.includes(q.phrase)).map(q=>q.phrase);
  return claim;
 }
 export function scoreEventComparisons(comparisonResult,extractionPlan){
- const multipleWitnesses=extractionPlan.documents.some(d=>new Set(parseTestimonySource(d.text,{speakerRoles:d.speakerRoles}).turns.filter(t=>t.role==='WITNESS'&&t.speaker).map(t=>t.speaker.trim().toUpperCase())).size>1);
+ const indexes=extractionPlan.documents.map(d=>parseTestimonySource(d.text,{speakerRoles:d.speakerRoles}));
+ const multipleWitnesses=indexes.some(index=>new Set(index.turns.filter(t=>t.role==='WITNESS'&&t.speaker).map(t=>t.speaker.trim().toUpperCase())).size>1);
  return comparisonResult.comparisons.map(comparison=>{
   const variant=comparison.variants[0];
   const sources=[comparison.leftSources,comparison.rightSources].map(side=>side.filter(s=>s.role==='WITNESS'));
   const records=[variant.leftId,variant.rightId].map((id,i)=>comparisonResult.catalogs[i].find(g=>g.id===id)?.event);
   const selected=sources.map(side=>side[0]);
   if(selected.some(s=>!s))throw new Error('Comparison has no validated witness quotation.');
-  const claims=selected.map((source,i)=>claimFor(source,records[i]));
+  const claims=selected.map((source,i)=>claimFor(source,records[i],extractionPlan.documents[i],indexes[i]));
   const options=Object.fromEntries(selected.map((source,i)=>['claim'+(i+1),{start:source.start,end:source.end,speakerRoles:extractionPlan.documents[i].speakerRoles}]));
   const scored=assessCandidate({type:comparison.type,reasoning:variant.reasoning,claim1:claims[0],claim2:claims[1]},...extractionPlan.documents.map(d=>d.text),options);
   // Multiple supporting passages are kept, never stitched into fabricated text.

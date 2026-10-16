@@ -116,6 +116,13 @@ function polarity(text) {
     const bases={signed:"sign",entered:"enter",left:"leave",met:"meet",visited:"visit",called:"call",went:"go"};
     return { action:`${bases[m[2]]??m[2]} ${m[3].trim()}`,negative:Boolean(m[1]) };
 }
+// A conservative bridge for open event attributes. Reuse the same supported verb/
+// polarity grammar, returning only the literal full statement, never a new fact.
+export function literalActivityPhrase(statement){
+ if(typeof statement!=='string'||/[.!?][^\s.!?]/.test(statement)||/[.!?]\s+\S/.test(statement)
+  ||/\b(?:if|unless|except|only|without|but|and|or|while|because|although|however|said|say|told|would|could|should|to)\b/i.test(statement))return null;
+ return polarity(statement)?statement:null;
+}
 // A positive purpose clause entails movement; a purpose-limited denial does not.
 // Read the containing witness sentence so a short extraction cannot hide scope.
 function movementAssertion(fact) {

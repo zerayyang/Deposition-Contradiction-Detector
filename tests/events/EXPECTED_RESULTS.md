@@ -181,3 +181,18 @@ remain failures. Fictional zero-call recovery passes only when the entire saved 
 passes current schema and exact-source checks. A fenced response with bad citations
 must stay partial; do not call it repaired. New extraction prompt/transport versions
 require a fresh reviewed plan. No gold labels or numeric calibration changed.
+
+## Necessary-context follow-up fixtures
+
+`context-necessity.test.mjs` uses fictional Friday-presence statements with no fixed
+event attributes. Expected: existing source-derived evidence rules still work; changing
+scripted model type cannot change numeric results; genuinely unresolved occasion/identity
+continues to block scores. The instructions distinguish necessary missing facts from
+optional follow-up questions. These transport tests do not prove live classification
+accuracy and are not approved gold. No response is silently rewritten to clear uncertainty.
+
+The open-attribute activity bridge reuses the existing supported verb/polarity grammar
+only for a complete validated witness answer. Expected: literal signing opposition
+with custom document/occasion fields can reach the old rule; a crop that omits "never",
+reported speech, conditionals, purpose-limited and compound statements cannot activate
+that fallback. No scoring formula, thresholds or source quotations are rewritten.

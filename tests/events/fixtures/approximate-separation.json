@@ -1,0 +1,12 @@
+{
+  "workflow": "events-v1",
+  "phase": "extract",
+  "caseId": "10000000-0000-0000-0000-000000000030",
+  "sameWitnessConfirmed": true,
+  "speakerRoles": [
+    {},
+    {}
+  ],
+  "transcript1": "Q: What time did you arrive at the restaurant on November 4, 2025?\nA: I arrived around 6 pm.",
+  "transcript2": "Q: What time did you arrive at the restaurant on November 4, 2025?\nA: I arrived around 10 pm."
+}

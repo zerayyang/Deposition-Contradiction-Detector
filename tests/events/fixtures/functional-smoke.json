@@ -1,0 +1,12 @@
+{
+  "workflow": "events-v1",
+  "phase": "extract",
+  "caseId": "10000000-0000-0000-0000-000000000020",
+  "sameWitnessConfirmed": true,
+  "speakerRoles": [
+    {},
+    {}
+  ],
+  "transcript1": "Q: Did you sign the first form during the meeting on October 1, 2025?\nA: I never signed the first form during that meeting.\n\nQ: Did you sign the second form during the meeting on October 2, 2025?\nA: I signed the second form during that meeting.\n\nQ: What time did your shift end on October 3, 2025?\nA: My shift ended around 8 pm.",
+  "transcript2": "Q: What time did your shift end on October 3, 2025?\nA: My shift ended about 8:10 pm.\n\nQ: Did you sign the second form during the meeting on October 2, 2025?\nA: I signed the second form during that meeting.\n\nQ: Did you sign the first form during the meeting on October 1, 2025?\nA: I signed the first form during that meeting."
+}

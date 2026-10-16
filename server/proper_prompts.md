@@ -109,6 +109,8 @@ Use DIRECT when the two statements concern the same fact and cannot both be true
 - one affirms what the other denies (X vs. not-X), or
 - they state different exact values for the same single fact.
 
+An explicit universal or exhaustive assertion and a stated exception are opposing assertions when the testimony itself establishes the same subject, occasion and scope. Directness does not require the literal word "not" or identical verbs. First check whether the exception falls inside the asserted scope using the governing questions and answers. Do not downgrade such an express exclusion merely because it uses different words. If scope membership instead requires a separate supported timeline/range inference, use the inference test; if it is unresolved, preserve that uncertainty.
+
 Hedges matter in ONE way only. If the conflict exists only because two APPROXIMATE VALUES are being compared (a time, quantity, date, or duration that is itself qualified, such as "around 10," "maybe 10:30," "about ten," or "three or four"), and the conflict depends on whether their ranges overlap, the label is INFERENTIAL, never DIRECT.
 
 A hedge about how sure the witness is that something happened ("I think I went out," "I don't think I met him," "I might have") does NOT make a conflict inferential. The application's confidence score handles witness certainty separately.
@@ -128,7 +130,7 @@ Never build an inference from outside assumptions about normal behavior, how mem
 
 ### Step 6a: Evaluate timelines and mutually exclusive conditions
 
-An inferential conflict can be strong even though neither answer explicitly denies the other. Reconstruct only the sequence and intervals the testimony supports, then identify the specific overlap that makes the two accounts incompatible. Do not require opposing keywords to detect an inferential conflict, and do not downgrade it merely because it requires a reasoning step.
+Apply this timeline step only after the directness test. A stated exception to an explicit exhaustive assertion, already within its source-established scope, belongs to the directness test; do not reclassify it merely because the scope concerns time. An inferential conflict can be strong even though neither answer explicitly denies the other. Reconstruct only the sequence and intervals the testimony supports, then identify the specific overlap that makes the two accounts incompatible. Do not require opposing keywords to detect an inferential conflict, and do not downgrade it merely because it requires a reasoning step.
 
 For every timeline candidate, check:
 
@@ -150,12 +152,12 @@ In `reasoning`, express the inference in ordinary language: the first statement 
 
 ### DIRECT
 
-The statements affirm and deny the same fact, or give different exact values for it, and the conflict does not depend on comparing approximate values. Hedges about how sure the witness is do not change this label; the application's confidence score accounts for them.
+The statements affirm and deny the same fact, or give different exact values for it, and the conflict does not depend on comparing approximate values. An explicit exhaustive assertion and a directly stated exception within its source-established scope count as opposing assertions even without the literal word 'not'. Reading that exclusion is not an additional inferential step. Hedges about how sure the witness is do not change this label; the application's confidence score accounts for them.
 
 
 ### INFERENTIAL
 
-No explicit denial, but the implications cannot both be true, or the conflict only appears after reasoning about ranges, timelines, or approximate values.
+No opposing assertion under the directness test, but the implications cannot both be true, or the conflict only appears after a separate supported inference about ranges, timelines, or approximate values. Do not use this category solely because a directly stated exception to an exhaustive assertion involves a time period. If establishing that the exception lies within the period requires a further inference rather than the actual conversational frame, retain the inference test and any unresolved scope.
 
 
 ### FALSE_POSITIVE
