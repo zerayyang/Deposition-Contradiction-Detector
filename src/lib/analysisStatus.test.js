@@ -33,3 +33,16 @@ test('resumed ETA uses only newly measured work and remaining comparisons, not o
  assert.match(remainingLabel(analysis,true,60,{processed:5,processedThisRun:1,remaining:1,elapsed:60}),/About 1 min remaining/);
  assert.match(remainingLabel({...analysis,completed:4},true,1,{processed:4,processedThisRun:0,remaining:2,elapsed:1}),/Waiting for the first comparison/);
 });
+
+
+test('citation explanations expose known checks without rendering arbitrary model messages',async()=>{
+ const {citationFailureDetails,withReadingDiagnostics}=await import('./analysisStatus.js');
+ const details=citationFailureDetails({validationIssues:[{code:'SOURCE_VALIDATION',errors:[
+  {code:'QUALIFIER_NOT_LITERAL',path:'/events/0/qualifiers/0',message:'SECRET provider payload'},
+  {code:'UNKNOWN_RANDOM',path:'<script>',message:'SECRET provider payload'},
+  {code:'QUOTE_MISMATCH',path:'<script>',message:'SECRET provider payload'}
+ ]}]});
+ assert.equal(details.length,2);assert.equal(details[0].path,'/events/0/qualifiers/0');assert.equal(details[1].path,null);
+ assert.ok(!JSON.stringify(details).includes('SECRET'));assert.ok(!JSON.stringify(details).includes('<script>'));
+ const direct={id:'direct',acceptedFindings:3};assert.equal(withReadingDiagnostics({workflow:'legacy'},direct),direct);
+});

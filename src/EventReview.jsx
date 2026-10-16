@@ -1,7 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {analysisBody,previewAnalysis,runAnalysis,eventRecoveryRequest} from './lib/analysisClient.js';
 import {documentMetadata} from './lib/documentStore.js';
-import {readCloudProgress} from './lib/cloudAnalysisClient.js';
+import {readCloudProgress,resumableCloudJobId} from './lib/cloudAnalysisClient.js';
 import {initialSpeakerChoices,confirmedSpeakerRoles} from './lib/speakerReview.js';
 import {readApiJson} from './lib/apiResponse.js';
 
@@ -22,7 +22,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  useEffect(()=>()=>controller.current?.abort(),[]);
  const state=draft.analysis?.eventState;
  const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryEnabled,
-  ...(continuing&&draft.analysis?.cloudJobId&&draft.analysis?.phase===phase?{cloudJobId:draft.analysis.cloudJobId}:{}),
+  ...(continuing&&resumableCloudJobId(draft.analysis)&&draft.analysis?.phase===phase?{cloudJobId:resumableCloudJobId(draft.analysis)}:{}),
   ...(continuing&&state?{eventState:state,...(draft.analysis.eventJobId?{eventJobId:draft.analysis.eventJobId}:{})}:{})});
  async function inspect(){
   if(lock.current)return;lock.current=true;
@@ -33,7 +33,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  async function prepare(phase,continuing){
   if(lock.current)return;lock.current=true;
   setBusy(true);onBusy(true);setError('');
-  try{if(!editingNew&&draft.analysis?.cloudJobId&&draft.analysis?.phase===phase)continuing=true;const body=bodyFor(phase,continuing);const preview=await previewAnalysis(body,{fetchImpl});setPlan({preview,body});onPlanning(true);}
+  try{if(!editingNew&&resumableCloudJobId(draft.analysis)&&draft.analysis?.phase===phase)continuing=true;const body=bodyFor(phase,continuing);const preview=await previewAnalysis(body,{fetchImpl});setPlan({preview,body});onPlanning(true);}
   catch(e){setError(e.message);if(/speaker|role/i.test(e.message))setSpeakersOpen(true);}finally{lock.current=false;setBusy(false);onBusy(false);}
  }
  async function start(){

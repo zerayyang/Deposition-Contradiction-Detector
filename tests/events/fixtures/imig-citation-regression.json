@@ -1,0 +1,155 @@
+{
+  "provenance": {
+    "description": "Exact PDF.js text from two user-supplied public Terry Imig excerpt PDFs; not full depositions. No external reference findings or approved classification labels.",
+    "files": [
+      "02-imig-deposition-2-excerpt.pdf",
+      "01-imig-deposition-1-excerpt.pdf"
+    ]
+  },
+  "inputs": [
+    {
+      "text": "Deposition 2 - Testimony excerpt\n\nTerry Imig | September 3, 2015\n\nExcerpt only, reproduced from Q&A quoted in the court filing. This is not a complete deposition transcript.\nOriginal transcript reference: page 37. Located on PDF page 14 (printed page 8) of the source filing.\nQ. Okay. My question is, when you applied your brakes, was there anything about the condition of the road\nthat you believe prevented your truck from coming to a stop right away.\nA. No.\nSource: Plaintiff-Appellant's Application for Leave to Appeal, filed October 18, 2018, Menard v. Imig\n(Michigan Supreme Court No. 158563).\nOpen the original court filing",
+      "extraction": {
+        "version": 1,
+        "textSha256": "8fbdfd201309ee5e8d7bb8725ce9e214cba69ef92f671d8419a1f653af3117cb",
+        "textLength": 630,
+        "pageCount": 1,
+        "pages": [
+          {
+            "pdfPage": 1,
+            "pageLabel": "1",
+            "start": 0,
+            "end": 630,
+            "status": "TEXT"
+          }
+        ],
+        "ocrPages": [],
+        "failedPages": []
+      }
+    },
+    {
+      "text": "Deposition 1 - Testimony excerpt\n\nTerry Imig | February 11, 2015\n\nExcerpt only, reproduced from Q&A quoted in the court filing. This is not a complete deposition transcript.\nOriginal transcript reference: pages 65-66. Located on PDF page 13 (printed page 7) of the source filing.\nThe * * * omission marker appears in the source quotation.\nQ. Did you hit the brakes?\nA. Yes.\nQ. Did the condition of the road with the potholes or anything else that was on the road affect your ability to\nstop your vehicle without hitting the boy?\nA. I believe it increased my stopping distance.\n* * *\nQ. And I can only ask you based on your observation that night, either before or after this accident occurred,\nthe conditions of the road when you went to hit your brakes, if it increased your stopping distance?\nA. I'm sure it did.\nSource: Plaintiff-Appellant's Application for Leave to Appeal, filed October 18, 2018, Menard v. Imig\n(Michigan Supreme Court No. 158563).\nOpen the original court filing",
+      "extraction": {
+        "version": 1,
+        "textSha256": "4e31ca869b24aa46417a9f8d5a686dc46ea506774a9e8d78e0f4a0ed9e49eb30",
+        "textLength": 984,
+        "pageCount": 1,
+        "pages": [
+          {
+            "pdfPage": 1,
+            "pageLabel": "1",
+            "start": 0,
+            "end": 984,
+            "status": "TEXT"
+          }
+        ],
+        "ocrPages": [],
+        "failedPages": []
+      }
+    }
+  ],
+  "speakerRoles": [
+    {
+      "Source": "OTHER"
+    },
+    {
+      "Source": "OTHER"
+    }
+  ],
+  "savedResponse": {
+    "schemaVersion": 1,
+    "events": [
+      {
+        "id": "ev1",
+        "kind": "denial_of_road_condition_preventing_stop",
+        "summary": "Asked whether, when applying the brakes, anything about the road's condition prevented the truck from stopping right away, the witness answered \"No.\"",
+        "assertion": {
+          "polarity": "DENIED",
+          "sourceIds": [
+            "s1",
+            "s2"
+          ]
+        },
+        "attributes": [
+          {
+            "name": "action",
+            "state": "STATED",
+            "value": "applied your brakes",
+            "basis": "QUESTION_CONTEXT",
+            "sourceIds": [
+              "s2"
+            ]
+          },
+          {
+            "name": "vehicle",
+            "state": "STATED",
+            "value": "your truck",
+            "basis": "QUESTION_CONTEXT",
+            "sourceIds": [
+              "s2"
+            ]
+          },
+          {
+            "name": "denied_factor",
+            "state": "STATED",
+            "value": "the condition of the road",
+            "basis": "QUESTION_CONTEXT",
+            "sourceIds": [
+              "s2"
+            ]
+          },
+          {
+            "name": "date",
+            "state": "UNSTATED",
+            "value": null,
+            "basis": "NONE",
+            "sourceIds": []
+          },
+          {
+            "name": "location",
+            "state": "UNSTATED",
+            "value": null,
+            "basis": "NONE",
+            "sourceIds": []
+          }
+        ],
+        "qualifiers": [
+          {
+            "kind": "belief",
+            "phrase": "that you believe",
+            "sourceId": "s2",
+            "scope": "ASSERTION",
+            "attributeNames": []
+          }
+        ],
+        "relations": [],
+        "sources": [
+          {
+            "id": "s1",
+            "unitId": "unit:2",
+            "quote": "No.",
+            "occurrence": null
+          },
+          {
+            "id": "s2",
+            "unitId": "unit:1",
+            "quote": "Okay. My question is, when you applied your brakes, was there anything about the condition of the road\nthat you believe prevented your truck from coming to a stop right away.",
+            "occurrence": null
+          }
+        ],
+        "reviewRequired": false,
+        "unresolvedReasons": []
+      }
+    ],
+    "units": [
+      {
+        "unitId": "unit:2",
+        "status": "EVENTS",
+        "eventIds": [
+          "ev1"
+        ],
+        "reason": null
+      }
+    ]
+  }
+}

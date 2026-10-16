@@ -6,10 +6,10 @@ const caseId='11111111-1111-4111-8111-111111111111',jobId='22222222-2222-4222-82
 const response=()=>({code:200,status(n){this.code=n;return this;},json(value){this.value=value;return this;}});
 const body={caseId,transcript1:'Q: First event on Monday?\nA: I signed.\nQ: Second event on Tuesday?\nA: I left.',transcript2:'Q: First event on Monday?\nA: I signed.\nQ: Second event on Tuesday?\nA: I left.'};
 const msg=()=>({stop_reason:'end_turn',usage:{input_tokens:10,output_tokens:10},content:[{type:'text',text:JSON.stringify({topicsReviewed:['Fictional transport only'],contradictions:[]})}]});
-function setup({model=async()=>msg(),stepTimeoutMs=2000}={}){
+function setup({model=async()=>msg(),stepTimeoutMs=2000,checkRequest=null}={}){
  const objects=new Map();let calls=0;
  const store={authorize:async id=>{if(id!==caseId)throw Error('Denied');},get:async(c,j,n)=>objects.get(c+'/'+j+'/'+n)??null,put:async(c,j,n,v)=>{const key=c+'/'+j+'/'+n;if(objects.has(key))return false;objects.set(key,structuredClone(v));return true;}};
- const make=(fingerprint='fixture')=>createCloudAnalysis({instructions:'Fictional transport check.',codeFingerprint:fingerprint,storeForRequest:()=>store,legacyPlanOptions:{singleRequestBytes:1,chunkBytes:45,overlapBytes:0},callModel:async(...args)=>{calls++;return model(...args);},stepTimeoutMs});
+ const make=(fingerprint='fixture')=>createCloudAnalysis({instructions:'Fictional transport check.',codeFingerprint:fingerprint,storeForRequest:request=>{checkRequest?.(request);return store;},legacyPlanOptions:{singleRequestBytes:1,chunkBytes:45,overlapBytes:0},callModel:async(...args)=>{calls++;return model(...args);},stepTimeoutMs});
  return {objects,make,get calls(){return calls;}};
 }
 const req=value=>({identity:{id:'owner'},params:{caseId,jobId},body:value??{}});
@@ -79,4 +79,18 @@ test('the analysis button can request a fresh approval after a definite failure 
  assert.equal(resumableCloudJobId({cloudJobId:jobId,status:'partial',tasks:[{status:'partial'}]}),null);
  assert.equal(resumableCloudJobId({cloudJobId:jobId,status:'interrupted',tasks:[]}),jobId);
  assert.equal(resumableCloudJobId({cloudJobId:jobId,status:'partial',tasks:[{status:'completed'},{status:'not_attempted'}]}),jobId);
+});
+
+
+test('resume cost preview preserves Express prototype headers and original authenticated request',async()=>{
+ let expected=null;
+ const s=setup({checkRequest:request=>{if(expected){assert.equal(request,expected);assert.equal(request.headers.authorization,'Bearer fictional-test');assert.equal(request.identity.id,'owner');}}});
+ const api=s.make();await start(api);const step=response();await api.step(req(),step);
+ expected=Object.assign(Object.create({get headers(){return {authorization:'Bearer fictional-test'};}}),req({...body,cloudJobId:jobId}));
+ const originalParams=expected.params;
+ assert.equal(Object.hasOwn(expected,'headers'),false);
+ const preview=response();await api.preview(expected,preview);
+ assert.equal(preview.code,200,JSON.stringify(preview.value));
+ assert.equal(preview.value.resuming,true);assert.equal(s.calls,1);
+ assert.equal(expected.params,originalParams);
 });

@@ -66,3 +66,13 @@ For a short adopting answer such as "Yes.", quote its full supplied governing
 QUESTION unit when using question details; do not cite only its opening line
 while extracting an office, person or date from an unquoted later line. Every
 field must pass this literal self-check independently of the event summary.
+
+Qualifier provenance is WITNESS ONLY. A hedge, belief phrase or approximation in
+an examiner's QUESTION is not a witness qualifier, even when the witness answers
+Yes or No. Preserve that wording in the separate governing-question citation;
+never copy it into qualifiers or attribute it to the witness. Every qualifier's
+sourceId must identify a WITNESS source in this event and its phrase must occur
+verbatim in that witness quote. A short adopting answer does not turn the
+examiner's words into words spoken by the witness. If interpretation remains
+uncertain, preserve the answer/question separately and flag reviewRequired with
+an unresolved reason instead of inventing a witness qualifier.
