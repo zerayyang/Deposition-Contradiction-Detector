@@ -13,7 +13,7 @@ test('a malformed or truncated response is never repaired into a successful resu
 });
 
 test('provider schema shares claim definitions and stays below the 16-union compilation limit',()=>{
- const plan=buildPlan(['I signed.','I did not sign.'],[],'instructions');const schema=directRequest(plan,plan.chunks[0][0],plan.chunks[1][0],'instructions').output_config.format.schema;
+ const plan=buildPlan(['I signed.','I did not sign.'],[],'instructions',{witnessTestimonyConfirmed:[true,true]});const schema=directRequest(plan,plan.chunks[0][0],plan.chunks[1][0],'instructions').output_config.format.schema;
  const count=v=>!v||typeof v!=='object'?0:(Array.isArray(v.type)||Array.isArray(v.anyOf)?1:0)+Object.values(v).reduce((n,x)=>n+(Array.isArray(x)?x.reduce((a,y)=>a+count(y),0):count(x)),0);
  assert.ok(count(schema)<=16);assert.equal(count(schema),9);assert.equal(schema.properties.contradictions.items.properties.claim1.$ref,schema.properties.contradictions.items.properties.claim2.$ref);
 });

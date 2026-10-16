@@ -108,7 +108,7 @@ test('edited or incomplete page manifests fail closed; plain text has offsets wi
  assert.throws(()=>validateDocuments([text,'Other'],[{extraction}]),/entire/);
  assert.throws(()=>validateDocuments([text,'Other'],[{pageMappingStale:true}]),/edited/);
  assert.throws(()=>validateDocuments([text,'Other'],[{extraction:{...extraction,textSha256:'incorrect'}}]),/no longer matches/);
- assert.equal(buildPlan([text,'Other'],[],instructions).manifests[0],null);
+ assert.equal(buildPlan([text,'Other'],[],instructions,{witnessTestimonyConfirmed:[false,true]}).manifests[0],null);
 });
 
 test('client streams split UTF-8 records, rejects lost final results and cancels without a server',async()=>{

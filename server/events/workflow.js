@@ -25,7 +25,7 @@ export async function prepareEventWorkflow(body,{codeFingerprint='local-test',ma
  const sourceOptions=body.speakerRoles??[{},{}];
  if(!Array.isArray(sourceOptions)||sourceOptions.length!==2)throw new Error('Supply two reviewed speaker-role maps.');
  [body.transcript1,body.transcript2].forEach((text,i)=>requireSpeakerReview(text,sourceOptions[i]));
- const extractionPlan=buildEventExtractionPlan([body.transcript1,body.transcript2].map((text,i)=>({documentId:`transcript-${i+1}`,text,extraction:body.documents?.[i]?.extraction,pageMappingStale:body.documents?.[i]?.pageMappingStale,speakerRoles:sourceOptions[i]})),{maxRequests});
+ const extractionPlan=buildEventExtractionPlan([body.transcript1,body.transcript2].map((text,i)=>({documentId:`transcript-${i+1}`,text,extraction:body.documents?.[i]?.extraction,pageMappingStale:body.documents?.[i]?.pageMappingStale,speakerRoles:sourceOptions[i],witnessTestimonyConfirmed:body.witnessTestimonyConfirmed?.[i]??false})),{maxRequests});
  const state=body.eventState;
  // Fresh plan IDs, raw schema/source validation and comparison pipeline hashes
  // govern reuse. A deployment fingerprint alone must not force repeated charges.

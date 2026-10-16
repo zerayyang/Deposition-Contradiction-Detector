@@ -1,3 +1,4 @@
+import {requireWitnessInput} from '../testimonyMarkers.js';
 import fs from 'node:fs';
 import {providerOutputFormat} from './structuredOutput.js';
 import {decodeEventJson} from './jsonTransport.js';
@@ -30,10 +31,11 @@ export function buildEventExtractionPlan(inputs,{chunkBytes=8000,overlapBytes=10
     // Reuse the app PDF hash/page/OCR checks. Extraction validates each complete
     // document independently; no comparison or synthetic second model input.
     const manifest=validateDocuments([input.text,input.text],[input,input])[0];
+    requireWitnessInput(input.text,input);
     const index=parseTestimonySource(input.text,{speakerRoles:input.speakerRoles,manifest});
     if(index.diagnostics.some(d=>d.code==='UNKNOWN_SPEAKER'))throw new Error(`Document ${input.documentId} has unresolved speaker labels; supply reviewed speakerRoles before extraction.`);
     if(!index.turns.some(t=>t.role==='WITNESS'&&input.text.slice(t.contentStart,t.end).trim()))throw new Error(`Document ${input.documentId} has no supported witness spans.`);
-    const source={documentId:input.documentId,text:input.text,pages:structuredClone(manifest?.pages??null),speakerRoles:structuredClone(input.speakerRoles??{}),documentSha256:hash(input.text),sourceDiagnostics:index.diagnostics};
+    const source={documentId:input.documentId,text:input.text,pages:structuredClone(manifest?.pages??null),speakerRoles:structuredClone(input.speakerRoles??{}),documentSha256:hash(input.text),sourceDiagnostics:index.diagnostics,witnessTestimonyConfirmed:input.witnessTestimonyConfirmed===true};
     const turns=index.turns.map((t,i)=>({...t,id:`unit:${i}`}));
     const chunks=sectionDocument(input.text,{chunkBytes,overlapBytes,maxWitnessUnits,speakerRoles:input.speakerRoles,manifest});
     for(const chunk of chunks) {

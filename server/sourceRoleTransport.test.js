@@ -21,7 +21,7 @@ test('reviewed named speakers reach the model, source binding and deterministic 
  const f=res.body.contradictions[0];assert.equal(f.claim2Valid,true);assert.equal(f.sourceBindings.claim2.status,'BOUND');assert.equal(f.sourceBindings.claim2.selected.speaker,'PRESIDENT VALE');assert.match(f.sourceBindings.claim2.selected.question,/Monday meeting/);assert.equal(f.status,'CONFLICT_SUPPORTED');assert.equal(f.score,90);assert.equal(res.body.analysis.provenance.codeFingerprint,'fixture-build');
 });
 test('unknown speakers and model-supplied role declarations never grant witness status',async()=>{
- const plan=buildPlan([body.transcript1,body.transcript2],[],instructions);
+ const plan=buildPlan([body.transcript1,body.transcript2],[],instructions,{witnessTestimonyConfirmed:[true,true]});
  const result=await executePlan({plan,texts:[body.transcript1,body.transcript2],instructions,callModel:async()=>message({...candidate,speakerRoles:body.speakerRoles,claim2:{...candidate.claim2,speakerRoles:body.speakerRoles[1],role:'WITNESS'}})});
  const f=result.contradictions[0];assert.equal(f.claim2Valid,false);assert.equal(f.notEvaluableReason,'UNVERIFIED_SOURCE');assert.equal(f.score,null);
 });
@@ -29,9 +29,10 @@ test('role maps require explicit review, reject reserved mappings and bind plan 
  const texts=[body.transcript1,body.transcript2];
  assert.throws(()=>buildPlan(texts,[],instructions,{speakerRoles:body.speakerRoles}),/sourceRolesReviewed/);
  assert.throws(()=>buildPlan(texts,[],instructions,{speakerRoles:[{}, {'THE COURT':'WITNESS'}],sourceRolesReviewed:true}),/Court/);
- const reviewed=buildPlan(texts,[],instructions,body),unknown=buildPlan(texts,[],instructions);
+ const confirmations={witnessTestimonyConfirmed:[true,true]};
+ const reviewed=buildPlan(texts,[],instructions,{...body,...confirmations}),unknown=buildPlan(texts,[],instructions,confirmations);
  assert.notEqual(reviewed.id,unknown.id);
- const other=buildPlan(texts,[],instructions,{...body,speakerRoles:[{}, {'MS. REED':'QUESTIONER','PRESIDENT VALE':'OTHER'}]});assert.notEqual(reviewed.id,other.id);
+ const other=buildPlan(texts,[],instructions,{...body,...confirmations,speakerRoles:[{}, {'MS. REED':'QUESTIONER','PRESIDENT VALE':'OTHER'}]});assert.notEqual(reviewed.id,other.id);
 });
 test('stream recovery preserves role maps and refuses changed assignments before any new call',async t=>{
  const directory=await mkdtemp(path.join(tmpdir(),'roles-recovery-'));t.after(()=>rm(directory,{recursive:true,force:true}));

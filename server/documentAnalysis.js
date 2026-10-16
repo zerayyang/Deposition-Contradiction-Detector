@@ -1,3 +1,4 @@
+import {requireWitnessInput} from './testimonyMarkers.js';
 import {directOutputFormat} from './directOutput.js';
 import { presenceIndex } from './presenceEvents.js';
 import { createHash } from 'node:crypto';
@@ -100,6 +101,9 @@ export function buildPlan(texts,documents,instructions,options={}) {
   if(!Array.isArray(submittedRoles)||submittedRoles.length!==2)throw new Error('Supply two reviewed speaker-role maps.');
   const speakerRoles=submittedRoles.map(roles=>Object.fromEntries(checkedSpeakerRoles({speakerRoles:roles})));
   if(speakerRoles.some(roles=>Object.keys(roles).length)&&options.sourceRolesReviewed!==true)throw new Error('Confirm sourceRolesReviewed before using named speaker assignments. No witness role was guessed.');
+  const witnessTestimonyConfirmed=options.witnessTestimonyConfirmed??[false,false];
+  if(!Array.isArray(witnessTestimonyConfirmed)||witnessTestimonyConfirmed.length!==2)throw new Error('Supply two witness testimony confirmations.');
+  texts.forEach((text,i)=>requireWitnessInput(text,{speakerRoles:speakerRoles[i],witnessTestimonyConfirmed:witnessTestimonyConfirmed[i]}));
   const single=utf8Bytes(texts[0])+utf8Bytes(texts[1])<=(options.singleRequestBytes??LIMITS.singleRequestBytes);
   const contexts=texts.map((text,i)=>parseTestimonySource(text,{speakerRoles:speakerRoles[i],manifest:manifests[i]}).turns
     .filter(t=>t.role==='WITNESS'&&(!t.question||t.roleOrigin==='CALLER_METADATA'))
@@ -124,8 +128,8 @@ export function buildPlan(texts,documents,instructions,options={}) {
     conservativeBudget:round((inputTokenUpperBudget*MODEL.inputUsdPerMillion+requestCount*outputTokens*MODEL.outputUsdPerMillion)/1e6),
     estimatedInputTokens,inputTokenUpperBudget,outputTokensPerRequest:outputTokens,
     note:`Local UTF-8 estimate, not provider tokenization or a billing guarantee. Estimate assumes ${single?'2,500':'10,000'} output tokens/call; budget reserves ${outputTokens.toLocaleString('en-US')} including thinking. Standard uncached pricing; retries disabled. In-flight cancelled work can still be billed.`};
-  const id=digest(JSON.stringify({texts:texts.map(digest),manifests,...(speakerRoles.some(r=>Object.keys(r).length)?{speakerRoles}:{}),instructions:digest(instructions),transportSchema:digest(JSON.stringify(directOutputFormat)),model:MODEL,pairs,chunks:chunks.map(cc=>cc.map(c=>({...c,text:undefined}))),cost}));
-  return {id,model:MODEL,outputTokens,requestCount,mode:single?'single':'all-section-pairs',cost,chunks,pairs,manifests,speakerRoles};
+  const id=digest(JSON.stringify({texts:texts.map(digest),manifests,witnessTestimonyConfirmed,...(speakerRoles.some(r=>Object.keys(r).length)?{speakerRoles}:{}),instructions:digest(instructions),transportSchema:digest(JSON.stringify(directOutputFormat)),model:MODEL,pairs,chunks:chunks.map(cc=>cc.map(c=>({...c,text:undefined}))),cost}));
+  return {id,model:MODEL,outputTokens,requestCount,mode:single?'single':'all-section-pairs',cost,chunks,pairs,manifests,speakerRoles,witnessTestimonyConfirmed};
 }
 export function previewPlan(plan) {
   return {id:plan.id,model:plan.model,outputTokens:outputBudget(plan),requestCount:plan.requestCount,mode:plan.mode,cost:plan.cost,

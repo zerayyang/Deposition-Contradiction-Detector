@@ -3,7 +3,7 @@ import {checkedSpeakerRoles,normalizeSpeakerLabel} from '../testimonyMarkers.js'
 export function reviewableSpeakerLabels(text){
  const index=parseTestimonySource(text);
  const labels=[...new Set(index.turns.map(t=>t.speaker).filter(Boolean))].filter(label=>{try{checkedSpeakerRoles({speakerRoles:{[label]:'WITNESS'}});return true;}catch{return false;}});
- return {labels,hasAnswers:index.turns.some(t=>t.role==='WITNESS'),hasQuestions:index.turns.some(t=>t.role==='QUESTION'),diagnostics:index.diagnostics};
+ return {labels,requiresWitnessConfirmation:index.mode==='PLAIN',hasAnswers:index.mode!=='PLAIN'&&index.turns.some(t=>t.role==='WITNESS'),hasQuestions:index.turns.some(t=>t.role==='QUESTION'),diagnostics:index.diagnostics};
 }
 export function requireSpeakerReview(text,speakerRoles){
  const roles=checkedSpeakerRoles({speakerRoles});

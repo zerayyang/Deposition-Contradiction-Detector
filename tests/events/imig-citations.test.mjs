@@ -23,7 +23,8 @@ test('exact PDF text retains introductions, omitted-passage marker, footer, page
   assert.equal(index.turns[0].role,'UNATTRIBUTED');
   assert.equal(index.turns.filter(t=>t.role==='WITNESS').length,i===0?1:3);
   assert.ok(!index.diagnostics.some(d=>d.code==='UNKNOWN_SPEAKER'));
-  const footer=index.turns.find(t=>t.speaker==='Source');assert.equal(footer.role,'OTHER');
+  const footerStart=d.text.search(/^Source:/m);assert.ok(footerStart>=0);
+  const footer=index.turns.find(t=>t.start===footerStart);assert.equal(footer.role,'OTHER');assert.equal(footer.speaker,null);
   for(const t of index.turns.filter(t=>t.role==='WITNESS')){
    assert.ok(t.question);assert.ok(t.end<=footer.start);
    assert.ok(!d.text.slice(t.contentStart,t.end).includes('Plaintiff-Appellant'));

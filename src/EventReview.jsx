@@ -5,7 +5,7 @@ import {readCloudProgress,resumableCloudJobId} from './lib/cloudAnalysisClient.j
 import {initialSpeakerChoices,confirmedSpeakerRoles} from './lib/speakerReview.js';
 import {readApiJson} from './lib/apiResponse.js';
 
-export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,onTick,onTiming,onPlanning=()=>{},disabled}){
+export default function EventReview({caseId,draft,witnessTestimonyConfirmed=[false,false],fetchImpl,onCheckpoint,onBusy,onTick,onTiming,onPlanning=()=>{},disabled}){
  const saved=draft.analysis?.eventState;
  const [speakersOpen,setSpeakersOpen]=useState(false);
  const [running,setRunning]=useState(false);
@@ -21,7 +21,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  useEffect(()=>{if(plan)approvalHeading.current?.focus();},[plan]);
  useEffect(()=>()=>controller.current?.abort(),[]);
  const state=draft.analysis?.eventState;
- const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryEnabled,
+ const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,witnessTestimonyConfirmed:continuing&&state?state.witnessTestimonyConfirmed??witnessTestimonyConfirmed:witnessTestimonyConfirmed,originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryEnabled,
   ...(continuing&&resumableCloudJobId(draft.analysis)&&draft.analysis?.phase===phase?{cloudJobId:resumableCloudJobId(draft.analysis)}:{}),
   ...(continuing&&state?{eventState:state,...(draft.analysis.eventJobId?{eventJobId:draft.analysis.eventJobId}:{})}:{})});
  async function inspect(){

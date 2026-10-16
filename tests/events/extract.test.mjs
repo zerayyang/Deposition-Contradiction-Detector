@@ -131,8 +131,10 @@ test('approval, request cap and stale plans prevent any model invocation',async(
 });
 test('invalid documents, source roles, OCR pages and stale manifests stop planning without calls',()=>{
  assert.throws(()=>buildEventExtractionPlan([]));assert.throws(()=>buildEventExtractionPlan([source(),source()]));
- assert.throws(()=>planFor(''),/non-empty/);assert.throws(()=>planFor('Q: Anything?\nA: '),/no supported witness/);assert.throws(()=>planFor('ALEX: I left.'),/unresolved speaker/);
- assert.throws(()=>planFor('THE COURT: Wait.'),/no supported witness/);
+ assert.throws(()=>planFor(''),/non-empty/);assert.throws(()=>planFor('Q: Anything?\nA: '),/no supported witness/);assert.throws(()=>planFor('ALEX: I left.'),/WITNESS_CONFIRMATION_REQUIRED/);
+ assert.throws(()=>buildEventExtractionPlan([source('ALEX: I left.',{witnessTestimonyConfirmed:true})]),/unresolved speaker/);
+ assert.throws(()=>planFor('THE COURT: Wait.'),/WITNESS_CONFIRMATION_REQUIRED/);
+ assert.throws(()=>buildEventExtractionPlan([source('THE COURT: Wait.',{witnessTestimonyConfirmed:true})]),/no supported witness/);
  assert.throws(()=>buildEventExtractionPlan([source(text,{extraction:{textSha256:'bad',textLength:text.length}})]),/page map/);
  const extraction={textSha256:createHash('sha256').update(text).digest('hex'),textLength:text.length,pageCount:1,pages:[{pdfPage:1,pageLabel:'1',start:0,end:text.length,status:'OCR_REQUIRED'}]};
  assert.throws(()=>buildEventExtractionPlan([source(text,{extraction})]),/OCR/);

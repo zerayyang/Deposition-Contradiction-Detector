@@ -5,7 +5,7 @@ export const normalizeSpeakerLabel=label=>label.trim().replace(/\s+/g,' ').toUpp
 const courtRole=/^(?:(?:THE\s+)?(?:COURT(?: OFFICER| REPORTER)?|CLERK|REPORTER|VIDEOGRAPHER|STENOGRAPHER)|COUNSEL|JUDGE|BAILIFF)$/i;
 export function documentLabel(label){
  const key=normalizeSpeakerLabel(label),compact=key.replace(/(?<=\b[A-Z]) (?=[A-Z]\b)/g,'');
- return ['BEFORE','PEOPLEOFTHESTATEOF','VIDEOTAPEDDEPOSITIONOF','VIDEOTAPEDEPOSITIONOF'].includes(key.replace(/\s+/g,''))||/^(?:IN THE MATTER OF|COUNTY OF .+|BEFORE|FILED|BY|RE|DATED|CASE NAME|DATE OF DEPOSITION|WITNESSES?[’']? NAME|DISCLAIMER|PEOPLE OF THE STATE OF(?: .+)?|VIDEOTAPED DEPOSITION OF(?: .+)?)$/.test(compact)
+ return ['BEFORE','PEOPLEOFTHESTATEOF','VIDEOTAPEDDEPOSITIONOF','VIDEOTAPEDEPOSITIONOF'].includes(key.replace(/\s+/g,''))||/^(?:SOURCE|CITATION|EXHIBIT|NOTE|FOOTNOTE|SEE|DEP\.|DEP\. .+|IN THE MATTER OF|COUNTY OF .+|BEFORE|FILED|BY|RE|DATED|CASE NAME|DATE OF DEPOSITION|WITNESSES?[’']? NAME|DISCLAIMER|PEOPLE OF THE STATE OF(?: .+)?|VIDEOTAPED DEPOSITION OF(?: .+)?)$/.test(compact)
   ||/^(?:EXAMINATION )?BY (?:MR|MS|MRS|DR)\. [\p{L}\p{M} .’'-]+$/u.test(key);
 }
 const titledName=/^(?:[Mm][Rr]|[Mm][Ss]|[Mm][Rr][Ss]|[Dd][Rr])\.[ \t]+(?:[\p{Lu}][\p{L}\p{M}’'.-]*)(?:[ \t]+(?:[\p{Lu}][\p{L}\p{M}’'.-]*|de|van|von)){0,4}$/u;
@@ -52,9 +52,24 @@ export function testimonyMarkers(text,options={}) {
     const mapped=roles.get(key);
     const role=key==='THE WITNESS'?'A':mapped==='WITNESS'?'A':mapped==='QUESTIONER'?'Q':'S';
     const roleKnown=Boolean(mapped||known);
-    markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role,speaker:label,
+    markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role,speaker:documentHeading?null:label,
       speakerKey:key,roleOrigin:mapped?'CALLER_METADATA':key==='THE WITNESS'?'EXPLICIT_WITNESS':documentHeading?'DOCUMENT_LABEL':known?'COURTROOM_LABEL':'UNRESOLVED',roleKnown});
+  }
+  // Bare deposition citation lines are metadata boundaries even without a colon.
+  for(const m of text.matchAll(/^[ \t]*(?:Dep\.|Deposition citation)[ \t]+[^\r\n]+/gim)){
+    if(!markers.has(m.index))markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role:'S',speaker:null,roleOrigin:'DOCUMENT_LABEL',roleKnown:true});
   }
   const reporting=pdfReportingRanges(text,options.manifest?.pages??options.pages);
   return [...markers.values()].filter(m=>!reporting.some(r=>m.index>=r.start&&m.index<r.end)).sort((a,b)=>a.index-b.index);
+}
+
+export function requireWitnessInput(text,{speakerRoles,witnessTestimonyConfirmed=false}={}){
+ if(typeof text!=='string')throw new TypeError('Original transcript text is required.');
+ if(typeof witnessTestimonyConfirmed!=='boolean')throw new Error('Witness testimony confirmation must be a boolean.');
+ const markers=testimonyMarkers(text,{speakerRoles});
+ // Q/A syntax or explicit caller witness assignment supplies source structure.
+ // Plain prose requires a distinct user confirmation before the legacy parser's
+ // unlabeled fallback can be used by an analysis entry point.
+ if(!markers.some(m=>m.role==='A'||m.role==='Q')&&witnessTestimonyConfirmed!==true)
+  throw new Error('WITNESS_CONFIRMATION_REQUIRED: No Q/A witness structure was found. Explicitly confirm "this is witness testimony" before analysis. A brief or citation is not automatically testimony.');
 }

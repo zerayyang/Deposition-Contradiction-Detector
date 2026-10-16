@@ -1,3 +1,4 @@
+import {checkedSpeakerRoles} from './testimonyMarkers.js';
 import {buildPlan,previewPlan,executePlan,digest,outputBudget,userContent} from './documentAnalysis.js';
 import {assessCandidate} from './humanConfidencePipeline.js';
 import {utf8Bytes} from '../shared/documentLimits.js';
@@ -17,7 +18,7 @@ export function remainingPreview(plan,result){
 export function createAnalysisHandlers({instructions,callModel,jobStore=null,codeFingerprint='local-test',runtimeIdentity=null,maxRequests=12,maxBudgetUsd=25,log=()=>{}}) {
  const runningJobs=new Map();
  const provenance=runtimeIdentity??{codeFingerprint,promptSha256:digest(instructions)};
- const prepare=body=>buildPlan([body?.transcript1,body?.transcript2],body?.documents,instructions,{speakerRoles:body?.speakerRoles,sourceRolesReviewed:body?.sourceRolesReviewed});
+ const prepare=body=>buildPlan([body?.transcript1,body?.transcript2],body?.documents,instructions,{speakerRoles:body?.speakerRoles,sourceRolesReviewed:body?.sourceRolesReviewed,witnessTestimonyConfirmed:body?.witnessTestimonyConfirmed});
  const guard=preview=>{if(preview.requestCount>maxRequests||preview.cost.conservativeBudget>maxBudgetUsd)throw new Error(`Analysis exceeds this server's request or spending allowance (${maxRequests} requests / USD ${maxBudgetUsd}). No paid calls started.`);};
  const load=async req=>{
   if(!jobStore)throw new Error('Recovery storage is unavailable.');
@@ -25,9 +26,15 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
   if(jobStore.isActive(record.id))throw new Error('This analysis is still running. Wait or cancel its original connection.');
   if(record.caseId!==req.body.caseId)throw new Error('Recovery belongs to a different case.');
   if(record.provenance.codeFingerprint!==codeFingerprint)throw new Error('The server code changed since this run. Its saved results remain available, but cannot be resumed under different rules.');
-  const body={transcript1:record.texts[0],transcript2:record.texts[1],documents:record.documents,speakerRoles:record.provenance.speakerRoles??[{},{}],sourceRolesReviewed:true},plan=prepare(body);
+  const body={transcript1:record.texts[0],transcript2:record.texts[1],documents:record.documents,speakerRoles:record.provenance.speakerRoles??[{},{}],sourceRolesReviewed:true,witnessTestimonyConfirmed:record.provenance.witnessTestimonyConfirmed},plan=prepare(body);
   if(plan.id!==record.planId)throw new Error('The prompt or plan changed. Export saved results before planning a new analysis.');
-  if(req.body.speakerRoles!==undefined&&JSON.stringify(prepare({...body,speakerRoles:req.body.speakerRoles,sourceRolesReviewed:req.body.sourceRolesReviewed}).speakerRoles)!==JSON.stringify(plan.speakerRoles))throw new Error('Reviewed source roles changed; do not resume under different witness assignments.');
+  if(req.body.speakerRoles!==undefined){
+   if(!Array.isArray(req.body.speakerRoles)||req.body.speakerRoles.length!==2)throw new Error('Supply two reviewed speaker-role maps.');
+   const roles=req.body.speakerRoles.map(speakerRoles=>Object.fromEntries(checkedSpeakerRoles({speakerRoles})));
+   if(roles.some(r=>Object.keys(r).length)&&req.body.sourceRolesReviewed!==true)throw new Error('Confirm sourceRolesReviewed before using named speaker assignments. No witness role was guessed.');
+   const canonical=maps=>JSON.stringify(maps.map(r=>Object.entries(r).sort(([a],[b])=>a.localeCompare(b))));
+   if(canonical(roles)!==canonical(plan.speakerRoles))throw new Error('Reviewed source roles changed; do not resume under different witness assignments.');
+  }
   if(req.body.transcript1!==undefined&&(req.body.transcript1!==record.texts[0]||req.body.transcript2!==record.texts[1]))throw new Error('Edited inputs cannot resume an older analysis.');
   return {record,plan,body};
  };
@@ -69,7 +76,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
     if(body.approvedPlanId!==plan.id&&req.body.approvedPlanId!==plan.id)return res.status(409).json({error:'The analysis plan changed or was not approved. Preview and approve the current request count and cost first.'});
     if(!preview.requestCount)return res.status(409).json({error:'All comparisons are already complete. Recover the saved results instead of paying again.'});
     if(jobStore&&!record){if(typeof req.body.caseId!=='string'||!req.body.caseId||req.body.caseId.length>200)throw new Error('Save a case before starting recoverable analysis.');
-     record=await jobStore.create({ownerId:identity(req),caseId:req.body.caseId,texts:[body.transcript1,body.transcript2],documents:body.documents,originalDocuments:req.body.originalDocuments?.map(d=>d?Object.fromEntries(['path','name','size','type','extraction','pageMappingStale'].map(k=>[k,d[k]])):null),planId:plan.id,provenance:{model:plan.model.id,promptSha256:digest(instructions),codeFingerprint,speakerRoles:plan.speakerRoles}});}
+     record=await jobStore.create({ownerId:identity(req),caseId:req.body.caseId,texts:[body.transcript1,body.transcript2],documents:body.documents,originalDocuments:req.body.originalDocuments?.map(d=>d?Object.fromEntries(['path','name','size','type','extraction','pageMappingStale'].map(k=>[k,d[k]])):null),planId:plan.id,provenance:{model:plan.model.id,promptSha256:digest(instructions),codeFingerprint,speakerRoles:plan.speakerRoles,witnessTestimonyConfirmed:plan.witnessTestimonyConfirmed}});}
    }catch(e){return res.status(400).json({error:e.message});}
    const controller=new AbortController(),close=()=>{if(!res.writableEnded)controller.abort();};res.on('close',close);
    res.status(200).set({'Content-Type':'application/x-ndjson','Cache-Control':'no-store','X-Accel-Buffering':'no'});res.flushHeaders?.();
