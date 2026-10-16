@@ -5,7 +5,7 @@ import {parseTestimonySource} from '../../server/testimonySource.js';
 import {prepareEventWorkflow,executeEventWorkflow} from '../../server/events/workflow.js';
 import {buildEventExtractionPlan} from '../../server/events/extract.js';
 import {materializeExtraction} from '../../server/events/extractionProtocol.js';
-import {withReadingDiagnostics,citationFailureDetails,friendlyFailure} from '../../src/lib/analysisStatus.js';
+import {withReadingDiagnostics,citationFailureDetails,friendlyFailure,citationMessages} from '../../src/lib/analysisStatus.js';
 import {buildReviewReport} from '../../src/lib/reviewReport.js';
 const fixture=JSON.parse(fs.readFileSync(new URL('./fixtures/imig-citation-regression.json',import.meta.url),'utf8'));
 const inputs=fixture.inputs.map((d,i)=>({...d,documentId:`transcript-${i+1}`,speakerRoles:fixture.speakerRoles[i]}));
@@ -59,7 +59,7 @@ test('workflow preserves rejected record, exact validation code and missing answ
  const task=result.analysis.tasks[0];assert.equal(task.acceptedFindings,0);assert.match(task.error,/QUALIFIER_NOT_LITERAL/);
  assert.match(task.rejectedFindings[0].reason,/QUALIFIER_NOT_LITERAL/);
  assert.equal(task.rejectedFindings[0].diagnostics[0].path,'/events/0/qualifiers/0');
- assert.match(friendlyFailure(task.rejectedFindings[0].reason),/Question wording/);
+ assert.equal(friendlyFailure(task.rejectedFindings[0].reason),citationMessages.QUALIFIER_NOT_LITERAL);
  assert.ok(citationFailureDetails(task).some(d=>d.code==='QUALIFIER_NOT_LITERAL'));
  assert.ok(result.analysis.eventState.extraction.tasks[0].rawText.includes('that you believe'));
  await assert.rejects(()=>prepareEventWorkflow({...body,phase:'compare',eventState:result.analysis.eventState}),/Finish complete event extraction/);

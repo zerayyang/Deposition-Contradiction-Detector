@@ -32,6 +32,8 @@ export function remainingLabel(analysis, active, elapsed, sample) {
 }
 
 export function friendlyFailure(error = '') {
+  const known=Object.keys(citationMessages).find(code=>new RegExp('\\b'+code+'\\b').test(error));
+  if(known)return citationMessages[known];
   if (/QUALIFIER_NOT_LITERAL/.test(error)) return 'A qualifier was not supported by the witness’s own quoted words. Question wording cannot be used as a witness qualifier.';
   if (/approved memory|private memory/i.test(error)) return 'Approved lessons changed or could not be checked. Review a fresh plan, or turn memory off. Saved results remain available.';
   if (/finding\(s\) failed source grounding or processing/i.test(error)) return 'Some findings need source review; retained findings remain available.';
@@ -47,7 +49,17 @@ export function friendlyFailure(error = '') {
 }
 
 // Only explain known validation codes. Never render arbitrary provider payloads.
-const citationMessages = {
+export const citationMessages = {
+ VERBATIM_MISMATCH: 'The model quotation does not exactly match its cited source text.',
+ OCCURRENCE_REQUIRED: 'This quotation repeats. The model must identify which occurrence it means.',
+ OCCURRENCE_MISSING: 'The selected occurrence of this quotation does not exist in its source.',
+ UNAVAILABLE_SOURCE_UNIT: 'The note cites a source section that was not supplied to this request.',
+ NO_WITNESS_QUOTE_IN_CORE: 'The note has no witness quotation in the section assigned for reading.',
+ DUPLICATE_EVENT_ID: 'Two notes share the same ID. Both need review; neither was silently overwritten.',
+ DUPLICATE_SOURCE_ID: 'A note repeats a citation ID, so its references cannot be trusted.',
+ FORBIDDEN_SCORE_ATTRIBUTE: 'The model supplied a score or confidence attribute. Only deterministic code may score evidence.',
+ INVALID_EVENT_SCHEMA: 'The proposed note does not match the required record structure.',
+
  QUALIFIER_NOT_LITERAL: 'A qualifier must quote the witness’s own words; a phrase from the lawyer’s question does not qualify.',
  QUOTE_MISMATCH: 'The quoted text or its offsets do not exactly match the original document.',
  SOURCE_ROLE: 'The citation is outside the assigned witness or question span. Check speaker roles.',

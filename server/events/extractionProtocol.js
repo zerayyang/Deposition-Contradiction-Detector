@@ -38,6 +38,25 @@ function occurrences(text,quote) {
   for(let at=text.indexOf(quote);at>=0;at=text.indexOf(quote,at+1))found.push(at);
   return found;
 }
+// Diagnostic previews never participate in source binding or validation. Only the
+// saved report renderer reads them; UI projections exclude this property.
+function reportPreview(quote,unit){
+ const mask=value=>Array.from(String(value??'').replace(/Bearer\s+\S+|(?:sk-|sb_secret_)[\w-]+/gi,'[REDACTED]')
+  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[EMAIL]')
+  .replace(/\b(?:\d[ -]?){7,}\b/g,'[NUMBER]')).slice(0,60).join('');
+ let nearest=null;
+ if(unit){
+  const lines=unit.text.split('\n');const tokens=String(quote??'').toLowerCase().match(/[a-z]{3,}/g)?.slice(0,12)??[];
+  const at=unit.text.indexOf(quote);
+  nearest=at>=0?unit.text.slice(at):lines.reduce((best,line)=>{
+   const score=tokens.filter(t=>line.toLowerCase().includes(t)).length;
+   return score>best.score?{score,line}:best;
+  },{score:-1,line:''}).line;
+ }
+ return {modelQuote:mask(quote),nearestSource:unit?mask(nearest):null,
+  notice:'Redacted, bounded diagnostic preview only; nearest text is not a verified citation. Private report only.'};
+}
+function reject(code,message,source,unit){const error=new Error(message);error.code=code;if(source)error.reportDiagnostic=reportPreview(source.quote,unit);throw error;}
 export function materializeExtraction(response,task,document) {
   const issues=[],rejected=[],proposed=[],anchorAudit=[];
   const add=(code,message,extra={})=>issues.push({code,message,...extra});
@@ -45,32 +64,32 @@ export function materializeExtraction(response,task,document) {
   const namespace=`d${task.documentIndex}:t${task.index}:`,eventId=id=>namespace+'e:'+encodeURIComponent(id);
   for(const [index,raw] of response.events.entries()) {
     try {
-      if(!eventShape(raw))throw new Error('Invalid event schema: '+JSON.stringify(shapeErrors(eventShape)));
-      if(raw.attributes.some(a=>/confidence|probability|^score|evidence(?:score|strength)/i.test(a.name.replace(/[_\s-]/g,''))))throw new Error('Model scoring attributes are forbidden.');
-      if(counts.get(raw.id)!==1)throw new Error('Duplicate proposed event ID; all occurrences require review.');
+      if(!eventShape(raw))reject('INVALID_EVENT_SCHEMA','Invalid event schema: '+JSON.stringify(shapeErrors(eventShape)));
+      if(raw.attributes.some(a=>/confidence|probability|^score|evidence(?:score|strength)/i.test(a.name.replace(/[_\s-]/g,''))))reject('FORBIDDEN_SCORE_ATTRIBUTE','Model scoring attributes are forbidden.');
+      if(counts.get(raw.id)!==1)reject('DUPLICATE_EVENT_ID','Duplicate proposed event ID; all occurrences require review.');
       const event=structuredClone(raw),sourceIds=new Map(event.sources.map(s=>[s.id,`${eventId(event.id)}:s:${encodeURIComponent(s.id)}`]));
-      if(sourceIds.size!==event.sources.length)throw new Error('Duplicate source ID in proposed event.');
+      if(sourceIds.size!==event.sources.length)reject('DUPLICATE_SOURCE_ID','Duplicate source ID in proposed event.');
       const audits=[];
       event.sources=raw.sources.map(s=>{
         const unit=task.input.sources.find(u=>u.id===s.unitId);
-        if(!unit)throw new Error('Source references an unavailable unit.');
+        if(!unit)reject('UNAVAILABLE_SOURCE_UNIT','Source references an unavailable unit.',s,null);
         const matches=occurrences(unit.text,s.quote);
-        if(!matches.length)throw new Error('Quotation does not match its submitted source verbatim.');
-        if(s.occurrence===null&&matches.length!==1)throw new Error('Repeated quotation needs an explicit occurrence; first-match guessing is forbidden.');
-        const at=matches[s.occurrence??0];if(at===undefined)throw new Error('Quoted occurrence does not exist.');
+        if(!matches.length)reject('VERBATIM_MISMATCH','Quotation does not match its submitted source verbatim.',s,unit);
+        if(s.occurrence===null&&matches.length!==1)reject('OCCURRENCE_REQUIRED','Repeated quotation needs an explicit occurrence; first-match guessing is forbidden.',s,unit);
+        const at=matches[s.occurrence??0];if(at===undefined)reject('OCCURRENCE_MISSING','Quoted occurrence does not exist.',s,unit);
         const start=unit.start+at,end=start+s.quote.length;
         audits.push({proposedSourceId:s.id,unitId:unit.id,start,end,speaker:unit.speaker,roleOrigin:unit.roleOrigin});
         return {id:sourceIds.get(s.id),role:unit.role,quote:s.quote,start,end,
           pageRefs:document.pages?.filter(p=>p.end>start&&p.start<end).map(p=>({pdfPage:p.pdfPage,pageLabel:p.pageLabel??null}))??[]};
       });
-      if(!event.sources.some(s=>s.role==='WITNESS'&&s.end>task.coreStart&&s.start<task.coreEnd))throw new Error('Context-only event has no witness quotation in the assigned core range.');
+      if(!event.sources.some(s=>s.role==='WITNESS'&&s.end>task.coreStart&&s.start<task.coreEnd))reject('NO_WITNESS_QUOTE_IN_CORE','Context-only event has no witness quotation in the assigned core range.');
       const ref=id=>sourceIds.get(id)??`UNKNOWN_SOURCE:${id}`;
       event.id=eventId(raw.id);event.assertion.sourceIds=event.assertion.sourceIds.map(ref);
       event.attributes.forEach(a=>{a.sourceIds=a.sourceIds.map(ref);});
       event.qualifiers.forEach(q=>{q.sourceId=ref(q.sourceId);});
       event.relations.forEach(r=>{if(r.targetEventId!==null)r.targetEventId=eventId(r.targetEventId);});
       proposed.push({index,event,rawId:raw.id,audits});
-    }catch(error){rejected.push({index,proposed:raw,errors:[{code:'EVENT_REJECTED',message:error.message}]});add('EVENT_REJECTED',error.message,{eventIndex:index});}
+    }catch(error){const code=error.code??'EVENT_REJECTED';const first=raw?.sources?.[0];rejected.push({index,proposed:raw,errors:[{code,message:error.message}],reportDiagnostic:error.reportDiagnostic??(first?reportPreview(first.quote,task.input.sources.find(u=>u.id===first.unitId)):null)});add(code,error.message,{eventIndex:index});}
   }
   // Quarantine invalid records and their dependent links; preserve every raw record
   // and each rejection rather than changing fields or dropping audit evidence.
@@ -83,7 +102,7 @@ export function materializeExtraction(response,task,document) {
     accepted=accepted.filter((p,i)=>{
       if(!bad.has(i))return true;
       const errors=checked.errors.filter(e=>!/^\/events\//.test(e.path)||e.path===`/events/${i}`||e.path.startsWith(`/events/${i}/`));
-      rejected.push({index:p.index,proposed:response.events[p.index],materialized:p.event,errors});
+      rejected.push({index:p.index,proposed:response.events[p.index],materialized:p.event,errors,reportDiagnostic:reportPreview(p.event.sources[0]?.quote,task.input.sources.find(u=>u.id===p.audits[0]?.unitId))});
       add('SOURCE_VALIDATION','Proposed event failed deterministic record/source validation.',{eventIndex:p.index,errors});return false;
     });
   }
