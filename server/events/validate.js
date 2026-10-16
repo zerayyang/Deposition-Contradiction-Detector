@@ -19,7 +19,7 @@ export function validateEventBundle(bundle,{documentId,text,pages=null,speakerRo
  if(bundle.documentId!==documentId)add('/documentId','DOCUMENT_MISMATCH','Record belongs to another document.');
  if(bundle.documentSha256!==documentDigest(text))add('/documentSha256','DOCUMENT_CHANGED','Original text differs from the extraction input.');
  let sourceIndex;
- try{sourceIndex=parseTestimonySource(text,{speakerRoles});}
+ try{sourceIndex=parseTestimonySource(text,{speakerRoles,pages});}
  catch(error){return {valid:false,errors:[{path:'/speakerRoles',code:'SOURCE_OPTIONS',message:error.message}],eventResults:[],coverage:null};}
  const witnessSpans=sourceIndex.turns.filter(turn=>turn.role==='WITNESS');
  const witnessSpan=source=>witnessSpans.find(turn=>source.start>=turn.contentStart&&source.end<=turn.end);

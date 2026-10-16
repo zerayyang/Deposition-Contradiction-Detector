@@ -1,3 +1,4 @@
+import {directOutputFormat} from './directOutput.js';
 import { presenceIndex } from './presenceEvents.js';
 import { createHash } from 'node:crypto';
 import { DOCUMENT_LIMITS as LIMITS,checkTextBudget,utf8Bytes } from '../shared/documentLimits.js';
@@ -13,6 +14,7 @@ export const MODEL = Object.freeze({id:'claude-opus-5-5',contextTokens:1000000,m
 export const OUTPUT_TOKENS=10000; // Existing short-document budget.
 export const SECTION_OUTPUT_TOKENS=32000; // Includes adaptive thinking plus answer text.
 export const outputBudget=plan=>plan.outputTokens ?? (plan.mode==='single'?OUTPUT_TOKENS:SECTION_OUTPUT_TOKENS);
+export const directRequest=(plan,a,b,instructions)=>({model:MODEL.id,max_tokens:outputBudget(plan),system:instructions,output_config:{format:directOutputFormat,effort:'medium'},messages:[{role:'user',content:userContent(a,b,plan.mode!=='single')}]});
 export const digest=text=>createHash('sha256').update(text).digest('hex');
 const round=n=>Math.round(n*10000)/10000;
 function byteEnd(text,start,bytes) {
@@ -21,15 +23,18 @@ function byteEnd(text,start,bytes) {
   if(low<text.length&&/[\uD800-\uDBFF]/.test(text[low-1]))low--;
   return low;
 }
-export function sectionDocument(text,{chunkBytes=LIMITS.chunkBytes,overlapBytes=LIMITS.overlapBytes,speakerRoles}={}) {
-  const markers=testimonyMarkers(text,{speakerRoles});
-  const source=parseTestimonySource(text,{speakerRoles});
+export function sectionDocument(text,{chunkBytes=LIMITS.chunkBytes,overlapBytes=LIMITS.overlapBytes,speakerRoles,manifest,maxWitnessUnits=Infinity}={}) {
+  if(maxWitnessUnits!==Infinity&&(!Number.isSafeInteger(maxWitnessUnits)||maxWitnessUnits<1))throw new Error('maxWitnessUnits must be positive.');
+  const markers=testimonyMarkers(text,{speakerRoles,manifest});
+  const source=parseTestimonySource(text,{speakerRoles,manifest});
   const questions=markers.filter(m=>m.role==='Q').map(m=>m.index);
   const chunks=[];let coreStart=0;
   while(coreStart<text.length) {
     let coreEnd=byteEnd(text,coreStart,chunkBytes);
     const boundary=questions.findLast(n=>n>coreStart&&n<=coreEnd);
     if(coreEnd<text.length&&boundary!==undefined)coreEnd=boundary;
+    const assigned=source.turns.filter(t=>t.role==='WITNESS'&&t.end>coreStart&&t.contentStart<coreEnd);
+    if(assigned.length>maxWitnessUnits){const next=assigned[maxWitnessUnits],q=next.question&&source.turns.find(t=>t.role==='QUESTION'&&t.contentStart===next.question.start);coreEnd=q?.start>coreStart?q.start:next.start;}
     if(coreEnd<=coreStart)throw new Error('Unable to section the document without losing text.');
     // Include local overlap and the full preceding question for continued answers.
     let start=coreStart;
@@ -96,11 +101,11 @@ export function buildPlan(texts,documents,instructions,options={}) {
   const speakerRoles=submittedRoles.map(roles=>Object.fromEntries(checkedSpeakerRoles({speakerRoles:roles})));
   if(speakerRoles.some(roles=>Object.keys(roles).length)&&options.sourceRolesReviewed!==true)throw new Error('Confirm sourceRolesReviewed before using named speaker assignments. No witness role was guessed.');
   const single=utf8Bytes(texts[0])+utf8Bytes(texts[1])<=(options.singleRequestBytes??LIMITS.singleRequestBytes);
-  const contexts=texts.map((text,i)=>parseTestimonySource(text,{speakerRoles:speakerRoles[i]}).turns
+  const contexts=texts.map((text,i)=>parseTestimonySource(text,{speakerRoles:speakerRoles[i],manifest:manifests[i]}).turns
     .filter(t=>t.role==='WITNESS'&&(!t.question||t.roleOrigin==='CALLER_METADATA'))
     .map(t=>({answerStart:t.contentStart,answerEnd:t.end,speaker:t.speaker,roleOrigin:t.roleOrigin,
       question:t.question?{start:t.question.start,end:t.question.end}:null})));
-  const chunks=texts.map((text,i)=>(single?[{id:0,start:0,end:text.length,coreStart:0,coreEnd:text.length,questionContext:'',text}]:sectionDocument(text,{...options,speakerRoles:speakerRoles[i]})).map(c=>{
+  const chunks=texts.map((text,i)=>(single?[{id:0,start:0,end:text.length,coreStart:0,coreEnd:text.length,questionContext:'',text}]:sectionDocument(text,{...options,speakerRoles:speakerRoles[i],manifest:manifests[i]})).map(c=>{
     const sourceContext=contexts[i].filter(t=>t.answerEnd>c.start&&t.answerStart<c.end);
     return {...c,...(Object.keys(speakerRoles[i]).length?{speakerRoles:speakerRoles[i]}:{}),...(sourceContext.length?{sourceContext}:{})};
   }));
@@ -109,7 +114,7 @@ export function buildPlan(texts,documents,instructions,options={}) {
   if(requestCount>LIMITS.maxRequests)throw new Error(`This plan needs ${requestCount} requests, above the safety limit of ${LIMITS.maxRequests}. No paid analysis started.`);
   const pairs=[];let estimatedInputTokens=0,inputTokenUpperBudget=0;
   for(const a of chunks[0])for(const b of chunks[1]){
-    const bytes=utf8Bytes(instructions)+utf8Bytes(userContent(a,b,!single));
+    const bytes=utf8Bytes(instructions)+utf8Bytes(JSON.stringify(directOutputFormat))+utf8Bytes(userContent(a,b,!single));
     const upper=bytes+8192; // UTF-8 byte budget plus framing reserve, not a tokenizer count.
     if(upper+outputTokens>MODEL.contextTokens)throw new Error('A planned request exceeds the conservative model context budget; no text was truncated.');
     estimatedInputTokens+=Math.ceil(bytes/3);inputTokenUpperBudget+=upper;
@@ -119,7 +124,7 @@ export function buildPlan(texts,documents,instructions,options={}) {
     conservativeBudget:round((inputTokenUpperBudget*MODEL.inputUsdPerMillion+requestCount*outputTokens*MODEL.outputUsdPerMillion)/1e6),
     estimatedInputTokens,inputTokenUpperBudget,outputTokensPerRequest:outputTokens,
     note:`Local UTF-8 estimate, not provider tokenization or a billing guarantee. Estimate assumes ${single?'2,500':'10,000'} output tokens/call; budget reserves ${outputTokens.toLocaleString('en-US')} including thinking. Standard uncached pricing; retries disabled. In-flight cancelled work can still be billed.`};
-  const id=digest(JSON.stringify({texts:texts.map(digest),manifests,...(speakerRoles.some(r=>Object.keys(r).length)?{speakerRoles}:{}),instructions:digest(instructions),model:MODEL,pairs,chunks:chunks.map(cc=>cc.map(c=>({...c,text:undefined}))),cost}));
+  const id=digest(JSON.stringify({texts:texts.map(digest),manifests,...(speakerRoles.some(r=>Object.keys(r).length)?{speakerRoles}:{}),instructions:digest(instructions),transportSchema:digest(JSON.stringify(directOutputFormat)),model:MODEL,pairs,chunks:chunks.map(cc=>cc.map(c=>({...c,text:undefined}))),cost}));
   return {id,model:MODEL,outputTokens,requestCount,mode:single?'single':'all-section-pairs',cost,chunks,pairs,manifests,speakerRoles};
 }
 export function previewPlan(plan) {
@@ -147,15 +152,15 @@ function findingKey(c) {
   const locations=Object.fromEntries(Object.entries(c.sourceBindings??{}).map(([key,binding])=>[key,{status:binding.status,ids:(binding.selected?[binding.selected]:binding.alternatives).map(m=>m.id)}]));
   return JSON.stringify([c.type,literal(c.claim1),literal(c.claim2),locations]);
 }
-export async function executePlan({plan,texts,instructions,callModel,signal,onEvent=()=>{},resume=null,provenance={}}) {
+export async function executePlan({plan,texts,instructions,callModel,signal,onEvent=()=>{},resume=null,provenance={},maxNewRequests=Infinity}) {
   const started=performance.now();
   const quoteMaps=[null,null]; // Build an offset map only when an exact PDF quote needs layout recovery.
   if(resume&&resume.analysis?.planId!==plan.id)throw new Error('Saved progress belongs to a different plan.');
   const findings=new Map((resume?.contradictions??[]).map(f=>[findingKey(f),structuredClone(f)]));
-  const topics=new Set(resume?.topicsReviewed??[]),usage={input_tokens:resume?.analysis?.usage?.input_tokens??0,output_tokens:resume?.analysis?.usage?.output_tokens??0},issues=[];
+  const topics=new Set(resume?.topicsReviewed??[]),usage={input_tokens:resume?.analysis?.usage?.input_tokens??0,output_tokens:resume?.analysis?.usage?.output_tokens??0},issues=structuredClone(resume?.analysis?.issues??[]);
   const tasks=plan.pairs.map(p=>{
     const old=resume?.analysis?.tasks?.find(t=>t.id===p.id);
-    if(old?.status==='completed'&&!resume.analysis.issues?.some(issue=>issue.pairId===p.id))return structuredClone(old);
+    if(old?.status==='completed')return structuredClone(old);
     return {...p,status:'pending',...(old?{previousAttempts:[...(old.previousAttempts??[]),structuredClone({...old,previousAttempts:undefined})]}:{})};
   });
   let completed=tasks.filter(t=>t.status==='completed').length,attempted=resume?.analysis?.attempted??0,cancelled=false,duplicatesCombined=resume?.analysis?.duplicatesCombined??0;
@@ -176,15 +181,18 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
     }),
     provenance:{model:plan.model.id,promptSha256:digest(instructions),pipelineVersion:'durable-context-v1',...provenance},
     notice:'Coverage lists planned ranges and completed comparison counts. It is not a guarantee that the model found every issue.'}});
+  let newRequests=0;
   await onEvent({event:'start',plan:previewPlan(plan)});
   for(const task of tasks) {
     if(task.status==='completed')continue;
+    if(newRequests>=maxNewRequests)break;
     if(signal?.aborted){cancelled=true;break;}
     task.status='running';task.startedAt=new Date().toISOString();task.attempted=true;attempted++;await onEvent({event:'progress',task:{...task},attempted,completed,total:tasks.length,analysis:snapshot('running').analysis});
     try {
       const a=plan.chunks[0][task.a],b=plan.chunks[1][task.b];
       const modelStarted=performance.now();
-      const message=await callModel({model:MODEL.id,max_tokens:outputBudget(plan),system:instructions,messages:[{role:'user',content:userContent(a,b,plan.mode!=='single')}]},{signal,maxRetries:0,...(plan.mode==='single'?{}:{timeout:600000})});
+      newRequests++;
+      const message=await callModel(directRequest(plan,a,b,instructions),{signal,maxRetries:0,...(plan.mode==='single'?{}:{timeout:600000})});
       task.modelDurationMs=Math.round(performance.now()-modelStarted);
       task.usageReported=Number.isFinite(message.usage?.input_tokens)&&Number.isFinite(message.usage?.output_tokens);
       task.stopReason=message.stop_reason??null;
@@ -210,7 +218,7 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
           // Anchors are checked inside this submitted section, using only literal
           // source context. Never select a repeated answer from model reasoning.
           for(const i of [0,1])if(plan.manifests[i]&&['sourceQuestion','sourceAnswer'].some(k=>typeof c[`claim${i+1}`]?.[k]==='string'))quoteMaps[i]??=pdfQuoteMap(texts[i],plan.manifests[i]);
-          const assessed=assessCandidate(c,texts[0],texts[1],{claim1:{...a,map:quoteMaps[0],speakerRoles:plan.speakerRoles?.[0]},claim2:{...b,map:quoteMaps[1],speakerRoles:plan.speakerRoles?.[1]}});
+          const assessed=assessCandidate(c,texts[0],texts[1],{claim1:{...a,map:quoteMaps[0],speakerRoles:plan.speakerRoles?.[0],manifest:plan.manifests[0]},claim2:{...b,map:quoteMaps[1],speakerRoles:plan.speakerRoles?.[1],manifest:plan.manifests[1]}});
           assessed.sourceGrounding=grounding;
           assessed.sourceReferences={claim1:sourceReferences(texts[0],c.claim1.original,plan.manifests[0],assessed.sourceBindings.claim1),claim2:sourceReferences(texts[1],c.claim2.original,plan.manifests[1],assessed.sourceBindings.claim2)};
           const variant={pairId:task.id,type:c.type,severity:c.severity,reasoning:c.reasoning,semanticAssist:c.semanticAssist,sourceAnchors:Object.fromEntries(['claim1','claim2'].map(key=>[key,{sourceQuestion:c[key]?.sourceQuestion??null,sourceAnswer:c[key]?.sourceAnswer??null}]))};

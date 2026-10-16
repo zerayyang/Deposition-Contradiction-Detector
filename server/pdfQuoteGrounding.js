@@ -1,7 +1,9 @@
+import {pdfReportingRanges} from './pdfReporting.js';
 // An offset map, not a fuzzy matcher. Only repeated PDF reporting furniture is
 // removed. No case folding, punctuation changes, synonyms, or word correction.
 export function pdfQuoteMap(text, manifest) {
   const ignored = new Uint8Array(text.length);
+  for(const range of pdfReportingRanges(text,manifest?.pages))ignored.fill(1,range.start,range.end);
   const pages=(manifest?.pages??[]).map(page=>({...page,lines:[...text.slice(page.start,page.end).matchAll(/[^\n]+/g)].map(m=>({text:m[0],start:page.start+m.index}))}));
   const headerCounts=new Map(),footerCounts=new Map();
   for(const page of pages){

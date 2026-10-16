@@ -196,3 +196,9 @@ only for a complete validated witness answer. Expected: literal signing oppositi
 with custom document/occasion fields can reach the old rule; a crop that omits "never",
 reported speech, conditionals, purpose-limited and compound statements cannot activate
 that fallback. No scoring formula, thresholds or source quotations are rewritten.
+
+## Dense extraction capacity
+
+The fictional 70-answer form fixture must split at no more than 12 assigned witness units per model task, preserve contiguous full source coverage, and retain all 70 scripted records after mocked extraction. The 32,768-token allocation includes adaptive thinking; it is room, not proof that every live response fits. Above-cap plans fail before paid work and never omit remaining answers. No numeric calibration target is supplied.
+
+Question-source fixture: a role stated as `Director` is valid only when that exact case appears inside the cited governing question quote. `director` and a cropped quote omitting the role remain rejected. Prompt guidance must improve the proposal; code never silently extends a model quotation or changes its spelling to pass.

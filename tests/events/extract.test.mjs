@@ -238,3 +238,20 @@ test('progress consumers cannot mutate retained source records or the raw audit'
  assert.equal(result.documents[0].events.length,2);
  assert.notEqual(result.tasks[0].response.events[0].summary,'Changed by callback');
 });
+
+test('dense answers are divided by output capacity without losing any assigned source range',async()=>{
+ const dense=Array.from({length:70},(_,i)=>`Q: Which form was signed on day ${i+1}?\nA: I signed form ${i+1}.`).join('\n');
+ const plan=planFor(dense,{chunkBytes:16000,overlapBytes:500,maxWitnessUnits:12,maxRequests:100});
+ assert.ok(plan.requestCount>1);assert.equal(plan.outputTokens,32768);
+ for(const task of plan.tasks)assert.ok(task.input.sources.filter(s=>s.role==='WITNESS'&&s.assigned).length<=12);
+ let end=0;for(const task of plan.tasks){assert.equal(task.coreStart,end);end=task.coreEnd;}assert.equal(end,dense.length);
+ const result=await run(plan);assert.equal(result.status,'COMPLETE');assert.equal(result.documents[0].coverage.status,'COMPLETE');
+ assert.equal(result.documents[0].events.length,70);
+});
+
+test('question-derived attributes must occur with exact case inside their cited question quote',async()=>{
+ const plan=planFor('Q: You were Director and President in May 2026?\nA: Yes.');
+ const transform=(response,task,{full=true,value='Director'}={})=>{const q=task.input.sources.find(s=>s.role==='QUESTION');const event=response.events[0];event.sources.push({id:'q',unitId:q.id,quote:full?q.text.trim():'You were',occurrence:0});event.attributes=[{name:'role',state:'STATED',value,basis:'QUESTION_CONTEXT',sourceIds:['q']}];return response;};
+ const valid=await run(plan,(r,t)=>transform(r,t));assert.equal(valid.status,'COMPLETE');
+ for(const options of [{full:false},{value:'director'}]){const invalid=await run(plan,(r,t)=>transform(r,t,options));assert.equal(invalid.status,'FAILED');assert.ok(invalid.tasks[0].rejected[0].errors.some(e=>e.code==='FIELD_NOT_LITERAL'));}
+});

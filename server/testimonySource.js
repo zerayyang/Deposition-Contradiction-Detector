@@ -35,9 +35,11 @@ export function parseTestimonySource(text,options={}) {
         questionAnswered=true;
         if(!question)diagnostics.push({code:'QUESTION_UNRESOLVED',start,end,message:'No uninterrupted governing question was established for this answer.'});
       }else{
-        question=null;questions=[];lastWitness=null;questionAnswered=false;
-        if(!marker.roleKnown)diagnostics.push({code:'UNKNOWN_SPEAKER',start,end,speaker,message:'Speaker role is unresolved; this turn is not witness evidence.'});
-        else diagnostics.push({code:'CONTEXT_INTERRUPTED',start,end,speaker,message:'Non-witness speech ends the preceding question frame; no resumed question is assumed.'});
+        const procedural=question&&!questionAnswered&&marker.roleKnown&&/^(?:Objection(?: to (?:the )?form)?|Object to (?:the )?form)[.!]?$/i.test(text.slice(contentStart,end).replace(/\b(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d\b/g,'').replace(/^\s*\d{1,2}\s+/gm,'').replace(/\s+/g,' ').trim());
+        if(procedural)diagnostics.push({code:'PROCEDURAL_OBJECTION',start,end,speaker,message:'A literal form-only objection preserves the pending question; objection text is not witness evidence.'});
+        else {question=null;questions=[];lastWitness=null;questionAnswered=false;}
+        if(!procedural&&!marker.roleKnown)diagnostics.push({code:'UNKNOWN_SPEAKER',start,end,speaker,message:'Speaker role is unresolved; this turn is not witness evidence.'});
+        else if(!procedural)diagnostics.push({code:'CONTEXT_INTERRUPTED',start,end,speaker,message:'Non-witness speech ends the preceding question frame; no resumed question is assumed.'});
       }
       add(start,contentStart,end,role,{speaker,roleOrigin:marker.roleOrigin??'QA_LABEL',
         question:role==='WITNESS'?question:null,questions:role==='WITNESS'?[...questions]:[]});

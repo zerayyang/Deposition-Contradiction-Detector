@@ -45,3 +45,5 @@ dist-ssr
 
 # Private durable analysis records (never commit testimony)
 /.analysis-jobs/
+.vercel
+.env*

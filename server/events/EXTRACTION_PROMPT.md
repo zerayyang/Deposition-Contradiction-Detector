@@ -55,3 +55,14 @@ exact quote in each event with a distinct source ID for that event. Use only the
 assigned witness unit and its supplied governing QUESTION unit. Do not borrow a
 question from a different answer to fill a date. If a field is not supported by
 these local sources, mark it UNSTATED or AMBIGUOUS rather than inventing support.
+
+Before returning each record, check every STATED attribute.value against the
+exact quote in its referenced sources array, with identical capitalization,
+punctuation and internal whitespace. A value appearing elsewhere in the source
+unit is insufficient if your selected quote omits it. Expand that source quote
+contiguously to include every value you rely on, or mark the unsupported field
+UNSTATED/AMBIGUOUS. Never lowercase a source pronoun or normalize a job title.
+For a short adopting answer such as "Yes.", quote its full supplied governing
+QUESTION unit when using question details; do not cite only its opening line
+while extracting an office, person or date from an unquoted later line. Every
+field must pass this literal self-check independently of the event summary.

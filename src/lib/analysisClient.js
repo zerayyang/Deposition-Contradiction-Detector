@@ -1,3 +1,4 @@
+import {runCloudAnalysis} from './cloudAnalysisClient.js';
 import {readApiJson,apiFailureMessage} from './apiResponse.js';
 import {DOCUMENT_LIMITS,utf8Bytes} from '../../shared/documentLimits.js';
 export function analysisBody(texts,documents) {
@@ -10,6 +11,7 @@ export async function previewAnalysis(body,{signal,fetchImpl=fetch}={}) {
   return readApiJson(response,'Could not prepare the analysis plan. The analysis service may be unavailable.');
 }
 export async function runAnalysis(body,plan,{signal,onEvent=()=>{},fetchImpl=fetch}={}) {
+  if(plan.execution==='durable-steps')return runCloudAnalysis(body,plan,{signal,onEvent,fetchImpl});
   const response=await fetchImpl(body.workflow==='events-v1'?'/api/events/stream':'/api/analyze/stream',{method:'POST',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,approvedPlanId:plan.id,...(body.workflow==='events-v1'?{approvedRequestCount:plan.requestCount,approvedMaxUsd:plan.cost.conservativeBudget}:{})})});
   if(!response.ok)await readApiJson(response,'Analysis failed to start.');
   if(response.headers?.get('content-type')?.includes('text/html'))throw new Error(apiFailureMessage(502));

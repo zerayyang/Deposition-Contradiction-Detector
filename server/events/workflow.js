@@ -66,7 +66,7 @@ export async function prepareEventWorkflow(body,{codeFingerprint='local-test',ma
  if(preview.requestCount>maxRequests||preview.cost.conservativeBudget>maxBudgetUsd)throw new Error(`Event phase exceeds the server allowance (${maxRequests} requests / USD ${maxBudgetUsd}). Nothing was omitted and no paid call started.`);
  return {phase,plan,extractionPlan,extraction,cache,preview,codeFingerprint,checkMemory};
 }
-export async function executeEventWorkflow({prepared,body,callModel,signal,onEvent=()=>{}}){
+export async function executeEventWorkflow({prepared,body,callModel,signal,onEvent=()=>{},maxNewRequests=Infinity}){
  const {phase,plan,extractionPlan,extraction,cache,codeFingerprint}=prepared;
  let paidRequests=0;const started=performance.now();
  const invoke=async(params,options)=>{const cached=cache.get(hash(JSON.parse(params.messages[0].content)));if(cached)return cachedMessage(cached);if(prepared.checkMemory)await prepared.checkMemory();options?.signal?.throwIfAborted();paidRequests++;return callModel(params,options);};
@@ -82,7 +82,7 @@ export async function executeEventWorkflow({prepared,body,callModel,signal,onEve
  };
  let latest=null;
  const execute=phase==='extract'?executeEventExtraction:executeEventComparison;
- await execute({plan,approval:approval(plan),callModel:invoke,signal,cachedResponses:new Map([...cache].map(([key,task])=>[key,cachedMessage(task)])),onEvent:async event=>{
+ await execute({plan,approval:approval(plan),callModel:invoke,signal,maxNewRequests,cachedResponses:new Map([...cache].map(([key,task])=>[key,cachedMessage(task)])),onEvent:async event=>{
   if(event.result){latest=materialize(event.result,event.event!=='result');await onEvent({...latest,event:event.event});}
   else await onEvent({...event,phase,total:plan.requestCount,attempted:paidRequests});
  }});

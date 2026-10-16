@@ -22,10 +22,10 @@ test('Vercel retains authentication requirements but does not require a persiste
  assert.equal(runtimeConfiguration({VERCEL:'1',DEMO_USER_IDS:'test'},'/tmp/project').production,true);
  assert.throws(()=>runtimeConfiguration({NODE_ENV:'production',DEMO_USER_IDS:'test'},'/tmp/project'),/persistent volume/);
 });
-test('Vite preset routes API requests to the 60-second function; dev proxy remains local',()=>{
+test('Vite preset routes API requests to the 300-second function; dev proxy remains local',()=>{
  const config=JSON.parse(readFileSync(new URL('vercel.json',root),'utf8'));
  assert.equal(config.framework,'vite');assert.equal(config.outputDirectory,'dist');
- assert.equal(config.functions['api/index.js'].maxDuration,60);
+ assert.equal(config.functions['api/index.js'].maxDuration,300);
  assert.deepEqual(config.rewrites,[{source:'/api/(.*)',destination:'/api/index'}]);
  assert.match(readFileSync(new URL('vite.config.js',root),'utf8'),/['"]\/api['"]:\s*['"]http:\/\/127\.0\.0\.1:3000['"]/);
 });

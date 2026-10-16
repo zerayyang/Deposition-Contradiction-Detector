@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {analysisBody,previewAnalysis,runAnalysis,eventRecoveryRequest} from './lib/analysisClient.js';
 import {documentMetadata} from './lib/documentStore.js';
+import {readCloudProgress} from './lib/cloudAnalysisClient.js';
 import {initialSpeakerChoices,confirmedSpeakerRoles} from './lib/speakerReview.js';
 import {readApiJson} from './lib/apiResponse.js';
 
@@ -21,6 +22,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  useEffect(()=>()=>controller.current?.abort(),[]);
  const state=draft.analysis?.eventState;
  const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryEnabled,
+  ...(continuing&&draft.analysis?.cloudJobId&&draft.analysis?.phase===phase?{cloudJobId:draft.analysis.cloudJobId}:{}),
   ...(continuing&&state?{eventState:state,...(draft.analysis.eventJobId?{eventJobId:draft.analysis.eventJobId}:{})}:{})});
  async function inspect(){
   if(lock.current)return;lock.current=true;
@@ -31,7 +33,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  async function prepare(phase,continuing){
   if(lock.current)return;lock.current=true;
   setBusy(true);onBusy(true);setError('');
-  try{const body=bodyFor(phase,continuing);const preview=await previewAnalysis(body,{fetchImpl});setPlan({preview,body});onPlanning(true);}
+  try{if(!editingNew&&draft.analysis?.cloudJobId&&draft.analysis?.phase===phase)continuing=true;const body=bodyFor(phase,continuing);const preview=await previewAnalysis(body,{fetchImpl});setPlan({preview,body});onPlanning(true);}
   catch(e){setError(e.message);if(/speaker|role/i.test(e.message))setSpeakersOpen(true);}finally{lock.current=false;setBusy(false);onBusy(false);}
  }
  async function start(){
@@ -96,6 +98,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
    <span className="event-hint">{complete?'Opening saved findings is free.':'Nothing is charged until you approve.'}</span>
   </div>}
   {plan&&<section className="event-approval" aria-label="Review cost before analysis"><div className="event-approval-heading"><h3 ref={approvalHeading} tabIndex={-1}>{plan.preview.phase==='extract'?'Read both transcripts':'Compare the accounts'}</h3><span>{plan.preview.requestCount} new AI requests</span></div><div className="event-cost"><div><span>Estimated cost</span><strong>US ${plan.preview.cost.estimated.toFixed(2)}</strong></div><div><span>Conservative budget</span><strong>US ${plan.preview.cost.conservativeBudget.toFixed(2)}</strong></div></div>
+   {plan.preview.execution==='durable-steps'&&<label>Maximum spend for this phase (US$)<input aria-label="Maximum phase spend" disabled={plan.preview.budgetFixed} type="number" min="0.01" step="0.01" value={plan.preview.approvedBudgetUsd??plan.preview.cost.conservativeBudget} onChange={e=>setPlan(old=>({...old,preview:{...old.preview,approvedBudgetUsd:Number(e.target.value)}}))}/><small>A lower cap may stop with partial coverage. Completed work is kept; no automatic retries.</small></label>}
    <p>These are estimates, not a billing guarantee. Work already sent to the AI may still be charged if you cancel.</p>
    {plan.preview.approvedMemory?.enabled&&<p>{plan.preview.approvedMemory.selectedCount} approved private lessons included. This is reference guidance, not model training. The added text is included in this price.</p>}
    {plan.preview.phase==='extract'&&<p>This pays for reading only. We’ll show a separate comparison price afterwards.</p>}
@@ -109,6 +112,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
   <details className="event-options"><summary>Saved progress & options</summary>
    {readyToCompare&&<label className="event-confirmation"><input type="checkbox" checked={memoryEnabled} disabled={locked||Boolean(plan)} onChange={e=>setMemoryEnabled(e.target.checked)}/><span>Use approved private lessons for this comparison</span></label>}
    {readyToCompare&&<p className="event-hint">Optional. Only separately reviewed and released lessons from your own cases are eligible. Pending feedback and evaluation examples stay out. No scores come from memory.</p>}<p>Find an interrupted review or start again. Finding saved progress does not call the AI.</p><div className="event-option-actions">
+   {draft.analysis?.cloudJobId&&<button className="event-button-secondary" disabled={locked} onClick={async()=>{try{const data=await readCloudProgress(caseId,draft.analysis.cloudJobId,fetchImpl);if(data.result)await onCheckpoint({...draft,results:data.result.contradictions,analysis:data.result.analysis,dirty:true});setNotice(data.waiting?'A hosted request has no saved final result yet; do not start a replacement.':'Saved hosted progress restored.');}catch(e){setError(e.message);}}}>Restore hosted progress · free</button>}
    <button className="event-button-secondary" disabled={locked||caseId==='sample'} onClick={listJobs}>Find saved progress</button>
    {draft.analysis?.eventJobId&&<button className="event-button-secondary" disabled={locked} onClick={()=>recover()}>Restore latest checkpoint</button>}
    {editingNew&&<button className="event-button-secondary" disabled={locked} onClick={()=>{setEditingNew(false);setRoles(state.speakerRoles);setSameWitness(state.sameWitnessConfirmed);setPlan(null);}}>Keep previous review</button>}

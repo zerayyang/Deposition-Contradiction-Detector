@@ -2,8 +2,8 @@ import {buildPlan,previewPlan,executePlan,digest,outputBudget,userContent} from 
 import {assessCandidate} from './humanConfidencePipeline.js';
 import {utf8Bytes} from '../shared/documentLimits.js';
 const identity=req=>req.identity?.id??'test-local';
-const remainingPairs=(plan,result)=>plan.pairs.filter(p=>!result?.analysis?.tasks?.some(t=>t.id===p.id&&t.status==='completed'&&!result.analysis.issues?.some(i=>i.pairId===p.id)));
-function remainingPreview(plan,result){
+const remainingPairs=(plan,result)=>plan.pairs.filter(p=>!result?.analysis?.tasks?.some(t=>t.id===p.id&&t.status==='completed'));
+export function remainingPreview(plan,result){
  const pairs=remainingPairs(plan,result),output=outputBudget(plan);let estimatedInputTokens=0,inputTokenUpperBudget=0;
  for(const p of pairs){const bytes=utf8Bytes(userContent(plan.chunks[0][p.a],plan.chunks[1][p.b],plan.mode!=='single'));estimatedInputTokens+=Math.ceil(bytes/3);inputTokenUpperBudget+=bytes+8192;}
  // Include the full system prompt reserve from the original per-request budget.

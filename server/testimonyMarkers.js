@@ -1,3 +1,4 @@
+import {pdfReportingRanges} from './pdfReporting.js';
 // Preserve source offsets. Speaker roles are caller-supplied metadata, never
 // taken from a model claim. Unknown named turns are boundaries, not testimony.
 export const normalizeSpeakerLabel=label=>label.trim().replace(/\s+/g,' ').toUpperCase();
@@ -54,5 +55,6 @@ export function testimonyMarkers(text,options={}) {
     markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role,speaker:label,
       speakerKey:key,roleOrigin:mapped?'CALLER_METADATA':key==='THE WITNESS'?'EXPLICIT_WITNESS':documentHeading?'DOCUMENT_LABEL':known?'COURTROOM_LABEL':'UNRESOLVED',roleKnown});
   }
-  return [...markers.values()].sort((a,b)=>a.index-b.index);
+  const reporting=pdfReportingRanges(text,options.manifest?.pages??options.pages);
+  return [...markers.values()].filter(m=>!reporting.some(r=>m.index>=r.start&&m.index<r.end)).sort((a,b)=>a.index-b.index);
 }

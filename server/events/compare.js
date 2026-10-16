@@ -99,7 +99,7 @@ export function buildEventComparisonPlan({extractionPlan,extractionResult},{even
     validateCoverage(extracted,source.text,allowPartialExtraction);
     if(!Array.isArray(extracted.events))throw new Error('Extraction events are missing.');
     const checked=validateEventRecords(extracted.events,source);if(!checked.valid)throw new Error('Extraction events failed fresh deterministic source validation: '+JSON.stringify(checked.errors));
-    const index={...parseTestimonySource(source.text,{speakerRoles:source.speakerRoles}),text:source.text};
+    const index={...parseTestimonySource(source.text,{speakerRoles:source.speakerRoles,pages:source.pages}),text:source.text};
     if(index.diagnostics.some(d=>d.code==='UNKNOWN_SPEAKER'))throw new Error('Source roles are unresolved.');
     const groups=groupEvents(extracted.events,i);catalogs.push(groups);indexes.push(index);
     sourceDocuments.push({documentId:source.documentId,documentSha256:source.documentSha256,extractionCoverage:structuredClone(extracted.coverage),sourceDiagnostics:index.diagnostics,
@@ -141,7 +141,7 @@ function combineComparisons(tasks){
   for(const g of merged){const key=baseKey(g);if(!types.has(key))types.set(key,new Set());types.get(key).add(g.type);}
   return merged.map(g=>{const alternatives=[...types.get(baseKey(g))];return {...g,typeDisagreement:alternatives.length>1,typeAlternatives:alternatives,reviewRequired:g.reviewRequired||alternatives.length>1};});
 }
-export async function executeEventComparison({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map()}){
+export async function executeEventComparison({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map(),maxNewRequests=Infinity}){
   if(!knownPlans.has(plan))throw new Error('Comparison requires a fresh immutable plan built by this module.');
   if(approval?.planId!==plan.id||approval?.requestCount!==plan.requestCount||!Number.isFinite(approval?.maxUsd)||approval.maxUsd<plan.cost.conservativeBudget)throw new Error('Explicit approval of this comparison plan, request count and budget is required.');
   if(typeof callModel!=='function')throw new Error('Model transport is required.');
@@ -170,13 +170,16 @@ export async function executeEventComparison({plan,approval,callModel,signal,onE
   };
   const emit=async e=>{try{await onEvent(structuredClone(e));}catch(error){error.comparisonResult=structuredClone(snapshot());throw error;}};
   await emit({event:'start',plan:previewEventComparisonPlan(plan)});
+  let newRequests=0;
   for(const task of tasks){
     if(task.status==='COMPLETE')continue;
+    if(newRequests>=maxNewRequests&&task.mode!=='LOCAL_NON_WITNESS')break;
     if(signal?.aborted){cancelled=true;break;}
     task.status='RUNNING';await emit({event:'progress',taskId:task.id,planned:plan.requestCount});
     if(signal?.aborted){cancelled=true;task.status='CANCELLED';break;}
     task.attempted=true;
     try{
+      newRequests++;
       const message=await model({model:plan.model.id,max_tokens:plan.outputTokens,system:plan.system,output_config:{format:plan.outputFormat},messages:[{role:'user',content:JSON.stringify(task.input)}]},{signal,maxRetries:0});
       const usage=message?.usage;task.usage={known:Number.isSafeInteger(usage?.input_tokens)&&usage.input_tokens>=0&&Number.isSafeInteger(usage?.output_tokens)&&usage.output_tokens>=0,inputTokens:usage?.input_tokens,outputTokens:usage?.output_tokens,cacheCreation:usage?.cache_creation_input_tokens??0,cacheRead:usage?.cache_read_input_tokens??0};
       task.rawText=Array.isArray(message?.content)?message.content.filter(b=>b.type==='text').map(b=>b.text).join(''):'';task.responseSha256=digest(task.rawText);task.stopReason=message?.stop_reason??null;

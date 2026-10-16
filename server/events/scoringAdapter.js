@@ -20,7 +20,7 @@ function claimFor(source,event,document,index){
  return claim;
 }
 export function scoreEventComparisons(comparisonResult,extractionPlan){
- const indexes=extractionPlan.documents.map(d=>parseTestimonySource(d.text,{speakerRoles:d.speakerRoles}));
+ const indexes=extractionPlan.documents.map(d=>parseTestimonySource(d.text,{speakerRoles:d.speakerRoles,pages:d.pages}));
  const multipleWitnesses=indexes.some(index=>new Set(index.turns.filter(t=>t.role==='WITNESS'&&t.speaker).map(t=>t.speaker.trim().toUpperCase())).size>1);
  return comparisonResult.comparisons.map(comparison=>{
   const variant=comparison.variants[0];
@@ -29,7 +29,7 @@ export function scoreEventComparisons(comparisonResult,extractionPlan){
   const selected=sources.map(side=>side[0]);
   if(selected.some(s=>!s))throw new Error('Comparison has no validated witness quotation.');
   const claims=selected.map((source,i)=>claimFor(source,records[i],extractionPlan.documents[i],indexes[i]));
-  const options=Object.fromEntries(selected.map((source,i)=>['claim'+(i+1),{start:source.start,end:source.end,speakerRoles:extractionPlan.documents[i].speakerRoles}]));
+  const options=Object.fromEntries(selected.map((source,i)=>['claim'+(i+1),{start:source.start,end:source.end,speakerRoles:extractionPlan.documents[i].speakerRoles,pages:extractionPlan.documents[i].pages}]));
   const scored=assessCandidate({type:comparison.type,reasoning:variant.reasoning,claim1:claims[0],claim2:claims[1]},...extractionPlan.documents.map(d=>d.text),options);
   // Multiple supporting passages are kept, never stitched into fabricated text.
   // Unresolved event/identity/context cannot activate a numeric score.

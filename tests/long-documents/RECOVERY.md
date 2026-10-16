@@ -43,3 +43,7 @@ The provider's documentation states that adaptive thinking and answer text share
 `max_tokens`: https://platform.claude.com/docs/en/models/opus-5-5/migration-guide
 A larger budget reduces a known exhaustion risk; it does not guarantee completion.
 Actual cost and latency remain unmeasured until a separately approved live check.
+
+## Repeated filing furniture and procedural objections
+
+Run `node --test server/pdfReporting.test.js`. Fictional three-page source fixtures require confirmed repeated filing/header furniture at PDF page starts or ends to preserve witness continuation and exact original page offsets. Isolated headings stay boundaries. Literal form-only objections preserve a pending question; instructions, unknown/substantive speech and invented anchors must fail. The complete original quotation includes any intervening layout; a mapped quote is audited, never paraphrased. No classification truth or numeric calibration is implied.
