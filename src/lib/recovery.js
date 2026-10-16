@@ -1,6 +1,10 @@
+import {readApiJson} from './apiResponse.js';
+export function checkpointSaveWarning(error,analysis) {
+ return `Cloud save failed: ${error.message}. ${analysis?.recoveryEnabled===true?'The server checkpoint remains available under Saved analysis recovery.':'Results remain in this tab. Keep it open and click Save case to retry.'}`;
+}
 export async function recoveryRequest(fetchImpl,path,options={}) {
- const response=await fetchImpl(`/api/analysis/jobs${path}`,options),data=await response.json();
- if(!response.ok)throw new Error(data.error??'Recovery could not be loaded.');return data;
+ const response=await fetchImpl(`/api/analysis/jobs${path}`,options);
+ return readApiJson(response,'Recovery could not be loaded.');
 }
 export function recoveredDraft(current,record) {
  if(!record.result)throw new Error('No completed checkpoint is available yet. Original documents are still saved.');

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { openReviewReport } from "./lib/reviewReport.js";
 import RecoveryPanel from "./RecoveryPanel.jsx";
-import { recoveredDraft, recoveryRequest, beginAnalysisDraft } from "./lib/recovery.js";
+import { recoveredDraft, recoveryRequest, beginAnalysisDraft, checkpointSaveWarning } from "./lib/recovery.js";
 import AnalysisStatus from "./AnalysisStatus.jsx";
 import AuthGate from "./SupabaseCases.jsx";
 import { supabase } from "./lib/supabaseClient.js";
@@ -273,7 +273,7 @@ function Dashboard({ session }) {
           updateDraft(id,{results:event.contradictions,analysis:event.analysis,seconds:(performance.now()-start)/1000,dirty:true});
           setAnalysisProgress(`${event.analysis.completed} of ${event.analysis.planned} comparisons completed · ${event.analysis.failed} failed`);
           try{await persist(id,{...base,results:event.contradictions,analysis:event.analysis,seconds:(performance.now()-start)/1000});}
-          catch(e){setSaveError(`Cloud save failed: ${e.message}. The server checkpoint remains available under Saved analysis recovery.`);}
+          catch(e){setSaveError(checkpointSaveWarning(e,event.analysis));}
         }
       }});
       const order={DIRECT:0,INFERENTIAL:1,FALSE_POSITIVE:2},severity={HIGH:0,MEDIUM:1,LOW:2};

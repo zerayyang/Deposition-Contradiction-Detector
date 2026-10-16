@@ -22,3 +22,23 @@ Sources: https://vercel.com/docs/functions/limitations and https://vercel.com/ch
 - Optional deployment emulation with an installed Vercel CLI: `vercel dev --listen 5173`, then request `http://localhost:5173/api/health`. This step verifies Vercel routing; ordinary Vite development alone does not validate the deployed rewrite. Do not run alongside Vite on the same port.
 
 No deployment, paid analysis, or account-plan inspection was performed as part of preparing this adapter.
+
+## Website-first checkpoint (2026-10-15)
+
+Stay on the existing Vercel project; no paid hosting upgrade is required by this
+change. Build-time `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` must be
+set before building the login page. Runtime `ANTHROPIC_API_KEY`, Supabase settings
+and `DEMO_USER_IDS` must be configured before using authenticated analysis. Use
+only publishable Supabase credentials for browser code; no service-role key is
+needed. Configure Supabase site/redirect URLs for the actual Vercel origin.
+
+The client now reports hosting errors without raw parsing failures. Recovery
+availability is explicit: on Vercel, save results to the private case and keep the
+analysis tab open; do not promise disk-based resume. `.vercelignore` excludes local
+credentials, reports and private author data from CLI uploads. Only publish the
+reviewed Git commit. The current 60-second and payload limits still apply; capacity
+work is deferred. No claim of a successful live analysis follows from a local mock.
+
+Before deploying: `node --test tests/deployment/*.test.mjs` and `npm run build`.
+After deploying, check the login page and `/api/health` without starting analysis.
+Plan preview uses no model call. Starting paid analysis remains a separate action.

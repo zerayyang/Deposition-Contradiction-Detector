@@ -30,7 +30,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
  };
  return {
   async preview(req,res){try{const loaded=req.body?.resumeJobId?await load(req):null,plan=loaded?.plan??prepare(req.body),preview=loaded?remainingPreview(plan,loaded.record.result):previewPlan(plan);guard(preview);return res.json({...preview,...(loaded?{resumeJobId:loaded.record.id}:{})});}catch(e){return res.status(400).json({error:e.message});}},
-  async list(req,res){try{if(!jobStore)return res.json({jobs:[]});const records=await jobStore.list(identity(req),req.query.caseId);return res.json({jobs:records.map(r=>({id:r.id,caseId:r.caseId,state:r.state,updatedAt:r.updatedAt,completed:r.result?.analysis?.completed??0,planned:r.result?.analysis?.planned??null,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'}))});}catch{return res.status(500).json({error:'Recovery records could not be listed.'});}},
+  async list(req,res){try{if(!jobStore)return res.json({jobs:[],recoveryEnabled:false});const records=await jobStore.list(identity(req),req.query.caseId);return res.json({recoveryEnabled:true,jobs:records.map(r=>({id:r.id,caseId:r.caseId,state:r.state,updatedAt:r.updatedAt,completed:r.result?.analysis?.completed??0,planned:r.result?.analysis?.planned??null,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'}))});}catch{return res.status(500).json({error:'Recovery records could not be listed.'});}},
   async recover(req,res){try{const r=await jobStore.get(req.params.id,identity(req));return res.json({id:r.id,caseId:r.caseId,state:r.state,notice:r.notice??null,texts:r.texts,documents:r.documents,originalDocuments:r.originalDocuments,result:r.result,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'});}catch{return res.status(404).json({error:'Recovery record not found or unavailable.'});}},
   async cancel(req,res){try{
    await jobStore.get(req.params.id,identity(req));const running=runningJobs.get(req.params.id);
@@ -65,6 +65,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
    const originalResult=record?.result;
    try{
     await executePlan({plan,resume:originalResult,texts:[body.transcript1,body.transcript2],instructions,callModel:(params,options)=>callModel(params,{...options,auditRunId:record?.id}),signal:controller.signal,onEvent:async event=>{
+     if(event.analysis)event.analysis={...event.analysis,recoveryEnabled:Boolean(record)};
      if(event.analysis&&record)event.analysis={...event.analysis,jobId:record.id,recoveryEnabled:true,provenance:{...event.analysis.provenance,codeFingerprint}};
      // The server saves before sending a checkpoint or beginning the next paid call.
      if(record&&['checkpoint','result'].includes(event.event))record=await jobStore.checkpoint(record,event,event.event==='result'?event.analysis.status:'running');

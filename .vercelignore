@@ -1,0 +1,18 @@
+# Deploy application code, never private local material.
+.git/
+.analysis-jobs/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+Apps.tsx
+utils/
+tests/
+AGENTS.md
+.codex/
+.agents/
+coverage/
+tmp/
+.cache/
