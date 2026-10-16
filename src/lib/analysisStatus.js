@@ -32,13 +32,15 @@ export function remainingLabel(analysis, active, elapsed, sample) {
 }
 
 export function friendlyFailure(error = '') {
+  if (/approved memory|private memory/i.test(error)) return 'Approved lessons changed or could not be checked. Review a fresh plan, or turn memory off. Saved results remain available.';
   if (/finding\(s\) failed source grounding or processing/i.test(error)) return 'Some findings need source review; retained findings remain available.';
+  if (/Every source ID|Proposed event failed|Answer disposition lacks|Invalid event schema/i.test(error)) return 'Some reading notes have invalid or missing citations. Valid notes were retained; review the details before continuing.';
   if (/max_tokens/i.test(error)) return 'The AI reached its output limit before finishing. This comparison needs another approved analysis.';
   if (/quotation.*outside|quote.*section|quotation.*grounded|quotation.*passage/i.test(error)) return 'A quoted passage did not exactly match its source section.';
   if (/contradictions array/i.test(error)) return 'The AI response did not include the required findings list.';
   if (/timeout|timed out/i.test(error)) return 'The comparison took too long.';
   if (/credit|billing|payment/i.test(error)) return 'The AI provider reported a billing problem.';
-  if (/json|parse|truncat|max.tokens|stop.reason/i.test(error)) return 'The AI response could not be read completely.';
+  if (/json|parse|truncat|max.tokens|stop.reason/i.test(error)) return 'The AI response format could not be read. Saved response details can identify the cause.';
   if (/network|fetch|connect/i.test(error)) return 'The connection was interrupted.';
   return 'This comparison could not be completed.';
 }

@@ -6,7 +6,7 @@ import {DOCUMENT_LIMITS} from '../shared/documentLimits.js';
 import {createAnalysisHandlers} from './analysisHandlers.js';
 import {createAdmission,createRateLimit} from './runtimeControls.js';
 // Factory imports start no listener, invoke no model and read no credentials.
-export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIMITS.requestBytes,authenticate=null,jobStore=null,codeFingerprint,maxRequests,maxBudgetUsd,log=()=>{},staticDirectory=null}) {
+export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIMITS.requestBytes,authenticate=null,jobStore=null,codeFingerprint,maxRequests,maxBudgetUsd,log=()=>{},staticDirectory=null,readApprovedMemory=null}) {
  const app=express(),admission=createAdmission(),recoveryAdmission=createAdmission(),allowed=createRateLimit(),ipAllowed=createRateLimit({limit:90});app.disable('x-powered-by');
  app.use((_req,res,next)=>{res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY'});next();});
  app.get('/api/health',(_req,res)=>res.set('Cache-Control','no-store').json({status:'ok',service:'deposition-backend',uptimeSeconds:Math.floor(process.uptime()),externalServices:'not checked',callsClaude:false}));
@@ -35,7 +35,7 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   if(error.type==='entity.too.large')return res.status(413).json({error:'Analysis request exceeds the server size budget. No document was truncated and no model request started.'});
   if(error instanceof SyntaxError)return res.status(400).json({error:'Invalid JSON request.'});next(error);
  });
- const events=createEventHandlers({callModel,jobStore,codeFingerprint,maxRequests,maxBudgetUsd,log});
+ const events=createEventHandlers({callModel,jobStore,codeFingerprint,maxRequests,maxBudgetUsd,log,readApprovedMemory});
  app.post('/api/events/sources',events.sources);app.post('/api/events/plan',events.preview);app.post('/api/events/stream',events.stream);
  app.get('/api/events/jobs',events.list);app.get('/api/events/jobs/:id',events.recover);app.post('/api/events/jobs/:id/cancel',events.cancel);app.delete('/api/events/jobs/:id',events.remove);
  const handlers=createAnalysisHandlers({instructions,callModel,jobStore,codeFingerprint,maxRequests,maxBudgetUsd,log});

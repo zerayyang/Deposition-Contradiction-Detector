@@ -1,4 +1,5 @@
 import {buildPlan,previewPlan,executePlan,digest,outputBudget,userContent} from './documentAnalysis.js';
+import {assessCandidate} from './humanConfidencePipeline.js';
 import {utf8Bytes} from '../shared/documentLimits.js';
 const identity=req=>req.identity?.id??'test-local';
 const remainingPairs=(plan,result)=>plan.pairs.filter(p=>!result?.analysis?.tasks?.some(t=>t.id===p.id&&t.status==='completed'&&!result.analysis.issues?.some(i=>i.pairId===p.id)));
@@ -44,6 +45,17 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
    if(plan.requestCount!==1)return res.status(428).json({error:'This document pair requires a multi-request plan. Preview /api/analysis/plan and explicitly approve it before starting /api/analyze/stream.',plan:previewPlan(plan)});
    const controller=new AbortController(),close=()=>{if(!res.writableEnded)controller.abort();};res.on('close',close);
    try{const result=await executePlan({plan,texts:[req.body.transcript1,req.body.transcript2],instructions,callModel,signal:controller.signal});
+    // Preserve the established short JSON API's unverified-candidate contract.
+    // Strict streamed/PDF findings still require source grounding; rejected raw
+    // candidates remain in that analysis audit, never presented as verified.
+    if(!plan.manifests.some(Boolean))for(const task of result.analysis.tasks)for(const rejected of task.rejectedFindings??[]){
+     const candidate=rejected.candidate;
+     if(typeof candidate?.claim1?.original!=='string'||typeof candidate?.claim2?.original!=='string')continue;
+     if(req.body.transcript1.includes(candidate.claim1.original)&&req.body.transcript2.includes(candidate.claim2.original))continue;
+     const assessed=assessCandidate(candidate,req.body.transcript1,req.body.transcript2);
+     if(assessed.status==='NOT_EVALUABLE'&&assessed.notEvaluableReason==='UNVERIFIED_SOURCE')result.contradictions.push({...assessed,reviewOnly:true,sourceReferences:{claim1:[],claim2:[]},sourceRejection:{pairId:task.id,candidateIndex:rejected.candidateIndex,reason:rejected.reason}});
+    }
+    if(result.contradictions.length&&result.analysis.status==='failed')result.analysis.status='partial';
     if(result.analysis.status==='failed')return res.status(500).json({error:'Failed to analyze depositions',details:result.analysis.tasks[0]?.error,analysis:result.analysis});return res.json(result);
    }catch(e){if(!res.destroyed)return res.status(500).json({error:'Failed to analyze depositions',details:e.message});}finally{res.off('close',close);}
   },

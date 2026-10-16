@@ -1,4 +1,6 @@
 import fs from 'node:fs';
+import {providerOutputFormat} from './structuredOutput.js';
+import {decodeEventJson} from './jsonTransport.js';
 import {createHash} from 'node:crypto';
 import {MODEL,sectionDocument,validateDocuments} from '../documentAnalysis.js';
 import {parseTestimonySource} from '../testimonySource.js';
@@ -8,13 +10,14 @@ import {extractionWireSchema,parseExtractionMessage,materializeExtraction,valida
 
 const prompt=fs.readFileSync(new URL('./EXTRACTION_PROMPT.md',import.meta.url),'utf8');
 const builtPlans=new WeakSet();
+const outputFormat=providerOutputFormat(extractionWireSchema);
 const system=prompt+'\nOutput transport schema:\n'+JSON.stringify(extractionWireSchema);
 const hash=value=>createHash('sha256').update(typeof value==='string'?value:JSON.stringify(value)).digest('hex');
 const round=n=>Math.round(n*1e6)/1e6;
 const planHash=plan=>hash(Object.fromEntries(Object.entries(plan).filter(([key])=>key!=='id')));
 function freeze(value){if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;}
 function positive(value,name){if(!Number.isSafeInteger(value)||value<1)throw new Error(`${name} must be a positive integer.`);return value;}
-function requestParams(plan,task){return {model:plan.model.id,max_tokens:plan.outputTokens,system:plan.system,messages:[{role:'user',content:JSON.stringify(task.input)}]};}
+function requestParams(plan,task){return {model:plan.model.id,max_tokens:plan.outputTokens,system:plan.system,output_config:{format:plan.outputFormat},messages:[{role:'user',content:JSON.stringify(task.input)}]};}
 
 export function buildEventExtractionPlan(inputs,{chunkBytes=16000,overlapBytes=1000,outputTokens=16384,maxRequests=128,timeoutMs=120000}={}) {
   if(!Array.isArray(inputs)||!inputs.length||inputs.length>2)throw new Error('Provide one or two complete documents.');
@@ -57,7 +60,7 @@ export function buildEventExtractionPlan(inputs,{chunkBytes=16000,overlapBytes=1
         mode:[...visible.values()].some(s=>s.role==='WITNESS'&&s.assigned)?'MODEL':'LOCAL_NON_WITNESS',
         input:{documentId:input.documentId,documentSha256:source.documentSha256,range:{start:chunk.start,end:chunk.end,coreStart:chunk.coreStart,coreEnd:chunk.coreEnd},text:chunk.text,sources:[...visible.values()]}};
       if(task.mode==='MODEL'){
-        const bytes=utf8Bytes(system)+utf8Bytes(JSON.stringify(task.input));
+        const bytes=utf8Bytes(system)+utf8Bytes(JSON.stringify(outputFormat))+utf8Bytes(JSON.stringify(task.input));
         if(bytes+8192+outputTokens>MODEL.contextTokens)throw new Error('Extraction request exceeds the conservative context budget; no source text was truncated.');
         inputBytes+=bytes;
       }
@@ -67,7 +70,7 @@ export function buildEventExtractionPlan(inputs,{chunkBytes=16000,overlapBytes=1
   }
   const requestCount=tasks.filter(t=>t.mode==='MODEL').length;
   if(requestCount>maxRequests)throw new Error(`Extraction needs ${requestCount} requests, above the configured cap of ${maxRequests}. No calls started.`);
-  const plan={version:1,model:MODEL,system,promptSha256:hash(prompt),wireSchemaSha256:hash(extractionWireSchema),documents,tasks,requestCount,outputTokens,timeoutMs,
+  const plan={version:1,model:MODEL,system,outputFormat,promptSha256:hash(prompt),wireSchemaSha256:hash(extractionWireSchema),documents,tasks,requestCount,outputTokens,timeoutMs,
     cost:{currency:'USD',estimated:round((Math.ceil(inputBytes/3)*MODEL.inputUsdPerMillion+requestCount*Math.min(2500,outputTokens)*MODEL.outputUsdPerMillion)/1e6),
       conservativeBudget:round(((inputBytes+requestCount*8192)*MODEL.inputUsdPerMillion+requestCount*outputTokens*MODEL.outputUsdPerMillion)/1e6),
       note:`Local UTF-8 estimates and existing standard model rates; not tokenization or verified billing. Estimate assumes up to 2,500 output tokens/call; budget reserves ${outputTokens} including thinking. No retries; in-flight cancellation can still be billed.`}};
@@ -93,7 +96,7 @@ export async function executeEventExtraction({plan,approval,callModel,signal,onE
   for(const task of tasks){const message=cachedResponses.get(hash(task.input));if(!message)continue;
     task.usage=usageFor(message);task.stopReason=message.stop_reason;
     task.rawText=message.content.filter(b=>b.type==='text').map(b=>b.text).join('');task.responseSha256=hash(task.rawText);
-    task.response=parseExtractionMessage(message);Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
+    task.response=parseExtractionMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
     if(task.issues.length)throw new Error('Saved completed extraction failed fresh validation. No new paid calls started.');
     task.status='COMPLETE';task.attempted=true;task.reused=true;
   }
@@ -132,7 +135,7 @@ export async function executeEventExtraction({plan,approval,callModel,signal,onE
       task.usage=usageFor(message);task.stopReason=message?.stop_reason??null;
       task.rawText=Array.isArray(message?.content)?message.content.filter(b=>b.type==='text').map(b=>b.text).join(''):'';
       task.responseSha256=hash(task.rawText);
-      task.response=parseExtractionMessage(message);
+      task.response=parseExtractionMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;
       Object.assign(task,materializeExtraction(task.response,task,plan.documents[task.documentIndex]));
       task.status=task.issues.length?'PARTIAL':'COMPLETE';
     }catch(error){task.error=error.message??String(error);task.status=signal?.aborted?'CANCELLED':'FAILED';if(signal?.aborted)cancelled=true;}

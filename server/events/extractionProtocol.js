@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import {decodeEventJson} from './jsonTransport.js';
 import {eventSchema,validateEventBundle,documentDigest} from './validate.js';
 
 // Transport has no authority to invent offsets, page refs, roles or coverage.
@@ -28,7 +29,7 @@ export function validateEventRecords(events,source) {
 export function parseExtractionMessage(message) {
   const rawText=Array.isArray(message?.content)?message.content.filter(b=>b.type==='text').map(b=>b.text).join(''):'';
   if(message?.stop_reason!=='end_turn')throw new Error(`Incomplete extraction response (${message?.stop_reason??'unknown stop reason'}).`);
-  const response=JSON.parse(rawText); // No fence stripping, repair, coercion or text rewriting.
+  const response=decodeEventJson(rawText).value; // Whole-wrapper decoding only; no repair or source rewriting.
   if(!envelope(response))throw new Error('Invalid extraction envelope: '+JSON.stringify(shapeErrors(envelope)));
   return response;
 }

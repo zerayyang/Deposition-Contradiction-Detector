@@ -8,7 +8,7 @@ import {createAnalysisHandlers} from '../../server/analysisHandlers.js';
 
 const response=()=>Object.assign(new EventEmitter(),{statusCode:200,lines:[],writableEnded:false,destroyed:false,status(n){this.statusCode=n;return this;},set(){return this;},json(body){this.body=body;return this;},flushHeaders(){},write(line){this.lines.push(line);},end(){this.writableEnded=true;}});
 test('hosting HTML errors become readable messages, never raw parser errors or HTML',async()=>{
- for(const [status,expected] of [[401,/Sign in again/],[413,/request limit/],[429,/busy/],[504,/stopped waiting/]]){
+ for(const [status,expected] of [[500,/backend could not start/],[401,/Sign in again/],[413,/request limit/],[429,/busy/],[504,/stopped waiting/]]){
   await assert.rejects(previewAnalysis({}, {fetchImpl:async()=>new Response('<html>PRIVATE_DIAGNOSTIC</html>',{status})}),expected);
  }
  await assert.rejects(recoveryRequest(async()=>new Response('<html>PRIVATE_DIAGNOSTIC</html>',{status:502}),'?caseId=example'),error=>/temporarily unavailable/.test(error.message)&&!error.message.includes('PRIVATE_DIAGNOSTIC'));

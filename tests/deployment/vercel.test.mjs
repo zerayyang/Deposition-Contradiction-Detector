@@ -10,9 +10,9 @@ test('Vercel import exports the same Express app without starting a listener',()
  Server.prototype.listen=function(){throw new Error('Unexpected listener during Vercel import');};
  const {default:app}=await import('./server.js');
  const {default:handler}=await import('./api/index.js');
- if(typeof app!=='function'||handler!==app)throw new Error('Invalid Express export');
+ if(typeof app!=='function'||typeof handler!=='function')throw new Error('Invalid Express export');
  let response;
- app({url:'/api/health',method:'GET',headers:{},socket:{}},{setHeader(){},getHeader(){},end(body){response=JSON.parse(body);},on(){},once(){},emit(){}});
+ await handler({url:'/api/health',method:'GET',headers:{},socket:{}},{setHeader(){},getHeader(){},end(body){response=JSON.parse(body);},on(){},once(){},emit(){}});
  if(response?.status!=='ok'||response.callsClaude!==false)throw new Error('Original health route unavailable');`;
  const result=spawnSync(process.execPath,['--input-type=module','-e',script],{cwd:root,encoding:'utf8',env:{...process.env,VERCEL:'1',NODE_ENV:'production',DEMO_USER_IDS:'deployment-test',ANTHROPIC_API_KEY:'test-not-a-secret',SUPABASE_URL:'https://example.supabase.co',SUPABASE_PUBLISHABLE_KEY:'test-not-a-secret'}});
  assert.equal(result.status,0,result.stderr);
@@ -37,4 +37,15 @@ test('Vercel includeFiles is a single glob string and bundles runtime file reads
  const files=globSync(pattern,{cwd:root});
  for(const required of ['server/proper_prompts.md','server/status.html','server/configuration.js','server/authentication.js','server/sourceContext.js','shared/documentLimits.js','package-lock.json'])assert.ok(files.includes(required),`Missing runtime resource: ${required}`);
  assert.ok(!files.some(file=>file.startsWith('tests/')||file.startsWith('.env')||file.startsWith('.analysis-jobs/')));
+});
+
+test('startup errors return redacted JSON codes rather than crashing the adapter',()=>{
+ const script=`delete process.env.DEMO_USER_IDS;
+ const {default:handler}=await import('./api/index.js');let code,result;
+ const res={headersSent:false,status(n){code=n;return this;},set(){return this;},json(v){result=v;return this;}};
+ await handler({url:'/api/health',method:'GET'},res);
+ if(code!==503||result.code!=='DEMO_ACCESS_NOT_CONFIGURED')throw Error('Missing startup diagnostic');
+ if(JSON.stringify(result).includes('SECRET_SENTINEL'))throw Error('Credential disclosed');`;
+ const result=spawnSync(process.execPath,['--input-type=module','-e',script],{cwd:root,encoding:'utf8',env:{...process.env,VERCEL:'1',ANTHROPIC_API_KEY:'SECRET_SENTINEL'}});
+ assert.equal(result.status,0,result.stderr);assert.ok(!result.stderr.includes('SECRET_SENTINEL'));
 });

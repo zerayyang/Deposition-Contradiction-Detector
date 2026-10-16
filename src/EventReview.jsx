@@ -10,13 +10,14 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
  const [editingNew,setEditingNew]=useState(false);
  const [jobs,setJobs]=useState(null);
  const [roles,setRoles]=useState(()=>saved?.speakerRoles??[{},{}]);
+ const [memoryEnabled,setMemoryEnabled]=useState(saved?.comparison?.provenance?.approvedMemory?.enabled??false);
  const [sameWitness,setSameWitness]=useState(saved?.sameWitnessConfirmed??false);
  const [labels,setLabels]=useState(null),[plan,setPlan]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const controller=useRef(null),lock=useRef(false),approvalHeading=useRef(null);
  useEffect(()=>{if(plan)approvalHeading.current?.focus();},[plan]);
  useEffect(()=>()=>controller.current?.abort(),[]);
  const state=draft.analysis?.eventState;
- const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,
+ const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryEnabled,
   ...(continuing&&state?{eventState:state,...(draft.analysis.eventJobId?{eventJobId:draft.analysis.eventJobId}:{})}:{})});
  async function inspect(){
   if(lock.current)return;lock.current=true;
@@ -93,6 +94,7 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
   </div>}
   {plan&&<section className="event-approval" aria-label="Review cost before analysis"><div className="event-approval-heading"><h3 ref={approvalHeading} tabIndex={-1}>{plan.preview.phase==='extract'?'Read both transcripts':'Compare the accounts'}</h3><span>{plan.preview.requestCount} new AI requests</span></div><div className="event-cost"><div><span>Estimated cost</span><strong>US ${plan.preview.cost.estimated.toFixed(2)}</strong></div><div><span>Conservative budget</span><strong>US ${plan.preview.cost.conservativeBudget.toFixed(2)}</strong></div></div>
    <p>These are estimates, not a billing guarantee. Work already sent to the AI may still be charged if you cancel.</p>
+   {plan.preview.approvedMemory?.enabled&&<p>{plan.preview.approvedMemory.selectedCount} approved private lessons included. This is reference guidance, not model training. The added text is included in this price.</p>}
    {plan.preview.phase==='extract'&&<p>This pays for reading only. We’ll show a separate comparison price afterwards.</p>}
    {plan.preview.cachedRequests>0&&<p>{plan.preview.cachedRequests} saved responses will be checked again without new AI calls.</p>}
    {!plan.preview.recoveryEnabled&&<p className="event-hint">This host saves progress to your case as results arrive. Work interrupted before a result is saved may need to run again.</p>}
@@ -101,12 +103,14 @@ export default function EventReview({caseId,draft,fetchImpl,onCheckpoint,onBusy,
   {notice&&<p role="status" className="event-notice">{notice}</p>}{error&&<p role="alert" className="error">{error}</p>}
   {state&&<details className="event-audit"><summary>Review reading notes and sources</summary><p>These notes are the AI’s interpretation. Quotations are checked against the text; that does not prove the interpretation is right.</p>{state.extraction.documents.map((doc,i)=><div key={doc.documentId}><h3>Transcript {i+1} · {doc.events.length} notes</h3><p>{doc.coverage.segments.filter(s=>s.status==='PROCESSED').length} of {doc.coverage.segments.length} sections read · {doc.coverage.status.toLowerCase()}.</p>{doc.events.map(e=><article key={e.id}><h4>{e.summary}</h4>{e.sources.map(s=><blockquote key={s.id}><small>{s.role==='QUESTION'?'Question':'Witness'} · {s.pageRefs.length?s.pageRefs.map(p=>'PDF page '+p.pdfPage).join(', '):'text characters '+s.start+'–'+s.end}</small><p>{s.quote}</p></blockquote>)}<details><summary>Recorded details</summary><p>{e.kind} · {e.assertion.polarity.toLowerCase()}</p><ul>{e.attributes.map((a,n)=><li key={n}>{a.name}: {a.value??a.state.toLowerCase()} ({a.basis.toLowerCase()})</li>)}</ul></details>{e.unresolvedReasons.map((reason,n)=><p key={n}>{reason}</p>)}</article>)}</div>)}</details>}
   {state?.comparison&&<details className="event-audit"><summary>Matches needing clarification</summary>{state.comparison.tasks.flatMap(t=>(t.pairs??[]).filter(p=>p.reviewRequired).map(p=><p key={t.id+p.pairId}>{p.reason} {p.reviewReasons.join(' ')}</p>))}</details>}
-  <details className="event-options"><summary>Saved progress & options</summary><p>Find an interrupted review or start again. Finding saved progress does not call the AI.</p><div className="event-option-actions">
+  <details className="event-options"><summary>Saved progress & options</summary>
+   {readyToCompare&&<label className="event-confirmation"><input type="checkbox" checked={memoryEnabled} disabled={locked||Boolean(plan)} onChange={e=>setMemoryEnabled(e.target.checked)}/><span>Use approved private lessons for this comparison</span></label>}
+   {readyToCompare&&<p className="event-hint">Optional. Only separately reviewed and released lessons from your own cases are eligible. Pending feedback and evaluation examples stay out. No scores come from memory.</p>}<p>Find an interrupted review or start again. Finding saved progress does not call the AI.</p><div className="event-option-actions">
    <button className="event-button-secondary" disabled={locked||caseId==='sample'} onClick={listJobs}>Find saved progress</button>
    {draft.analysis?.eventJobId&&<button className="event-button-secondary" disabled={locked} onClick={()=>recover()}>Restore latest checkpoint</button>}
    {editingNew&&<button className="event-button-secondary" disabled={locked} onClick={()=>{setEditingNew(false);setRoles(state.speakerRoles);setSameWitness(state.sameWitnessConfirmed);setPlan(null);}}>Keep previous review</button>}
    {state&&!editingNew&&<button className="event-button-secondary" disabled={locked} onClick={()=>{if(window.confirm('Start a new reading plan? Your saved review stays until you approve a replacement.')){setEditingNew(true);setNotice('Check the witness and speakers, then review the new reading cost.');}}}>Start a new review</button>}
-  </div>{jobs&&<ul>{jobs.length?jobs.map(job=><li key={job.id}>{job.state} · {new Date(job.updatedAt).toLocaleString()} <button className="event-button-secondary" disabled={locked||job.state==='running'} onClick={()=>recover(job.id)}>Restore</button>{!job.backendMatches&&' The app changed; this checkpoint is for review only.'}</li>):<li>No server checkpoints were found for this case.</li>}</ul>}
+  </div>{jobs&&<ul>{jobs.length?jobs.map(job=><li key={job.id}>{job.state} · {new Date(job.updatedAt).toLocaleString()} <button className="event-button-secondary" disabled={locked||job.state==='running'} onClick={()=>recover(job.id)}>Restore</button>{!job.backendMatches&&' The app changed; saved responses must pass fresh checks before reuse.'}</li>):<li>No server checkpoints were found for this case.</li>}</ul>}
    {draft.analysis?.eventSummary&&<p>{draft.analysis.eventSummary.allComparisons} comparisons assessed; {draft.analysis.eventSummary.suppressedComparisons} additional comparisons kept in the report; {draft.analysis.eventSummary.unresolvedPairs} matches need review.</p>}
   </details>
  </section>;

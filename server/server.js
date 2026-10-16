@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import {createHash} from 'node:crypto';
 import {createApp} from './app.js';
+import {createApprovedMemoryReader} from './memory/approvedMemory.js';
 import {createJobStore} from './jobStore.js';
 import {createAuthentication} from './authentication.js';
 import {runtimeConfiguration} from './configuration.js';
@@ -23,7 +24,7 @@ hash.update(fs.readFileSync(path.join(root,'package-lock.json')));
 const codeFingerprint=hash.digest('hex');
 const anthropic=new Anthropic({apiKey:process.env.ANTHROPIC_API_KEY,maxRetries:0,timeout:600000});
 const callModel=createMeasuredModel((params,options)=>anthropic.messages.create(params,options),{timeoutMs,log});
-const app=createApp({instructions,callModel,authenticate,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
+const app=createApp({readApprovedMemory:createApprovedMemoryReader({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}),instructions,callModel,authenticate,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
 export default app;
 
 // Keep the existing local entry point, but never bind a port in Vercel.

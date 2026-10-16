@@ -172,3 +172,12 @@ Expected tooling behavior:
 
 These checks do not approve labels, prove event recall or measure model accuracy.
 No private documents, author/verifier outputs or paid services are read or called.
+
+## Response transport and recovery follow-up
+
+Whole-response Markdown JSON fences are explicitly decoded, audited and validated.
+Prose around fences, stitched objects, malformed JSON, partial output and fake scores
+remain failures. Fictional zero-call recovery passes only when the entire saved task
+passes current schema and exact-source checks. A fenced response with bad citations
+must stay partial; do not call it repaired. New extraction prompt/transport versions
+require a fresh reviewed plan. No gold labels or numeric calibration changed.

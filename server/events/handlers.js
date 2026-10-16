@@ -2,14 +2,14 @@ import {prepareEventWorkflow,executeEventWorkflow} from './workflow.js';
 import {reviewableSpeakerLabels} from './sourceRoles.js';
 const owner=req=>req.identity?.id??'test-local';
 const safeFiles=files=>files?.map(d=>d?Object.fromEntries(['path','name','size','type','extraction','pageMappingStale'].map(k=>[k,d[k]])):null);
-export function createEventHandlers({callModel,jobStore=null,codeFingerprint='local-test',maxRequests=12,maxBudgetUsd=25,log=()=>{}}){
+export function createEventHandlers({callModel,jobStore=null,codeFingerprint='local-test',maxRequests=12,maxBudgetUsd=25,log=()=>{},readApprovedMemory=null}){
  const active=new Map(),settings={codeFingerprint,maxRequests,maxBudgetUsd};
  async function load(req){
   let body=req.body,record=null;
   if(body?.eventJobId){
    if(!jobStore)throw new Error('Server recovery is unavailable; recover the saved case snapshot instead.');
    record=await jobStore.get(body.eventJobId,owner(req));
-   if(record.provenance.workflow!=='events-v1'||record.provenance.codeFingerprint!==codeFingerprint)throw new Error('Recovery pipeline or backend version changed. Saved work remains available for review.');
+   if(record.provenance.workflow!=='events-v1')throw new Error('Recovery pipeline or backend version changed. Saved work remains available for review.');
    if(jobStore.isActive(record.id))throw new Error('This event review is already running.');
    if(record.caseId!==body.caseId||record.texts[0]!==body.transcript1||record.texts[1]!==body.transcript2)throw new Error('Recovery does not match the selected case and source texts.');
    const saved=record.result?.analysis?.eventState;
@@ -17,7 +17,17 @@ export function createEventHandlers({callModel,jobStore=null,codeFingerprint='lo
    if(JSON.stringify(saved.speakerRoles)!==JSON.stringify(body.speakerRoles??[{},{}])||saved.sameWitnessConfirmed!==body.sameWitnessConfirmed)throw new Error('Source roles or witness confirmation changed; start a new review explicitly.');
    body={...body,documents:record.documents,eventState:saved};
   }
-  return {body,record,prepared:await prepareEventWorkflow(body,settings)};
+  let approvedMemory=null,checkMemory=null;
+  if(body.phase==='compare'&&body.useApprovedMemory){
+   if(!readApprovedMemory)throw new Error('Approved memory is not configured. Turn it off to continue without it.');
+   approvedMemory=await readApprovedMemory(req,body);let invalid=null;
+   checkMemory=async()=>{
+    if(invalid)throw invalid;
+    try{const current=await readApprovedMemory(req,body);if(current.snapshotSha256!==approvedMemory.snapshotSha256)throw new Error('Approved memory changed or was revoked. Review a fresh comparison plan; saved work remains available.');}
+    catch(e){invalid=e;throw e;}
+   };
+  }
+  return {body,record,prepared:await prepareEventWorkflow(body,{...settings,approvedMemory,checkMemory})};
  }
  return {
   sources(req,res){try{return res.json({documents:[req.body.transcript1,req.body.transcript2].map(text=>{

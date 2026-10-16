@@ -3,6 +3,7 @@ import {requireSpeakerReview} from './sourceRoles.js';
 import {createHash} from 'node:crypto';
 import {buildEventExtractionPlan,previewEventExtractionPlan,executeEventExtraction} from './extract.js';
 import {buildEventComparisonPlan,previewEventComparisonPlan,executeEventComparison} from './compare.js';
+import {parseExtractionMessage,materializeExtraction} from './extractionProtocol.js';
 import {scoreEventComparisons} from './scoringAdapter.js';
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const approval=plan=>({planId:plan.id,requestCount:plan.requestCount,maxUsd:plan.cost.conservativeBudget});
@@ -16,7 +17,9 @@ async function replayExtraction(plan,saved){
   const task=byInput.get(hash(JSON.parse(params.messages[0].content)));if(!task)throw new Error('Saved extraction is incomplete; no comparison was started.');return cachedMessage(task);
  }});
 }
-export async function prepareEventWorkflow(body,{codeFingerprint='local-test',maxRequests=12,maxBudgetUsd=25}={}){
+export async function prepareEventWorkflow(body,{codeFingerprint='local-test',maxRequests=12,maxBudgetUsd=25,approvedMemory=null,checkMemory=null}={}){
+ if(body?.useApprovedMemory!==undefined&&typeof body.useApprovedMemory!=='boolean')throw new Error('Memory preference must be a boolean.');
+ if(body?.phase==='compare'&&body.useApprovedMemory&&!approvedMemory)throw new Error('Approved memory must be checked by the server before comparison.');
  const phase=body?.phase??'extract';if(!['extract','compare'].includes(phase))throw new Error('Choose extraction or comparison.');
  if(typeof body?.sameWitnessConfirmed!=='boolean')throw new Error('Review whether both documents concern the same witness.');
  const sourceOptions=body.speakerRoles??[{},{}];
@@ -24,24 +27,34 @@ export async function prepareEventWorkflow(body,{codeFingerprint='local-test',ma
  [body.transcript1,body.transcript2].forEach((text,i)=>requireSpeakerReview(text,sourceOptions[i]));
  const extractionPlan=buildEventExtractionPlan([body.transcript1,body.transcript2].map((text,i)=>({documentId:`transcript-${i+1}`,text,extraction:body.documents?.[i]?.extraction,pageMappingStale:body.documents?.[i]?.pageMappingStale,speakerRoles:sourceOptions[i]})),{maxRequests});
  const state=body.eventState;
- if(state&&state.codeFingerprint!==codeFingerprint)throw new Error('The backend changed. Saved event records remain available for review; start a new extraction rather than resuming under different code.');
+ // Fresh plan IDs, raw schema/source validation and comparison pipeline hashes
+ // govern reuse. A deployment fingerprint alone must not force repeated charges.
+ if(state&&state.extraction?.planId!==extractionPlan.id)throw new Error('Saved extraction belongs to different sources, roles or instructions. Start a new reading plan; existing results remain available.');
  let extraction=null,plan=extractionPlan;
  if(phase==='compare'){
   if(!state?.extraction||state.extraction.status!=='COMPLETE')throw new Error('Finish complete event extraction before comparing. Partial extraction remains available for review.');
   extraction=await replayExtraction(extractionPlan,state.extraction);
   extraction.elapsedMs=state.extraction.elapsedMs;
   if(extraction.status!=='COMPLETE')throw new Error('Saved raw extraction did not pass fresh validation. No paid comparison started.');
-  plan=buildEventComparisonPlan({extractionPlan,extractionResult:extraction},{sameWitnessConfirmed:body.sameWitnessConfirmed,maxRequests});
+  plan=buildEventComparisonPlan({extractionPlan,extractionResult:extraction},{sameWitnessConfirmed:body.sameWitnessConfirmed,maxRequests,approvedMemory:body.useApprovedMemory?approvedMemory:null});
  }
  const saved=phase==='extract'?state?.extraction:state?.comparison;
  // Only matching successful raw responses can be replayed. Partial/failed tasks
  // are retried solely after a fresh displayed approval; no automatic retries.
  const cache=new Map();
- if(saved?.planId===plan.id)for(const t of saved.tasks??[])if(t.status==='COMPLETE'&&t.rawText&&t.stopReason==='end_turn')cache.set(t.inputSha256,t);
+ if(saved?.planId===plan.id)for(const t of saved.tasks??[]){
+  if(!t.rawText||t.stopReason!=='end_turn')continue;
+  if(phase==='extract'){
+   const task=plan.tasks.find(task=>hash(task.input)===t.inputSha256);if(!task)continue;
+   try{const parsed=parseExtractionMessage(cachedMessage(t)),checked=materializeExtraction(parsed,task,plan.documents[task.documentIndex]);
+    if(!checked.issues.length)cache.set(t.inputSha256,t);else if(t.status==='COMPLETE')throw new Error('Invalid completed cache.');
+   }catch{if(t.status==='COMPLETE')throw new Error('Saved completed extraction failed fresh validation. No new paid calls started.');}
+  }else if(t.status==='COMPLETE')cache.set(t.inputSha256,t);
+ }
  const paidTasks=plan.tasks.filter(t=>t.mode!=='LOCAL_NON_WITNESS'&&!cache.has(hash(t.input)));
  // Reprice each remaining request from its actual prompt bytes. Never average
  // unequal request sizes or bill cached work as new provider requests.
- const inputBytes=paidTasks.reduce((sum,t)=>sum+utf8Bytes(plan.system)+utf8Bytes(JSON.stringify(t.input)),0);
+ const inputBytes=paidTasks.reduce((sum,t)=>sum+utf8Bytes(plan.system)+utf8Bytes(JSON.stringify(plan.outputFormat))+utf8Bytes(JSON.stringify(t.input)),0);
  const round=n=>Math.round(n*1e6)/1e6;
  const cost={currency:'USD',estimated:round((Math.ceil(inputBytes/3)*plan.model.inputUsdPerMillion+paidTasks.length*Math.min(2500,plan.outputTokens)*plan.model.outputUsdPerMillion)/1e6),
  conservativeBudget:round(((inputBytes+paidTasks.length*8192)*plan.model.inputUsdPerMillion+paidTasks.length*plan.outputTokens*plan.model.outputUsdPerMillion)/1e6),note:'Local uncached UTF-8 estimate for new requests only, not verified billing. Output includes thinking; no automatic retries. In-flight cancellation can still be billed.'};
@@ -51,12 +64,12 @@ export async function prepareEventWorkflow(body,{codeFingerprint='local-test',ma
   cost,
   nextPhase:phase==='extract'?'Comparison count and price require separate approval after extraction.':null};
  if(preview.requestCount>maxRequests||preview.cost.conservativeBudget>maxBudgetUsd)throw new Error(`Event phase exceeds the server allowance (${maxRequests} requests / USD ${maxBudgetUsd}). Nothing was omitted and no paid call started.`);
- return {phase,plan,extractionPlan,extraction,cache,preview,codeFingerprint};
+ return {phase,plan,extractionPlan,extraction,cache,preview,codeFingerprint,checkMemory};
 }
 export async function executeEventWorkflow({prepared,body,callModel,signal,onEvent=()=>{}}){
  const {phase,plan,extractionPlan,extraction,cache,codeFingerprint}=prepared;
  let paidRequests=0;const started=performance.now();
- const invoke=async(params,options)=>{const cached=cache.get(hash(JSON.parse(params.messages[0].content)));if(cached)return cachedMessage(cached);paidRequests++;return callModel(params,options);};
+ const invoke=async(params,options)=>{const cached=cache.get(hash(JSON.parse(params.messages[0].content)));if(cached)return cachedMessage(cached);if(prepared.checkMemory)await prepared.checkMemory();options?.signal?.throwIfAborted();paidRequests++;return callModel(params,options);};
  const materialize=(raw,running=false)=>{
   const eventState={version:1,codeFingerprint,speakerRoles:body.speakerRoles??[{},{}],sameWitnessConfirmed:body.sameWitnessConfirmed,
    extraction:phase==='extract'?raw:extraction,comparison:phase==='compare'?raw:null};

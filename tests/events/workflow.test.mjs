@@ -46,10 +46,10 @@ test('comparison approval IDs are stable across fresh extraction replay',async()
  const first=await prepareEventWorkflow(request);await new Promise(resolve=>setTimeout(resolve,5));const second=await prepareEventWorkflow(JSON.parse(JSON.stringify(request)));
  assert.equal(first.preview.id,second.preview.id);
 });
-test('changed source, roles and backend identity cannot reuse prior extraction',async()=>{
+test('changed sources and roles block reuse; backend changes require fresh raw validation',async()=>{
  const input=body(),extracted=await extract(input),state=extracted.analysis.eventState;
  await assert.rejects(()=>prepareEventWorkflow({...input,phase:'compare',eventState:state,transcript1:input.transcript1+' extra'}),/different sources/);
- await assert.rejects(()=>prepareEventWorkflow({...input,phase:'compare',eventState:{...state,codeFingerprint:'other'}}),/backend changed/);
+ const upgraded=await prepareEventWorkflow({...input,phase:'compare',eventState:{...state,codeFingerprint:'other'}});assert.equal(upgraded.extraction.status,'COMPLETE');
  const modified=structuredClone(state);modified.extraction.tasks[0].rawText=modified.extraction.tasks[0].rawText.replace('I was at home all evening.','Invented words.');
  await assert.rejects(()=>prepareEventWorkflow({...input,phase:'compare',eventState:modified}),/fresh validation/);
 });
@@ -115,8 +115,7 @@ test('a failed durable checkpoint stops every later paid request',async()=>{
 });
 test('corrupt completed cache cannot cause an unapproved replacement call',async()=>{
  const input=body(),extracted=await extract(input),state=structuredClone(extracted.analysis.eventState);state.extraction.tasks[1].rawText='{"broken":true}';
- const resume={...input,eventState:state},prepared=await prepareEventWorkflow(resume);assert.equal(prepared.preview.requestCount,0);
- let calls=0;await assert.rejects(()=>executeEventWorkflow({prepared,body:resume,callModel:async()=>{calls++;}}));assert.equal(calls,0);
+ const resume={...input,eventState:state};await assert.rejects(()=>prepareEventWorkflow(resume),/fresh validation/);
 });
 test('event plans cannot override original texts through client metadata',async()=>{
  const input=body();input.documents=[{text:'Injected replacement source',documentId:'injected'},null];const prepared=await prepareEventWorkflow(input);
@@ -146,3 +145,13 @@ test('event controls and finding cards render saved source-linked records withou
  const completedHtml=renderToStaticMarkup(React.createElement(EventReview,{caseId:'case',draft:{texts:[input.transcript1,input.transcript2],files:[],analysis:result.analysis},fetchImpl:()=>{throw new Error('No calls while rendering');},onCheckpoint:()=>{},onBusy:()=>{},onTick:()=>{},onTiming:()=>{}}));assert.match(completedHtml,/href="#review-findings"/);
  const card=renderToStaticMarkup(React.createElement(ReviewCard,{result:result.contradictions[0]}));assert.match(card,/Source-linked event details/);assert.match(card,/Witness context/);
 });
+
+ test('a failed fenced response recovers without paid calls after fresh validation',async()=>{
+  const input=body(),extracted=await extract(input),state=structuredClone(extracted.analysis.eventState);
+  state.extraction.tasks[0].rawText='```json\n'+state.extraction.tasks[0].rawText+'\n```';state.extraction.tasks[0].status='FAILED';state.extraction.status='PARTIAL';state.codeFingerprint='earlier-build';
+  const request={...input,eventState:state},prepared=await prepareEventWorkflow(request);
+  assert.equal(prepared.preview.requestCount,0);assert.equal(prepared.preview.cachedRequests,2);
+  const restored=await executeEventWorkflow({prepared,body:request,callModel:async()=>{throw Error('No paid call allowed');}});
+  assert.equal(restored.analysis.status,'awaiting_comparison');assert.equal(restored.analysis.eventState.extraction.tasks[0].responseFormat,'MARKDOWN_JSON_FENCE');
+  assert.equal(restored.analysis.eventState.extraction.tasks[0].rawText,state.extraction.tasks[0].rawText);
+ });

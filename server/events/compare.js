@@ -1,4 +1,7 @@
 import fs from 'node:fs';
+import {providerOutputFormat} from './structuredOutput.js';
+import {decodeEventJson} from './jsonTransport.js';
+import {MEMORY_INSTRUCTIONS} from '../memory/approvedMemory.js';
 import {createHash} from 'node:crypto';
 import {MODEL,SECTION_OUTPUT_TOKENS,validateDocuments} from '../documentAnalysis.js';
 import {parseTestimonySource} from '../testimonySource.js';
@@ -11,11 +14,12 @@ const stop=originalInstructions.indexOf('## 6. Required Output');
 if(stop<0)throw new Error('Existing classification instruction boundary is missing.');
 const definitions=originalInstructions.slice(0,stop),instructions=fs.readFileSync(new URL('./COMPARISON_PROMPT.md',import.meta.url),'utf8');
 const pipelineSha256=digestSources();
-function digestSources(){const hash=createHash('sha256');for(const name of ['compare.js','comparisonProtocol.js','validate.js','extractionProtocol.js','../testimonySource.js','../testimonyMarkers.js','../documentAnalysis.js','../runtimeControls.js'])hash.update(name).update(fs.readFileSync(new URL(name,import.meta.url)));return hash.digest('hex');}
+function digestSources(){const hash=createHash('sha256');for(const name of ['compare.js','jsonTransport.js','structuredOutput.js','../memory/approvedMemory.js','comparisonProtocol.js','validate.js','extractionProtocol.js','../testimonySource.js','../testimonyMarkers.js','../documentAnalysis.js','../runtimeControls.js'])hash.update(name).update(fs.readFileSync(new URL(name,import.meta.url)));return hash.digest('hex');}
 const system=definitions+'\n\n'+instructions+'\nTransport schema:\n'+JSON.stringify(comparisonWireSchema);
 const digest=value=>createHash('sha256').update(typeof value==='string'?value:JSON.stringify(value)).digest('hex');
 function stable(value){if(Array.isArray(value))return value.map(stable);if(value&&typeof value==='object')return Object.fromEntries(Object.keys(value).sort().map(key=>[key,stable(value[key])]));return value;}
 function freeze(value){if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;}
+const outputFormat=providerOutputFormat(comparisonWireSchema);
 const knownPlans=new WeakSet(),round=n=>Math.round(n*1e6)/1e6;
 function eventKey(event){
   const sourceKey=s=>stable({role:s.role,start:s.start,end:s.end,quote:s.quote,pageRefs:s.pageRefs});
@@ -79,7 +83,7 @@ function validateCoverage(document,text,allowPartial){
   for(const e of document.events)if(!segments.some(s=>s.eventIds.includes(e.id)&&e.sources?.some(source=>source.role==='WITNESS'&&source.end>s.start&&source.start<s.end)))throw new Error('Extracted event is not linked to its assigned witness core range.');
   if(!allowPartial&&segments.some(s=>s.status!=='PROCESSED'))throw new Error('Extraction is incomplete; explicit partial-extraction review is required.');
 }
-export function buildEventComparisonPlan({extractionPlan,extractionResult},{eventsPerBlock=64,blockBytes=128000,maxRequests=128,maxPairs=1000000,outputTokens=SECTION_OUTPUT_TOKENS,timeoutMs=120000,sameWitnessConfirmed=false,allowPartialExtraction=false}={}){
+export function buildEventComparisonPlan({extractionPlan,extractionResult},{eventsPerBlock=64,blockBytes=128000,maxRequests=128,maxPairs=1000000,outputTokens=SECTION_OUTPUT_TOKENS,timeoutMs=120000,sameWitnessConfirmed=false,allowPartialExtraction=false,approvedMemory=null}={}){
   for(const [name,value] of Object.entries({eventsPerBlock,blockBytes,maxRequests,maxPairs,outputTokens,timeoutMs}))if(!Number.isSafeInteger(value)||value<1)throw new Error(`${name} must be a positive integer.`);
   if(eventsPerBlock>128)throw new Error('At most 128 primary events per block are supported; no events were discarded.');
   if(typeof sameWitnessConfirmed!=='boolean'||typeof allowPartialExtraction!=='boolean')throw new Error('Identity and partial-extraction flags must be explicit booleans.');
@@ -105,21 +109,22 @@ export function buildEventComparisonPlan({extractionPlan,extractionResult},{even
   if(pairCount>maxPairs)throw new Error(`Comparison needs ${pairCount} event pairs, above the configured cap. No paid calls started; nothing was omitted.`);
   const views=catalogs.map((groups,i)=>blocks(groups,indexes[i],eventsPerBlock,blockBytes)),requestCount=views[0].length*views[1].length;
   if(pairCount>maxPairs||requestCount>maxRequests)throw new Error(`Comparison needs ${pairCount} event pairs in ${requestCount} requests, above the configured cap. No paid calls started; nothing was omitted.`);
+  const comparisonSystem=system+(approvedMemory?'\n'+MEMORY_INSTRUCTIONS:'');
   const tasks=[];let inputBytes=0;
   for(const [a,left] of views[0].entries())for(const [b,right] of views[1].entries()){
-    const input={sameWitnessConfirmed,left,right},bytes=utf8Bytes(system)+utf8Bytes(JSON.stringify(input));
+    const input={sameWitnessConfirmed,left,right,...(approvedMemory?{approvedLessons:approvedMemory.examples}:{} )},bytes=utf8Bytes(comparisonSystem)+utf8Bytes(JSON.stringify(outputFormat))+utf8Bytes(JSON.stringify(input));
     if(bytes+8192+outputTokens>MODEL.contextTokens)throw new Error('A comparison request exceeds the conservative context budget; source context was not shortened.');
     inputBytes+=bytes;tasks.push({id:`${a}:${b}`,input,pairCount:left.records.length*right.records.length});
   }
   const upstreamIncomplete=extractionResult.status!=='COMPLETE'||sourceDocuments.some(d=>d.extractionCoverage.segments.some(s=>s.status!=='PROCESSED'));
-  const base={version:1,pipelineSha256,model:MODEL,system,classificationSha256:digest(definitions),promptSha256:digest(instructions),schemaSha256:digest(comparisonWireSchema),
+  const base={version:1,pipelineSha256,model:MODEL,system:comparisonSystem,outputFormat,approvedMemory:approvedMemory?{...approvedMemory.audit,snapshotSha256:approvedMemory.snapshotSha256}:null,classificationSha256:digest(definitions),promptSha256:digest(instructions),schemaSha256:digest(comparisonWireSchema),
     extractionPlanId:extractionPlan.id,extractionResultSha256:digest({...extractionResult,elapsedMs:0}),documents:sourceDocuments,catalogs,tasks,requestCount,pairCount,outputTokens,timeoutMs,sameWitnessConfirmed,upstreamIncomplete,
     cost:{currency:'USD',estimated:round((Math.ceil(inputBytes/3)*MODEL.inputUsdPerMillion+requestCount*Math.min(2500,outputTokens)*MODEL.outputUsdPerMillion)/1e6),
       conservativeBudget:round(((inputBytes+requestCount*8192)*MODEL.inputUsdPerMillion+requestCount*outputTokens*MODEL.outputUsdPerMillion)/1e6),
       note:'Local UTF-8 estimate at existing uncached rates, not verified billing. Output reserve includes thinking. No retries; cancelled in-flight work can still be billed.'}};
   const built=freeze({...base,id:digest(base)});knownPlans.add(built);return built;
 }
-export function previewEventComparisonPlan(plan){return {id:plan.id,requestCount:plan.requestCount,pairCount:plan.pairCount,cost:plan.cost,model:plan.model.id,documents:plan.documents,sameWitnessConfirmed:plan.sameWitnessConfirmed,upstreamIncomplete:plan.upstreamIncomplete,
+export function previewEventComparisonPlan(plan){return {id:plan.id,requestCount:plan.requestCount,pairCount:plan.pairCount,cost:plan.cost,model:plan.model.id,documents:plan.documents,sameWitnessConfirmed:plan.sameWitnessConfirmed,upstreamIncomplete:plan.upstreamIncomplete,approvedMemory:plan.approvedMemory,
   notice:'Every primary event block crosses every block in the other document. Processing coverage is not semantic recall. Empty extraction can conceal missed events; no score is produced.'};}
 function combineComparisons(tasks){
   const groups=new Map();
@@ -137,7 +142,7 @@ function combineComparisons(tasks){
   return merged.map(g=>{const alternatives=[...types.get(baseKey(g))];return {...g,typeDisagreement:alternatives.length>1,typeAlternatives:alternatives,reviewRequired:g.reviewRequired||alternatives.length>1};});
 }
 export async function executeEventComparison({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map()}){
-  if(!knownPlans.has(plan)||plan.system!==system)throw new Error('Comparison requires a fresh immutable plan built by this module.');
+  if(!knownPlans.has(plan))throw new Error('Comparison requires a fresh immutable plan built by this module.');
   if(approval?.planId!==plan.id||approval?.requestCount!==plan.requestCount||!Number.isFinite(approval?.maxUsd)||approval.maxUsd<plan.cost.conservativeBudget)throw new Error('Explicit approval of this comparison plan, request count and budget is required.');
   if(typeof callModel!=='function')throw new Error('Model transport is required.');
   const model=createMeasuredModel(callModel,{timeoutMs:plan.timeoutMs}),started=performance.now();let cancelled=false;
@@ -145,7 +150,7 @@ export async function executeEventComparison({plan,approval,callModel,signal,onE
   for(const task of tasks){const message=cachedResponses.get(digest(task.input));if(!message)continue;
     const u=message.usage;task.usage={known:Number.isSafeInteger(u?.input_tokens)&&u.input_tokens>=0&&Number.isSafeInteger(u?.output_tokens)&&u.output_tokens>=0,inputTokens:u?.input_tokens,outputTokens:u?.output_tokens,cacheCreation:u?.cache_creation_input_tokens??0,cacheRead:u?.cache_read_input_tokens??0};
     task.stopReason=message.stop_reason;task.rawText=message.content.filter(b=>b.type==='text').map(b=>b.text).join('');task.responseSha256=digest(task.rawText);
-    task.response=parseComparisonMessage(message);Object.assign(task,validateComparisonResponse(task.response,task));
+    task.response=parseComparisonMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;Object.assign(task,validateComparisonResponse(task.response,task));
     if(task.issues.length)throw new Error('Saved completed comparison failed fresh validation. No new paid calls started.');
     task.status='COMPLETE';task.attempted=true;task.reused=true;
   }
@@ -160,7 +165,7 @@ export async function executeEventComparison({plan,approval,callModel,signal,onE
       tasks:tasks.map(({input,...t})=>({...t,assignment:{leftIds:input.left.records.map(r=>r.id),rightIds:input.right.records.map(r=>r.id)},inputSha256:digest(input)})),
       usage:{attempted:attempted.length,inputTokens:known?input:null,outputTokens:known?output:null,unavailableRequests:attempted.filter(t=>!t.usage?.known).length,
         estimatedUsd:known&&uncached?round((input*MODEL.inputUsdPerMillion+output*MODEL.outputUsdPerMillion)/1e6):null,note:'Configured-rate USD estimate, not verified billing or Codex credits.'},
-      provenance:{pipeline:'event-comparison-v1',pipelineSha256:plan.pipelineSha256,schemaSha256:plan.schemaSha256,classificationSha256:plan.classificationSha256,promptSha256:plan.promptSha256,extractionPlanId:plan.extractionPlanId,extractionResultSha256:plan.extractionResultSha256,model:plan.model.id},
+      provenance:{pipeline:'event-comparison-v1',approvedMemory:plan.approvedMemory,pipelineSha256:plan.pipelineSha256,schemaSha256:plan.schemaSha256,classificationSha256:plan.classificationSha256,promptSha256:plan.promptSha256,extractionPlanId:plan.extractionPlanId,extractionResultSha256:plan.extractionResultSha256,model:plan.model.id},
       elapsedMs:Math.round(performance.now()-started),notice:'Proposed AI categories and relationships, source-verified only. No numeric confidence is computed. The website scoring adapter is separate from this comparison engine.'};
   };
   const emit=async e=>{try{await onEvent(structuredClone(e));}catch(error){error.comparisonResult=structuredClone(snapshot());throw error;}};
@@ -172,10 +177,10 @@ export async function executeEventComparison({plan,approval,callModel,signal,onE
     if(signal?.aborted){cancelled=true;task.status='CANCELLED';break;}
     task.attempted=true;
     try{
-      const message=await model({model:plan.model.id,max_tokens:plan.outputTokens,system,messages:[{role:'user',content:JSON.stringify(task.input)}]},{signal,maxRetries:0});
+      const message=await model({model:plan.model.id,max_tokens:plan.outputTokens,system:plan.system,output_config:{format:plan.outputFormat},messages:[{role:'user',content:JSON.stringify(task.input)}]},{signal,maxRetries:0});
       const usage=message?.usage;task.usage={known:Number.isSafeInteger(usage?.input_tokens)&&usage.input_tokens>=0&&Number.isSafeInteger(usage?.output_tokens)&&usage.output_tokens>=0,inputTokens:usage?.input_tokens,outputTokens:usage?.output_tokens,cacheCreation:usage?.cache_creation_input_tokens??0,cacheRead:usage?.cache_read_input_tokens??0};
       task.rawText=Array.isArray(message?.content)?message.content.filter(b=>b.type==='text').map(b=>b.text).join(''):'';task.responseSha256=digest(task.rawText);task.stopReason=message?.stop_reason??null;
-      task.response=parseComparisonMessage(message);Object.assign(task,validateComparisonResponse(task.response,task));task.status=task.issues.length?'PARTIAL':'COMPLETE';
+      task.response=parseComparisonMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;Object.assign(task,validateComparisonResponse(task.response,task));task.status=task.issues.length?'PARTIAL':'COMPLETE';
     }catch(error){task.error=error.message??String(error);task.status=signal?.aborted?'CANCELLED':'FAILED';if(signal?.aborted)cancelled=true;}
     await emit({event:'checkpoint',result:snapshot()});if(cancelled)break;
   }

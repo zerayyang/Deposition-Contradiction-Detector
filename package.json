@@ -20,7 +20,9 @@
     "tests:reliability": "node --test tests/reliability/*.test.mjs server/contextReliability.test.js src/lib/recovery.test.js",
     "tests:load": "node tests/reliability/load.mjs",
     "tests:events": "node --test tests/events/*.test.mjs",
-    "tests:feedback": "node --test tests/feedback/*.test.mjs"
+    "tests:feedback": "node --test tests/feedback/*.test.mjs",
+    "tests:memory": "node --test tests/memory/*.test.mjs",
+    "demo:memory": "node tests/memory/demo.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

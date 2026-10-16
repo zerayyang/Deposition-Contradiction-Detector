@@ -46,3 +46,12 @@ exhaustive semantic recall merely because each unit has a disposition.
 No scores, probabilities, confidence values, evidence strengths or contradiction
 labels are allowed in the response. Do not smuggle such values into attributes.
 Keep unresolved meaning explicit; never fill missing facts with a guess.
+
+Citation scope is PER EVENT. Every assertion.sourceIds, attribute.sourceIds and
+qualifier.sourceId MUST name a source in that SAME event's sources array. A source
+listed only in another event is unavailable, even for shared actor/date context.
+If several events use the same witness or governing-question passage, repeat its
+exact quote in each event with a distinct source ID for that event. Use only the
+assigned witness unit and its supplied governing QUESTION unit. Do not borrow a
+question from a different answer to fill a date. If a field is not supported by
+these local sources, mark it UNSTATED or AMBIGUOUS rather than inventing support.

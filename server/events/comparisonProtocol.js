@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import {decodeEventJson} from './jsonTransport.js';
 
 const text={type:'string',minLength:1},ids={type:'array',items:text,uniqueItems:true};
 const issue={type:'object',additionalProperties:false,required:['issue','type','report','reasoning','leftSourceIds','rightSourceIds','missingContext'],properties:{
@@ -15,7 +16,7 @@ const issueShape=ajv.compile(issue),rangeShape=ajv.compile(comparisonWireSchema.
 export function parseComparisonMessage(message){
   if(message?.stop_reason!=='end_turn')throw new Error(`Incomplete event comparison (${message?.stop_reason??'unknown'}).`);
   const raw=Array.isArray(message.content)?message.content.filter(b=>b.type==='text').map(b=>b.text).join(''):'';
-  const parsed=JSON.parse(raw);
+  const parsed=decodeEventJson(raw).value;
   if(!envelope(parsed))throw new Error('Invalid comparison envelope: '+JSON.stringify(envelope.errors));
   return parsed;
 }
