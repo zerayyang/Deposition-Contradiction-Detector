@@ -99,3 +99,39 @@ by this extraction stage. No author or verifier artifacts are read.
 
 Run `npm run tests:events`. No paid API calls, server startup, credentials or private
 source files are needed. Read EXTRACTION.md before wiring this to a live transport.
+
+
+## Part 4 mocked matching/comparison (`compare.test.mjs`)
+
+Inputs are fictional testimony and manually constructed source-valid event records;
+mock model replies are scripted transport assertions. This does NOT measure live
+classification accuracy or create author gold. For the signing/denial mock, DIRECT
+is the scripted type under an assumed shared fact/occasion, not an approved finding.
+The tests also inject INFERENTIAL and FALSE_POSITIVE to check preservation of each
+category and prohibition of model confidence. Scope and semantic correctness still
+require human-reviewed evaluation of live outputs, not transport pass counts.
+
+| Scenario | Intended local behavior |
+| --- | --- |
+| Reordered / differently named / disputed-attribute records | Every block crosses the other document; no lexical or event-kind exclusion. |
+| Unrelated pairs | Explicit ranged dispositions with reasons and actual IDs; no invented type/score. |
+| Compatible/identical assessment | FALSE_POSITIVE audit retained even with report:false. |
+| Multiple issues in one pair | Every independent scripted issue retained. |
+| Unknown witness identity, event ambiguity, missing scope | Explicit review flags/reasons; no inferred shared person or occasion. |
+| Missing rows/cells, duplicates, overlap, invalid ranges | Visible issues; cannot count as a complete comparison. |
+| Bad citation or malformed issue | Rejected proposal/raw response retained; valid independent siblings survive. |
+| Question-only or opposite-document support | Rejected, never treated as a witness source. |
+| Model scores/evidence status/new label/rewritten quote | Strict validation rejects; no numerical confidence produced. |
+| Fully equivalent records | Conservative grouping, every original member preserved. |
+| Same quote/different interpretation or occasion | Separate records and findings; original question contexts retained. |
+| Distant corrections | Both-direction context includes old/new linked assertions; neither is deleted. |
+| Short excerpt hides qualifier | Full original witness answer and governing question supplied. |
+| Invalid source/hash/coverage, stale approval, cap/context excess | Stop before model invocation; no text or events silently omitted. |
+| Partial upstream extraction | Default block; explicit opt-in stays PARTIAL even if comparison tasks finish. |
+| Empty extracted events | Zero pairs exposed, not a clean-testimony claim. |
+| Provider/JSON/truncation errors | Failed/partial status, raw response and known usage retained, no retries. |
+| Cancellation/timeout/checkpoint failure | Stop further work appropriately; retain outcomes and pending-pair counts. |
+| Label/report disagreements | Keep variants and flag disagreement; never average or auto-relabel. |
+| Real Part 3 → Part 4 interface, mocked transports | Actual extracted event/result structures feed matching unchanged, with source/provenance checks. |
+| Two synthetic 225-page manifests | All 50,625 event pairs accounted; distant selected comparison cites original pages 225 and 1. |
+| Local checks | No paid calls, server startup, private sources or author/verifier artifacts. |

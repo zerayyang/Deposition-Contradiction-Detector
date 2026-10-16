@@ -1,4 +1,4 @@
-# General source-linked event records: Parts 1–3
+# General source-linked event records: Parts 1–4
 
 This is an isolated module, not a replacement analysis engine. The model prompt,
 presence prototype, classification definitions, numeric scoring formulas, Supabase
@@ -29,9 +29,10 @@ sourceDiagnostics; see SOURCE_HANDLING.md. Unknown named roles remain rejections
 
 Part 2 source handling is documented in SOURCE_HANDLING.md. Part 3 adds an
 isolated, approval-gated model extraction engine; see EXTRACTION.md.
-The current UI and API still use the existing analysis workflow. Event matching,
-comparison, confidence changes, database migrations, feedback, retrieval memory and
-live evaluation are outside Parts 1–3. The current presence regex is retained as a
+Part 4 adds isolated global event-block matching and source-linked classification;
+see COMPARISON.md. The current UI and API still use the existing analysis workflow.
+Confidence integration, database migrations, feedback, retrieval memory and live
+evaluation remain later stages. The current presence regex is retained as a
 checkpointed prototype; do not expand it into a hardcoded taxonomy or delete working
 production logic before a replacement passes independent checks.
 
@@ -42,3 +43,9 @@ Part 3 files: `extract.js` (lossless planning, spend approval, execution and pro
 (interface, actual limits and validation distinctions). No new packages are required.
 The prior general guidelines remain a design reference; the dedicated extraction
 prompt is used only when a trusted caller explicitly executes this new engine.
+
+
+Part 4 files: `compare.js`, `comparisonProtocol.js`, `COMPARISON_PROMPT.md` and
+`COMPARISON.md`. Matching/classification uses a fixed approved workflow, not
+self-delegating agents. Existing category definitions are loaded without edits;
+source verification stays deterministic and numeric scoring is not invoked.
