@@ -20,7 +20,9 @@ export function parseTestimonySource(text,options={}) {
         if(question&&!questionAnswered)questions.pop();
         questionAnswered=false;
         question={start:contentStart,end,text:text.slice(contentStart,end).trim(),speaker};
-        questions.push(question.text);
+        // The existing assessment consumes only its last four questions. Preserve
+        // all literal Q turns, but avoid quadratic copies of the whole history.
+        questions.push(question.text);questions=questions.slice(-4);
       }else if(role==='WITNESS') {
         // A newly identified witness cannot inherit the preceding witness's frame.
         const namedKey=marker.roleOrigin==='CALLER_METADATA'?speakerKey:null;

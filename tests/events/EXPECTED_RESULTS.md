@@ -67,3 +67,35 @@ labels or numeric targets are approved here.
 Run `npm run tests:events`. These are deterministic source-binding assertions,
 not an evaluation of AI-generated cases or legal classification accuracy. No paid
 calls are required. Numeric scoring correctness/calibration is outside Part 2.
+
+
+## Part 3 mocked extraction checks (`extract.test.mjs`)
+
+All snippets and PDF page manifests in these tests are synthetic. Mock event
+interpretations are scripted implementation inputs, not approved author gold or
+observed model accuracy. Classification types/numeric calibration are not tested
+by this extraction stage. No author or verifier artifacts are read.
+
+| Scenario | Intended behavior |
+| --- | --- |
+| One short / two complete inputs | Inert preview; independent extraction requests, stable immutable plan IDs. |
+| New event kind / uncertain assertion / unknown companions | Generic record shape accepted; uncertainty and nulls preserved. |
+| Missing, duplicate, extra, unsupported or unresolved answer disposition | Partial result with explicit issues; never claim complete processing. |
+| NO_EVENT with reason | Auditable model judgment accepted; not proof of recall. |
+| Invalid quote or invented punctuation | Quarantine original proposal; retain valid siblings and raw response. |
+| Model roles, offsets, pages, numeric confidence or scoring attributes | Strict rejection; code supplies source metadata, model supplies no score. |
+| Wrong question / nonliteral fields / question-only assertion | Existing deterministic source checks reject it. |
+| Repeated/overlapping quotes | Explicit occurrence required when ambiguous; exact selected offsets stay verifiable. |
+| Duplicate event IDs / invalid correction target | No overwrite or link repair; reject all duplicates/dependents visibly. |
+| Invalid JSON, fences, output truncation or malformed envelope | Failed task, original text and returned usage retained; no retries. |
+| Wrong approval, changed plan, request cap or invalid source | No model invocation. |
+| Named speech | Reviewed caller metadata required; no model-assigned witness role. |
+| Long continued answer | Full governing question retained; every core character accounted for. |
+| 3,000 Q/A pairs | Every source turn retained; copied working histories bounded to the existing four-question context window. |
+| 225 synthetic pages | Every page represented in source refs, exact offsets and complete core coverage. |
+| Failure/cancellation/timeout/checkpoint error | Retain completed records; expose failed/unprocessed ranges; stop on cancellation/checkpoint errors. |
+| Missing usage / unpriced cache | Cost unknown, never silently zero; recorded tokens remain distinct from Codex credits. |
+| Input and response objects | No mutation, coercion, auto-repair or caller-manifest freezing. |
+
+Run `npm run tests:events`. No paid API calls, server startup, credentials or private
+source files are needed. Read EXTRACTION.md before wiring this to a live transport.

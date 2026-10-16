@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import Ajv from 'ajv';
-import {witnessQuoteMatches} from '../sourceEvidence.js';
 import {parseTestimonySource} from '../testimonySource.js';
 
 export const eventSchema=JSON.parse(fs.readFileSync(new URL('./schema.v1.json',import.meta.url),'utf8'));
@@ -22,6 +21,8 @@ export function validateEventBundle(bundle,{documentId,text,pages=null,speakerRo
  let sourceIndex;
  try{sourceIndex=parseTestimonySource(text,{speakerRoles});}
  catch(error){return {valid:false,errors:[{path:'/speakerRoles',code:'SOURCE_OPTIONS',message:error.message}],eventResults:[],coverage:null};}
+ const witnessSpans=sourceIndex.turns.filter(turn=>turn.role==='WITNESS');
+ const witnessSpan=source=>witnessSpans.find(turn=>source.start>=turn.contentStart&&source.end<=turn.end);
  const questionSpans=sourceIndex.turns.filter(turn=>turn.role==='QUESTION').map(turn=>({start:turn.contentStart,end:turn.end}));
  const eventIds=new Set(),eventResults=[],sourceIds=new Set(),pageMap=new Map((Array.isArray(pages)?pages:[]).map(p=>[p.pdfPage,p]));
  if(pages!==null&&(!Array.isArray(pages)||pageMap.size!==pages.length||pages.some(p=>!Number.isInteger(p.pdfPage)||p.pdfPage<1||!Number.isInteger(p.start)||!Number.isInteger(p.end)||p.start<0||p.end<=p.start||p.end>text.length)))add('/pages','INVALID_PAGE_MAP','Page references need a valid caller-supplied extraction map.');
@@ -35,7 +36,7 @@ export function validateEventBundle(bundle,{documentId,text,pages=null,speakerRo
    if(sourceIds.has(source.id))add(path+'/id','DUPLICATE_ID','Source IDs must be unique within a document.');sourceIds.add(source.id);sources.set(source.id,source);
    if(source.end<=source.start||source.end>text.length||text.slice(source.start,source.end)!==source.quote)add(path,'QUOTE_MISMATCH','Offsets must reproduce the exact original quotation.');
    const inRole=source.role==='WITNESS'
-    ?witnessQuoteMatches(text,source.quote,{speakerRoles}).some(m=>m.index===source.start&&source.end<=m.end)
+    ?Boolean(witnessSpan(source))
     :questionSpans.some(s=>source.start>=s.start&&source.end<=s.end);
    if(!inRole)add(path+'/role','SOURCE_ROLE','Quotation is not inside a supported source span of the declared role. Unsupported speaker formats need review.');
    if(source.pageRefs.length&&pages===null)add(path+'/pageRefs','PAGE_MAP_REQUIRED','Do not invent page numbers without an extraction map.');
@@ -46,7 +47,7 @@ export function validateEventBundle(bundle,{documentId,text,pages=null,speakerRo
   }
   // A question context must actually govern an answer in the same proposed event.
   for(const question of event.sources.filter(source=>source.role==='QUESTION')){
-   const governs=event.sources.filter(source=>source.role==='WITNESS').some(source=>witnessQuoteMatches(text,source.quote,{speakerRoles}).some(match=>match.index===source.start&&match.question&&question.start>=match.question.start&&question.end<=match.question.end));
+   const governs=event.sources.filter(source=>source.role==='WITNESS').some(source=>((span)=>span?.question&&question.start>=span.question.start&&question.end<=span.question.end)(witnessSpan(source)));
    if(!governs)add(base+'/sources','QUESTION_NOT_GOVERNING','Question context must govern a preserved witness source in this event.');
   }
   const resolve=(ids,path)=>ids.map(id=>{const source=sources.get(id);if(!source)add(path,'UNKNOWN_SOURCE','Every source ID must refer to this event\'s preserved sources.');return source;}).filter(Boolean);

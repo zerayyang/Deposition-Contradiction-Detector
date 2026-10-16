@@ -6,7 +6,7 @@ export function witnessQuoteMatches(transcript, quote, options={}) {
         .filter(turn=>turn.role==='WITNESS')
         .map(turn=>({...turn,start:turn.contentStart}));
     const matches = [];
-    for (let index = transcript.indexOf(quote); index >= 0; index = transcript.indexOf(quote, index + quote.length)) {
+    for (let index = transcript.indexOf(quote); index >= 0; index = transcript.indexOf(quote, index + 1)) {
         const answer = answers.find(span => index >= span.start && index + quote.length <= span.end);
         if (!answer) continue;
         const before = transcript.slice(answer.start, index);

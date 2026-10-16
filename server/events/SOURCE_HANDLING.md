@@ -26,6 +26,9 @@ manifest to map offsets to original physical pages; no page numbers are inferred
 - A second named witness cannot inherit the first witness's question. A fresh
   question for the new witness remains available. Unanswered earlier questions
   are excluded from answered-question history.
+- All literal question turns remain preserved. The per-answer working history
+  contains up to four recent answered/current questions, matching the existing
+  assessment helper’s context window; it is not a replacement for full source text.
 - Plain text without recognized labels remains supported as submitted witness
   text. `UNLABELED_INPUT` explicitly says that no speaker identity is established.
   An orphan answer remains literal testimony but gets `QUESTION_UNRESOLVED`.

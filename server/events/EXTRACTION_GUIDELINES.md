@@ -1,8 +1,10 @@
-# General event extraction guidelines — proposed, not active production prompt
+# General event extraction guidelines — design reference
 
 Part 1 defines the output contract. It does not call a model, modify the current
 prompt, classify contradictions, match records across documents or calculate scores.
-The later extractor may use these guidelines after that stage is implemented.
+Part 3 now implements an isolated extractor with its own EXTRACTION_PROMPT.md
+and source-unit transport; see EXTRACTION.md. This design reference is not loaded
+into the current analysis prompt, and the UI has not switched to the new extractor.
 
 ## Task
 
@@ -61,4 +63,4 @@ See SOURCE_HANDLING.md. There is no automatic cover-sheet identity inference.
 These general guidelines are not learned memory. No case is automatically promoted
 into a reusable example. Private testimony, author analyses and held-out evaluation
 answers must not become production examples. Reviewed memory, database persistence,
-model extraction calls and comparisons are later separately approved stages.
+live extraction calls and comparisons require separate explicit approval.
