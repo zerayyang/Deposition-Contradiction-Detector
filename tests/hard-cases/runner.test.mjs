@@ -49,3 +49,11 @@ test('mocked event reading with a quarantined note never acknowledges gaps or st
  assert.equal(calls,2);assert.equal(result.requests,2);assert.equal(result.summaries.length,1);
  assert.equal(result.summaries[0].phase,'extraction');assert.notEqual(result.summaries[0].status,'awaiting_comparison');
 });
+test('a response with usage settles its reservation to measured cost',async()=>{
+ const model={id:'synthetic',inputUsdPerMillion:4,outputUsdPerMillion:20};
+ const transport=cappedTransport(async()=>({usage:{input_tokens:1000,output_tokens:1000}}),1,{model});
+ await transport.call({model:'synthetic',max_tokens:10000},{});
+ assert.equal(transport.reservedUsd,0.024);
+ const unknown=cappedTransport(async()=>({}),1,{model});await unknown.call({model:'synthetic',max_tokens:10000},{});
+ assert.ok(unknown.reservedUsd>0.2,'Missing usage keeps the full ceiling');
+});

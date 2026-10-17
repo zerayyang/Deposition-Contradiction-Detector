@@ -15,7 +15,10 @@ not extra primary rows/columns. Distinguish the same proposition from related to
 different people/occasions, reported speech and different predicates. No fixed event
 taxonomy, guessed alias or exact-word blocking rule may exclude a relevant pair.
 
-For each left event return one row. Each right event must appear exactly once:
+Return exactly requiredRows.count rows: one row for every id in requiredRows.leftIds,
+in that order, and no others. Never skip a left event. When no right event relates
+to it, still return its row with pairs [] and one unrelatedRanges interval covering
+every right position, with a checkable reason. Each right event must appear exactly once:
 either in pairs, or in an unrelatedRanges interval. Right positions are zero-based
 indices into right.records; intervals are [start,end), end exclusive. Ranges may
 only combine genuinely unrelated pairs and need a checkable reason. Do not call a

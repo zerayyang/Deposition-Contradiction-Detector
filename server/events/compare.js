@@ -116,7 +116,9 @@ export function buildEventComparisonPlan({extractionPlan,extractionResult},{even
   const comparisonSystem=system+(approvedMemory?'\n'+MEMORY_INSTRUCTIONS:'');
   const tasks=[];let inputBytes=0;
   for(const [a,left] of views[0].entries())for(const [b,right] of views[1].entries()){
-    const input={sameWitnessConfirmed,left,right,...(approvedMemory?{approvedLessons:approvedMemory.examples}:{} )},bytes=utf8Bytes(comparisonSystem)+utf8Bytes(JSON.stringify(outputFormat))+utf8Bytes(JSON.stringify(input));
+    // An explicit checklist: models skipped rows for left events with no related right event.
+    const requiredRows={count:left.records.length,leftIds:left.records.map(r=>r.id)};
+    const input={sameWitnessConfirmed,requiredRows,left,right,...(approvedMemory?{approvedLessons:approvedMemory.examples}:{} )},bytes=utf8Bytes(comparisonSystem)+utf8Bytes(JSON.stringify(outputFormat))+utf8Bytes(JSON.stringify(input));
     if(bytes+8192+outputTokens>MODEL.contextTokens)throw new Error('A comparison request exceeds the conservative context budget; source context was not shortened.');
     inputBytes+=bytes;tasks.push({id:`${a}:${b}`,input,pairCount:left.records.length*right.records.length});
   }

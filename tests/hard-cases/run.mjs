@@ -61,41 +61,50 @@ export async function prepareCases(cases,options){
 }
 // Future paid execution is a separately explicit opt-in. Reserve the entire local
 // byte-based request ceiling before each call; retain reservation on any error.
+// A response that reports usage settles to its measured cost so the cap tracks spend.
+const usageUsd=(usage,model)=>usage&&Number.isFinite(usage.input_tokens)&&Number.isFinite(usage.output_tokens)
+ ?money(((usage.input_tokens+(usage.cache_creation_input_tokens??0)*1.25+(usage.cache_read_input_tokens??0)*0.1)*model.inputUsdPerMillion+usage.output_tokens*model.outputUsdPerMillion)/1e6):null;
 export function cappedTransport(callModel,cap,{model=MODEL}={}){
- let reserved=0,calls=0;
- return {get reservedUsd(){return reserved;},get calls(){return calls;},async call(params,options){
+ let reserved=0,calls=0,capReached=false;
+ return {get reservedUsd(){return reserved;},get calls(){return calls;},get capReached(){return capReached;},async call(params,options){
   if(params.model!==model.id)throw Object.assign(new Error('Unpriced model refused.'),{code:'BUDGET_EXHAUSTED'});
   const bytes=Buffer.byteLength(JSON.stringify(params),'utf8');
   const ceiling=money(((bytes+8192)*model.inputUsdPerMillion+params.max_tokens*model.outputUsdPerMillion)/1e6);
-  if(!Number.isFinite(ceiling)||reserved+ceiling>cap)throw Object.assign(new Error('Approved spending cap reached; no request started.'),{code:'BUDGET_EXHAUSTED'});
+  if(!Number.isFinite(ceiling)||reserved+ceiling>cap){capReached=true;throw Object.assign(new Error('Approved spending cap reached; no request started.'),{code:'BUDGET_EXHAUSTED'});}
   reserved=money(reserved+ceiling);calls++;
-  return callModel(params,{...options,maxRetries:0});
+  const message=await callModel(params,{...options,maxRetries:0});
+  const used=usageUsd(message?.usage,model);
+  if(used!==null&&used<ceiling)reserved=money(reserved-ceiling+used);
+  return message;
  }};
 }
 // Labels and scores only; quotes stay in the private audit directory.
 const labelsOf=findings=>findings.map(f=>({type:f.type??null,humanConfidence:f.humanConfidence??null,status:f.status??null}));
 export async function executeCases(prepared,options,callModel){
  if(options.approveUsd===null)throw new Error('Paid execution refused: --approve-usd=CAP is required.');
- if(options.approveUsd<prepared.preview.conservativeBudgetUsd)throw new Error('Cap is below the selected phase conservative budget; no calls started.');
+ // The transport refuses any request whose ceiling would pass the cap, so the cap only
+ // needs to cover the realistic estimate; a run that reaches it stops cleanly.
+ if(options.approveUsd<prepared.preview.estimatedUsd)throw new Error('Cap is below the selected phase estimate; no calls started.');
  const transport=cappedTransport(callModel,options.approveUsd),summaries=[];
  for(const job of prepared.jobs){
   if(options.method==='direct'){
    const result=await executePlan({plan:job.plan,texts:job.texts,instructions:job.instructions,callModel:(...args)=>transport.call(...args)});
    summaries.push({id:job.id,attempt:job.attempt,phase:'direct',status:result.analysis.status,findings:result.contradictions.length,labels:labelsOf(result.contradictions)});
-   if(result.analysis.tasks.some(t=>t.status!=='completed'))break;
+   // Incomplete cases are recorded and left ungraded; only an exhausted cap stops the run.
+   if(transport.capReached)break;
   }else{
    const reading=await executeEventWorkflow({prepared:job.prepared,body:job.body,callModel:(...args)=>transport.call(...args)});
    summaries.push({id:job.id,attempt:job.attempt,phase:'extraction',status:reading.analysis.status});
    // Never acknowledge gaps automatically. A new explicitly reviewed run is
    // needed for incomplete reading; no retries or relaxed source validation.
-   if(reading.analysis.status!=='awaiting_comparison')break;
+   if(reading.analysis.status!=='awaiting_comparison'){if(transport.capReached)break;continue;}
    const body={...job.body,phase:'compare',eventState:reading.analysis.eventState};
    const comparison=await prepareEventWorkflow(body,{maxRequests:512,maxBudgetUsd:100000});
    const remaining=options.approveUsd-transport.reservedUsd;
-   if(comparison.preview.cost.conservativeBudget>remaining){summaries.push({id:job.id,phase:'comparison',status:'NOT_RUN_CAP',plannedRequests:comparison.preview.requestCount});break;}
+   if(comparison.preview.cost.estimated>remaining){summaries.push({id:job.id,phase:'comparison',status:'NOT_RUN_CAP',plannedRequests:comparison.preview.requestCount});break;}
    const result=await executeEventWorkflow({prepared:comparison,body,callModel:(...args)=>transport.call(...args)});
    summaries.push({id:job.id,attempt:job.attempt,phase:'comparison',status:result.analysis.status,findings:result.contradictions.length,labels:labelsOf(result.contradictions)});
-   if(result.analysis.status!=='complete')break;
+   if(transport.capReached)break;
   }
  }
  return {summaries,requests:transport.calls,reservedUsd:transport.reservedUsd,note:'Reserved ceiling at local rates, not measured provider spend. No accuracy grading.'};
@@ -106,15 +115,17 @@ async function main(){
  const prepared=await prepareCases(cases,options);
  console.log(JSON.stringify(prepared.preview,null,2));
  if(options.approveUsd===null)return;
- if(options.approveUsd<prepared.preview.conservativeBudgetUsd)throw new Error('Cap below conservative phase budget; no paid requests started.');
+ if(options.approveUsd<prepared.preview.estimatedUsd)throw new Error('Cap below the phase estimate; no paid requests started.');
  // No .env loading and no credential access whatsoever in preview mode.
  if(!process.env.ANTHROPIC_API_KEY)throw new Error('Explicit paid execution requires an exported credential; its value is never printed.');
  const {default:Anthropic}=await import('@anthropic-ai/sdk');
- const client=new Anthropic({apiKey:process.env.ANTHROPIC_API_KEY,maxRetries:0});
+ // Same explicit timeout as server.js; without it the SDK refuses long non-streaming requests locally.
+ const client=new Anthropic({apiKey:process.env.ANTHROPIC_API_KEY,maxRetries:0,timeout:600000});
  const auditDirectory=await fs.mkdtemp(join(tmpdir(),'deposition-hard-run-'));let responseNumber=0;
  console.log(JSON.stringify({auditDirectory,approvedCapUsd:options.approveUsd,automaticRetries:false}));
  const result=await executeCases(prepared,options,async(params,{signal}={})=>{
-  const message=await client.messages.create(params,{signal,maxRetries:0});
+  // Error kind and HTTP status only; provider messages may echo submitted testimony.
+  const message=await client.messages.create(params,{signal,maxRetries:0}).catch(e=>{console.error(`Request failed: ${e?.constructor?.name??'Error'} status=${e?.status??'none'}`);throw e;});
   await fs.writeFile(join(auditDirectory,`response-${++responseNumber}.json`),JSON.stringify(message),{mode:0o600});
   return message;
  });
