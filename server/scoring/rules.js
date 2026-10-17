@@ -238,11 +238,14 @@ function knowledge(f1,f2,context,config){
     }
     return unknown(id,fields,"No comparable knowledge/contact family.");
 }
+// "$10 billion", "USD 10 billion", "10 billion dollars" and "... of dollars" share one unit;
+// other currencies (CAD, C$) and units stay distinct.
+const unitKey=unit=>{const u=String(unit??'').replace(/^of\s+/,'').trim();return /^(?:\$|us\$|usd|(?:us\s+)?dollars?)$/.test(u)?'usd':u;};
 function quantity(f1,f2,context,config){
     const id="quantity",fields=["quantity","object"];
     const a=parseQuantityRange(f1.quantity,config),b=parseQuantityRange(f2.quantity,config);
     if(!a||!b)return unknown(id,fields,"Two supported numeric/number-word amounts are needed.");
-    if(blocked(context)||a.unit!==b.unit||(f1.object&&f2.object&&normalize(f1.object)!==normalize(f2.object)))return unknown(id,fields,"Quantity referents, units or event scopes differ.","MISSING_CONTEXT");
+    if(blocked(context)||unitKey(a.unit)!==unitKey(b.unit)||(f1.object&&f2.object&&normalize(f1.object)!==normalize(f2.object)))return unknown(id,fields,"Quantity referents, units or event scopes differ.","MISSING_CONTEXT");
     const positive=!overlaps(a,b),gap=positive?Math.max(a.earliest-b.latest,b.earliest-a.latest):0;
     return verified(id,fields,positive?"CONFLICT":"COMPATIBLE",positive?`Quantity ranges do not overlap; remaining gap is ${gap}.`:"Quantity ranges overlap.",config,{basis:"DERIVED",strength:positive?gapStrength(gap,config.quantityGapForFullStrength,config):0,target1:f1.quantity,target2:f2.quantity,limits:[...limitRange(a,f1.quantity),...limitRange(b,f2.quantity)],ranges:[a,b]});
 }

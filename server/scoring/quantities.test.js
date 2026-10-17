@@ -23,8 +23,17 @@ test('approximation uses existing configured widening; no new score weights or c
  assert.deepEqual(parse('close to 2,000 acres'),{earliest:1600,latest:2400,widenedBy:400,unit:'acres'});
  assert.deepEqual(parse('about ten people'),{earliest:8,latest:12,widenedBy:2,unit:'people'});
 });
+// Owner-approved 2026-10-17: these spoken forms each have one fixed reading.
+test('spoken amounts read with one fixed meaning each',()=>{
+ assert.deepEqual(parse('tens of millions of dollars'),range(10e6,99e6,'of dollars'));
+ assert.deepEqual(parse('hundreds of thousands of people'),range(100e3,999e3,'of people'));
+ assert.deepEqual(parse('a billion five'),range(1.5e9,1.5e9,''));
+ assert.deepEqual(parse('between a billion and a billion five'),range(1e9,1.5e9,''));
+ assert.deepEqual(parse('2,000 some-odd acres'),{earliest:1600,latest:2400,widenedBy:400,unit:'acres'});
+ for(const s of ['tens','some-odd','millions of dollars','tens of people'])assert.equal(parse(s),null,s);
+});
 test('ambiguous shorthand, vague magnitudes, malformed commas and unsupported bounds are never silently coerced',()=>{
- for(const s of ['tens of millions of dollars','a billion five','between a billion and a billion five','2,00 acres','20,00,000 dollars','one two people','1 billion to 2 dollars','one million and ten dollars','1,000.2.3 dollars','over 2,000 acres','at least 2,000 acres','50%','12:30','June 3','-20 dollars','3/4 acre','2,000 some-odd acres'])assert.equal(parse(s),null,s);
+ for(const s of ['2,00 acres','20,00,000 dollars','one two people','1 billion to 2 dollars','one million and ten dollars','1,000.2.3 dollars','over 2,000 acres','at least 2,000 acres','50%','12:30','June 3','-20 dollars','3/4 acre'])assert.equal(parse(s),null,s);
 });
 test('currencies are kept distinct and unsupported phrases cannot become a unitless number',()=>{
  assert.equal(parse('CAD 2 million').unit,'cad');assert.equal(parse('USD 2 million').unit,'usd');

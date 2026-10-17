@@ -28,10 +28,23 @@ function numberValue(text) {
     }
     return result+group;
 }
-// Supported literal amounts only. Unknown orders of magnitude ('tens of ...'),
-// malformed grouping, colloquial shorthand and unbounded values return null.
+// Spoken forms rewritten to the literal grammar below, each with one fixed meaning:
+// "1230 some-odd" is approximate; "a billion five" is 1.5 billion; "tens of millions"
+// is the whole 10-99 million range ("hundreds of ..." likewise 100-999).
+const DIGIT={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9};
+const ORDER={thousands:'thousand',millions:'million',billions:'billion'};
+const decimal=(scale,d)=>`1.${DIGIT[d]??d} ${scale}`;
+function spokenAmount(text){
+    return text
+        .replace(/^([\d,]+(?:\.\d+)?)\s+some[- ]odd\b/,'about $1')
+        .replace(/^(?:a|one)\s+(billion|million)\s+(one|two|three|four|five|six|seven|eight|nine|[1-9])(?=$|\s+(?:and|or|to)\s)/,(_,scale,d)=>decimal(scale,d))
+        .replace(/(\s(?:and|or|to)\s+)(?:a|one)\s+(billion|million)\s+(one|two|three|four|five|six|seven|eight|nine|[1-9])$/,(_,bridge,scale,d)=>bridge+decimal(scale,d))
+        .replace(/^(tens|hundreds) of (thousands|millions|billions)\b/,(_,size,order)=>size==='tens'?`10 to 99 ${ORDER[order]}`:`100 to 999 ${ORDER[order]}`);
+}
+// Supported literal amounts only. Other unknown orders of magnitude, malformed
+// grouping, unsupported shorthand and unbounded values return null.
 export function parseQuantityRange(phrase,config=SCORING_CONFIG) {
-    let text=String(phrase??'').toLowerCase().trim().replace(/[.!?]$/,'');
+    let text=spokenAmount(String(phrase??'').toLowerCase().trim().replace(/[.!?]$/,''));
     if(!text||/\b(?:am|pm|january|february|march|april|may|june|july|august|september|october|november|december|tens|hundreds|thousands|millions|billions|over|under|at least|at most|more than|less than|some-odd)\b/.test(text)||/[/%:]/.test(text)||/^[-−]/.test(text))return null;
     for(const m of text.matchAll(/\d[\d,]*(?:\.\d+)?/g))if(m[0].includes(',')&&!/^\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(m[0]))return null;
     const approximate=/\b(?:about|around|roughly|approximately|maybe|nearly|close to)\b|\bor so\b/.test(text);
