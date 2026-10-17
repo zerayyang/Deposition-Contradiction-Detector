@@ -119,6 +119,9 @@ function polarity(text) {
 // A conservative bridge for open event attributes. Reuse the same supported verb/
 // polarity grammar, returning only the literal full statement, never a new fact.
 export function literalActivityPhrase(statement){
+ // An opening "Yes."/"No." answers the question; the following first-person
+ // sentence carries its own polarity and is returned as the literal phrase.
+ if(typeof statement==='string')statement=statement.replace(/^\s*(?:yes|no)[.,]\s+(?=I\b)/i,'');
  if(typeof statement!=='string'||/[.!?][^\s.!?]/.test(statement)||/[.!?]\s+\S/.test(statement)
   ||/\b(?:if|unless|except|only|without|but|and|or|while|because|although|however|said|say|told|would|could|should|to)\b/i.test(statement))return null;
  return polarity(statement)?statement:null;

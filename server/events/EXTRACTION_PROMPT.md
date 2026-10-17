@@ -37,6 +37,23 @@ outside this request, targetEventId:null and an explicit review reason are requi
 Never silently reconcile, discard or overwrite an earlier assertion. A shared title,
 name or generic pronoun does not prove identity across documents.
 
+Shared attribute names. Names stay open-ended, but when a STATED witness value has
+one of these meanings, use exactly this lowercase name: activity (the asserted
+action or non-action as one contiguous phrase, keeping its negation), time (a clock
+time, date or period as spoken), location, person, object, quantity (a count or
+amount as spoken, keeping words such as "exactly" or "about"), state (a condition of
+a person or thing). Downstream code checks only these names; other names stay
+visible but unchecked. Use each shared name at most once per event. If an event has
+two values with the same meaning, such as a start and an end time, give both
+specific names instead of the shared name. Add specific names only for information
+the shared names cannot hold. Values must still be WITNESS_WORDS from that event's
+own witness quote.
+
+Quote whole answers. When a witness answer is one to three sentences about the same
+event, quote the complete answer, including an opening "Yes." or "No.", so its
+framing, negation and scope stay together. Quote only part of an answer when the
+rest concerns a different event.
+
 Give exactly one disposition for EVERY assigned WITNESS unit, including continued
 answer fragments. EVENTS lists the proposed event IDs supported by this unit.
 NO_EVENT needs a checkable reason, not an empty result by default. UNRESOLVED needs

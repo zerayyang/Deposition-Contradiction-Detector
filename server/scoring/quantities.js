@@ -35,6 +35,8 @@ export function parseQuantityRange(phrase,config=SCORING_CONFIG) {
     if(!text||/\b(?:am|pm|january|february|march|april|may|june|july|august|september|october|november|december|tens|hundreds|thousands|millions|billions|over|under|at least|at most|more than|less than|some-odd)\b/.test(text)||/[/%:]/.test(text)||/^[-−]/.test(text))return null;
     for(const m of text.matchAll(/\d[\d,]*(?:\.\d+)?/g))if(m[0].includes(',')&&!/^\d{1,3}(?:,\d{3})+(?:\.\d+)?$/.test(m[0]))return null;
     const approximate=/\b(?:about|around|roughly|approximately|maybe|nearly|close to)\b|\bor so\b/.test(text);
+    // A leading "exactly"/"precisely" restates an exact amount; mixed with an approximation it is ambiguous.
+    if(/^(?:exactly|precisely)\s+/.test(text)){if(approximate)return null;text=text.replace(/^(?:exactly|precisely)\s+/,'');}
     text=text.replace(/^(?:(?:about|around|roughly|approximately|maybe|nearly|close to|between|from)\s+)*/,'').replace(/\s+or so$/,'');
     const currency=text.match(/^(usd|cad|us\$|c\$|\$)\s*/)?.[0]??'';
     text=text.slice(currency.length);
