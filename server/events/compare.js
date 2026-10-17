@@ -85,7 +85,9 @@ function validateCoverage(document,text,allowPartial){
   for(const e of document.events)if(!segments.some(s=>s.eventIds.includes(e.id)&&e.sources?.some(source=>source.role==='WITNESS'&&source.end>s.start&&source.start<s.end)))throw new Error('Extracted event is not linked to its assigned witness core range.');
   if(!allowPartial&&segments.some(s=>s.status!=='PROCESSED'))throw new Error('Extraction is incomplete; explicit partial-extraction review is required.');
 }
-export function buildEventComparisonPlan({extractionPlan,extractionResult},{eventsPerBlock=64,blockBytes=128000,maxRequests=128,maxPairs=1000000,outputTokens=SECTION_OUTPUT_TOKENS,timeoutMs=120000,sameWitnessConfirmed=false,allowPartialExtraction=false,approvedMemory=null}={}){
+// Every left/right event pair needs an explicit disposition, so output grows with block size squared.
+// 32-event blocks keep each request near 1,000 pairs; timeout matches the server model timeout.
+export function buildEventComparisonPlan({extractionPlan,extractionResult},{eventsPerBlock=32,blockBytes=128000,maxRequests=128,maxPairs=1000000,outputTokens=SECTION_OUTPUT_TOKENS,timeoutMs=600000,sameWitnessConfirmed=false,allowPartialExtraction=false,approvedMemory=null}={}){
   for(const [name,value] of Object.entries({eventsPerBlock,blockBytes,maxRequests,maxPairs,outputTokens,timeoutMs}))if(!Number.isSafeInteger(value)||value<1)throw new Error(`${name} must be a positive integer.`);
   if(eventsPerBlock>128)throw new Error('At most 128 primary events per block are supported; no events were discarded.');
   if(typeof sameWitnessConfirmed!=='boolean'||typeof allowPartialExtraction!=='boolean')throw new Error('Identity and partial-extraction flags must be explicit booleans.');

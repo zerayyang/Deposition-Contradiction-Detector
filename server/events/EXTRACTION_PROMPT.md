@@ -49,6 +49,12 @@ specific names instead of the shared name. Add specific names only for informati
 the shared names cannot hold. Values must still be WITNESS_WORDS from that event's
 own witness quote.
 
+Uncertainty self-check. Before returning each event, set reviewRequired true and
+give at least one specific unresolvedReasons entry whenever ANY of these holds:
+assertion polarity UNCERTAIN or UNKNOWN; any attribute state AMBIGUOUS; any
+qualifier scope UNRESOLVED; any relation with targetEventId null. An event that
+meets one of these without reviewRequired true and a reason is rejected.
+
 Quote whole answers. When a witness answer is one to three sentences about the same
 event, quote the complete answer, including an opening "Yes." or "No.", so its
 framing, negation and scope stay together. Quote only part of an answer when the

@@ -20,7 +20,8 @@ function freeze(value){if(value&&typeof value==='object'){Object.values(value).f
 function positive(value,name){if(!Number.isSafeInteger(value)||value<1)throw new Error(`${name} must be a positive integer.`);return value;}
 function requestParams(plan,task){return {model:plan.model.id,max_tokens:plan.outputTokens,system:plan.system,output_config:{format:plan.outputFormat,effort:plan.effort},messages:[{role:'user',content:JSON.stringify(task.input)}]};}
 
-export function buildEventExtractionPlan(inputs,{chunkBytes=8000,overlapBytes=1000,outputTokens=32768,maxWitnessUnits=12,maxRequests=512,timeoutMs=120000}={}) {
+// Real testimony can need several minutes of adaptive thinking per request; match the server model timeout.
+export function buildEventExtractionPlan(inputs,{chunkBytes=8000,overlapBytes=1000,outputTokens=32768,maxWitnessUnits=12,maxRequests=512,timeoutMs=600000}={}) {
   if(!Array.isArray(inputs)||!inputs.length||inputs.length>2)throw new Error('Provide one or two complete documents.');
   positive(maxWitnessUnits,'maxWitnessUnits');positive(chunkBytes,'chunkBytes');positive(outputTokens,'outputTokens');positive(maxRequests,'maxRequests');positive(timeoutMs,'timeoutMs');
   if(!Number.isSafeInteger(overlapBytes)||overlapBytes<0||overlapBytes>=chunkBytes)throw new Error('overlapBytes must be smaller than chunkBytes and nonnegative.');
