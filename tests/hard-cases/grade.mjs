@@ -8,7 +8,7 @@ import {resolve} from 'node:path';
 // The strongest label the detector raised for a case; no flagged pair means FALSE_POSITIVE.
 export function predictedLabel(labels=[]){
  const types=new Set(labels.map(l=>l.type));
- return types.has('DIRECT')?'DIRECT':types.has('INFERENTIAL')?'INFERENTIAL':'FALSE_POSITIVE';
+ return ['DIRECT','INFERENTIAL','NEEDS_REVIEW'].find(t=>types.has(t))??'FALSE_POSITIVE';
 }
 export function gradeRun(results,references){
  const byId=new Map(references.map(r=>[r.id,r])),rows=[];
@@ -24,8 +24,13 @@ export function gradeRun(results,references){
  const by=label=>{const rs=graded.filter(r=>r.expected===label);return {cases:rs.length,correct:count(rs,r=>r.correct)};};
  return {rows,summary:{graded:graded.length,correct:count(graded,r=>r.correct),
   DIRECT:by('DIRECT'),INFERENTIAL:by('INFERENTIAL'),FALSE_POSITIVE:by('FALSE_POSITIVE'),
+  // Strict accuracy above. A NEEDS_REVIEW card still puts a real contradiction in front of
+  // a person, so it is counted as caught but not correct; on a compatible pair it is extra work.
+  caught:count(graded,r=>['DIRECT','INFERENTIAL'].includes(r.expected)&&r.predicted!=='FALSE_POSITIVE'),
+  sentToReview:count(graded,r=>r.predicted==='NEEDS_REVIEW'),
   missedContradictions:count(graded,r=>r.expected==='DIRECT'&&r.predicted==='FALSE_POSITIVE'),
-  falseAlarms:count(graded,r=>r.expected==='FALSE_POSITIVE'&&r.predicted!=='FALSE_POSITIVE'),
+  falseAlarms:count(graded,r=>r.expected==='FALSE_POSITIVE'&&['DIRECT','INFERENTIAL'].includes(r.predicted)),
+  compatibleSentToReview:count(graded,r=>r.expected==='FALSE_POSITIVE'&&r.predicted==='NEEDS_REVIEW'),
   incomplete:count(rows,r=>!r.complete),
   debatable:rows.filter(r=>r.expected==='DEBATABLE').map(r=>({id:r.id,predicted:r.predicted}))},
   note:'Draft reference labels from court rulings; not approved gold. Debatable and incomplete cases are not graded.'};

@@ -35,6 +35,35 @@ Apply the existing directness test before the inference test, including explicit
 
 missingContext lists only absent facts NECESSARY to establish this issue's identity, scope, overlap or incompatibility. It is not a list of everything an investigator could ask. Unknown details that cannot change the particular comparison belong in an optional follow-up in reasoning, not missingContext. An imagined reconciliation is not missing evidence by itself. Conversely, if the shared person/occasion, relevant interval or logical exclusion genuinely is unresolved, state it and keep review required. Never clear missingContext just to obtain a score; the model does not decide whether code can score an issue.
 
+NEEDS_REVIEW (this workflow only). This overrides the earlier instruction to keep
+three types and to use FALSE_POSITIVE for an unestablished conflict, including the
+"Unresolved timing — review needed" fallback. Use NEEDS_REVIEW when a reading that the
+testimony supports makes the pair DIRECT or INFERENTIAL, but one specific fact needed to
+establish that conflict is absent from the supplied testimony: the time anchor, the
+referent of a pronoun or fragment, whose situation a fragment describes, the scope, or
+whether the same event is meant. List each absent fact in missingContext and set
+report:true. FALSE_POSITIVE now means only that the testimony itself shows both
+statements can be true. Never use FALSE_POSITIVE for a possible conflict that depends
+on missing information, and never use NEEDS_REVIEW to avoid a conflict the testimony
+establishes.
+
+Reconciliations must come from the testimony. A pair is reconciled only by a
+distinction the witness, the governing question or other supplied testimony actually
+draws: a stated different time, occasion, person, scope, correction or qualification.
+Do not reconcile a conflict with a distinction neither side states, such as reading one
+answer as describing a rule and the other as describing practice, giving a common word
+a narrower technical meaning, or treating one answer as being about different material
+than its question indicates. If the only available reconciliation needs such an
+unstated distinction, classify the conflict under the DIRECT/INFERENTIAL tests, or use
+NEEDS_REVIEW if a needed fact is genuinely absent.
+
+A plain "yes" to a question about what the witness would do in their role, job or
+routine ("Would you approve...?", "Would you recommend...?") adopts a description of
+their usual practice, not a hypothetical, unless the question or answer marks it as
+hypothetical (if, suppose, imagine, would you be willing). Compare such an adopted
+practice with a later "never" or denial about the same activity under the directness
+test.
+
 Use FALSE_POSITIVE for independently compared compatible/identical details; set
 report:false when existing reporting rules exclude a standalone card, with an
 explicit explanation. Audit comparisons remain even when report:false.

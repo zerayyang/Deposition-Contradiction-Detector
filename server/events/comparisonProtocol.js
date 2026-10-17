@@ -3,7 +3,7 @@ import {decodeEventJson} from './jsonTransport.js';
 
 const text={type:'string',minLength:1},ids={type:'array',items:text,uniqueItems:true};
 const issue={type:'object',additionalProperties:false,required:['issue','type','report','reasoning','leftSourceIds','rightSourceIds','missingContext'],properties:{
-  issue:text,type:{enum:['DIRECT','INFERENTIAL','FALSE_POSITIVE']},report:{type:'boolean'},reasoning:text,leftSourceIds:ids,rightSourceIds:ids,missingContext:{type:'array',items:text}}};
+  issue:text,type:{enum:['DIRECT','INFERENTIAL','NEEDS_REVIEW','FALSE_POSITIVE']},report:{type:'boolean'},reasoning:text,leftSourceIds:ids,rightSourceIds:ids,missingContext:{type:'array',items:text}}};
 export const comparisonWireSchema={type:'object',additionalProperties:false,required:['schemaVersion','rows'],properties:{schemaVersion:{const:1},rows:{type:'array',items:{type:'object',additionalProperties:false,required:['leftId','pairs','unrelatedRanges'],properties:{
   leftId:text,pairs:{type:'array',items:{type:'object',additionalProperties:false,required:['rightId','relation','reason','comparisons'],properties:{rightId:text,relation:{enum:['RELATED','UNRESOLVED']},reason:text,comparisons:{type:'array',items:issue}}}},
   unrelatedRanges:{type:'array',items:{type:'object',additionalProperties:false,required:['start','end','reason'],properties:{start:{type:'integer',minimum:0},end:{type:'integer',minimum:0},reason:text}}}
@@ -55,7 +55,7 @@ export function validateComparisonResponse(response,task){
           const leftSources=sideSources(task.input.left,c.leftSourceIds,left),rightSources=sideSources(task.input.right,c.rightSourceIds,right);
           const id=JSON.stringify([task.id,left.id,right.id,comparisonIndex]);
           comparisons.push({...structuredClone(c),id,pairId,leftId:left.id,rightId:right.id,leftSources,rightSources,
-            reviewReasons:[...record.reviewReasons,...c.missingContext,...(pair.relation==='UNRESOLVED'?[pair.reason]:[])],reviewRequired:record.reviewRequired||c.missingContext.length>0,sourceVerified:true,taskId:task.id});
+            reviewReasons:[...record.reviewReasons,...c.missingContext,...(pair.relation==='UNRESOLVED'?[pair.reason]:[])],reviewRequired:record.reviewRequired||c.missingContext.length>0||c.type==='NEEDS_REVIEW',sourceVerified:true,taskId:task.id});
           record.comparisonIds.push(id);
         }catch(error){add('COMPARISON_SOURCE',error.message,{pairId,comparisonIndex});rejected.push({pairId,comparisonIndex,comparison:structuredClone(c),error:error.message});}
       }

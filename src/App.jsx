@@ -20,7 +20,7 @@ import CaseList from "./CaseList.jsx";
 import { CaseActions, DeleteCaseDialog } from "./CaseActions.jsx";
 import "./workspace.css";
 
-const label = type => ({ DIRECT: "Direct", INFERENTIAL: "Inferential", FALSE_POSITIVE: "False positive" }[type] ?? "Finding");
+const label = type => ({ DIRECT: "Direct", INFERENTIAL: "Inferential", NEEDS_REVIEW: "Needs review", FALSE_POSITIVE: "False positive" }[type] ?? "Finding");
 const blankDraft = (sample = false) => ({ texts: sample ? [TRANSCRIPT_1, TRANSCRIPT_2] : ["", ""], files: [null, null], results: null, seconds: null, analysis: null, selected: 0, reviewed: {}, notes: {}, dirty: false });
 const heading = result => {
   const a = result.claim1?.original ?? "";
@@ -290,7 +290,7 @@ function Dashboard({ session }) {
           catch(e){setSaveError(checkpointSaveWarning(e,event.analysis));}
         }
       }});
-      const order={DIRECT:0,INFERENTIAL:1,FALSE_POSITIVE:2},severity={HIGH:0,MEDIUM:1,LOW:2};
+      const order={DIRECT:0,INFERENTIAL:1,NEEDS_REVIEW:2,FALSE_POSITIVE:3},severity={HIGH:0,MEDIUM:1,LOW:2};
       const sorted=[...data.contradictions].sort((a,b)=>(order[a.type]??3)-(order[b.type]??3)||(severity[a.severity]??3)-(severity[b.severity]??3));
       const completed={...recoveredDraft(base,{id:data.analysis.jobId,state:data.analysis.status,texts:source.texts,originalDocuments:source.files,result:{...data,contradictions:sorted}}),seconds:(performance.now()-start)/1000};
       updateDraft(id,{...completed,dirty:true});
@@ -343,7 +343,7 @@ function Dashboard({ session }) {
       {reportError && <p className="error" role="alert">{reportError}</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {saveError && <p className="error" role="alert">{saveError}</p>}
-      <section className="review-layout" id="review-findings"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{findings.length}</span></div><div className="finding-filters" aria-label="Filter findings">{[["ALL","All"],["DIRECT","Direct"],["INFERENTIAL","Inferential"],["FALSE_POSITIVE","False positive"]].map(([value,text]) => <button key={value} aria-pressed={filter === value} className={filter === value ? "active" : ""} onClick={() => { setFilter(value); setCopyMessage(""); }}>{text}</button>)}</div>
+      <section className="review-layout" id="review-findings"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{findings.length}</span></div><div className="finding-filters" aria-label="Filter findings">{[["ALL","All"],["DIRECT","Direct"],["INFERENTIAL","Inferential"],["NEEDS_REVIEW","Needs review"],["FALSE_POSITIVE","False positive"]].map(([value,text]) => <button key={value} aria-pressed={filter === value} className={filter === value ? "active" : ""} onClick={() => { setFilter(value); setCopyMessage(""); }}>{text}</button>)}</div>
         {!draft.results && <div className="findings-empty"><span>⌕</span><h3>{loading ? "Review in progress" : "Start with two transcripts"}</h3><p>{loading ? "Findings will appear when analysis completes. Keep this tab open." : "Preview the text above, then analyze to compare the witness’s accounts."}</p></div>}
         {draft.results && visible.length === 0 && <p className="findings-empty">No findings in this category.</p>}
         <div className="finding-list">{visible.map(({result,index}) => <button key={index} className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); setCopyMessage(""); }}><span className={`type-chip ${result.type.toLowerCase()}`}>{label(result.type)}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{heading(result)}</h3><p>{result.reasoning?.slice(0,135)}{result.reasoning?.length > 135 ? "…" : ""}</p><span className="finding-arrow">›</span></button>)}</div>

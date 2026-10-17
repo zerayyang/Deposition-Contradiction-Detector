@@ -21,3 +21,11 @@ test('grading skips debatable and incomplete cases and counts misses and false a
  assert.equal(summary.missedContradictions,1);assert.equal(summary.falseAlarms,1);
  assert.equal(summary.incomplete,1);assert.deepEqual(summary.debatable,[{id:'c',predicted:'FALSE_POSITIVE'}]);
 });
+test('needs-review ranks below conflicts, counts as caught but not correct, and is not a false alarm',()=>{
+ assert.equal(predictedLabel([{type:'FALSE_POSITIVE'},{type:'NEEDS_REVIEW'}]),'NEEDS_REVIEW');
+ assert.equal(predictedLabel([{type:'NEEDS_REVIEW'},{type:'INFERENTIAL'}]),'INFERENTIAL');
+ const refs=[{id:'a',label:'DIRECT'},{id:'b',label:'FALSE_POSITIVE'}];
+ const {summary}=gradeRun({summaries:[{id:'a',phase:'comparison',status:'complete',labels:[{type:'NEEDS_REVIEW'}]},{id:'b',phase:'comparison',status:'complete',labels:[{type:'NEEDS_REVIEW'}]}]},refs);
+ assert.equal(summary.correct,0);assert.equal(summary.caught,1);assert.equal(summary.missedContradictions,0);
+ assert.equal(summary.falseAlarms,0);assert.equal(summary.compatibleSentToReview,1);assert.equal(summary.sentToReview,2);
+});

@@ -31,7 +31,7 @@ export function ReviewCard({result:r, dismissed=false}) {
   const reasoning = r.reasoning ?? "No explanation provided.";
   const question = followUp(reasoning);
   const assessment = question ? reasoning.replace(/(?:neutral\s+|possible\s+)?follow[- ]up(?:\s+question)?\s*:\s*["'“‘]?([\s\S]*?\?)["'”’]?/i, "").trim() : reasoning;
-  const labelFor = type => type === "DIRECT" ? "Direct" : type === "INFERENTIAL" ? "Inferential" : "False positive";
+  const labelFor = type => type === "DIRECT" ? "Direct" : type === "INFERENTIAL" ? "Inferential" : type === "NEEDS_REVIEW" ? "Needs review" : "False positive";
   const label = r.labelDisagreement ? "Labels disagree" : labelFor(r.type);
   const review = notEvaluable || r.flag === "REVIEW" || /^(Unresolved timing|Question meaning unresolved)/i.test(reasoning);
   return <article className={`review-card ${r.type?.toLowerCase() ?? ""}`}>
