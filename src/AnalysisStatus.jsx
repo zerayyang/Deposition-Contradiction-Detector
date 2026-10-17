@@ -10,7 +10,9 @@ export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }
   const reading=analysis.workflow==='events-v1'&&analysis.phase==='extract';
   const unit=analysis.workflow==='events-v1'&&analysis.phase==='extract'?'extraction requests':'comparisons';
   const gaps=readingHasGaps(analysis),documents=readingDocumentStats(analysis);
-  const title = gaps ? readingGapLabel : running ? (active ? 'Reviewing your documents' : 'Review interrupted') : (titles[analysis.status] ?? 'Review status');
+  // Gaps are reported once reading stops; while steps are still running, unread ranges are just pending.
+  const inProgress = running && active;
+  const title = inProgress ? 'Reviewing your documents' : gaps ? readingGapLabel : running ? 'Review interrupted' : (titles[analysis.status] ?? 'Review status');
   const remaining = remainingLabel(analysis, active, elapsed, timing);
   const failures = (analysis.tasks ?? []).filter(task => task.status === 'failed' || task.status === 'partial').map(task=>withReadingDiagnostics(analysis,task));
   const coverage = analysis.coverage ?? [];
@@ -18,7 +20,7 @@ export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }
   return <section className="analysis-status" aria-label="Analysis progress">
     <div className="analysis-status-heading"><h2>{title}</h2><span>{processed} of {total} {unit} finished</span></div>
     {documents.length>0&&<div aria-label="Reading coverage by document">{documents.map(doc=><p key={doc.document}><strong>{readingDocumentLabel(doc)}</strong></p>)}</div>}
-    {gaps&&<aside className="event-gap-review" role="note"><strong>{retainedNotesLabel}</strong><p>{readingGapWarning}</p></aside>}
+    {gaps&&!inProgress&&<aside className="event-gap-review" role="note"><strong>{retainedNotesLabel}</strong><p>{readingGapWarning}</p></aside>}
     <progress aria-label="Comparisons finished" value={processed} max={total || 1} />
     <div className="analysis-status-stats"><span>{completed} successful</span>{failed > 0 && <span>{failed} failed</span>}{partial > 0 && <span>{partial} partly completed</span>}{Number.isFinite(elapsed) && <span>Elapsed: {elapsedLabel(elapsed)}</span>}</div>
     {remaining && <p role="status" className="analysis-remaining">{remaining}</p>}
