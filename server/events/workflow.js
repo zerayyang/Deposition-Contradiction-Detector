@@ -49,7 +49,7 @@ export async function prepareEventWorkflow(body,{codeFingerprint='local-test',ma
  // Only matching successful raw responses can be replayed. Partial/failed tasks
  // are retried solely after a fresh displayed approval; no automatic retries.
  const cache=new Map(),retained=new Map();
- if(phase==='extract'&&saved?.planId===plan.id)for(const t of saved.tasks??[])if(['PARTIAL','FAILED'].includes(t.status))retained.set(t.inputSha256,t);
+ if(saved?.planId===plan.id)for(const t of saved.tasks??[])if(['PARTIAL','FAILED'].includes(t.status))retained.set(t.inputSha256,t);
  if(saved?.planId===plan.id)for(const t of saved.tasks??[]){
   if(!t.rawText||t.stopReason!=='end_turn')continue;
   if(phase==='extract'){

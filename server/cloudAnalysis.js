@@ -29,7 +29,13 @@ export function createCloudAnalysis({instructions,callModel,storeForRequest,code
   return {caseId,jobId,store,meta,latest,sequence,spent,claimed,cancelled,stale:meta.codeFingerprint!==codeFingerprint};
  }
  const decorate=(result,j)=>({...result,analysis:{...result.analysis,cloudJobId:j.jobId,cloudCaseId:j.caseId,execution:'durable-steps',recoveryEnabled:true,cloudSpentUsd:j.spent,cloudBudgetUsd:j.meta.maxUsd}});
- function final(result){if(!result)return false;if(result.analysis?.comparisonFinished===true)return true;if(readingCanContinue(result.analysis))return false;if(result.analysis?.workflow==='events-v1'&&result.analysis.phase==='extract'&&result.analysis.readingFinished===true)return true;return ['complete','awaiting_comparison','cancelled'].includes(result.analysis.status)||result.analysis.tasks?.some(t=>['failed','partial','cancelled'].includes(t.status));}
+ function final(result){if(!result)return false;if(result.analysis?.comparisonFinished===true)return true;if(readingCanContinue(result.analysis))return false;if(result.analysis?.workflow==='events-v1'&&result.analysis.phase==='extract'&&result.analysis.readingFinished===true)return true;if(['complete','awaiting_comparison','cancelled'].includes(result.analysis.status)||result.analysis.tasks?.some(t=>t.status==='cancelled'))return true;
+  // Budget exhaustion ends the run: no further paid work is possible under this approval.
+  if(result.analysis.budgetExhausted||result.analysis.tasks?.some(t=>t.errorCode==='BUDGET_EXHAUSTED'||/remaining approved budget/i.test(t.error??'')))return true;
+  // Direct comparison would retry a failed/partial pair on resume, so it stops there for a fresh approval.
+  if(result.analysis.workflow!=='events-v1'&&result.analysis.tasks?.some(t=>['failed','partial'].includes(t.status)))return true;
+  // Event comparison keeps and skips failed/partial tasks; the run continues until every approved task was attempted.
+  const tasks=result.analysis.tasks??[];return tasks.length>0&&!tasks.some(t=>['pending','not_attempted','running'].includes(t.status));}
  function reply(j){const result=j.latest?decorate(j.latest,j):null;return {jobId:j.jobId,caseId:j.caseId,spentUsd:j.spent,maxUsd:j.meta.maxUsd,result,done:Boolean(j.cancelled)||final(result),waiting:Boolean(j.claimed),notice:j.claimed?'A request was started but has no durable result yet. It may still be billed. No automatic retry is allowed.':null};}
  const error=(res,e)=>res.status(400).json({error:e.message});
  return {

@@ -145,7 +145,7 @@ function combineComparisons(tasks){
   for(const g of merged){const key=baseKey(g);if(!types.has(key))types.set(key,new Set());types.get(key).add(g.type);}
   return merged.map(g=>{const alternatives=[...types.get(baseKey(g))];return {...g,typeDisagreement:alternatives.length>1,typeAlternatives:alternatives,reviewRequired:g.reviewRequired||alternatives.length>1};});
 }
-export async function executeEventComparison({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map(),maxNewRequests=Infinity}){
+export async function executeEventComparison({plan,approval,callModel,signal,onEvent=()=>{},cachedResponses=new Map(),retainedTasks=new Map(),maxNewRequests=Infinity}){
   if(!knownPlans.has(plan))throw new Error('Comparison requires a fresh immutable plan built by this module.');
   if(approval?.planId!==plan.id||approval?.requestCount!==plan.requestCount||!Number.isFinite(approval?.maxUsd)||approval.maxUsd<plan.cost.conservativeBudget)throw new Error('Explicit approval of this comparison plan, request count and budget is required.');
   if(typeof callModel!=='function')throw new Error('Model transport is required.');
@@ -157,6 +157,15 @@ export async function executeEventComparison({plan,approval,callModel,signal,onE
     task.response=parseComparisonMessage(message);task.responseFormat=decodeEventJson(task.rawText).format;Object.assign(task,validateComparisonResponse(task.response,task));
     if(task.issues.length)throw new Error('Saved completed comparison failed fresh validation. No new paid calls started.');
     task.status='COMPLETE';task.attempted=true;task.reused=true;
+  }
+  // Saved failed/partial comparisons are replayed locally and never automatically retried,
+  // so later approved comparisons can still run in step-by-step (hosted) execution.
+  for(const task of tasks){const saved=retainedTasks.get(digest(task.input));if(!saved||task.status==='COMPLETE')continue;
+    task.attempted=true;task.reused=true;task.retained=true;task.usage=saved.usage??{known:false};task.stopReason=saved.stopReason??null;
+    task.rawText=saved.rawText??'';task.responseSha256=digest(task.rawText);
+    try{task.response=parseComparisonMessage({stop_reason:task.stopReason,content:[{type:'text',text:task.rawText}]});task.responseFormat=decodeEventJson(task.rawText).format;
+      Object.assign(task,validateComparisonResponse(task.response,task));task.status=task.issues.length?'PARTIAL':'COMPLETE';}
+    catch(error){task.error=saved.error??error.message;task.status='FAILED';}
   }
   const snapshot=()=>{
     const attempted=tasks.filter(t=>t.attempted),known=attempted.every(t=>t.usage?.known),uncached=attempted.every(t=>!t.usage?.cacheCreation&&!t.usage?.cacheRead);
@@ -176,7 +185,7 @@ export async function executeEventComparison({plan,approval,callModel,signal,onE
   await emit({event:'start',plan:previewEventComparisonPlan(plan)});
   let newRequests=0;
   for(const task of tasks){
-    if(task.status==='COMPLETE')continue;
+    if(task.status==='COMPLETE'||task.retained)continue;
     if(newRequests>=maxNewRequests&&task.mode!=='LOCAL_NON_WITNESS')break;
     if(signal?.aborted){cancelled=true;break;}
     task.status='RUNNING';await emit({event:'progress',taskId:task.id,planned:plan.requestCount});
