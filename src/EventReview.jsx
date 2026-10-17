@@ -1,5 +1,6 @@
 import {readingGapLabel,retainedNotesLabel,readingGapWarning,readingHasGaps,readingDocumentStats,readingDocumentLabel} from '../shared/readingState.js';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {compareWitnesses} from '../shared/witnessName.js';
 import {analysisBody,previewAnalysis,runAnalysis,eventRecoveryRequest} from './lib/analysisClient.js';
 import {documentMetadata} from './lib/documentStore.js';
 import {readCloudProgress,resumableCloudJobId} from './lib/cloudAnalysisClient.js';
@@ -14,7 +15,10 @@ export default function EventReview({caseId,draft,memoryAvailable=true,witnessTe
  const [jobs,setJobs]=useState(null);
  const [roles,setRoles]=useState(()=>saved?.speakerRoles??[{},{}]);
  const [memoryEnabled,setMemoryEnabled]=useState(saved?.comparison?.provenance?.approvedMemory?.enabled??false);
- const [sameWitness,setSameWitness]=useState(saved?.sameWitnessConfirmed??false);
+ // Cover pages naming the same person pre-tick the box; the reviewer can still untick it.
+ const witness=useMemo(()=>compareWitnesses(draft.texts[0],draft.texts[1]),[draft.texts]);
+ const [sameWitness,setSameWitness]=useState(saved?.sameWitnessConfirmed??witness.status==='same');
+ const witnessTouched=useRef(false);
  const [choices,setChoices]=useState([]);
  const [acknowledgedGapDigest,setAcknowledgedGapDigest]=useState(null);
  const [rolesConfirmed,setRolesConfirmed]=useState(false);
@@ -23,6 +27,8 @@ export default function EventReview({caseId,draft,memoryAvailable=true,witnessTe
  useEffect(()=>{if(plan)approvalHeading.current?.focus();},[plan]);
  useEffect(()=>()=>controller.current?.abort(),[]);
  const state=draft.analysis?.eventState;
+ // Re-detect when transcripts change before reading starts, unless the reviewer chose.
+ useEffect(()=>{if(!state&&!witnessTouched.current)setSameWitness(witness.status==='same');},[witness,state]);
  const extractionGaps=state?.extraction?.gaps??[];
  const gapAcknowledged=Boolean(state?.extraction?.gapDigest)&&acknowledgedGapDigest===state.extraction.gapDigest;
  const bodyFor=(phase,continuing)=>({...analysisBody(draft.texts,draft.files),workflow:'events-v1',phase,caseId,witnessTestimonyConfirmed:continuing&&state?state.witnessTestimonyConfirmed??witnessTestimonyConfirmed:witnessTestimonyConfirmed,...(phase==='compare'?{acknowledgeExtractionGaps:gapAcknowledged,extractionGapDigest:state?.extraction?.gapDigest}:{}),originalDocuments:draft.files.map(documentMetadata),speakerRoles:roles,sameWitnessConfirmed:sameWitness,useApprovedMemory:phase==='compare'&&memoryAvailable&&memoryEnabled,
@@ -88,8 +94,10 @@ export default function EventReview({caseId,draft,memoryAvailable=true,witnessTe
   <header className="event-review-heading"><div><h2>{incomplete?readingGapLabel:complete?'Review your findings':readyToCompare?'Compare the accounts':'Compare your transcripts'}</h2><p>{complete?'The review is saved. Check the findings alongside their original quotations.':readyToCompare?'Your reading notes are saved. Review the comparison cost when you’re ready.':'First we read both transcripts. You approve the cost again before we compare them.'}</p></div><span className="event-step">{stage}</span></header>
   {caseId==='sample'&&<p className="event-hint">Save this sample as a case to begin.</p>}
   {!hasBoth&&<p className="event-hint">Add both transcripts above to begin.</p>}
-  <label className="event-confirmation"><input type="checkbox" checked={sameWitness} disabled={locked||Boolean(state)&&!editingNew} onChange={e=>setSameWitness(e.target.checked)}/><span>Both transcripts are from the same witness.</span></label>
-  {!sameWitness&&<p className="event-hint">Not sure? You can continue, but some checks will need review.</p>}
+  <label className="event-confirmation"><input type="checkbox" checked={sameWitness} disabled={locked||Boolean(state)&&!editingNew} onChange={e=>{witnessTouched.current=true;setSameWitness(e.target.checked);}}/><span>Both transcripts are from the same witness.</span></label>
+  {witness.status==='same'&&<p className="event-hint">Detected from the cover pages: both transcripts are {witness.names[0]}. Untick if that is wrong.</p>}
+  {witness.status==='different'&&<p className="event-hint">The cover pages name different people ({witness.names[0]} and {witness.names[1]}). Tick only if you have checked they are the same witness.</p>}
+  {!sameWitness&&witness.status==='unknown'&&<p className="event-hint">Not sure? You can continue, but some checks will need review.</p>}
   <details className="event-speakers" open={speakersOpen} onToggle={e=>setSpeakersOpen(e.currentTarget.open)}><summary>Who is speaking?</summary><p>Confirm the witness and questioner once for each transcript. Detailed editing is optional.</p>
    <button className="event-button-secondary" disabled={locked||Boolean(state)&&!editingNew} onClick={inspect}>Check speakers · free</button>
    {labels&&<><div className="speaker-quick-grid">{labels.map((doc,i)=><div className="event-speaker-group" key={i}><h3>Transcript {i+1}</h3><label className="event-speaker-row"><span>Giving testimony</span><select aria-label={`Transcript ${i+1} witness`} disabled={locked||Boolean(state)&&!editingNew} value={choices[i]?.witness??''} onChange={e=>{setChoices(old=>old.map((c,n)=>n===i?{...c,witness:e.target.value}:c));setRolesConfirmed(false);}}><option value="">Choose witness</option>{doc.hasAnswers&&<option value="__QA__">Answers marked A / THE WITNESS</option>}{doc.labels.map(name=><option key={name} value={name}>{name}</option>)}</select></label><label className="event-speaker-row"><span>Asking questions</span><select aria-label={`Transcript ${i+1} questioner`} disabled={locked||Boolean(state)&&!editingNew} value={choices[i]?.questioner??'__NONE__'} onChange={e=>{setChoices(old=>old.map((c,n)=>n===i?{...c,questioner:e.target.value}:c));setRolesConfirmed(false);}}>{doc.hasQuestions&&<option value="__QA__">Questions marked Q</option>}<option value="__NONE__">No named questioner confirmed</option>{doc.labels.map(name=><option key={name} value={name}>{name}</option>)}</select></label><small>{doc.labels.length} named labels found. Headings and court staff are handled separately.</small></div>)}</div><p>All other named turns will be treated as other speech. Confirm this matches the documents; use individual roles for multiple witnesses or questioners.</p><button className="event-button-secondary" disabled={locked||Boolean(state)&&!editingNew} onClick={()=>{try{setRoles(confirmedSpeakerRoles(labels,choices));setRolesConfirmed(true);setError('');}catch(e){setError(e.message);}}}>{rolesConfirmed?'Speakers confirmed ✓':'Confirm speakers'}</button><details><summary>Edit individual roles</summary>{labels.map((doc,i)=><div className="event-speaker-group" key={i}><h3>Transcript {i+1}</h3>{doc.labels.map(name=><label className="event-speaker-row" key={name}><span>{name}</span><select disabled={locked||Boolean(state)&&!editingNew} value={roles[i][name]??''} onChange={e=>{setRoles(old=>old.map((m,n)=>n===i?{...m,[name]:e.target.value}:m));setRolesConfirmed(false);}}><option value="">Choose role</option><option value="WITNESS">Giving testimony</option><option value="QUESTIONER">Asking questions</option><option value="OTHER">Other speaker</option></select></label>)}</div>)}</details></>}

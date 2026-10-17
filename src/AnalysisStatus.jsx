@@ -4,7 +4,8 @@ import { elapsedLabel, friendlyFailure, progressCounts, remainingLabel, citation
 export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }) {
   if (!analysis) return null;
   const { total, completed, failed, partial, processed } = progressCounts(analysis);
-  const running = analysis.status === 'running';
+  // Hosted runs save a partial result after each step; while the run is active that is progress, not an outcome.
+  const running = analysis.status === 'running' || (active && analysis.status === 'partial');
   const titles = {awaiting_gap_acknowledgement:'Reading incomplete—review required · acknowledgement needed',reading_gaps:'Comparison finished with reading gaps', complete: 'Analysis complete', partial: 'Review partly complete', failed: 'Analysis could not finish', cancelled: 'Analysis cancelled', awaiting_comparison: 'Events saved · comparison approval needed', interrupted: 'Review interrupted' };
   const reading=analysis.workflow==='events-v1'&&analysis.phase==='extract';
   const unit=analysis.workflow==='events-v1'&&analysis.phase==='extract'?'extraction requests':'comparisons';
