@@ -72,7 +72,8 @@ export function cappedTransport(callModel,cap,{model=MODEL}={}){
   const ceiling=money(((bytes+8192)*model.inputUsdPerMillion+params.max_tokens*model.outputUsdPerMillion)/1e6);
   if(!Number.isFinite(ceiling)||reserved+ceiling>cap){capReached=true;throw Object.assign(new Error('Approved spending cap reached; no request started.'),{code:'BUDGET_EXHAUSTED'});}
   reserved=money(reserved+ceiling);calls++;
-  const message=await callModel(params,{...options,maxRetries:0});
+  // A billing, key or permission refusal will repeat for every case; stop the run instead.
+  const message=await callModel(params,{...options,maxRetries:0}).catch(error=>{if([400,401,403].includes(error?.status))capReached=true;throw error;});
   const used=usageUsd(message?.usage,model);
   if(used!==null&&used<ceiling)reserved=money(reserved-ceiling+used);
   return message;

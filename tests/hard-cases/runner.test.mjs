@@ -57,3 +57,10 @@ test('a response with usage settles its reservation to measured cost',async()=>{
  const unknown=cappedTransport(async()=>({}),1,{model});await unknown.call({model:'synthetic',max_tokens:10000},{});
  assert.ok(unknown.reservedUsd>0.2,'Missing usage keeps the full ceiling');
 });
+test('a billing or permission refusal stops the run instead of trying every case',async()=>{
+ const transport=cappedTransport(async()=>{throw Object.assign(new Error('refused'),{status:400});},1,{model:{id:'synthetic',inputUsdPerMillion:4,outputUsdPerMillion:20}});
+ await assert.rejects(()=>transport.call({model:'synthetic',max_tokens:10},{}),/refused/);
+ assert.equal(transport.capReached,true);
+ const other=cappedTransport(async()=>{throw Object.assign(new Error('timeout'),{status:529});},1,{model:{id:'synthetic',inputUsdPerMillion:4,outputUsdPerMillion:20}});
+ await assert.rejects(()=>other.call({model:'synthetic',max_tokens:10},{}));assert.equal(other.capReached,false);
+});
