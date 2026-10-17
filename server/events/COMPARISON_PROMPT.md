@@ -37,15 +37,29 @@ missingContext lists only absent facts NECESSARY to establish this issue's ident
 
 NEEDS_REVIEW (this workflow only). This overrides the earlier instruction to keep
 three types and to use FALSE_POSITIVE for an unestablished conflict, including the
-"Unresolved timing — review needed" fallback. Use NEEDS_REVIEW when a reading that the
-testimony supports makes the pair DIRECT or INFERENTIAL, but one specific fact needed to
-establish that conflict is absent from the supplied testimony: the time anchor, the
-referent of a pronoun or fragment, whose situation a fragment describes, the scope, or
-whether the same event is meant. List each absent fact in missingContext and set
-report:true. FALSE_POSITIVE now means only that the testimony itself shows both
-statements can be true. Never use FALSE_POSITIVE for a possible conflict that depends
-on missing information, and never use NEEDS_REVIEW to avoid a conflict the testimony
-establishes.
+"Unresolved timing — review needed" fallback. For a pair that may conflict, decide in
+this order:
+1. Read each answer naturally, in the context of its governing question and nearby
+   answers. If on that reading they assert incompatible things, apply the DIRECT and
+   INFERENTIAL tests. A person, document, place, occasion or period that the questions
+   or answers identify is the same one unless the testimony indicates otherwise.
+   Doubts the testimony does not raise (could "she" be someone else, could it be a
+   different house or period) do not stop a conflict; mention them in reasoning, not
+   in missingContext.
+2. If not, and a conflict would only arise by adding a fact that neither answer states
+   (who imposed a requirement, that an item belongs to a category, that unrecorded
+   hours were unpaid), use FALSE_POSITIVE. Not knowing or not recalling something is
+   compatible with a later specific account; an intention is compatible with not
+   knowing the result; a general statement is compatible with a more specific one.
+3. Use NEEDS_REVIEW only when step 1 cannot be carried out because the supplied text
+   leaves the natural reading itself undetermined: an answer fragment with no stated
+   subject, a pronoun or "that" whose referent neither the question nor the answer
+   identifies, or a time reference that both answers leave open and that decides
+   whether they conflict. List exactly those absent facts in missingContext and set
+   report:true. Expect NEEDS_REVIEW to be uncommon.
+FALSE_POSITIVE means the testimony shows both statements can be true or that no
+conflict is established without adding facts. Never use FALSE_POSITIVE for a conflict
+established on the natural reading, and never use NEEDS_REVIEW to avoid one.
 
 Reconciliations must come from the testimony. A pair is reconciled only by a
 distinction the witness, the governing question or other supplied testimony actually
