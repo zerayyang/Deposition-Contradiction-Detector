@@ -6,6 +6,7 @@ import {documentMetadata} from './lib/documentStore.js';
 import {readCloudProgress,resumableCloudJobId} from './lib/cloudAnalysisClient.js';
 import {initialSpeakerChoices,confirmedSpeakerRoles} from './lib/speakerReview.js';
 import {readApiJson} from './lib/apiResponse.js';
+import {stepTiming} from './lib/analysisStatus.js';
 
 export default function EventReview({caseId,draft,memoryAvailable=true,witnessTestimonyConfirmed=[false,false],fetchImpl,onCheckpoint,onBusy,onTick,onTiming,onPlanning=()=>{},disabled}){
  const saved=draft.analysis?.eventState;
@@ -64,8 +65,7 @@ export default function EventReview({caseId,draft,memoryAvailable=true,witnessTe
     }
     if(event.event==='progress')setNotice((pending.body.phase==='extract'?'Reading testimony':'Comparing accounts')+' · '+event.attempted+' new AI requests started.');
     if(event.analysis){
-     const processed=event.analysis.tasks.filter(t=>!t.reused&&['completed','failed','partial'].includes(t.status)).length;
-     onTiming({processed,processedThisRun:processed,remaining:pending.preview.requestCount-processed,elapsed:(performance.now()-began)/1000});
+     onTiming(stepTiming(event.analysis.tasks,pending.preview,(performance.now()-began)/1000));
      latest={...draft,results:event.contradictions,analysis:event.analysis,seconds:(performance.now()-began)/1000,notes:pending.body.phase==='extract'?{}:draft.notes,reviewed:pending.body.phase==='extract'?{}:draft.reviewed,selected:0,dirty:true};await onCheckpoint(latest);}
    }});
    setNotice(result.analysis.status==='awaiting_comparison'?'Reading finished. You can review the notes, then check the comparison cost.':result.analysis.status==='complete'?'Comparison finished. Review the findings; the AI may still have missed something.':'The review is incomplete. Check the saved progress before trying again.');

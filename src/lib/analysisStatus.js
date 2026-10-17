@@ -21,6 +21,16 @@ export function elapsedLabel(seconds) {
   return h?`${h}h ${m}m ${s}s`:total>=60?`${Math.floor(total/60)}m ${s}s`:`${s}s`;
 }
 
+// Hosted runs return every task each step, marking earlier steps' work as reused.
+// Count all finished tasks, minus those already finished before this run began.
+export function stepTiming(tasks, preview, elapsedSeconds) {
+  const done = (tasks ?? []).filter(t => ['completed', 'failed', 'partial'].includes(t.status)).length;
+  const before = (preview?.cachedRequests ?? 0) + (preview?.retainedGapRequests ?? 0);
+  const total = preview?.totalRequestCount ?? ((preview?.requestCount ?? 0) + before);
+  const processedThisRun = Math.max(0, done - before);
+  return { processed: done, processedThisRun, remaining: Math.max(0, total - done), elapsed: elapsedSeconds };
+}
+
 export function remainingLabel(analysis, active, elapsed, sample) {
   if (analysis.status !== 'running' || !active) return null;
   const { total, processed } = progressCounts(analysis);
