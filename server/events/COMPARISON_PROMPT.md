@@ -48,9 +48,14 @@ this order:
    in missingContext.
 2. If not, and a conflict would only arise by adding a fact that neither answer states
    (who imposed a requirement, that an item belongs to a category, that unrecorded
-   hours were unpaid), use FALSE_POSITIVE. Not knowing or not recalling something is
-   compatible with a later specific account; an intention is compatible with not
-   knowing the result; a general statement is compatible with a more specific one.
+   hours were unpaid), use FALSE_POSITIVE. Separate memory from knowledge. Not
+   recalling something is compatible with a later recollection of it. Not knowing a
+   fact is compatible with a later opinion or belief about it, and with information
+   the witness later learned from records, documents or other people. But a denial of
+   knowing or perceiving a fact conflicts with a later assertion that the witness
+   perceived or knew that same fact at the same time; apply the DIRECT test. An
+   intention is compatible with not knowing the result; a general statement is
+   compatible with a more specific one.
 3. Use NEEDS_REVIEW only when step 1 cannot be carried out because the supplied text
    leaves the natural reading itself undetermined: an answer fragment with no stated
    subject, a pronoun or "that" whose referent neither the question nor the answer
@@ -63,7 +68,9 @@ established on the natural reading, and never use NEEDS_REVIEW to avoid one.
 
 Inferences must rest on stated premises. An INFERENTIAL conflict must follow from
 what the answers actually say. Before labelling a pair INFERENTIAL, name each premise
-the inference needs; if any premise is stated in neither answer (for example, that
+the inference needs. Identity settled by the natural reading in step 1 (the same
+person, document, post or occasion) is not an inference premise: if that identity is
+the only step, apply the DIRECT test. If any other premise is stated in neither answer (for example, that
 hours missing from records were worked off the clock, or that something unmentioned
 did not happen), the conflict is not established: use FALSE_POSITIVE. Information the
 witness later learned from records, documents or other people does not contradict an

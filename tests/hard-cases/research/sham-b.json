@@ -1209,11 +1209,11 @@
     "labelBasis": "Expressly denying seeking treatment for the conditions and later asserting repeated attempts for those conditions are directly opposed in the court’s analysis.",
     "debatable": false,
     "split": null,
-    "transcript1": "Q.: Have you sought mental healthcare at any point based on this?\nA.: Specifically, for this, no….",
+    "transcript1": "Q.: [Context from the opinion, p.10: “this” means the conditions at issue in this case.] Have you sought mental healthcare at any point based on this?\nA.: Specifically, for this, no….",
     "transcript2": "Q: [Question reconstructed from the opinion, p.10 n.4: the declaration statement describes the witness himself.] What is your testimony about your own attempts to obtain mental health treatment?\nA: repeatedly attempted to receive mental health treatment for everything he has endured, including the living conditions alleged in this complaint",
     "quote1": "Q.: Have you sought mental healthcare at any point based on this?\nA.: Specifically, for this, no….",
     "quote2": "repeatedly attempted to receive mental health treatment for everything he has endured, including the living conditions alleged in this complaint",
-    "notes": "The later court-reproduced declaration fragment uses third-person pronouns and is retained literally; the court’s deposition ellipsis is retained, not generated; no injury finding or court analysis enters either transcript. Public court-text extraction available; direct PDF download returned HTTP error, so no source-byte hash or visual-page verification is claimed. Affidavit/declaration question reconstructed as a neutral presentation prompt; it is not original testimony. Fixture-fidelity audit 2026-10-17: reconstructed question carries context the opinion states explicitly; witness words unchanged.",
+    "notes": "The later court-reproduced declaration fragment uses third-person pronouns and is retained literally; the court’s deposition ellipsis is retained, not generated; no injury finding or court analysis enters either transcript. Public court-text extraction available; direct PDF download returned HTTP error, so no source-byte hash or visual-page verification is claimed. Affidavit/declaration question reconstructed as a neutral presentation prompt; it is not original testimony. Fixture-fidelity audit 2026-10-17: reconstructed question carries context the opinion states explicitly; witness words unchanged. Fixture-fidelity audit 2026-10-18 (pronoun pass): bracketed context states the referent the opinion gives; witness words unchanged.",
     "provenance": {
       "court": "N.D. Ill.",
       "year": 2026,
