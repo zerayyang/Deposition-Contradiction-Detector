@@ -1,0 +1,282 @@
+[
+  {
+    "id": "fresh-a-001",
+    "judgeLabel": "DIRECT",
+    "label": "INFERENTIAL",
+    "labelBasis": "Routinely cancelling unsold deals implies understanding they could be cancelled; no express denial-vs-affirm of the same words.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-002",
+    "judgeLabel": "DIRECT",
+    "label": "INFERENTIAL",
+    "labelBasis": "Stating the reason implies knowing it; the earlier answer denies knowing it today.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-004",
+    "judgeLabel": "DIRECT",
+    "label": "DIRECT",
+    "labelBasis": "\"Age didn't come up\" versus \"told that I was old\".",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-005",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Adding \"old\" to the adopted statement is a different level of detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-006",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"Anything else you can recall? No\" is limited by recollection; the later list adds detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-007",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Not able to recommend \"[at that time]\" without seeing her versus a later opinion based on an evaluation: different time/scope.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-008",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Surgical suitability versus medical necessity: different scope.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-009",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"I can't remember\" whether talking versus a later account of conduct: uncertain recollection, different fact.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-010",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Wish to return today versus future travel plans: compatible.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-a-011",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Indirect derogatory comments versus witnessing discriminatory actions: compatible detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-001",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"Greasy liquid\" versus a detailed description: more detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-002",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"I don't know\" whether it got on him is uncertain recollection; later touching account adds detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-003",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "No crane request versus an unspecified job he was not qualified for: not shown to be the same job.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-004",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Same non-answer plus general complaint: compatible.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-005",
+    "judgeLabel": "DIRECT",
+    "label": "INFERENTIAL",
+    "labelBasis": "\"Nothing could help\" versus a lifting limit that would let him keep working: conflict by implication.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-006",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"I don't know\" whether he contends it versus later stated awareness: uncertain answer, no claim of knowing then.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-007",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"I don't remember\" specifics versus later detail of the message.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-008",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"Not really\" recall signing versus account of not reading it: compatible.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-009",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "No deckhand duties \"that night\" versus general crew duties: different scope.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-010",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"Not actively involved\" answered the criticism question; supporting her is admitted: not established.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-011",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Not knowing whose name the utilities were in versus later investigation of who arranged them: different fact, later information.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-012",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"Don't recall telling her\" versus \"may have, can't remember with certainty\": both uncertain.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-014",
+    "judgeLabel": "DIRECT",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"Later after he hung up\" versus \"ended the conversation. He told me he could not breathe\": same order on the text supplied.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-015",
+    "judgeLabel": "DIRECT",
+    "label": "INFERENTIAL",
+    "labelBasis": "Two different explanations attributed to the same speaker for the nickname; both cannot be the explanation given unless both were given.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-016",
+    "judgeLabel": "DIRECT",
+    "label": "DIRECT",
+    "labelBasis": "No knowledge of moving in sleep before the fall versus telling a deputy before the fall that he turns over a lot.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-017",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"Primarily\" knees versus additional concerns: added detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-018",
+    "judgeLabel": "DIRECT",
+    "label": "DIRECT",
+    "labelBasis": "\"None whatsoever\" knowledge of other dealerships versus other GMs confirming at the time.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-b-019",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Paraphrases of the same remark with more detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-001",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "He did supervise / gave orders weekly: consistent.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-002",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Knowing lights get hot versus not knowing items below were a hazard: different fact.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-003",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"It could have been\" versus never saw the instructions: compatible.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-004",
+    "judgeLabel": "DIRECT",
+    "label": "INFERENTIAL",
+    "labelBasis": "Believing they were partners implies a binding arrangement; later says nothing binding until final documents.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-005",
+    "judgeLabel": "DIRECT",
+    "label": "DIRECT",
+    "labelBasis": "\"He did not agree to that\" versus \"we mutually agreed\" to that substitute.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-006",
+    "judgeLabel": "DIRECT",
+    "label": "DIRECT",
+    "labelBasis": "\"Anything distract you? No\" versus \"I was distracted\".",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-008",
+    "judgeLabel": "DIRECT",
+    "label": "DIRECT",
+    "labelBasis": "Exhaustive \"just them\" versus a third speaker.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-009",
+    "judgeLabel": "DIRECT",
+    "label": "DIRECT",
+    "labelBasis": "No pain other than shoulder versus handcuffs hurting wrists, same period.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-010",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "\"I can't remember\" versus a later account.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-011",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Suspicion of fraud versus two specific possible frauds: more detail.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-012",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "A guess about who drafted versus own involvement in negotiation: compatible.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  },
+  {
+    "id": "fresh-c-013",
+    "judgeLabel": "FALSE_POSITIVE",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Agreed to the change versus it was the only solution offered: compatible.",
+    "source": "Assignment definitions (DIRECT / INFERENTIAL / FALSE_POSITIVE), applied by Claude 2026-10-18; draft pending owner approval"
+  }
+]
