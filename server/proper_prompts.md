@@ -39,144 +39,103 @@ Application to this detector:
 - Retain both exact statements, explain the factual tension and any unresolved context, and preserve the required JSON schema. The reference supplies no confidence values or numerical scoring rules; confidence remains calculated by application code.
 
 
-## Context and account interpretation
-
-
-1. Read each question, answer, and relevant follow-up together. Identify what the question asks and what the witness independently asserts, denies, qualifies, or leaves unknown. Examiner premises are not testimony unless adopted. Resolve negative questions, compound questions, pronouns, and conditional statements from context; do not invent their meaning when ambiguous.
-2. Review every shared topic and every assertion in its answers, including volunteered facts beyond the question. Distinguish different predicates, referents, scopes, events, and periods. Do not collapse meeting into awareness, proximity into visiting, being seen into speaking, or an activity into a different unstated state.
-3. Connect relevant answers across different questions. Formulate the actual common factual issue and establish what each account says about it. Different questions can reveal incompatible facts; identical questions can yield compatible answers. Use supported implications, not habits, stereotypes, or merely possible events. A different number or activity alone is not a contradiction.
-4. Test whether both accounts can reasonably be true under ordinary meaning and supplied context. Consider genuine corrections, exceptions, and clarifications. An omission is not a denial. A clarification of one detail does not erase a separate conflict. Preserve an adopted absolute and its actual period; do not stretch it beyond that scope or disregard a supplied exception.
-5. Determine temporal scope from the conversation as a whole. Deposition dates are not automatically the dates of events or knowledge described. Retrospective answers may share a historical frame without repeating dates. Do not invent intervening learning or other changes to reconcile an established conflict; do not invent shared timing to establish one. Distinguish a supported reconciliation from a conditional possibility requiring missing facts.
-6. Apply the definitions, then consolidate results. Explain the exact incompatible proposition or missing logical link. Missing context warrants a neutral follow-up, not a finding that a witness lied.
-
 ## 2. Analysis Procedure
 
-Work through these steps in order. Your work is recorded in the output fields described in Section 6 (`topicsReviewed` and each `reasoning`).
+Work through these steps in order for every pair of statements on a shared topic. The same steps apply to every pair; do not use a different standard for different topics. Your work is recorded in `topicsReviewed` and each `reasoning`.
 
 ### Step 1: Recall shared topics
 
-List every factual topic that appears in BOTH transcripts (for example: whereabouts, times, activities, people met or known, vehicles, quantities, locations, communications, physical states, sources of information). Review every one. Do not stop after the first contradiction found.
+List every factual topic that appears in BOTH transcripts (for example: whereabouts, times, activities, people met or known, vehicles, quantities, locations, communications, physical states, sources of information). Review every one. Do not stop after the first conflict found.
 
-### Step 2: Compare all testimony on each topic
+### Step 2: Gather all testimony on each topic
 
-For each topic, gather ALL of the witness's answers on it from both transcripts, not only the closest-matching pair. Use each question to understand what the answer is responding to. A narrow answer to a narrow question can be compatible with a broad answer to a broad question.
+For each topic, gather ALL of the witness's answers on it from both transcripts, not only the closest-matching pair. Connect answers given to different questions. If the witness explicitly corrects or withdraws an earlier answer within the same transcript, compare the corrected version and mention the correction in `reasoning`.
 
-If the witness explicitly corrects or withdraws an earlier answer within the same transcript, compare the corrected version, and mention the correction in `reasoning`.
+### Step 3: Pin down exactly what each statement asserts
 
-### Step 3: Pin down what each statement asserts
+- Read each answer with its question and the nearby questions and answers. Resolve pronouns, short answers and "that"/"this" from that context.
+- "Yes" or "No" adopts only the proposition actually asked. "Did you speak to anyone? — No" does not mean "Nobody saw me." Examiner premises are not testimony unless the witness adopts them.
+- Keep the witness's certainty, negation, time, place, quantity, person and scope exactly as stated. Do not turn "I think I called him" into "I called him", "around 8" into "8:00", or weaken "never", "all", "none", "definitely" or "did not".
+- A plain "yes" to a question about what the witness would do in their role, job or routine ("Would you approve...?") describes their usual practice, not a hypothetical, unless the question or answer marks it as hypothetical (if, suppose, imagine).
+- People, places, documents or events identified by the questions or answers are the same ones throughout unless the testimony indicates otherwise. Differently named people or things are not presumed to be the same.
+- Deposition dates are not automatically the dates of the events described. An unspecified period is not the same as an explicitly different period.
+- Editorial brackets, [sic], ellipses and marked reconstructed questions are reliable context from the record, not gaps.
 
-Interpret each statement by its ordinary meaning without changing its certainty, negation, time, location, quantity, identity, or scope.
+### Step 4: The core test — can both statements be true as stated?
 
-Do not turn "I think I called him" into "I called him," "around 8" into "8:00 exactly," or "I might have seen him" into "I saw him." Likewise, do not weaken "never," "all," "none," "definitely," or "did not."
+Ask: "Taken exactly as stated, can both statements be true at the same time?"
 
-Resolve pronouns and brief answers using the actual question and nearby testimony. "No" answers only the proposition asked; "Did you speak to anyone? — No" does not mean "Nobody saw me." A date supplied by the question may establish the event date for analysis, but it must not be inserted into the quoted answer or literal extracted fields. Deposition dates are not automatically the dates of the events described. Different testimony dates do not themselves establish a contradiction.
+You may rely ONLY on these reconciliations, and only when the testimony itself supplies them:
 
-Before comparing, establish whether the statements concern the same person, event, time period, and scope using the surrounding questions and answers. State any unresolved identity or context ambiguity in `reasoning`; do not assume a shared referent merely because wording is similar.
+1. A different time, occasion, person, place or scope that the questions or answers actually state.
+2. A correction, withdrawal, exception or qualification the witness actually gave.
+3. The narrower scope of the question that was actually answered.
+4. Approximate values ("around 8", "three or four") whose ordinary ranges overlap.
+5. Uncertain recollection: "I don't remember", "I'm not sure" or "I can't recall" followed by a later account of the same matter. Not remembering is compatible with later remembering.
+6. A later opinion or belief, or information the witness says they learned later from records, documents or other people, compared with an earlier statement that they did not know.
+7. An omission followed by an addition, a general statement followed by a more specific one, or a clarification. This does NOT apply when the earlier answer was exhaustive or exclusive ("nothing else", "only", "just them", "never", "none", "no one") and the addition falls inside that scope.
 
-### Step 4: Compatibility test
+You may NOT reconcile with any distinction the witness did not draw, including: an unmentioned second event, occasion or person; an unstated change, intervening event or later learning; a different period when none is stated; reading one answer as a rule and the other as practice; giving an ordinary word a narrower technical meaning; treating different verbs for the same act as different acts; or imperfect memory in general. If a reconciliation needs any of these, it is not available.
 
-Ask:
+Outcomes:
 
-"Could both statements reasonably be true under their ordinary meanings and the context in the transcripts?"
+- One of reconciliations 1–7 makes both true → FALSE_POSITIVE.
+- No permitted reconciliation exists → the statements conflict; go to Step 5.
+- The answer cannot be decided because the testimony leaves the meaning itself undetermined (an answer fragment with no stated subject, a pronoun or "that" whose referent neither the question nor the answer identifies, or an open time reference that decides whether they conflict) → NEEDS_REVIEW. Use NEEDS_REVIEW only for these gaps in the text, never for doubts the testimony does not raise.
 
-- YES: the pair is compatible. Assign FALSE_POSITIVE only if it passes the independent-card test below. If it is a supporting detail already explained by a reported conflict, include it in that conflict’s reasoning rather than returning another card.
-- NO: continue to Step 5.
+A denial of knowing or perceiving a fact ("I don't know", "I didn't see", "I have no idea") conflicts with a later assertion that the witness knew or perceived that same fact at the same time; reconciliation 6 does not cover it.
 
-For approximate times or quantities, consider ordinary meaning, units, reference points, and stated ranges. "Around 8" can include "8:05"; it does not mean an exact 8:00. Do not impose a universal cutoff for every use of "around," "about," or "maybe." State why approximate values plausibly overlap or are materially separated in the supplied context. A different number alone is insufficient if it counts a different group, uses different units, or describes a different occasion. Code applies its own numerical heuristics for confidence; do not adjust your classification to predict or imitate that score.
+### Step 5: Which type of conflict?
 
-Identify the strongest reasonable reconciliation supported by the testimony. Distinguish a reconciliation supported by stated context from one that would require missing information. Do not invent facts to create or defeat a conflict.
+DIRECT when, on the ordinary reading of the words, the two statements concern the same fact and:
 
-For a potential conflict with incomplete time scope, review the full question, nearby answers, and every other answer on that factual issue before classifying. A shared period may be established by conversational context even when the two answers do not repeat the same date. An unspecified period is not the same as an explicitly different period. Do not assume either that the periods match or that knowledge or an event occurred later merely because that would reconcile the accounts. Distinguish knowing of a person, meeting that person, and when that knowledge or meeting began.
+- one affirms what the other denies (X vs. not-X), including an explicit universal or exhaustive assertion versus a stated exception inside its scope (directness does not require the word "not" or identical verbs; first check from the governing questions and answers that the exception falls inside the asserted scope. If scope membership instead requires a separate supported timeline or range inference, use INFERENTIAL); or
+- they give different exact values for the same single fact.
 
-If the context establishes a shared period, apply the existing DIRECT/INFERENTIAL tests. If timing remains unresolved, retain a superficially conflicting, testimony-supported pair for human review and begin `reasoning` with "Unresolved timing — review needed." State the tension, the specific missing time anchor, the conditional reconciliation, and a neutral question that would resolve it. Keep the existing three types: if a conflict is not established under their definitions, use FALSE_POSITIVE and explicitly explain that the label reflects an unestablished conflict, not a demonstrated reconciliation. Do not describe hypothetical compatibility as proven or safely resolved. Do not add an unresolved type, review field, or confidence score. This instruction does not force a particular label for any named person or sample pair.
+Scope set by the witness's own words in either answer counts as stated: if the witness denies discussing "anything related to" a matter and their own words tie an item to that matter, an admitted discussion of that item is a DIRECT exception.
 
-For comparisons across midnight, distinguish calendar dates from elapsed time. 12:00 AM is the start of a calendar day; 12:00 PM is noon. If the surrounding testimony establishes the same reference day, "10:30 PM tonight" and "12:00 AM tomorrow" are 90 minutes apart across that day's midnight boundary. A change in calendar date alone does not establish a contradiction, but different exact times for the same event still follow the existing classification rules. Do not assume that "tonight" or "tomorrow" in separate depositions share a reference day. Bare "12" does not establish AM or PM, and "midnight tonight" may need clarification about which date is meant. State unresolved day or AM/PM ambiguity in `reasoning` and, when useful, ask a neutral question such as "Which calendar date do you mean by midnight?" Do not invent a date or silently resolve ambiguity.
+INFERENTIAL when there is no opposing assertion, but the conflict follows necessarily, or by strongly supported implication, from what the testimony states: overlapping times or places that exclude each other, timelines, mutually exclusive states, or approximate values whose ranges do not overlap. Every premise of the inference must be stated in the testimony; never build one from assumptions about normal behaviour, memory, motive or probability. Identity settled in Step 3 is not an inference step.
 
-### Compare every independently asserted proposition
+Hedges:
 
-A brief denial may answer the question, while the rest of the answer volunteers a separate factual assertion. Evaluate both. Do not discard the volunteered assertion because the examiner asked about a different predicate. Agreement on one predicate does not resolve disagreement on another.
+- If the conflict exists only because two APPROXIMATE values are compared (a time, quantity, date or duration qualified by "around", "maybe", "about", "three or four"), the label is INFERENTIAL, never DIRECT.
+- A hedge about whether something happened ("I think I went out", "I don't think I met him") does NOT turn an affirm-versus-deny conflict into INFERENTIAL. Application code scores certainty separately.
 
-Awareness of a person and meeting that person are separate facts. A denial of awareness must be compared with an admission of awareness; agreement about not meeting in person is not a reconciliation of that awareness tension. Social connections are supporting context, not a substitute for the explicit awareness assertions, and do not independently prove awareness or its timing.
+For a timeline candidate, check the same event and day (AM/PM and midnight resolved from context: 12:00 AM starts a calendar day; "10:30 PM tonight" and "12:00 AM tomorrow" on the same reference day are 90 minutes apart); whether each statement describes a point, an interval or a continuous condition ("at home at 6" is not "at home all evening"); whether the states actually exclude each other; and the exact predicate (going to bed, falling asleep and being asleep differ; scheduled is not attended; knowing of someone is not meeting them). In `reasoning`, state the inference plainly: the first statement establishes A during period P; the second establishes B during overlapping P; A and B cannot coexist because of the stated reason.
 
-Determine the shared period from the full conversational frame before applying a missing-timing fallback. A question need not repeat the historical date for a responsive answer to describe the same historical circumstances. Cite the actual contextual basis in reasoning. If that frame establishes the same period, an explicit awareness denial versus admission is DIRECT and is reported once. If establishing incompatibility requires a supported contextual inference instead of an express opposing assertion, apply INFERENTIAL under its existing definition. Do not label an established conflict FALSE_POSITIVE merely because an unstated intervening change is imaginable.
+### Step 6: Consistency check before labelling
 
-Do not manufacture a later introduction, newly discovered connection, or other intervening event. A conditional reconciliation must be identified as conditional, not asserted as testimony. If the full context genuinely cannot establish the required period, identify that exact limitation without claiming the statements have been reconciled. Preserve temporal restrictions in the original denial rather than turning a period-specific assertion into a lifelong one.
+Apply the same answer to the same pattern every time:
 
-### Step 5: Directness test
-
-Use DIRECT when the two statements concern the same fact and cannot both be true on their face:
-
-- one affirms what the other denies (X vs. not-X), or
-- they state different exact values for the same single fact.
-
-An explicit universal or exhaustive assertion and a stated exception are opposing assertions when the testimony itself establishes the same subject, occasion and scope. Directness does not require the literal word "not" or identical verbs. First check whether the exception falls inside the asserted scope using the governing questions and answers. Do not downgrade such an express exclusion merely because it uses different words. If scope membership instead requires a separate supported timeline/range inference, use the inference test; if it is unresolved, preserve that uncertainty.
-
-Hedges matter in ONE way only. If the conflict exists only because two APPROXIMATE VALUES are being compared (a time, quantity, date, or duration that is itself qualified, such as "around 10," "maybe 10:30," "about ten," or "three or four"), and the conflict depends on whether their ranges overlap, the label is INFERENTIAL, never DIRECT.
-
-A hedge about how sure the witness is that something happened ("I think I went out," "I don't think I met him," "I might have") does NOT make a conflict inferential. The application's confidence score handles witness certainty separately.
-
-A hedge that qualifies a different fact elsewhere in the same answer is ignored.
-
-### Step 6: Inference test
-
-If not DIRECT, ask:
-
-"Does the conflict follow necessarily, or by strongly supported implication, from the testimony itself?"
-
-- YES: INFERENTIAL.
-- NO: FALSE_POSITIVE.
-
-Never build an inference from outside assumptions about normal behavior, how memory works, what the witness should have remembered, motives, or what seems suspicious or probable.
-
-### Step 6a: Evaluate timelines and mutually exclusive conditions
-
-Apply this timeline step only after the directness test. A stated exception to an explicit exhaustive assertion, already within its source-established scope, belongs to the directness test; do not reclassify it merely because the scope concerns time. An inferential conflict can be strong even though neither answer explicitly denies the other. Reconstruct only the sequence and intervals the testimony supports, then identify the specific overlap that makes the two accounts incompatible. Do not require opposing keywords to detect an inferential conflict, and do not downgrade it merely because it requires a reasoning step.
-
-For every timeline candidate, check:
-
-- Same event and relevant night/day, with AM/PM and midnight resolved from supplied context where possible.
-- Whether the assertion describes a point, an interval, or a continuous condition. "At home at 6" is not "at home all evening."
-- Whether the activities or states actually exclude each other during the overlap. Ordering pizza and buying groceries can both happen. Being asleep continuously and actively watching TV during that interval cannot.
-- The exact predicate: going to bed, trying to sleep, falling asleep, being asleep, and waking up are different assertions. An appointment scheduled for 1 does not establish attendance at 1. Knowing of someone does not establish meeting them.
-- Any stated interruption, return, correction, or exception. Use an interruption that is supported; do not invent waking up, rescheduling, or an unmentioned second event merely to erase a supported conflict. Equally, do not invent uninterrupted sleep or attendance when the words and questions do not support it.
-
-In `reasoning`, express the inference in ordinary language: the first statement establishes A during period P; the second establishes B during overlapping period P; A and B cannot coexist for the stated reason. If the overlap or exclusion cannot be supported, explain the unresolved context and use the existing compatibility/inference tests. No additional output fields are permitted.
-
-### Step 7: Tie-breaks
-
-- Torn between DIRECT and INFERENTIAL on a pair that involves approximate or hedged values: choose INFERENTIAL. This does not apply to an affirm-vs-deny pair, which is DIRECT.
-- Torn between INFERENTIAL and FALSE_POSITIVE: ask "Could a person with an imperfect memory reasonably say both statements?" If yes, FALSE_POSITIVE. This is only a compatibility check, not a judgment that the witness is honest. Imperfect memory is not a blanket explanation that makes every pair compatible: do not silently replace a stated fact with a corrected fact or uncertainty that was not expressed.
-
+- Affirm versus deny of the same fact → DIRECT, whatever the hedging.
+- Exhaustive answer versus an exception inside its scope → DIRECT.
+- Approximate values that do not overlap → INFERENTIAL.
+- "Don't remember" versus a later account → FALSE_POSITIVE.
+- "Didn't know" versus "I knew it then" → DIRECT.
+- Torn between FALSE_POSITIVE and a conflict: choose FALSE_POSITIVE only if you can name which of reconciliations 1–7 applies and quote the testimony that supplies it. Otherwise it is a conflict.
+- Torn between NEEDS_REVIEW and a decision: if the needed fact is in the testimony, decide; NEEDS_REVIEW only when it is genuinely absent.
 
 ## 3. Classification Types
 
 ### DIRECT
 
-The statements affirm and deny the same fact, or give different exact values for it, and the conflict does not depend on comparing approximate values. An explicit exhaustive assertion and a directly stated exception within its source-established scope count as opposing assertions even without the literal word 'not'. Reading that exclusion is not an additional inferential step. Hedges about how sure the witness is do not change this label; the application's confidence score accounts for them.
-
+The statements affirm and deny the same fact, or give different exact values for it, and the conflict does not depend on comparing approximate values. An explicit exhaustive assertion and a directly stated exception within its scope count as opposing assertions even without the literal word "not". Reading that exclusion is not an additional inferential step. Hedges about how sure the witness is do not change this label; the application's confidence score accounts for them.
 
 ### INFERENTIAL
 
-No opposing assertion under the directness test, but the implications cannot both be true, or the conflict only appears after a separate supported inference about ranges, timelines, or approximate values. Do not use this category solely because a directly stated exception to an exhaustive assertion involves a time period. If establishing that the exception lies within the period requires a further inference rather than the actual conversational frame, retain the inference test and any unresolved scope.
-
+No opposing assertion under the directness test, but the implications cannot both be true, or the conflict only appears after a separate supported inference about ranges, timelines, or approximate values.
 
 ### FALSE_POSITIVE
 
-Statements that superficially appear to conflict but can reasonably both be true: approximate times, uncertain recollection, different levels of detail, clarification, different scope, ordinary imprecision.
+Statements that superficially appear to conflict but can reasonably both be true: approximate times, uncertain recollection, different levels of detail, clarification, different scope, ordinary imprecision. The reconciliation must be one of the permitted reconciliations in Step 4.
 
+### NEEDS_REVIEW
 
-### Scope and multiple answers
+A possible conflict that cannot be decided because the supplied testimony leaves the meaning undetermined (fragment without a subject, unidentified referent, or a deciding time reference left open). State exactly what is missing and one neutral follow-up question. It is not a finding either way and receives no score.
 
-A scope difference can reconcile two statements, but a separate answer on the same topic may still conflict. Compare each answer, and report any pair that cannot coexist, even when another pair on the same topic is reconcilable.
+### Duplicates and multiple answers
 
-### Additions and clarifications
-
-A later statement that adds information does not contradict an earlier one unless the added detail makes the earlier statement impossible or incompatible. "I might have done both" or "I also stopped at the store" does not contradict an earlier mention of a different activity unless the two exclude each other.
-
-### Duplicates
-
-Report each distinct factual issue once. If several answers support the same conflict, choose the pair that shows it most clearly and mention the others in `reasoning`.
-
+Report each distinct factual issue once. If several answers support the same conflict, choose the pair that shows it most clearly and mention the others in `reasoning`. A reconcilable pair on a topic does not cancel a separate pair on the same topic that cannot coexist; compare each answer.
 
 ## Consolidating results
 
@@ -201,7 +160,7 @@ Reject a separate compatible-detail card whose justification is only that the ac
 
 For each retained comparison, reconstruct the witness's proposition from the nearest question, the full answer, and any correction or qualifier. A short answer such as "Yes" adopts only the proposition actually asked; state that proposition in reasoning. Keep the original quote literal: do not insert the examiner's wording into a witness quotation. Choose a sufficiently informative contiguous answer excerpt when one is available rather than a generic fragment that occurs throughout the document.
 
-Before comparing numerical statements, establish that they concern the same entity, attribute, units, scope, and relevant period. Distinguish a whole site from a component, an actual valuation from a hypothetical addition, and an estimate from an exact value. Do not manufacture precise bounds for vague quantities. If an apparent numerical conflict depends on unresolved scope or time, explain that condition rather than declaring the quantities conclusively incompatible. Apply the existing DIRECT / INFERENTIAL / FALSE_POSITIVE definitions after this check; an assertion hedge alone does not change DIRECT into INFERENTIAL.
+Before comparing numerical statements, establish that they concern the same entity, attribute, units, scope, and relevant period. Distinguish a whole site from a component, an actual valuation from a hypothetical addition, and an estimate from an exact value. Do not manufacture precise bounds for vague quantities. If an apparent numerical conflict depends on unresolved scope or time, explain that condition rather than declaring the quantities conclusively incompatible. Apply the Section 2 procedure and Section 3 definitions after this check; an assertion hedge alone does not change DIRECT into INFERENTIAL.
 
 Different testimony dates alone neither prove a conflict nor reconcile it. Answers explicitly about current knowledge or current conditions may refer to different dates; accounts of the same historical event must still be compared against that event's period. Do not assume an unmentioned acquisition, correction, changed role, or later event to reconcile a pair.
 
@@ -210,6 +169,7 @@ Check both directions: uncertainty is not a denial; reviewing is not necessarily
 ## 4. What to Report
 
 - Report pairs that concern the same factual issue and conflict, with type DIRECT or INFERENTIAL.
+- Report undecidable possible conflicts as NEEDS_REVIEW, stating the missing fact in `reasoning`.
 - Report independent apparent mismatches with type FALSE_POSITIVE after applying the consolidation rules; compatible supporting details already covered by another card belong in that card’s reasoning.
 - Preserve one independently assessed comparison when two answers assign materially different values, bounds, or precision to the same factual attribute of the same event, even if their permitted ranges overlap. If compatible, return it as FALSE_POSITIVE with the actual literal evidence and explain the overlap or boundary relationship. Do not omit this independent comparison merely because it is compatible. This does not require a separate card for supporting details of an already reported issue.
 - Do not report pairs that are merely differently worded or plainly identical in factual content. A substantive range-versus-point or restriction-versus-occurrence comparison is different from a wording-only change.
@@ -294,7 +254,7 @@ Include Transcript 1/2 page and line references only when explicitly supplied; o
 
 Allowed values:
 
-- `type`: "DIRECT", "INFERENTIAL", "FALSE_POSITIVE"
+- `type`: "DIRECT", "INFERENTIAL", "NEEDS_REVIEW", "FALSE_POSITIVE"
 - `severity`: "HIGH", "MEDIUM", "LOW"
 - `semanticAssist.relationship`: "MATCH", "POSSIBLE_CONFLICT", "UNRELATED", "UNCERTAIN"
 
@@ -365,8 +325,8 @@ Before returning, confirm:
 1. Every shared topic was reviewed and appears in `topicsReviewed`.
 2. Each claim's `original` comes from the right transcript and is the witness's exact words.
 3. Every non-null literal field and every qualifier appears verbatim in its own `original`.
-4. Affirm-vs-deny pairs and exact-value conflicts were labeled DIRECT, even when the witness hedged about whether the event happened. Conflicts that depend on comparing approximate values were labeled INFERENTIAL.
-5. Torn DIRECT/INFERENTIAL cases involving approximate values were labeled INFERENTIAL; torn INFERENTIAL/FALSE_POSITIVE cases got the imperfect-memory check.
+4. Affirm-vs-deny pairs, exhaustive-versus-exception pairs and exact-value conflicts were labeled DIRECT, even when the witness hedged. Conflicts that depend on comparing approximate values were labeled INFERENTIAL.
+5. Every FALSE_POSITIVE names one permitted reconciliation from Step 4 that the testimony supplies; every NEEDS_REVIEW names the missing fact.
 6. Each distinct factual issue is reported once. Every returned FALSE_POSITIVE passes the independent-card test; no compatible supporting detail repeats an event conflict already reported.
 7. No outside assumptions, no credibility or intent judgments, no confidence numbers.
 8. Each inferential candidate identifies an actual supported incompatibility and the necessary overlapping time/scope; none relies solely on suspiciousness, expected behavior, or unfamiliar wording.
@@ -379,4 +339,4 @@ If a candidate cannot be supported by the transcripts, omit it.
 
 Emit compact valid JSON without indentation. Preserve all whitespace inside literal testimony strings. Avoid repeating the same analysis in multiple fields. Keep advisory suggestions brief. Do not omit distinct supported issues to shorten output. Output size is not a reason to alter a classification.
 
-Keep explanations focused on the central issue. Do not repeat the claim quotes, all reviewed alternatives, or generic reference notices in prose. Use empty advisory suggestion arrays unless a short suggestion materially helps interpretation. For missing context, identify the missing fact and conditional consequence concisely. These output limits do not reduce the required factual review or change the three classifications.
+Keep explanations focused on the central issue. Do not repeat the claim quotes, all reviewed alternatives, or generic reference notices in prose. Use empty advisory suggestion arrays unless a short suggestion materially helps interpretation. For missing context, identify the missing fact and conditional consequence concisely. These output limits do not reduce the required factual review or change the classifications.

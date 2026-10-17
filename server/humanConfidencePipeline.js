@@ -16,7 +16,7 @@ function sourceContext(transcript, quote, binding, options={}) {
 // Orchestration preserves model metadata, but passes only validated literal facts to scoring.
 export function assessCandidate(candidate, transcript1, transcript2, sourceOptions={}) {
     if (!candidate || typeof candidate !== "object" ||
-        !["DIRECT", "INFERENTIAL", "FALSE_POSITIVE"].includes(candidate.type)) {
+        !["DIRECT", "INFERENTIAL", "NEEDS_REVIEW", "FALSE_POSITIVE"].includes(candidate.type)) {
         throw new Error("Invalid candidate classification in model response");
     }
     const sourceBindings={claim1:resolveWitnessSource(transcript1,candidate.claim1,sourceOptions.claim1),
@@ -38,6 +38,9 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
     if (!verified) Object.assign(index, {score:null,band:"NOT_EVALUABLE",status:"NOT_EVALUABLE",
         notEvaluableReason:"UNVERIFIED_SOURCE",evidenceStrength:null,rulesFired:[],rulesLimiting:[{id:"grounding",explanation:"Quote or extracted phrase failed exact source validation."}]});
     if(verified&&Object.values(sourceBindings).some(source=>source.status!=='BOUND'))index.notEvaluableReason='MISSING_CONTEXT';
+    // A possible conflict the AI could not decide is never given a number.
+    if (verified && candidate.type === "NEEDS_REVIEW") Object.assign(index, {score:null,band:"NOT_EVALUABLE",status:"NOT_EVALUABLE",
+        notEvaluableReason:"NEEDS_REVIEW",evidenceStrength:null,rulesFired:[],rulesLimiting:[{id:"needs-review",explanation:"The AI marked this possible contradiction undecidable from the testimony; a person decides."}]});
     const review = !verified || index.status === "NOT_EVALUABLE";
     return {...candidate, ...index, claim1Valid,claim2Valid,claim1LiteralValid,claim2LiteralValid,sourceBindings,
         chronoTimeAnalysis:{claim1:interpretValidatedTime(fact1,claim1Valid),claim2:interpretValidatedTime(fact2,claim2Valid)},

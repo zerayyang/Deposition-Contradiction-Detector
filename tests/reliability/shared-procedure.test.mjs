@@ -1,0 +1,38 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {assessCandidate} from '../../server/humanConfidencePipeline.js';
+import {directWireSchema} from '../../server/directOutput.js';
+import {comparisonWireSchema} from '../../server/events/comparisonProtocol.js';
+
+const shared=readFileSync(new URL('../../server/proper_prompts.md',import.meta.url),'utf8');
+const comparison=readFileSync(new URL('../../server/events/COMPARISON_PROMPT.md',import.meta.url),'utf8');
+const types=['DIRECT','INFERENTIAL','NEEDS_REVIEW','FALSE_POSITIVE'];
+
+// Both methods classify with one procedure. The new method reads the shared text up to
+// "## 6. Required Output"; its own prompt may add transport rules but no classification rules.
+test('both methods share one classification procedure and the same four types',()=>{
+ const definitions=shared.slice(0,shared.indexOf('## 6. Required Output'));
+ for(const heading of ['### Step 4: The core test','### Step 5: Which type of conflict?','### Step 6: Consistency check','### NEEDS_REVIEW'])assert.ok(definitions.includes(heading),heading);
+ assert.deepEqual(directWireSchema.properties.contradictions.items.properties.type.enum,types);
+ const issue=comparisonWireSchema.properties.rows.items.properties.pairs.items.properties.comparisons.items;
+ assert.deepEqual([...issue.properties.type.enum].sort(),[...types].sort());
+ for(const overlay of ['overrides the earlier instruction','Reconciliations must come from the testimony','Inferences must rest on stated premises','Separate memory from knowledge'])
+  assert.ok(!comparison.includes(overlay),`New-method prompt still carries its own rule: ${overlay}`);
+ assert.match(comparison,/adds no classification rules/);
+});
+test('the shared procedure bans imagined reconciliations and the old imperfect-memory default',()=>{
+ assert.match(shared,/You may NOT reconcile with any distinction the witness did not draw/);
+ assert.match(shared,/choose FALSE_POSITIVE only if you can name which of reconciliations 1–7 applies/);
+ assert.doesNotMatch(shared,/Could a person with an imperfect memory reasonably say both statements/);
+ assert.doesNotMatch(shared,/Keep the existing three types/);
+});
+const claim=original=>({original,activityPhrase:null,timePhrase:null,locationPhrase:null,personPhrase:null,objectPhrase:null,quantityPhrase:null,statePhrase:null,qualifierPhrases:[]});
+test('the old method accepts NEEDS_REVIEW and never scores it',()=>{
+ const a='I signed the form.',b='I did not sign the form.';
+ const r=assessCandidate({type:'NEEDS_REVIEW',reasoning:'Fictional: which form is unclear.',claim1:claim(a),claim2:claim(b)},`Q: Did you sign it?\nA: ${a}`,`Q: Did you sign it?\nA: ${b}`);
+ assert.equal(r.type,'NEEDS_REVIEW');assert.equal(r.humanConfidence,null);assert.equal(r.status,'NOT_EVALUABLE');assert.equal(r.notEvaluableReason,'NEEDS_REVIEW');assert.equal(r.flag,'REVIEW');
+ const d=assessCandidate({type:'DIRECT',reasoning:'Fictional affirm versus deny.',claim1:claim(a),claim2:claim(b)},`Q: Did you sign it?\nA: ${a}`,`Q: Did you sign it?\nA: ${b}`);
+ assert.notEqual(d.notEvaluableReason,'NEEDS_REVIEW');
+ assert.throws(()=>assessCandidate({type:'MAYBE',reasoning:'x',claim1:claim(a),claim2:claim(b)},a,b));
+});

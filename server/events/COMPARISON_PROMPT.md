@@ -1,7 +1,8 @@
 # Source-linked event matching and comparison
 
-This workflow uses the existing project classification definitions supplied above.
-Only the output transport changes. Do not output legacy contradictions JSON or any
+Apply the analysis procedure and the four types defined above (DIRECT, INFERENTIAL,
+NEEDS_REVIEW, FALSE_POSITIVE) to every comparison, exactly as written there. This
+workflow changes only the output transport; it adds no classification rules. Do not output legacy contradictions JSON or any
 numeric confidence, probability, evidence status/strength, or similarity score.
 Event summaries, attributes and assertion labels are PROPOSED interpretations, not
 new evidence. The supplied source context and exact quotations are the authority.
@@ -28,77 +29,10 @@ Do not omit candidates because they are compatible, approximate or difficult.
 A pair has relation RELATED or UNRESOLVED, a reason and comparisons. RELATED needs
 one or more independently assessed factual issues. A pair can contain MULTIPLE
 independent issues: do not impose one issue per event pair. Each issue has a type
-DIRECT, INFERENTIAL or FALSE_POSITIVE under the unchanged supplied definitions,
+DIRECT, INFERENTIAL, NEEDS_REVIEW or FALSE_POSITIVE under the procedure above,
 report (whether it warrants a standalone finding under the existing reporting
 rules), issue, reasoning, leftSourceIds, rightSourceIds and missingContext.
-Apply the existing directness test before the inference test, including explicit exhaustive assertions versus stated exceptions within the same source-established scope. Different verbs alone do not require an inferential label. Do not guess scope membership or discard real uncertainty.
-
-missingContext lists only absent facts NECESSARY to establish this issue's identity, scope, overlap or incompatibility. It is not a list of everything an investigator could ask. Unknown details that cannot change the particular comparison belong in an optional follow-up in reasoning, not missingContext. An imagined reconciliation is not missing evidence by itself. Conversely, if the shared person/occasion, relevant interval or logical exclusion genuinely is unresolved, state it and keep review required. Never clear missingContext just to obtain a score; the model does not decide whether code can score an issue.
-
-NEEDS_REVIEW (this workflow only). This overrides the earlier instruction to keep
-three types and to use FALSE_POSITIVE for an unestablished conflict, including the
-"Unresolved timing — review needed" fallback. For a pair that may conflict, decide in
-this order:
-1. Read each answer naturally, in the context of its governing question and nearby
-   answers. If on that reading they assert incompatible things, apply the DIRECT and
-   INFERENTIAL tests. A person, document, place, occasion or period that the questions
-   or answers identify is the same one unless the testimony indicates otherwise.
-   Doubts the testimony does not raise (could "she" be someone else, could it be a
-   different house or period) do not stop a conflict; mention them in reasoning, not
-   in missingContext. Conversely, people, documents or agreements known by different
-   names are not presumed to be the same; if a conflict needs them to be the same and
-   the testimony does not link them, go to step 2.
-2. If not, and a conflict would only arise by adding a fact that neither answer states
-   (who imposed a requirement, that an item belongs to a category, that unrecorded
-   hours were unpaid), use FALSE_POSITIVE. Separate memory from knowledge. Not
-   recalling something is compatible with a later recollection of it. Not knowing a
-   fact is compatible with a later opinion or belief about it, and with information
-   the witness later learned from records, documents or other people. But a denial of
-   knowing or perceiving a fact conflicts with a later assertion that the witness
-   perceived or knew that same fact at the same time; apply the DIRECT test. An
-   intention is compatible with not knowing the result; a general statement is
-   compatible with a more specific one.
-3. Use NEEDS_REVIEW only when step 1 cannot be carried out because the supplied text
-   leaves the natural reading itself undetermined: an answer fragment with no stated
-   subject, a pronoun or "that" whose referent neither the question nor the answer
-   identifies, or a time reference that both answers leave open and that decides
-   whether they conflict. List exactly those absent facts in missingContext and set
-   report:true. Expect NEEDS_REVIEW to be uncommon. Editorial brackets, [sic],
-   ellipses and marked reconstructed questions are reliable context from the record:
-   never list them, or the wording they replace, as missing facts.
-FALSE_POSITIVE means the testimony shows both statements can be true or that no
-conflict is established without adding facts. Never use FALSE_POSITIVE for a conflict
-established on the natural reading, and never use NEEDS_REVIEW to avoid one.
-
-Inferences must rest on stated premises. An INFERENTIAL conflict must follow from
-what the answers actually say. Before labelling a pair INFERENTIAL, name each premise
-the inference needs. Identity settled by the natural reading in step 1 (the same
-person, document, post or occasion) is not an inference premise: if that identity is
-the only step, apply the DIRECT test. Scope set by the witness's own words in either
-answer is source-established: if the witness denies discussing "anything related to"
-a matter and their own words tie an item to that matter, an admitted discussion of
-that item is an exception inside the denied scope and the DIRECT test applies. If any other premise is stated in neither answer (for example, that
-hours missing from records were worked off the clock, or that something unmentioned
-did not happen), the conflict is not established: use FALSE_POSITIVE. Information the
-witness later learned from records, documents or other people does not contradict an
-earlier statement that the witness did not personally know.
-
-Reconciliations must come from the testimony. A pair is reconciled only by a
-distinction the witness, the governing question or other supplied testimony actually
-draws: a stated different time, occasion, person, scope, correction or qualification.
-Do not reconcile a conflict with a distinction neither side states, such as reading one
-answer as describing a rule and the other as describing practice, giving a common word
-a narrower technical meaning, or treating one answer as being about different material
-than its question indicates. If the only available reconciliation needs such an
-unstated distinction, classify the conflict under the DIRECT/INFERENTIAL tests, or use
-NEEDS_REVIEW if a needed fact is genuinely absent.
-
-A plain "yes" to a question about what the witness would do in their role, job or
-routine ("Would you approve...?", "Would you recommend...?") adopts a description of
-their usual practice, not a hypothetical, unless the question or answer marks it as
-hypothetical (if, suppose, imagine, would you be willing). Compare such an adopted
-practice with a later "never" or denial about the same activity under the directness
-test.
+missingContext lists only absent facts NECESSARY to establish this issue's identity, scope, overlap or incompatibility. It is not a list of everything an investigator could ask. Unknown details that cannot change the particular comparison belong in an optional follow-up in reasoning, not missingContext. An imagined reconciliation is not missing evidence by itself. Conversely, if the shared person/occasion, relevant interval or logical exclusion genuinely is unresolved, state it and keep review required. Never clear missingContext just to obtain a score; the model does not decide whether code can score an issue. A NEEDS_REVIEW issue must list its missing facts here and set report:true.
 
 Use FALSE_POSITIVE for independently compared compatible/identical details; set
 report:false when existing reporting rules exclude a standalone card, with an
@@ -106,9 +40,8 @@ explicit explanation. Audit comparisons remain even when report:false.
 
 UNRESOLVED means the link between events needs review, not that they have been
 reconciled. It may have no comparisons if a defensible factual comparison cannot
-be made. Explain what is missing in the pair reason. For a superficial conflict
-with unestablished timing, follow the supplied existing FALSE_POSITIVE/review-needed
-instructions if emitting a comparison; do not invent an extra contradiction type.
+be made. Explain what is missing in the pair reason. If a comparison is emitted for an
+undecidable possible conflict, its type is NEEDS_REVIEW under the procedure above.
 Never assume both documents concern the same witness from names or pronouns. The
 caller-supplied sameWitnessConfirmed flag is context, not proof supplied by a model;
 if false, identify identity as unresolved and avoid unconditional conflict claims.
