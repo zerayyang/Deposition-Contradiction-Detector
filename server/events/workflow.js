@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import {buildEventExtractionPlan,previewEventExtractionPlan,executeEventExtraction} from './extract.js';
 import {buildEventComparisonPlan,previewEventComparisonPlan,executeEventComparison} from './compare.js';
 import {parseExtractionMessage,materializeExtraction} from './extractionProtocol.js';
-import {scoreEventComparisons} from './scoringAdapter.js';
+import {scoreEventComparisons,mergeConflictingLabels} from './scoringAdapter.js';
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const approval=plan=>({planId:plan.id,requestCount:plan.requestCount,maxUsd:plan.cost.conservativeBudget});
 function cachedMessage(task){return {stop_reason:task.stopReason,content:[{type:'text',text:task.rawText}],usage:{input_tokens:task.usage?.inputTokens,output_tokens:task.usage?.outputTokens,cache_creation_input_tokens:task.usage?.cacheCreationInputTokens??task.usage?.cacheCreation??0,cache_read_input_tokens:task.usage?.cacheReadInputTokens??task.usage?.cacheRead??0}};}
@@ -81,7 +81,7 @@ export async function executeEventWorkflow({prepared,body,callModel,signal,onEve
  const materialize=(raw,running=false)=>{
   const eventState={version:1,codeFingerprint,speakerRoles:body.speakerRoles??[{},{}],witnessTestimonyConfirmed:body.witnessTestimonyConfirmed??[false,false],sameWitnessConfirmed:body.sameWitnessConfirmed,
    extraction:phase==='extract'?raw:extraction,comparison:phase==='compare'?raw:null};
-  const all=phase==='compare'?scoreEventComparisons(raw,extractionPlan):[];
+  const all=phase==='compare'?mergeConflictingLabels(scoreEventComparisons(raw,extractionPlan),extractionPlan):[];
   const tasks=raw.tasks.filter(t=>t.mode!=='LOCAL_NON_WITNESS').map(t=>({id:t.id,reused:Boolean(t.reused),status:({COMPLETE:'completed',PARTIAL:'partial',FAILED:'failed',RUNNING:'running',PENDING:'pending',CANCELLED:'cancelled',NOT_ATTEMPTED:'not_attempted'})[t.status],error:t.error??t.issues?.map(i=>[i.message,...(i.errors??[]).map(e=>`${e.code}: ${e.message}`)].join(' ')).join(' '),stopReason:t.stopReason,acceptedFindings:t.events?.length??t.comparisons?.length??0,validationIssues:structuredClone(t.issues??[]),rejectedFindings:(t.rejected??[]).map((r,i)=>({candidateIndex:r.index??i,reason:r.error??r.errors?.map(e=>`${e.code}: ${e.message}`).join(' ')??'Event or comparison failed source/schema validation.',diagnostics:structuredClone(r.errors??[])}))}));
   const comparisonFinished=phase==='compare'&&raw.tasks.every(t=>['COMPLETE','PARTIAL','FAILED'].includes(t.status));
   // Bounded reading steps can return before the remaining tasks have run.

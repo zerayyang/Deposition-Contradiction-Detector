@@ -11,3 +11,6 @@
 .cloud-list { padding: 0; list-style: none; }
 .cloud-list li { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid #e8eef0; overflow-wrap: anywhere; }
 .cloud-list span { color: #617585; white-space: nowrap; }
+.label-disagreement{margin-top:16px;padding:12px 14px;border-radius:8px;color:#5f420e;background:#fff6df}
+.label-disagreement ul{margin:8px 0 0;padding-left:18px}
+.label-disagreement details{margin-top:4px}

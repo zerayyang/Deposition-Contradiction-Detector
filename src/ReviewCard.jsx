@@ -1,7 +1,7 @@
 import {sourceBindingMessage} from './lib/sourceStatus.js';
 const percent = value => Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Unavailable";
 const ruleNames = {time:"Time comparison",state:"Opposing states",timeline:"Timeline conflict","activity polarity":"Action affirmed vs denied","location+activity":"Home presence vs departure","point-location":"Same-time location comparison",knowledge:"Awareness or meeting",quantity:"Amount comparison"};
-const reasonLabels = {NO_FACTS:"The code has no supported facts to compare.",UNSUPPORTED_PATTERN:"This comparison is outside the patterns the code can verify.",MISSING_CONTEXT:"The comparison needs clearer person, event, day or time context.",UNVERIFIED_SOURCE:"A quote or extracted phrase could not be verified against the source."};
+const reasonLabels = {LABEL_DISAGREEMENT:"Comparisons of the same witness answers reached different categories. A person should decide before any score is shown.",NO_FACTS:"The code has no supported facts to compare.",UNSUPPORTED_PATTERN:"This comparison is outside the patterns the code can verify.",MISSING_CONTEXT:"The comparison needs clearer person, event, day or time context.",UNVERIFIED_SOURCE:"A quote or extracted phrase could not be verified against the source."};
 
 export function ScoreGuide() {
   return <details className="score-guide"><summary>How to read the confidence score</summary>
@@ -31,11 +31,13 @@ export function ReviewCard({result:r, dismissed=false}) {
   const reasoning = r.reasoning ?? "No explanation provided.";
   const question = followUp(reasoning);
   const assessment = question ? reasoning.replace(/(?:neutral\s+|possible\s+)?follow[- ]up(?:\s+question)?\s*:\s*["'“‘]?([\s\S]*?\?)["'”’]?/i, "").trim() : reasoning;
-  const label = r.type === "DIRECT" ? "Direct" : r.type === "INFERENTIAL" ? "Inferential" : "False positive";
+  const labelFor = type => type === "DIRECT" ? "Direct" : type === "INFERENTIAL" ? "Inferential" : "False positive";
+  const label = r.labelDisagreement ? "Labels disagree" : labelFor(r.type);
   const review = notEvaluable || r.flag === "REVIEW" || /^(Unresolved timing|Question meaning unresolved)/i.test(reasoning);
   return <article className={`review-card ${r.type?.toLowerCase() ?? ""}`}>
     {r.eventDetails && <details><summary>Source-linked event details</summary><p>{r.eventDetails.notice}</p>{r.eventDetails.records.map((event,i)=><section key={i}><h4>Transcript {i+1}: {event.summary}</h4><ul>{event.attributes.map((a,n)=><li key={n}>{a.name}: {a.value??a.state.toLowerCase()}</li>)}</ul>{event.sources.map(s=><blockquote key={s.id}>{s.quote}<small> · {s.pageRefs.length?s.pageRefs.map(p=>'PDF page '+p.pdfPage).join(', '):'text offsets '+s.start+'–'+s.end}</small></blockquote>)}</section>)}</details>}
     <header className="card-heading"><span className={`type-chip ${r.type?.toLowerCase()}`}>{label}</span><span className="muted">AI importance: {r.severity?.toLowerCase() ?? "unspecified"}</span>{review && <span className="review-chip">Clarification needed</span>}</header>
+    {r.labelDisagreement && <section className="label-disagreement"><b>Labels disagree — review.</b> These comparisons of the same witness answers reached different categories:<ul>{(r.mergedViews ?? []).map(v=><li key={v.id}><b>{labelFor(v.type)}:</b> {v.issue}<details><summary>Reasoning</summary><p>{v.reasoning}</p></details></li>)}</ul></section>}
     <div className="quote-grid">{[r.claim1,r.claim2].map((claim,i)=><blockquote key={i}><span className="eyebrow">Transcript {i+1}</span><p>“{claim?.original ?? "No quote available."}”</p></blockquote>)}</div>
     {r.sourceReferences && <section className="source-citations"><b>Source references</b>{['claim1','claim2'].map((key,i)=><p key={key}>Transcript {i+1}: {(r.sourceReferences[key]??[]).map((p,j)=><span key={j}>{j>0?' · ':''}{p.pdfPage?`PDF page ${p.pdfPage} (label ${p.pageLabel})`:`text characters ${p.start}–${p.end}`}</span>)}</p>)}{r.supportingAnalyses?.length>1 && <small>{r.supportingAnalyses.length} matching section findings combined; exact quotes and analysis variants retained.</small>}</section>}
     {r.sourceBindings && <section className="source-citations"><b>Witness context</b>{['claim1','claim2'].map((key,i)=>{

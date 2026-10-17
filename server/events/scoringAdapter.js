@@ -35,6 +35,30 @@ function resolvedOutsideLink(comparison,records,comparisonResult){
   return pair?.relation==='RELATED'&&!pair.coverageConflict&&(v.missingContext??[]).length===0
    &&!tasks.some(t=>(t.rejected??[]).some(r=>r.pairId===v.pairId));});
 }
+// Cards whose quotes share a witness answer on both sides but carry different labels
+// are one unsettled judgment, not two findings. Combine only those into a single
+// review card that keeps every view; same-label cards may be distinct issues and stay.
+export function mergeConflictingLabels(cards,extractionPlan){
+ const indexes=extractionPlan.documents.map(d=>parseTestimonySource(d.text,{speakerRoles:d.speakerRoles,pages:d.pages}));
+ const answers=(side,i)=>new Set(side.filter(s=>s.role==='WITNESS').map(s=>indexes[i].turns.findIndex(t=>t.role==='WITNESS'&&s.start>=t.contentStart&&s.end<=t.end)).filter(n=>n>=0));
+ const keys=cards.map(c=>c.eventDetails?[answers(c.eventDetails.comparison.leftSources,0),answers(c.eventDetails.comparison.rightSources,1)]:null);
+ const overlap=(a,b)=>[...a].some(x=>b.has(x));
+ const parent=cards.map((_,i)=>i),root=i=>parent[i]===i?i:(parent[i]=root(parent[i]));
+ for(let i=0;i<cards.length;i++)for(let j=i+1;j<cards.length;j++)
+  if(keys[i]&&keys[j]&&cards[i].type!==cards[j].type&&overlap(keys[i][0],keys[j][0])&&overlap(keys[i][1],keys[j][1]))parent[root(j)]=root(i);
+ const groups=new Map();cards.forEach((c,i)=>{const r=root(i);if(!groups.has(r))groups.set(r,[]);groups.get(r).push(c);});
+ return [...groups.values()].map(group=>{
+  if(new Set(group.map(c=>c.type)).size<2)return group[0];
+  const rank={DIRECT:0,INFERENTIAL:1,FALSE_POSITIVE:2},base=[...group].sort((a,b)=>rank[a.type]-rank[b.type])[0];
+  const views=group.map(c=>({id:c.id,type:c.type,issue:c.eventDetails.issue,reasoning:c.reasoning,report:c.report}));
+  return {...base,id:'merged:'+group.map(c=>c.id).join('|'),report:true,reviewRequired:true,labelDisagreement:true,
+   typeAlternatives:[...new Set(group.map(c=>c.type))],mergedViews:views,
+   score:null,humanConfidence:null,evidenceScore:null,evidenceStrength:null,band:'NOT_EVALUABLE',status:'NOT_EVALUABLE',basis:'NOT_EVALUABLE',
+   notEvaluableReason:'LABEL_DISAGREEMENT',rulesFired:[],evidenceDetails:[],comparisons:{},flag:'REVIEW',
+   reasons:[`Labels disagree — review. ${group.length} comparisons of the same answers reached ${[...new Set(group.map(c=>c.type))].join(' / ')}.`],
+   rulesLimiting:[{id:'label-disagreement',explanation:'Comparisons of the same witness answers reached different categories; no score until a person decides.'}]};
+ });
+}
 export function scoreEventComparisons(comparisonResult,extractionPlan){
  const indexes=extractionPlan.documents.map(d=>parseTestimonySource(d.text,{speakerRoles:d.speakerRoles,pages:d.pages}));
  const multipleWitnesses=indexes.some(index=>new Set(index.turns.filter(t=>t.role==='WITNESS'&&t.speaker).map(t=>t.speaker.trim().toUpperCase())).size>1);
