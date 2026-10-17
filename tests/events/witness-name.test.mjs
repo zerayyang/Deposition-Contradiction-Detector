@@ -28,3 +28,10 @@ test('compares the two transcripts: same, different or unknown',()=>{
   assert.equal(different.status,'different');assert.deepEqual(different.names,['Jane Doe','John Roe']);
   assert.equal(compareWitnesses('Deposition of Jane Doe','Q: Hi?\nA: Hi.').status,'unknown');
 });
+
+test('same witness is assumed unless the captions name different people',async()=>{
+  const {defaultSameWitness}=await import('../../shared/witnessName.js');
+  assert.equal(defaultSameWitness(compareWitnesses('Deposition of Jane Doe','Deposition of Jane Doe')),true);
+  assert.equal(defaultSameWitness(compareWitnesses('Q: Hi?\nA: Hi.','Q: Hi?\nA: Hi.')),true);
+  assert.equal(defaultSameWitness(compareWitnesses('Deposition of Jane Doe','Deposition of John Roe')),false);
+});

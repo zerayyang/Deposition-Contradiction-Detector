@@ -46,3 +46,7 @@ export function compareWitnesses(text1, text2) {
   if (!a || !b) return {status: 'unknown', names: [a?.display ?? null, b?.display ?? null]};
   return {status: a.key === b.key ? 'same' : 'different', names: [a.display, b.display]};
 }
+
+// Two depositions of one witness is the app's purpose, so assume it unless the
+// captions name different people; the reviewer can still change it.
+export const defaultSameWitness = comparison => comparison?.status !== 'different';
