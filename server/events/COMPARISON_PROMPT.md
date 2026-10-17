@@ -45,7 +45,9 @@ this order:
    or answers identify is the same one unless the testimony indicates otherwise.
    Doubts the testimony does not raise (could "she" be someone else, could it be a
    different house or period) do not stop a conflict; mention them in reasoning, not
-   in missingContext.
+   in missingContext. Conversely, people, documents or agreements known by different
+   names are not presumed to be the same; if a conflict needs them to be the same and
+   the testimony does not link them, go to step 2.
 2. If not, and a conflict would only arise by adding a fact that neither answer states
    (who imposed a requirement, that an item belongs to a category, that unrecorded
    hours were unpaid), use FALSE_POSITIVE. Separate memory from knowledge. Not
@@ -61,7 +63,9 @@ this order:
    subject, a pronoun or "that" whose referent neither the question nor the answer
    identifies, or a time reference that both answers leave open and that decides
    whether they conflict. List exactly those absent facts in missingContext and set
-   report:true. Expect NEEDS_REVIEW to be uncommon.
+   report:true. Expect NEEDS_REVIEW to be uncommon. Editorial brackets, [sic],
+   ellipses and marked reconstructed questions are reliable context from the record:
+   never list them, or the wording they replace, as missing facts.
 FALSE_POSITIVE means the testimony shows both statements can be true or that no
 conflict is established without adding facts. Never use FALSE_POSITIVE for a conflict
 established on the natural reading, and never use NEEDS_REVIEW to avoid one.
@@ -70,7 +74,10 @@ Inferences must rest on stated premises. An INFERENTIAL conflict must follow fro
 what the answers actually say. Before labelling a pair INFERENTIAL, name each premise
 the inference needs. Identity settled by the natural reading in step 1 (the same
 person, document, post or occasion) is not an inference premise: if that identity is
-the only step, apply the DIRECT test. If any other premise is stated in neither answer (for example, that
+the only step, apply the DIRECT test. Scope set by the witness's own words in either
+answer is source-established: if the witness denies discussing "anything related to"
+a matter and their own words tie an item to that matter, an admitted discussion of
+that item is an exception inside the denied scope and the DIRECT test applies. If any other premise is stated in neither answer (for example, that
 hours missing from records were worked off the clock, or that something unmentioned
 did not happen), the conflict is not established: use FALSE_POSITIVE. Information the
 witness later learned from records, documents or other people does not contradict an
