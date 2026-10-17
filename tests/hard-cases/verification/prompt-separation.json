@@ -1,0 +1,31 @@
+{
+  "files": [
+    {
+      "path": "server/events/COMPARISON_PROMPT.md",
+      "sha256": "9fe6749a06972dc753f710d69cefdaf5baaf3e62fee8bfa87fda9ef36ff8e0ad",
+      "unchanged": true
+    },
+    {
+      "path": "server/events/EXTRACTION_GUIDELINES.md",
+      "sha256": "1cbdd637d38454f90006f3743a2bb8ddfdb21bb1578d7da031654d3e3cdc974d",
+      "unchanged": true
+    },
+    {
+      "path": "server/events/EXTRACTION_PROMPT.md",
+      "sha256": "83edfcab85cb557b5596397ea9a1790ff169bf9ccabf804919b554778c1b8806",
+      "unchanged": true
+    },
+    {
+      "path": "server/proper_prompts.md",
+      "sha256": "a08a5bf691a9bbbda881345cf49d63161317bc14769a20a22185b848df4f4b80",
+      "unchanged": true
+    }
+  ],
+  "referenceStringsChecked": 111,
+  "caseIdsChecked": 70,
+  "exactMatches": [],
+  "scope": "Exact full labelBasis/ruling strings of >=30 characters and corpus case IDs; generic class definitions are not answer-key leaks.",
+  "finalCaseIdsChecked": 67,
+  "finalReferenceStringsChecked": 107,
+  "productionFilesUnchanged": true
+}

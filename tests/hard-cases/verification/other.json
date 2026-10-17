@@ -1,0 +1,1584 @@
+{
+  "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+  "operation": "Independent author-only source review of 29 existing research drafts; no production/gold/verifier/model API reads or calls.",
+  "scope": [
+    "research/famous.json",
+    "research/datasets.json"
+  ],
+  "summary": {
+    "originalCount": 29,
+    "keepCount": 27,
+    "dropCount": 2,
+    "quotesExactCount": 58,
+    "proposedType": "DEBATABLE"
+  },
+  "methodNotes": [
+    "Each unique source URL freshly downloaded using certifi CA bundle; repeated source URLs share downloaded immutable snapshot. Initial system-CA SSL failures were resolved with certifi, without disabling TLS verification.",
+    "Dataset source changed from landing page to official ZIP containing decoded original test.json, annotations, LICENSE and TERMS. Original document URLs are historical provenance; official release is the verified text source.",
+    "PDF page text cross-check does not replace exact HTML quotation checks; partial PDF prefixes are explicitly identified.",
+    "Two full-document NotMentioned adaptations excluded for structural role-heading ambiguity; original source text and annotations retained unchanged in research."
+  ],
+  "sources": {
+    "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf": {
+      "status": 200,
+      "finalUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+      "sha256": "c77a27f7291ab92bfe8950e2ac151604267f5c7cd37c4c9aca68baac109b0eaa",
+      "bytes": 279990
+    },
+    "https://github.com/stanfordnlp/contract-nli/blob/gh-pages/LICENSE": {
+      "status": 200,
+      "finalUrl": "https://github.com/stanfordnlp/contract-nli/blob/gh-pages/LICENSE",
+      "sha256": "5ca1c52fc5e3504d1e72c3cfc83769a975dbaecd6d3db42744dbd385adf1f013",
+      "bytes": 379645
+    },
+    "https://github.com/stanfordnlp/contract-nli/blob/gh-pages/index.md#terms-and-conditions": {
+      "status": 200,
+      "finalUrl": "https://github.com/stanfordnlp/contract-nli/blob/gh-pages/index.md#terms-and-conditions",
+      "sha256": "bf89774c0ec734cd6663ba12035ba86d69f8b2562d0efb9e9567b1fc2622b380",
+      "bytes": 280752
+    },
+    "https://stanfordnlp.github.io/contract-nli/": {
+      "status": 200,
+      "finalUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "sha256": "c4ce154ae48ddb800cc32070d2019a2ad0dd05d115e81200b74536b84f3c80be",
+      "bytes": 21751
+    },
+    "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip": {
+      "status": 200,
+      "finalUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "sha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "bytes": 65362913
+    },
+    "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm": {
+      "status": 200,
+      "finalUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "sha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+      "bytes": 857616
+    },
+    "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf": {
+      "status": 200,
+      "finalUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+      "sha256": "cba27090901c8616d38a75f7338b0bbeb6cd9acb243e3f56b451adfa80ffff47",
+      "bytes": 708271
+    },
+    "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm": {
+      "status": 200,
+      "finalUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "sha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+      "bytes": 243338
+    },
+    "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf": {
+      "status": 200,
+      "finalUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf",
+      "sha256": "f1a57f5d99c728b9cbf74681fb5882e877e6bf536fb90bf43419a79388e3c979",
+      "bytes": 4425936
+    },
+    "http://3d-printing-expert.com/wp-content/uploads/2019/03/Mutual-Non-Disclosure-Agreement-Inventor-Product-Development-Experts-Inc..pdf": {
+      "status": 200,
+      "finalUrl": "https://3d-printing-expert.com/wp-content/uploads/2019/03/Mutual-Non-Disclosure-Agreement-Inventor-Product-Development-Experts-Inc..pdf",
+      "sha256": "ef8cb23ec14c2a984f769db2590148955a918629ed455b88f3b9de7a26093833",
+      "bytes": 412422
+    },
+    "http://ictstrategicservices.com.au/wp-content/uploads/2016/08/ICTSC-NDA-General-MandA-signed.pdf": {
+      "status": 200,
+      "finalUrl": "http://ictstrategicservices.com.au/wp-content/uploads/2016/08/ICTSC-NDA-General-MandA-signed.pdf",
+      "sha256": "76ccccb4e327afb38dce1f98ab0522b208b45f6a1f170c51f4df112e98287134",
+      "bytes": 146282
+    },
+    "http://suppliers.otctools.com/wp-content/uploads/2017/07/01_Bosch-Automotive-Service-Solutions-Mutual-Non-Disclosure-Agreement-7-12-17.pdf": {
+      "error": "<urlopen error timed out>"
+    },
+    "http://www.hoffmanland.com/wp-content/uploads/2016/05/NDA-Template-Media-News-Group-inc.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "http://www.hysafe.org/download/22/NDA_V3.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "http://www.lastmanstands.com/files/LMS_Non_Disclosure_Agreement.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "http://www.vidar.com/film/images/stories/PDFs/oem_resellers/18268-001%20Rev%20B%20Form%20Version%20in%20PDF.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "https://baconbusinesssales.com/wp-content/uploads/2013/07/BaconNon-Disclosure.pdf": {
+      "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+    },
+    "https://datatrec.com/wp-content/uploads/2016/07/MUTUAL_NDA.pdf": {
+      "status": 200,
+      "finalUrl": "https://datatrec.com/wp-content/uploads/2016/07/MUTUAL_NDA.pdf",
+      "sha256": "59fa26a323f5d9505837c3102443d9164980927dbc4fadb67ba6d7d8edaf07c8",
+      "bytes": 171859
+    },
+    "https://nrgpropertyservicescompany.co.uk/wp-content/uploads/2018/09/NDA-Urban_Wind_Turbines.pdf": {
+      "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+    },
+    "https://pitchdeckfire.com/wp-content/uploads/2016/02/Generic-NDA-Pitch-Deck-Fire.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "https://streetstream.co.uk/files/NDA_Street_Stream_Franchise.pdf": {
+      "error": "HTTP Error 403: Forbidden"
+    },
+    "https://www.acumensystems.com/media/documents/mutual-non-disclosure-agreement.pdf": {
+      "status": 200,
+      "finalUrl": "https://www.acumensystems.com/media/documents/mutual-non-disclosure-agreement.pdf",
+      "sha256": "ded86cdb6dc4a8f1294cedf4b926513335244b7caae96b9abe6503ae90a6a37a",
+      "bytes": 294666
+    },
+    "https://www.business-partnership.com/uploads/business/pdf/41629_1.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "https://www.design1st.com/wp-content/uploads/2013/12/NDAMutualTemplateClientFill.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "https://www.itagg.com/nda.pdf": {
+      "error": "<urlopen error [Errno 61] Connection refused>"
+    },
+    "https://www.jea.com/About/Procurement/Formal_Procurement_Opportunities/064-19_Non_Disclosure_Agreement_2019.aspx": {
+      "status": 200,
+      "finalUrl": "https://www.jea.com/About/Procurement/Formal_Procurement_Opportunities/064-19_Non_Disclosure_Agreement_2019.aspx",
+      "sha256": "f11c72cce239f16d338cc9737cb02b475fc3646fdc2f4f88d727382b6a0dfcd8",
+      "bytes": 51412
+    },
+    "https://www.molybdenumconsortium.org/assets/files/IMOA%20Molybdenum%20Consortium%20NDA%20Agreement%20amended%20Jan%2008,%20valid%20March%2009%20onwards.pdf": {
+      "status": 200,
+      "finalUrl": "https://www.molybdenumconsortium.org/assets/files/IMOA%20Molybdenum%20Consortium%20NDA%20Agreement%20amended%20Jan%2008,%20valid%20March%2009%20onwards.pdf",
+      "sha256": "44ccddb5f03adc3eee5b318e404998fd68df2609cae8585f7a0f07277eb0bff6",
+      "bytes": 46855
+    },
+    "https://www.nskeurope.com/content/dam/nskcmsr/downloads/literature_corporate/5-NSK-Confidentiality-Agreement-for-Suppliers.pdf": {
+      "error": "HTTP Error 404: Not Found"
+    },
+    "https://www.regjeringen.no/link/54c808c1b20e4490b1300ad2ce3b9649.aspx?id=2139003": {
+      "error": "HTTP Error 403: Forbidden"
+    }
+  },
+  "cases": [
+    {
+      "id": "famous-clinton-definition",
+      "inputResearchRecordSha256": "6dd87e9d7b00386a4aca670a7fad02ff3c7a7e3dfd56afce1683a81d36eee796",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            562664,
+            562772
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            144
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            633268,
+            633416
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            164
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "OIC allegations/characterizations; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-clinton-alone",
+      "inputResearchRecordSha256": "90132cc18b1dfec7c07b43a091c9c7a446700037d3c46ee76b5b40e71aaea34e",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            628401,
+            628767
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            163
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            633268,
+            633416
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            164
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "OIC allegations/characterizations; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-clinton-gifts",
+      "inputResearchRecordSha256": "1dcc650b5af55ab9b0ad6f2336b424757cda1cdaec3135d510bfad5a715fee65",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            639101,
+            639144
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            166
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            123382,
+            123433
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            33,
+            169
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "OIC allegations/characterizations; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-clinton-testimony-discussion",
+      "inputResearchRecordSha256": "fce6bca2bc26a3c771fa06b8e7af20d13b1c86a7e10a8519ce8cb832b214ebb4",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            658991,
+            660023
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            171
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            439297,
+            439445
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            112
+          ],
+          "pdfFullQuoteNormalizedMatch": false
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "OIC allegations/characterizations; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-clinton-subpoena",
+      "inputResearchRecordSha256": "782c0667c5eb9675d65ccfee50d37e3a8d526a0d36b701389f5cd1cf36bbf67c",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            669628,
+            669661
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            174
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            670403,
+            670542
+          ],
+          "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            174
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "OIC allegations/characterizations; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-clemens-hgh-discussion",
+      "inputResearchRecordSha256": "f08034479bf8a150a3942bc8acd56bf01356bbbcd1413d7c8ac39ffa9c7e22bf",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            79023,
+            79035
+          ],
+          "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            101
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            84403,
+            84502
+          ],
+          "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            102
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "Roger Clemens",
+        "testimony1SourceRole": "Rep. John Tierney reads a passage attributed to Clemens in an earlier deposition; source is hearing readback, not independently fetched deposition.",
+        "testimony2SourceRole": "Clemens answers during hearing."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "Congressional examination and quoted testimony; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-clemens-research",
+      "inputResearchRecordSha256": "b0c6578d3d907709e9195c7d6cb48d5721377acd319e61f099eb2fe6ebf64522",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            85879,
+            85966
+          ],
+          "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            103
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            87622,
+            87994
+          ],
+          "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            103
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "Roger Clemens",
+        "testimony1SourceRole": "Rep. John Tierney reads a passage attributed to Clemens in an earlier deposition; source is hearing readback, not independently fetched deposition.",
+        "testimony2SourceRole": "Clemens answers during hearing."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "Congressional examination and quoted testimony; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-clemens-wife-consistency",
+      "inputResearchRecordSha256": "1d5e82769ecc0f19e62830771082c2498553e81e94704c819f40c5c8278b3d07",
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "fetchStatus": 200,
+      "sourceSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            80721,
+            80916
+          ],
+          "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            101
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            81316,
+            81342
+          ],
+          "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+          "mode": "Official HTML tag-strip/entity-decode exact substring",
+          "pdfPageLocation": [
+            101
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "Roger Clemens",
+        "testimony1SourceRole": "Rep. John Tierney reads a passage attributed to Clemens in an earlier deposition; source is hearing readback, not independently fetched deposition.",
+        "testimony2SourceRole": "Clemens answers during hearing."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "Congressional examination and quoted testimony; not an adjudicated app-type classification.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "famous-bonds-evasion-followup",
+      "inputResearchRecordSha256": "9118ec54a4cb1ad48e4885ac3cb97119519fd5dd81a3e287ffb791a7f870050f",
+      "originalSourceUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+      "fetchStatus": 200,
+      "sourceSha256": "c77a27f7291ab92bfe8950e2ac151604267f5c7cd37c4c9aca68baac109b0eaa",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+      "checkMode": "Reopened primary official HTML/PDF; both complete quotes exact; attribution and source citations checked; PDF page cross-check distinguished full matches from prefix-only locations.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            6379,
+            7164
+          ],
+          "extractedTextSha256": "c386c3b6e7fcc00e4df8add240da5e05e396bcf546535c0a58179ac112847731",
+          "mode": "Official opinion PDF PyMuPDF text extraction exact substring",
+          "pdfPageLocation": [
+            6
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        },
+        {
+          "exact": true,
+          "offsetsCodePoints": [
+            7502,
+            7528
+          ],
+          "extractedTextSha256": "c386c3b6e7fcc00e4df8add240da5e05e396bcf546535c0a58179ac112847731",
+          "mode": "Official opinion PDF PyMuPDF text extraction exact substring",
+          "pdfPageLocation": [
+            7
+          ],
+          "pdfFullQuoteNormalizedMatch": true
+        }
+      ],
+      "attribution": {
+        "sameWitness": true,
+        "witness": "Barry Bonds",
+        "testimony1SourceRole": "Court opinion reproduces Bonds grand jury testimony.",
+        "testimony2SourceRole": "Same grand jury, follow-up answer reproduced in court opinion."
+      },
+      "sourceAnnotationMapping": {
+        "sourceJudgment": "Ninth Circuit opinion discusses materiality and reverses obstruction conviction; no judicial finding that every denial is true, or app-type adjudication.",
+        "labelBasisReview": "Consistent with unresolved/qualified reading; DEBATABLE retained.",
+        "questions": "Explicitly marked reconstructed in existing notes; contextual prompts carry no independent factual evidentiary weight."
+      },
+      "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location."
+    },
+    {
+      "id": "contractnli-test-1-nda-1",
+      "inputResearchRecordSha256": "a30d09859261696c5a3f638f25ac9cf26d49b0366535668f24be4ad8b509399c",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            3254,
+            3518
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.jea.com/About/Procurement/Formal_Procurement_Opportunities/064-19_Non_Disclosure_Agreement_2019.aspx",
+        "status": 200,
+        "finalUrl": "https://www.jea.com/About/Procurement/Formal_Procurement_Opportunities/064-19_Non_Disclosure_Agreement_2019.aspx",
+        "sha256": "f11c72cce239f16d338cc9737cb02b475fc3646fdc2f4f88d727382b6a0dfcd8",
+        "bytes": 51412,
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-11-nda-1",
+      "inputResearchRecordSha256": "50743a72d70906fe9de90336f206481f090e20e084285acb44dc4b4fd45cc76a",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            1212,
+            2551
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "http://www.vidar.com/film/images/stories/PDFs/oem_resellers/18268-001%20Rev%20B%20Form%20Version%20in%20PDF.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-117-nda-1",
+      "inputResearchRecordSha256": "a172467c7b6d3c6036ba5956a8e322adfeac14a758abe71118e671a50fd330af",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            1417,
+            1582
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://pitchdeckfire.com/wp-content/uploads/2016/02/Generic-NDA-Pitch-Deck-Fire.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-127-nda-1",
+      "inputResearchRecordSha256": "251b203d5ee52b65908a86699c13990138d55330d5bd58d569d89b36f2b5f9b7",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            614,
+            1092
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "http://ictstrategicservices.com.au/wp-content/uploads/2016/08/ICTSC-NDA-General-MandA-signed.pdf",
+        "status": 200,
+        "finalUrl": "http://ictstrategicservices.com.au/wp-content/uploads/2016/08/ICTSC-NDA-General-MandA-signed.pdf",
+        "sha256": "76ccccb4e327afb38dce1f98ab0522b208b45f6a1f170c51f4df112e98287134",
+        "bytes": 146282,
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-129-nda-17",
+      "inputResearchRecordSha256": "812af0b70fa7e703034112f6ebebbc7238333ccab88ae6e59775df3a05ec2d46",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            2525,
+            3136
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-17"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.molybdenumconsortium.org/assets/files/IMOA%20Molybdenum%20Consortium%20NDA%20Agreement%20amended%20Jan%2008,%20valid%20March%2009%20onwards.pdf",
+        "status": 200,
+        "finalUrl": "https://www.molybdenumconsortium.org/assets/files/IMOA%20Molybdenum%20Consortium%20NDA%20Agreement%20amended%20Jan%2008,%20valid%20March%2009%20onwards.pdf",
+        "sha256": "44ccddb5f03adc3eee5b318e404998fd68df2609cae8585f7a0f07277eb0bff6",
+        "bytes": 46855,
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-138-nda-17",
+      "inputResearchRecordSha256": "50a39b9e43580b94a7402f14e5fa58934ef1f1c4e482df10be486be85eb031f8",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            603,
+            1336
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-17"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "http://www.lastmanstands.com/files/LMS_Non_Disclosure_Agreement.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-157-nda-2",
+      "inputResearchRecordSha256": "dd64da54a8f5dfb3b2ec1d2421c84846f874587c8731dcbfdd3ed2f32a0e8488",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            420,
+            1084
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-2"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://datatrec.com/wp-content/uploads/2016/07/MUTUAL_NDA.pdf",
+        "status": 200,
+        "finalUrl": "https://datatrec.com/wp-content/uploads/2016/07/MUTUAL_NDA.pdf",
+        "sha256": "59fa26a323f5d9505837c3102443d9164980927dbc4fadb67ba6d7d8edaf07c8",
+        "bytes": 171859,
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-165-nda-2",
+      "inputResearchRecordSha256": "90e4aa284fbed05151f00ff6ae02ce0630e957200663cce6918e92bab1d0f083",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            728,
+            1272
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-2"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "http://3d-printing-expert.com/wp-content/uploads/2019/03/Mutual-Non-Disclosure-Agreement-Inventor-Product-Development-Experts-Inc..pdf",
+        "status": 200,
+        "finalUrl": "https://3d-printing-expert.com/wp-content/uploads/2019/03/Mutual-Non-Disclosure-Agreement-Inventor-Product-Development-Experts-Inc..pdf",
+        "sha256": "ef8cb23ec14c2a984f769db2590148955a918629ed455b88f3b9de7a26093833",
+        "bytes": 412422,
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-18-nda-19",
+      "inputResearchRecordSha256": "cb799332d1ce9486f0da7f6dbd962501e7eea4e2acdcf9ef9b187337d8b986b6",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            779,
+            2451
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-19"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.business-partnership.com/uploads/business/pdf/41629_1.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-181-nda-13",
+      "inputResearchRecordSha256": "bb0bdf8e4befb79eb3dbe34ae889af8e031433d6a6f5679746d00baf19846ed6",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            2456,
+            2826
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-13"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.acumensystems.com/media/documents/mutual-non-disclosure-agreement.pdf",
+        "status": 200,
+        "finalUrl": "https://www.acumensystems.com/media/documents/mutual-non-disclosure-agreement.pdf",
+        "sha256": "ded86cdb6dc4a8f1294cedf4b926513335244b7caae96b9abe6503ae90a6a37a",
+        "bytes": 294666,
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-190-nda-1",
+      "inputResearchRecordSha256": "8468686cc748b50d324c4c6fbfbadd6d43a99cbc7c293cff5fa0a64008449423",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            960,
+            7551
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.itagg.com/nda.pdf",
+        "error": "<urlopen error [Errno 61] Connection refused>",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-2-nda-11",
+      "inputResearchRecordSha256": "53195f279b20a875fc549a4feb82147c6cac562d5ca387ec0b075cfa201e7a7f",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            3305,
+            3717
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-11"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "http://suppliers.otctools.com/wp-content/uploads/2017/07/01_Bosch-Automotive-Service-Solutions-Mutual-Non-Disclosure-Agreement-7-12-17.pdf",
+        "error": "<urlopen error timed out>",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-21-nda-10",
+      "inputResearchRecordSha256": "0cd8f200e67af6faf268d5c06bfcd2420ba4745682e833936954e0ea7355ff4b",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            1926,
+            2341
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-10"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.nskeurope.com/content/dam/nskcmsr/downloads/literature_corporate/5-NSK-Confidentiality-Agreement-for-Suppliers.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-212-nda-1",
+      "inputResearchRecordSha256": "8f95361fd3745b76576980e190e729dc758fa2509117d64565965541b9020e18",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            2478,
+            2691
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "http://www.hoffmanland.com/wp-content/uploads/2016/05/NDA-Template-Media-News-Group-inc.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-213-nda-10",
+      "inputResearchRecordSha256": "437b147dfd4d5d912f5976c781fef15b09b96d05ad43f7c3049fbd69f647517f",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            670,
+            1102
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-10"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://nrgpropertyservicescompany.co.uk/wp-content/uploads/2018/09/NDA-Urban_Wind_Turbines.pdf",
+        "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-218-nda-12",
+      "inputResearchRecordSha256": "76574f45bdfaac6ad79edb5ba943c7ca9e826dfe0d99302a114eee47039e9222",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            5440,
+            6103
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-12"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.design1st.com/wp-content/uploads/2013/12/NDAMutualTemplateClientFill.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-22-nda-10",
+      "inputResearchRecordSha256": "6295a74bbddc1c568cbbbd12a76bf9726facbf6fec85c3b52f1ef8b104a5e5c7",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": false,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            0,
+            7808
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-10"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Literal signature/address headings in the full NotMentioned premise are interpreted as named speaker turns by the existing parser; preserving all premise text would require explicit source-role handling. Excluded from this classification corpus; original annotation remains valid.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://www.regjeringen.no/link/54c808c1b20e4490b1300ad2ce3b9649.aspx?id=2139003",
+        "error": "HTTP Error 403: Forbidden",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-47-nda-1",
+      "inputResearchRecordSha256": "dd476809e5d72773b6dd55e89b7865430be9b1dc5fe8928ed093285d94641b94",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            0,
+            4116
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://baconbusinesssales.com/wp-content/uploads/2013/07/BaconNon-Disclosure.pdf",
+        "error": "<urlopen error [Errno 8] nodename nor servname provided, or not known>",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-227-nda-11",
+      "inputResearchRecordSha256": "0d1aa272a9901b3c679d38001000f8288a1d165f820373b93dc1341ccdfac402",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": false,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            0,
+            20823
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-11"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Literal signature/address headings in the full NotMentioned premise are interpreted as named speaker turns by the existing parser; preserving all premise text would require explicit source-role handling. Excluded from this classification corpus; original annotation remains valid.",
+      "historicalOriginalDocumentFetch": {
+        "url": "https://streetstream.co.uk/files/NDA_Street_Stream_Franchise.pdf",
+        "error": "HTTP Error 403: Forbidden",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    },
+    {
+      "id": "contractnli-test-228-nda-1",
+      "inputResearchRecordSha256": "cb017bd4a4764a51e63d08e85759490dc9cea1b0eb2c0741a6d363025ca8cee2",
+      "originalSourceUrl": "https://stanfordnlp.github.io/contract-nli/",
+      "fetchStatus": 200,
+      "sourceSha256": "e03fc77bbf8b53e2976a250e81d8a294bc3d5e5fb014521e477dee9340d6287b",
+      "keep": true,
+      "proposedType": "DEBATABLE",
+      "pairSpecificAuthoritativeAppClassification": false,
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "checkMode": "Fresh official release ZIP, JSON decode, exact contiguous document slice and exact hypothesis; full annotation/ID/span/offset/document metadata equality; bundled LICENSE and TERMS rechecked.",
+      "quoteChecks": [
+        {
+          "exact": true,
+          "mode": "decoded JSON exact contiguous premise",
+          "offsetsCodePoints": [
+            0,
+            5947
+          ]
+        },
+        {
+          "exact": true,
+          "mode": "decoded JSON exact hypothesis",
+          "hypothesisId": "nda-1"
+        }
+      ],
+      "sourceArchiveMember": "contract-nli/test.json",
+      "sourceMemberSha256": "460267b56052a2dc5aead98eb35eadef9e6734d5723d37b4a9790e410f812387",
+      "sourceAnnotationMapping": {
+        "originalSplitAndDocumentIdVerified": true,
+        "originalAnnotationAndHypothesisIdVerified": true,
+        "originalEvidenceIndicesAndOffsetsVerified": true,
+        "appTypeMapping": "Unresolved; retained only as DEBATABLE research adaptation. Dataset annotation is neither sworn testimony nor a judicial finding."
+      },
+      "licenseCheck": {
+        "bundledLicenseSha256": "9e5f1b3c610b9c2da5c313bf81d577a7d1acec686bdb0384edefa6df0f90cd94",
+        "bundledTermsSha256": "b86e5b9bd7d2c49fd0d60e1d0842b7f64746abc8b206451acbe9080027cc49c8",
+        "ccBy40Verified": true,
+        "thirdPartyWebsiteTermsExcluded": true
+      },
+      "reason": "Both texts and original dataset annotation verified in the licensed primary release; direct archive source replaces landing page. Proposed app mapping remains unresolved.",
+      "historicalOriginalDocumentFetch": {
+        "url": "http://www.hysafe.org/download/22/NDA_V3.pdf",
+        "error": "HTTP Error 404: Not Found",
+        "role": "Historical document link checked for availability; exact text and annotations verified in licensed official archive regardless of historical URL status."
+      }
+    }
+  ]
+}

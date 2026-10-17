@@ -1,0 +1,164 @@
+{
+  "reviewed": 70,
+  "kept": 67,
+  "dropped": [
+    {
+      "id": "contractnli-test-22-nda-10",
+      "reason": "Literal signature/address headings in the full NotMentioned premise are interpreted as named speaker turns by the existing parser; preserving all premise text would require explicit source-role handling. Excluded from this classification corpus; original annotation remains valid."
+    },
+    {
+      "id": "contractnli-test-227-nda-11",
+      "reason": "Literal signature/address headings in the full NotMentioned premise are interpreted as named speaker turns by the existing parser; preserving all premise text would require explicit source-role handling. Excluded from this classification corpus; original annotation remains valid."
+    },
+    {
+      "id": "hard-sham-b-walter-right-to-sue-recollection",
+      "reason": "Both complete quotations could not be freshly verified; inaccessible opinion; do not retain based on prior audit."
+    }
+  ],
+  "independentlyReviewed": 70,
+  "parserTranscripts": 134,
+  "parserIssues": 0,
+  "byLabel": {
+    "DEBATABLE": 31,
+    "FALSE_POSITIVE": 22,
+    "DIRECT": 14
+  },
+  "bySourceFamily": {
+    "research-dataset": 18,
+    "famous-debatable": 9,
+    "judicial-sham": 40
+  },
+  "bySource": {
+    "ContractNLI (Koreeda and Manning, EMNLP 2021), official dataset release": 18,
+    "United States v. Bonds, No. 11-10669, Ninth Circuit en banc opinion, April 22, 2015; quoting 2003 grand jury testimony": 1,
+    "U.S. House Oversight hearing, February 13, 2008, serial 110-63; quoted deposition/affidavit and hearing answers": 3,
+    "William J. Clinton; Jones deposition and federal grand jury testimony (1998), quoted in H. Doc. 105-310": 5,
+    "Dins v. Wisconsin Department of Natural Resources, No. 24-cv-411-jdp, Doc. 53 (W.D. Wis. Sept. 26, 2025)": 1,
+    "Goldenson v. Steffens, No. 2:10-cv-00440-JAW, Doc. 236 (D. Me. Mar. 7, 2014)": 1,
+    "Kabba v. Metropolitan Nashville Hospital Authority, No. 3:20-cv-00738, Doc. 57 (M.D. Tenn. May 6, 2022)": 1,
+    "Maisha v. University of North Carolina, No. 1:12-cv-371, memorandum opinion and order (Jan. 5, 2015)": 1,
+    "Crawford v. Garland (caption Bondi), No. 2:23-cv-02456, Doc. 101 (W.D. Tenn. Jan. 29, 2026)": 4,
+    "O\u2019Brien v. Ed Donnelly Enterprises, Inc., 575 F.3d 567 (6th Cir. 2009)": 4,
+    "West v. Emeritus Corp., No. 3:15-cv-00437, Doc. 28 (M.D. Tenn. Dec. 14, 2016)": 1,
+    "American Rena International Corp. v. Sis-Joyce International Co., No. CV 12-6972 FMO (JEMx), Doc. 284 (Dec. 14, 2015)": 1,
+    "Bauer v. The Travelers Home and Marine Insurance Company, No. 3:15-CV-348-CLS, Doc. 75 (Jan. 20, 2017)": 1,
+    "Cole v. CVS Pharmacy, Inc., No. 1:19-cv-01384-JLT-EPG, Doc. 20 (July 14, 2022)": 1,
+    "In re ConAgra Foods, Inc., No. CV 11-05379 MMM (AGRx), Doc. 545 (Feb. 23, 2015)": 3,
+    "Daniels v. Texas Department of Transportation, No. 4:15-CV-00702-CAN, Doc. 62 (Dec. 10, 2016)": 3,
+    "David v. Betts, No.20-00002 JMS-WRP, Order (May15,2024), footnote24": 1,
+    "U.S. EEOC v. Ecology Services, Inc., No. ELH-18-1065, Memorandum Opinion (Mar. 19, 2020)": 1,
+    "Gattineri v. Wynn MA, LLC, No. 18-11229-FDS, Doc. 167 (Jan. 13, 2022)": 7,
+    "Hamilton v. Coffee Health Group, No. CV-10-S-3621-NW, Doc. 58 (June 6, 2013)": 1,
+    "Mansoori v. Brown, No. 17-cv-8846, Doc. 253 (Feb. 19, 2026)": 1,
+    "Ruple Builders, Inc. v. Brackenridge Construction Co., No. 2:17-cv-00004, Doc. 63 (2019)": 2,
+    "Hill-Satterfield v. Lauderdale, No. 3:24-CV-249-TAV-DCP, Doc.63 (Dec.19,2025)": 1,
+    "Shelcusky v. Garjulio, 172 N.J. 185 (2002)": 1,
+    "Smith v. Caesars Baltimore Management Company, L.L.C., No.ELH-17-3014, Doc.45 (Aug.9,2019)": 1,
+    "Thomas v. Bronco Oilfield Services, No. 2:16-cv-01557-MRH, Doc. 130 (Nov. 30, 2020)": 1,
+    "Willard v. Friendswood ISD, No. 3:18-CV-00233, Doc. 39, Memorandum and Recommendation (Dec. 12, 2019)": 1
+  },
+  "bySplit": {
+    "heldout": 34,
+    "tuning": 33
+  },
+  "bySplitLabel": {
+    "tuning": {
+      "DIRECT": 7,
+      "FALSE_POSITIVE": 11,
+      "DEBATABLE": 15
+    },
+    "heldout": {
+      "DIRECT": 7,
+      "FALSE_POSITIVE": 11,
+      "DEBATABLE": 16
+    }
+  },
+  "costPreviews": {
+    "direct_tuning": {
+      "mode": "COST PREVIEW ONLY",
+      "method": "direct",
+      "split": "tuning",
+      "cases": 33,
+      "repeat": 1,
+      "model": "claude-opus-5-5",
+      "plannedRequests": 33,
+      "phase": "comparison",
+      "estimatedUsd": 3.5112,
+      "conservativeBudgetUsd": 13.265,
+      "pricing": "Current application-configured uncached USD rates; not verified billing. No automatic retries.",
+      "answerKeyStatus": "Draft proposals, not approved gold. This runner does not grade or promote them."
+    },
+    "direct_heldout": {
+      "mode": "COST PREVIEW ONLY",
+      "method": "direct",
+      "split": "heldout",
+      "cases": 34,
+      "repeat": 1,
+      "model": "claude-opus-5-5",
+      "plannedRequests": 34,
+      "phase": "comparison",
+      "estimatedUsd": 3.6131,
+      "conservativeBudgetUsd": 13.653901,
+      "pricing": "Current application-configured uncached USD rates; not verified billing. No automatic retries.",
+      "answerKeyStatus": "Draft proposals, not approved gold. This runner does not grade or promote them."
+    },
+    "events_tuning": {
+      "mode": "COST PREVIEW ONLY",
+      "method": "events",
+      "split": "tuning",
+      "cases": 33,
+      "repeat": 1,
+      "model": "claude-opus-5-5",
+      "plannedRequests": 66,
+      "phase": "extraction only",
+      "estimatedUsd": 4.724873,
+      "conservativeBudgetUsd": 49.690953,
+      "comparisonRequests": "UNKNOWN until validated extraction; no fabricated event counts",
+      "completeWorkflowCost": "UNKNOWN; extraction estimate excludes comparison",
+      "pricing": "Current application-configured uncached USD rates; not verified billing. No automatic retries.",
+      "answerKeyStatus": "Draft proposals, not approved gold. This runner does not grade or promote them."
+    },
+    "events_heldout": {
+      "mode": "COST PREVIEW ONLY",
+      "method": "events",
+      "split": "heldout",
+      "cases": 34,
+      "repeat": 1,
+      "model": "claude-opus-5-5",
+      "plannedRequests": 68,
+      "phase": "extraction only",
+      "estimatedUsd": 4.864808,
+      "conservativeBudgetUsd": 51.186964,
+      "comparisonRequests": "UNKNOWN until validated extraction; no fabricated event counts",
+      "completeWorkflowCost": "UNKNOWN; extraction estimate excludes comparison",
+      "pricing": "Current application-configured uncached USD rates; not verified billing. No automatic retries.",
+      "answerKeyStatus": "Draft proposals, not approved gold. This runner does not grade or promote them."
+    }
+  },
+  "npmTest": {
+    "command": "npm test",
+    "exitCode": 0,
+    "counts": {
+      "tests": 596,
+      "pass": 596,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "failingTests": [],
+    "stderrPresent": false,
+    "runs": 1
+  },
+  "lint": {
+    "command": "npm run lint",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  "promptCheck": {
+    "files": 4,
+    "exactAnswerKeyMatches": 0,
+    "unchanged": true
+  },
+  "approval": "Source-checked drafts only; not human-approved gold or measured model accuracy."
+}

@@ -1,0 +1,404 @@
+[
+  {
+    "id": "contractnli-test-1-nda-1",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: For purposes of this Agreement, \"Confidential Information\" means any data or information that is proprietary to the Parties and not generally known to the public, whether in tangible or intangible form, whenever and however disclosed, including but not limited to:",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "contractnli-test-11-nda-1",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: The term “Confidential Information” means any and all tangible and intangible information disclosed to Receiver in oral, written, graphic, recorded, photographic, any machine-readable or in any other medium or form relating to the intellectual property, management, operations, products, inventions, suppliers, customers, financials of VIDAR or any present or contemplated project, contract or relationship between VIDAR and Receiver, including without limitation, any and all plans, Intellectual Property (defined below), know-how, computer programs, software (source and object code), algorithms, computer processing systems, techniques, methodologies, formulae, compilations of information, designs, drawings, schematics, analyses, evaluations, formulations, ingredients, samples, processes, machines, prototypes, mock-ups, product performance data, proposals, job notes, reports, records, specifications, manuals, supplier and customer lists and information, licenses, the prices it obtains or has obtained for the licensing of its software products and services, purchase and sales records, marketing information or any other information concerning the business and goodwill of VIDAR and any information which is identified as being of a confidential or proprietary nature or should be considered confidential under the circumstances.",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "contractnli-test-117-nda-1",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: For convenience, the Disclosing Party may, but is not required to, mark written Confidential Information with the legend \"Confidential\" or an equivalent designation.",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "contractnli-test-127-nda-1",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: \"Confidential Information\" of a disclosing party (\"Discloser\") means the following, regardless of its form and including copies made by the receiving party (\"Recipient\"), whether the Recipient becomes aware of it before or after the date of this Agreement:\n all information treated by the Discloser as confidential; and\n disclosed by the Discloser to the Recipient or of which the Recipient becomes aware, including but not limited to, the information specified in Schedule 1;",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "contractnli-test-129-nda-17",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: In Particular, the Receiving Party undertakes (in addition and without prejudice to any commitments under the Consortium Agreement), that:\na. the Receiving Party shall not disclose the Material to any Third Party except with the Steering Committee’s prior written consent and provided that no other legal disclosure requirement applies;\nb. the Material shall neither be copied, nor otherwise reproduced nor duplicated in whole or in part where such copying, reproduction or duplication have not been specifically authorized by the Consortium Agreement or otherwise approved in writing by the Steering Committee;",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Receiving Party may create a copy of some Confidential Information in some circumstances."
+  },
+  {
+    "id": "contractnli-test-138-nda-17",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: 1. In consideration of the disclosure of Proprietary Information by the Disclosing Party, the Receiving Party hereby agrees: (i) to hold the Proprietary Information in strict confidence and to take all reasonable precautions to protect such Proprietary Information (including, without limitation, all precautions the Receiving Party employs with respect to its own confidential materials), (ii) not to disclose any such Proprietary Information or any information derived there from to any third person, (iii) not to make any use whatsoever at any time of such Proprietary Information except to evaluate internally its relationship with the Disclosing Party, and\n(iv) not to copy or reverse engineer any such Proprietary Information. ",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Receiving Party may create a copy of some Confidential Information in some circumstances."
+  },
+  {
+    "id": "contractnli-test-157-nda-2",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: For purposes of this Agreement, \"Confidential Information\" shall mean information disclosed by the disclosing party (the \"Disclosing Party\") to the receiving party (the \"Receiving Party\") which relates to product plans, designs, costs, prices and names, finances, marketing plans, business opportunities, research, development, know-how, or personnel, including confidential information disclosed by third parties and information relating to any type of technology; provided that information disclosed by the Disclosing Party will be considered Confidential Information by the Receiving Party only if such information is conspicuously designated as \"Confidential\" ",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Confidential Information shall only include technical information."
+  },
+  {
+    "id": "contractnli-test-165-nda-2",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: \"Confidential Information\" means any information disclosed by either party to the other party, either directly or indirectly, in writing, orally or by inspection of tangible objects, including without limitation documents, prototypes, samples, plant and equipment, research, product plans, products, services, customer lists, software, developments, inventions, processes, designs, drawings, engineering, hardware configuration, marketing materials or finances, which is designated as \"Confidential,\" \"Proprietary\" or some similar designation. ",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Confidential Information shall only include technical information."
+  },
+  {
+    "id": "contractnli-test-18-nda-19",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: I fully understand and agree that all information relating to any client of The Business Partnership and supplied to me will be kept strictly confidential. I acknowledge that The Business Partnership has provided, and/or has agreed to provide in the future, to me information of a confidential or proprietary nature (the Confidential Information) Confidential Information shall mean any information or data relating to any clients of The Business Partnership business or affairs disclosed whether in writing, orally or by any other means. I agree that in respect of the Confidential Information received from The Business Partnership I will:\nTreat it as confidential and make no copies thereof not disclose it to any third party without the prior written consent of The Business Partnership and use it solely for the purpose as agreed between parties\nI further acknowledge that all documents and other material things embodying any of the Confidential Information which is received under this agreement shall remain the property of the supplying party (or other owner thereof) and I shall hold them as bailee for the supplying party, exercising reasonable care to keep them safe from access by unauthorised persons, and shall return them to the supplying party within one week of a written request from the supplying party.\nI will not attempt to contact the employees, customers, creditors, suppliers or landlords of any client of The Business Partnership at any time. I will not use the confidential information to seek to obtain any commercial advantage over any client of The Business Partnership.\nI acknowledge that this Agreement shall remain in force in perpetuity. ",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Some obligations of Agreement may survive termination of Agreement."
+  },
+  {
+    "id": "contractnli-test-181-nda-13",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: 4.1. The provisions of this Agreement shall not apply to information:\n4.1.1. publicly available prior to the date of this Agreement or that is made publicly available on or after the date of this Agreement by the Disclosing Party without restriction;\n4.1.2. that is independently obtained by the Receiving Party without breach by it of any obligation of confidentiality;",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Receiving Party may acquire information similar to Confidential Information from a third party."
+  },
+  {
+    "id": "contractnli-test-190-nda-1",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: Each party agrees that, for a period of 5 years from receipt of information from the other party hereunder, such party shall use the same means it uses to protect its own confidential and proprietary information to prevent the disclosure and to protect the confidentiality of both:\ni) written information received from the other party which is marked or identified as \"confidential\"; and\nii) oral or visual information identified as confidential at the time of disclosure which is reduced to written form and provided to the other in such written form promptly after such oral or visual disclosure,\nhereinafter collectively referred to as \"the Information\".\nThe foregoing shall not prevent either party from disclosing Information which is:\ni) already known by the recipient party prior to the disclosure thereof with no obligation of confidentiality; or\nii) publicly known or becomes publicly known not due to any unauthorised act of the recipient party; or\niii) rightfully received from a third party; or\niv) independently developed by the recipient party without use of the other party's Information; or\nv) disclosed without similar restrictions by the party owning the Information to any third party; or\nvi) approved by the other party for disclosure; or\nvii) required to be disclosed pursuant to a governmental or legal requirement provided that the disclosing party gives to the other party written notice of such requirement prior to any such disclosure.\nviii) publicly known or becomes publicly known not due to any unauthorised act of the recipient party; or\nix) rightfully received from a third party; or\nx) independently developed by the recipient party without use of the other party's Information; or\nxi) disclosed without similar restrictions by the party owning the Information to any third party; or\nxii) approved by the other party for disclosure; or\nxiii) required to be disclosed pursuant to a governmental or legal requirement provided that the disclosing party gives to the other party written notice of such requirement prior to any such disclosure.\n2. Return of Information\nUpon completion of the Business Purpose and/or upon written request of the party providing the Information, the other party shall within 14 days return all copies of the Information to the providing party or certify in writing that all copies of the Information have been destroyed. Nothing in this clause shall affect the right of either party voluntarily to return the Information, or any part thereof, to the other party at any time.\n3. No Warranty/Liability\nNeither party makes any warranty, express or implied, with respect to the Information. Neither party shall be liable to the other or to any other person hereunder for amounts representing loss of profits or loss of business or indirect, consequential or punitive damages of the other or of such other person in connection with the provision or use of the Information hereunder.\n4. No Further Rights\nNothing contained in this Agreement shall be construed as granting or conferring any rights by licence or otherwise in the Information except as provided herein.\n5. Business Purpose\nThe parties expressly agree that the provision of Information hereunder and any discussions held in connection with the Business Purpose shall not prevent either party from pursuing similar discussions with third parties provided that no breach of this Agreement is so occasioned or oblige that party to take, continue or forego any action relating to the Business Purpose. Any forecasts or similar material provided by either party to the other shall not constitute any commitments.\n6. Injunctive Rights\nEach party acknowledges and agrees that the Information is the confidential and/or proprietary and/or trade secret information of the other and the unauthorised use or disclosure of the Information could cause irreparable harm and significant injury to the other party for which that other party would have no adequate remedy at law. Therefore, each party shall have the right, in addition to any other rights it may have at law or in equity, to seek and obtain immediate injunctive relief in respect of any breach or potential breach of this Agreement by the other.\n7. Media Releases\nNo media releases, public announcements or public disclosure by either party relating to this Agreement, its subject matter or the Information, including but not limited to promotional or marketing, shall be made without the prior written consent of the other party.\n8. General\n8.1 Notices\nAny notices required under this Agreement shall be in writing and posted by registered mail return receipt requested to the applicable address indicated in Exhibit A.\n8.2 Entire Agreement\nThis Agreement and any attachments hereto:\ni) are the complete and exclusive statement between the parties with respect to the protection of the confidentiality of the Information; and\nii) supersede all related discussions and other communications between the parties; and\niii) may only be modified in writing by authorised representatives of the parties.\n8.3 Governing Law\nThis Agreement shall be governed by and interpreted in accordance with the law of England and shall be subject to the exclusive jurisdiction of the courts of England.\nAS WITNESS WHEREOF the parties named below have caused this Agreement to be signed and delivered by its duly authorised representative on this date: …………………………………………………..\nFor and on behalf of For and on behalf of\niTagg Limited …………………………………………………………\n(herein known as “Party 1”) (herein known as “Party 2”)\nAddress Address\n3rd Floor\n12 Gough Square\nLondon\nEC4A 3DW\nEngland\nCompany number 4344060 Company number..............................\nSigned Signed................................................\nName Steve Procter Name..................................................\nTitle Director Title....................................................\nEXHIBIT A\n1. Business Purpose:\nAll business related support services, as well as affiliate, reseller and introducer deals and all commercial and business opportunities. For the purpose of clarity, all information and discussions related to service and product prices, costs, commissions, fees and other monetary matters are also covered under this agreement and to be kept confidential. This includes any prices, costs, commissions, fees or other monetary information offered by one party to the other even if not accepted, as well as any prices, costs, commissions, fees or other monetary information that are accepted by both parties and drawn into a subsequent contract between the parties.",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "contractnli-test-2-nda-11",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: Recipient shall not without Disclosing Party’s prior written consent reverse engineer, disassemble or decompile any prototypes, software or other objects which embody the Disclosing Party’s Confidential Information to obtain access to Disclosing Party’s trade secrets and to the extent such consent is granted Recipient shall receive and hold such Confidential Information subject to the terms of this Agreement.",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Receiving Party shall not reverse engineer any objects which embody Disclosing Party's Confidential Information."
+  },
+  {
+    "id": "contractnli-test-21-nda-10",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: 2.1. Confidential Information means all confidential information relating to the Purpose which the Disclosing Party or any of its Affiliates, discloses or makes available, to the Receiving Party or any of its Affiliates, before, on or after the Effective Date. This includes:\na) the fact that discussions and negotiations are taking place concerning the Purpose and the status of those discussions and negotiations;",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Receiving Party shall not disclose the fact that Agreement was agreed or negotiated."
+  },
+  {
+    "id": "contractnli-test-212-nda-1",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: Confidential Information provided by Disclosing Party must be expressly marked or designated in writing by the Disclosing Party in a manner to indicate its confidential, proprietary or otherwise non-public nature.",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "contractnli-test-213-nda-10",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: “Confidential Information” means:\n[(a) any information disclosed by [or on behalf of] the Discloser to the Recipient [during the Term / before the end of the Term] (whether disclosed in writing, orally or otherwise) that at the time of disclosure: (i) was marked as “confidential”; or (ii) should have been reasonably understood by the Recipient to be confidential;]\n[(b) the terms [(but not the existence)] of this Agreement; and]5",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Receiving Party shall not disclose the fact that Agreement was agreed or negotiated."
+  },
+  {
+    "id": "contractnli-test-218-nda-12",
+    "split": "heldout",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: Information shall be deemed not to be confidential if such information is or becomes publicly known through no wrongful act of the receiving party, or is already known by the receiving party as evidenced by competent proof thereof, or is approved for release by the prior written approval of the disclosing party, or is rightfully received by the receiving party from a third party without restriction and without breach of this agreement, or is disclosed by the disclosing party to a third party without a similar restriction on the rights of such third party, or is independently developed by the receiving party without the use of the Confidential Information.",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: Receiving Party may independently develop information similar to Confidential Information."
+  },
+  {
+    "id": "contractnli-test-228-nda-1",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: NON DISCLOSURE AGREEMENT\nThis NON DISCLOSURE AGREEMENT is entered into this __________ 2004 (\"Effective Date\") by Forschungszentrum Karlsruhe GmbH, Weberstraße 5, 76133 Karlsruhe, Federal Republic of Germany (hereinafter referred to as \"Forschungszentrum\") acting on its behalf and on behalf of the participants in the EU project HySafe, which are the following\nL’Air Liquide\nFederal Institute for Materials Research and Testing\nBMW Forschung und Technik GmbH\nBuilding Research Establishment Ltd\nCommissariat à l’Energie Atomique\nDet Norske Veritas AS\nFraunhofer-Gesellschaft zur Foerderung der Angewandten Forschung e.V.\nForschungszentrum Juelich GmbH\nGexCon AS\nThe United Kingdom’s Health and Safety Laboratory\nFoundation INASMET\nInstitut National de l’Environnement industriel et des RISques\nInstituto Superior Technico\nEuropean Commission - Joint Research Centre - Institute for Energy\nNational Center for Scientific Research Demokritos\nNorsk Hydro ASA\nRisø National Laboratory\nTNO\nUniversity of Calgary\nUniversity of Pisa\nUniversidad Politécnica de Madrid\nUniversity of Ulster\nVOLVO Technology Corporation\nWarsaw University of Technology\nand\nMr./Mrs. …\n(hereinafter referred to as \"Mr./Mrs. …\")\nWHEREAS, Forschungszentrum is Coordinator of the Network of Excellence \"Safety of Hydrogen as an Energy Carrier\" (HySafe), a project in the Sixth Research and Technological Development Framework Programme of the European Community.\nWHEREAS, according to Section 5.2.3.8 of the Consortium Agreement concluded between all participants in HySafe, an Advisory Council can be constituted, which consists of distinguished scientists from organisations, companies and universities outside the Network as well as representatives from industry and authorities. It advises the Network and makes recommendations on all important matters of substance (e.g. scientific, industry and end user evaluations).\nWHEREAS, Mr./Mrs. … is appointed as a member of the Advisory Council.\nWHEREAS, each participant in HySafe may provide own confidential information related to HySafe to the Advisory Council, all such information to be considered as the “Confidential Information”, and whereupon the parties hereto wish to record the terms and conditions upon which this information will be disclosed.\nTHEREFORE it is hereby agreed as follows:\n1 In this agreement:\n “Disclosing Party” shall mean any participant in HySafe.\n“Recipient” shall mean Mr./Mrs. ….\n 2 Recipient shall hold the Confidential Information in strict confidence and shall take all reasonable and prudent precautions to prevent the Confidential Information from reaching third parties. Recipient shall use the Confidential Information exclusively for HySafe purposes, especially to advice the Governing Board of HySafe.\n3 Recipient's obligations under this agreement shall not apply to any information which Recipient can document beyond any reasonable doubt was available to the public or known to or developed by the Recipient prior to the date first above written. These obligations shall cease as to any information which Recipient can document thereafter became or becomes available to the public, otherwise than as a result of disclosure by Recipient or was or is disclosed to Recipient by a party unrelated to Recipient, that does not have a nondisclosure obligation with respect to it. Moreover, Recipient's obligations under this agreement shall not apply to Confidential Information Recipient has a legal obligation to disclose to public authorities under law, regulation or lawful administrative decision.\n4 At any time, upon the respective Disclosing Party's request, Recipient shall promptly deliver to the respective Disclosing Party the Confidential Information and all materials relating to or involving Confidential Information (whether prepared by the respective Disclosing Party or otherwise), and will not retain any copies, extracts or other reproductions in whole or in part regarding the Confidential Information. The delivery of such material shall not relieve Recipient of its obligation of confidentiality or other obligations hereunder.\n5 Nothing in this agreement shall be construed as granting Recipient any rights of any kinds in the Confidential Information, by license or otherwise.\n6 This agreement shall be governed by the laws of Belgium. All disputes or differences arising in connection with this agreement which cannot be settled amicably shall be finally settled by arbitration in Brussels under the Rules of Arbitration of the International Chamber of Commerce by one or more arbitrators to be appointed under the terms of those rules. In any arbitration in which there are three arbitrators, the chairman shall be of juridical education. It shall be conducted in English.\nThe award of the arbitration will be final and binding upon the parties concerned.\nThe parties concerned may instead elect to resolve by mediation a dispute or difference arising in connection with this agreement which cannot be settled amicably.\n7 Any Disclosing Party may act individually in relation to the Recipient under this Non Disclosure Agreement.\n8 This agreement shall come into force after signature of both parties hereto on the Effective Date and shall expire on February 28, 2009. The obligations pursuant to Article 2 shall remain valid for the Recipient even after the end of this agreement for a period of five (5) years thereafter.\nIN WITNESS WHEREOF, the parties hereto have executed this agreement\nForschungszentrum Karlsruhe GmbH\n_____________________________________\nHeinz-Jürgen FABER Oliver WITTEK\nCentral Legal and Insurance Department\nMr./Mrs. …\n____________________________\nThe employer of Mr./Mrs. … hereby confirms that he has taken note of this Non Disclosure Agreement and acknowledges that Confidential Information disclosed to Mr./Mrs. … shall not be used for any internal purposes.\n[Company Name]\n____________________________\n_____________________________\n",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "contractnli-test-47-nda-1",
+    "split": "tuning",
+    "transcript1": "Q: What text appears in the selected contract passage?\nA: Bacon Business Group\nBuyer Confidential Non-Disclosure Agreement Broker Disclosure\nOur agreement with the Seller requires that we obtain a Non-Disclosure and evidence of financial ability before disclosing the name and location of his/ her business. This information will be kept confidential. In consideration of the broker, (\"Broker\") providing the information on businesses for sale, I/we understand and agree:\n1. (a) That any information provided on any business is sensitive and confidential, and that its disclosure to others may be damaging to the businesses and their owners.\n(b) Not to disclose, for a period of three years from the date I/we sign this Non-Disclosure Agreement, any information regarding these businesses to any other person who has not also signed this Agreement, except to secure the advise and recommendations of my business advisors (accountants, attorneys, etc.) \"Information\" as used in this Agreement shall include the fact that the businesses are for sale, plus any other data provided.\n(c) Not to contact the business owners or their landlords, employees, suppliers or customers except through Broker. All correspondence, inquiries, offers to purchase and negotiations relating to the purchase or lease of any business presented by Broker will be conducted exclusively through Broker.\n(d) Notto circumvent or interfere with Broker's contract with the Seller in any way, I/we understand that if I/we interfere with Broker's contract right to its fee from Seller, I/we may be personally liable to Broker for payment of the Seller's fee. We understand that should I/we become a manager or otherwise connect with any of the businesses shown or offered to me/us for sale, or should I/we buy, trade, lease or exchange any of the businesses disclosed to me/us, then a fee will be due to Broker. I/we understand that if I/we make the purchase through Broker, I/we will not be liable for the fee to be paid by Seller to Broker.\n2. That all information regarding businesses for sale is provided by the Seller or other sources and is not verified in any way by Broker. Broker has no knowledge of the accuracy of said information and makes no warranty, express or implied, as to the accuracy of such information. Understanding that I/we shall make an independent verification of said information prior to entering into an agreement to purchase any business. I/we agree that Broker is not responsible for the accuracy of any of the information I/we receive or fail to receive, and I/we agree to indemnify and hold Broker and its agent harmless from any claims or damages which may occur by reason of the inaccuracy or incompleteness of any information provided to me/us with respect to any business I/we might purchase.\n3. That should I/we enter into an agreement to purchase a business, I/we will provide a financial statement and a personal and business history, and I/we authorize the Seller to obtain through standard reporting agencies financial and credit information about me/us or the companies I/we represent.\n4. That Broker is not an agent for me/us, butis an agent for the Seller and has a contract providing for a fee to be paid to Broker by Seller upon sale, trade, lease, or transfer of Seller's business or property.\n5. I/we acknowledge that we will receive confidential information about the Seller's business, operations, customers, and employees and agree not to start a business similar to the sellers listed above and not to solicit or contact Seller's employees or customers for a period of three years from the date herein. In the event Buyer for whatever reason does not purchase the business, Buyer agrees to immediately return to Broker any and all materials related to Seller without retaining any copies.\nI/we acknowledge that I/we have received an exact copy of this Agreement and that I/we have read this Agreement carefully and fully understand it.\nSignature Date Broker Signature Company Name\nPrint Name Print Name\nStreet Address Street Address\nCity, State, Zip City, State, Zip\nSignature Date Agent for BBG Broker Date\nPrint Name\nStreet Address\nCity, State, Zip\n",
+    "transcript2": "Q: What hypothesis does the dataset ask us to evaluate?\nA: All Confidential Information shall be expressly identified by the Disclosing Party."
+  },
+  {
+    "id": "famous-bonds-evasion-followup",
+    "split": "tuning",
+    "transcript1": "Q: Did Greg Anderson ever give you anything requiring a syringe to inject yourself?\nA: I’ve only had one doctor touch me.  And\nthat’s my only personal doctor.  Greg, like\nI said, we don’t get into each others’\npersonal lives.  We’re friends, but I\ndon’t—we don’t sit around and talk\nbaseball, because he knows I don’t\nwant— don’t come to my house talking\nbaseball.  If you want to come to my\nhouse and talk about fishing, some other\nstuff, we’ll be good friends.  You come\naround talking about baseball, you go on. \nI don’t talk about his business.  You know\nwhat I mean?\nQ: Right.\nA: That’s what keeps our friendship.  You\nknow, I am sorry, but that—you know,\nthat—I was a celebrity child, not just in\nbaseball by my own instincts.  I became a\ncelebrity child with a famous father.  I just\ndon’t get into other people’s business\nbecause of my father’s situation, you see.",
+    "transcript2": "Q: Did you ever inject yourself with anything Greg Anderson gave you?\nA: I’m not that talented, no."
+  },
+  {
+    "id": "famous-clemens-hgh-discussion",
+    "split": "tuning",
+    "transcript1": "Q: Had you ever spoken with Brian McNamee about human growth hormone?\nA: I have \nnot.",
+    "transcript2": "Q: What discussions did you have with Brian McNamee about human growth hormone?\nA: Very heated conversation about it. And again, \nprior to that, we had not had discussions about HGH."
+  },
+  {
+    "id": "famous-clemens-research",
+    "split": "tuning",
+    "transcript1": "Q: Had you done research about human growth hormone?\nA: no, I haven't. I've never researched it. I couldn't \ntell you the first thing about it.",
+    "transcript2": "Q: What steps did you take to learn about HGH after your wife received an injection?\nA: I didn't take a lot of steps, Mr. Congressman. \nTo be--in the last 2 months since this has been going on, I've \nlearned more about HGH than I--than I ever thought. I still \ndon't know enough about it. I--you know I've heard--I've seen \nthings on TV that these guys talk about how it helps them, \nactors and different things of that nature. I don't know \nanything about it."
+  },
+  {
+    "id": "famous-clemens-wife-consistency",
+    "split": "tuning",
+    "transcript1": "Q: What did you know about the HGH injection your wife received?\nA: I was not \npresent at the time. I found out later in the evening, and the \nreason I had found out is she was telling me that something was \ngoing wrong with her circulation and this concerned me.",
+    "transcript2": "Q: Is the account just read back about your wife and your response correct?\nA: That is correct, sir, yes."
+  },
+  {
+    "id": "famous-clinton-alone",
+    "split": "heldout",
+    "transcript1": "Q: Had you and Ms. Lewinsky ever been alone in a White House room?\nA: I think I testified to that earlier. I think \n        that there is a, it is--I have no specific \n        recollection, but it seems to me that she was on duty \n        on a couple of occasions working for the legislative \n        affairs office and brought me some things to sign, \n        something on the weekend. That's--I have a general \n        memory of that.",
+    "transcript2": "Q: Describe occasions alone with Ms. Lewinsky.\nA: When I was alone with Ms. Lewinsky on certain \n        occasions in early 1996 and once in early 1997, I \n        engaged in conduct that was wrong."
+  },
+  {
+    "id": "famous-clinton-definition",
+    "split": "heldout",
+    "transcript1": "Q: Did you have sexual relations with Monica Lewinsky under the deposition definition?\nA: I have never had sexual relations with Monica \n        Lewinsky. I've never had an affair with \n        her.",
+    "transcript2": "Q: Describe your conduct when alone with Ms. Lewinsky.\nA: When I was alone with Ms. Lewinsky on certain \n        occasions in early 1996 and once in early 1997, I \n        engaged in conduct that was wrong."
+  },
+  {
+    "id": "famous-clinton-gifts",
+    "split": "heldout",
+    "transcript1": "Q: Had you given gifts to Monica Lewinsky?\nA: I don't recall. Do you know what they were?",
+    "transcript2": "Q: Why did you give gifts to Ms. Lewinsky?\nA: it was a \nright thing to do to give her gifts back."
+  },
+  {
+    "id": "famous-clinton-subpoena",
+    "split": "heldout",
+    "transcript1": "Q: Did Ms. Lewinsky tell you she had been served with a subpoena in the Jones case?\nA: No. I don't know if she had been.",
+    "transcript2": "Q: What did you recall knowing at the December 28, 1997 conversation?\nA: my recollection is I knew by then, of course, that she \nhad gotten a subpoena. And I knew that she was, therefore * * * \nslated to testify."
+  },
+  {
+    "id": "famous-clinton-testimony-discussion",
+    "split": "heldout",
+    "transcript1": "Q: Had you discussed with Ms. Lewinsky the possibility she might testify in the Jones lawsuit?\nA: I'm not sure, and let me tell you why I'm not \n        sure. It seems to me the, the, the--I want to be as \n        accurate as I can here. Seems to me the last time she \n        was there to see Betty before Christmas we were joking \n        about how you-all [Ms. Jones's attorneys], with the \n        help of the Rutherford Institute, were going to call \n        every woman I'd ever talked to * * * and ask them that, \n        and so I said you [Ms. Lewinsky] would qualify, or \n        something like that. I don't, I don't think we ever had \n        more of a conversation than that about it, but I might \n        have mentioned something to her about it, because when \n        I saw how long the witness list was, or I heard about \n        it, before I saw, but actually by the time I saw it her \n        name was on it, but I think that was after all this had \n        happened. I might have said something like that, so I \n        don't want to say for sure I didn't, because I might \n        have said something like that.",
+    "transcript2": "Q: Did you discuss testimony with Ms. Lewinsky?\nA: talking \nwith Ms. Lewinsky about her testimony, or about the prospect \nthat she might have to give testimony. And she, she talked to \nme about that."
+  },
+  {
+    "id": "hard-sham-a-dins-additional-incident",
+    "split": "heldout",
+    "transcript1": "Q: Can you recall any other specific incidents involving Moore?\n\nA: Not that I recall right now.",
+    "transcript2": "Q: What additional incident involving Moore do you recall?\n\nA: thrusted his daughter’s baby to [Dins] to hold, at the same time saying something to the effect of, ‘here woman, this is what you’re good for.’"
+  },
+  {
+    "id": "hard-sham-a-goldenson-decision-reassurance",
+    "split": "heldout",
+    "transcript1": "Q: That was a decision you made on your own, according to your own logic and reasoning. \nA: Yes",
+    "transcript2": "Q: What did Steffens tell you about Ascot in January 2008?\n\nA: Mr. Steffens allayed my concerns by telling me how steady, reliable and conservative Ascot continued to be even in the down-market."
+  },
+  {
+    "id": "hard-sham-a-kabba-message-conversation",
+    "split": "heldout",
+    "transcript1": "Q: Were you able to talk with Andrew about what happened?\n\nA: I sent text messages, I believe, I called him, left messages. He would always – I wasn’t able to talk to him until the whole situation happened. He would say he would get back to me, but I was never really – he never got back to me until that day. \nQ: Meaning April 11th? \nA: Yeah, it’s when – Yes, when I was called into the office.",
+    "transcript2": "Q: When did you make a discrimination complaint to Welker?\n\nA: [t]he next day or so, I made a discrimination complaint to Welker[.]"
+  },
+  {
+    "id": "hard-sham-a-maisha-health-insurance",
+    "split": "tuning",
+    "transcript1": "Q: Why had you not consulted a doctor for emotional distress?\n\nA: [s]eeing a doctor requires insurance [and he] didn’t have insurance after [he] stopped working for the university",
+    "transcript2": "Q: How did you use your fall 2011 loan disbursement?\n\nA: used [his] loan disbursement for the fall 2011 [semester] to cover appropriate costs associated with living in Chapel Hill and other related expenses including rent, car and health insurance…"
+  },
+  {
+    "id": "hard-sham-a-moody-intention-receipt",
+    "split": "tuning",
+    "transcript1": "Q: Why did you send your ratings to Mr. Green? \nA: Oh, just so he would know. We kept the chief informed of every single step along the way. Almost any vacancy that would have happened, I would have sent it like that, copied the chief.",
+    "transcript2": "Q: What did you know about district leadership seeing the ranking?\n\nA: At that time, I do not think I even knew district leadership saw the ranking the team put together."
+  },
+  {
+    "id": "hard-sham-a-moody-knowledge-opinion",
+    "split": "tuning",
+    "transcript1": "Q: You don’t know what importance [Green] placed on those ratings, do you? \nA: No, I don’t.",
+    "transcript2": "Q: What is your view of Green’s use of the rankings?\n\nA: I did not and still do not think Green used the rankings in his decision process."
+  },
+  {
+    "id": "hard-sham-a-moody-recollection-omission",
+    "split": "tuning",
+    "transcript1": "Q: Have you left out any part of your work history?\n\nA: not that I can think of right now. No.",
+    "transcript2": "Q: Where have you performed AO duties?\n\nA: performed AO duties in other jurisdictions, including…Arkansas."
+  },
+  {
+    "id": "hard-sham-a-moody-training",
+    "split": "tuning",
+    "transcript1": "Q: What training did you provide Steve Blue?\n\nA: I began doing Skype sessions with Steve Blue to train him on how to use UFMS, the unified financial management system, to run his budget.",
+    "transcript2": "Q: What do you know about training Blue received?\n\nA: I do know that Blue did not receive any training for his position in keeping track of budgets or expenditures in his position."
+  },
+  {
+    "id": "hard-sham-a-obrien-required-instructed",
+    "split": "tuning",
+    "transcript1": "Q: Mr. Donnelly never instructed you to come in an hour and a half before the restaurant opened, correct? \nA: Correct.",
+    "transcript2": "Q: Describe your reporting and clock-in times.\n\nA: Even though I was required to report to work at 4:30 a.m. during the week, and 5:30 a.m. on Sundays, Mr. Donnelly instructed me not to clock in on the cash register until closer to 5:00 a.m., and 6:00 a.m., on Sundays. And, I followed Mr. Donnelly’s instruction in this regard."
+  },
+  {
+    "id": "hard-sham-a-prater-days-hours",
+    "split": "tuning",
+    "transcript1": "Q: Are you telling me, though, that every time that you worked it was in accordance with the schedule at the restaurant? \nA: Yes.",
+    "transcript2": "Q: What happened when the opening shift manager arrived?\n\nA: Once an opening shift manager had arrived at the North store, I would begin working right away without clocking in because the opening shift managers told me they would clock me in at 4:00 a.m., which was the time I arrived at the North store."
+  },
+  {
+    "id": "hard-sham-a-prater-knowledge-records",
+    "split": "tuning",
+    "transcript1": "Q: Do you know whether or not you were punched in when you went to the south store to work? \nA: No, I do not. \nQ: So you don’t know of having ever worked 10 hours off the clock at the south store, do you? \nA: That’s right. I don’t mind giving them a few minutes, but ten hours, not [sic].",
+    "transcript2": "Q: What were you told about clocking in, and what do the produced records show?\n\nA: Instead, I was told by the South store managers that one of the North store managers would clock me in and out at the North store. However, none of the records Defendants produced in this lawsuit show any of my work hours at the South store, which averaged ten hours per shift."
+  },
+  {
+    "id": "hard-sham-a-prater-offhand-specific",
+    "split": "tuning",
+    "transcript1": "Q: And for any of the days that we would go through here in these time punch records, you don’t have any independent recollection of when you worked on those days, do you? \nA: No. Not right offhand, no.",
+    "transcript2": "Q: Describe occasions you were sent from the North store to work at the South store.\n\nA: On approximately nine occasions, I arrived for work at the North store in the morning and was instructed by one of the North store managers that I was needed to work at the South store because it was short staffed. Then, on thee [sic] occasions, I traveled to the South store to work a shift as a grill cook. But, I did not clock in at the South store to record my hours of work."
+  },
+  {
+    "id": "hard-sham-a-west-pay-raises",
+    "split": "tuning",
+    "transcript1": "Q: So would you recommend pay raises for folks? \nA: At the time of evaluation, yes.",
+    "transcript2": "Q: Did you recommend a pay raise for an employee?\n\nA: never recommended a pay raise for an employee."
+  },
+  {
+    "id": "hard-sham-b-american-rena-drafting",
+    "split": "tuning",
+    "transcript1": "Q: What is your testimony?\nA: I wrote them down in Chinese. And then essentially my sister translated them through Google or some sort of Hong Kong translation software. And then after they were translated, then my sister [Annie] typed them up.",
+    "transcript2": "Q: What is your testimony?\nA: I did not draft the declarations themselves, do not know how the signatures were obtained, and did not know whether they were falsified."
+  },
+  {
+    "id": "hard-sham-b-bauer-rental-agreement",
+    "split": "tuning",
+    "transcript1": "Q. Now, based on the discovery responses that you’ve previously given us and filed in the case, it is my understanding that you are currently residing at this [redacted] address?\nA. Yes.\nQ. And, again, that’s [redacted] in Los Angeles?\nA. Yes.\nQ. Now, who is Barbara S. Brody?\nA. She is the elderly lady that I rent from.\nQ. How long have you lived at [redacted] Avenue?\nA. I moved from [redacted] to there [during] October of 2013.",
+    "transcript2": "Q: What is your testimony?\nA: did not rent the Los Angeles house. Rather, I assisted my friend, the Los Angeles homeowner, in getting out of foreclosure, in exchange for accommodating myself and my dogs. The cost was approximately the same."
+  },
+  {
+    "id": "hard-sham-b-cole-wet-substance",
+    "split": "heldout",
+    "transcript1": "Q. Was it water that you slipped on?\nA. It’s unknown to me what I slipped on.",
+    "transcript2": "Q: What is your testimony?\nA: she felt herself slip on a wet substance"
+  },
+  {
+    "id": "hard-sham-b-conagra-briseno-gmo-preference",
+    "split": "tuning",
+    "transcript1": "Q. So it’s a challenge, but you – it’s your testimony that you try to avoid purchasing GMO-ingredient foods for yourself and your family. Is that your testimony?\nA. Yes. We try to avoid it.",
+    "transcript2": "Q: What is your testimony?\nA: preference to avoid GMOs [is] not always absolute."
+  },
+  {
+    "id": "hard-sham-b-conagra-crouch-future-purchase",
+    "split": "tuning",
+    "transcript1": "Q. Would you buy Wesson oil today if it were at a lower price point?\nA. I don’t think so.\nQ. Would you buy Wesson oil today if it changed its label but the contents were the same?\nA. I don’t know.",
+    "transcript2": "Q: What is your testimony?\nA: might consider buying Wesson Oil in the future depending on the price and the other products conveniently available"
+  },
+  {
+    "id": "hard-sham-b-conagra-towey-food-choice",
+    "split": "tuning",
+    "transcript1": "Q. Your knowledge of GMOs, has it changed the way you purchase foods?\nA. Yes.\nQ. How so?\nA. I don’t – if I know that it’s GMO, I don’t buy it",
+    "transcript2": "Q: What is your testimony?\nA: might consider buying Wesson Oils depending on the price and the other products conveniently available"
+  },
+  {
+    "id": "hard-sham-b-daniels-additional-speakers",
+    "split": "heldout",
+    "transcript1": "Q: Okay. Who was using that – who was using those terms? And I guess I’ll be specific. Who was using the term “boy” as a racial epithet in your hearing?\nA: John Grissom.\nQ: Anybody else?\nA: As far as my knowledge, I know there’s more incidents, but I can’t recall at the time.",
+    "transcript2": "Q: What is your testimony?\nA: Grissom, Shearin, and Lawson would call me “boy” or “boo” without any indication in their voice, their facial expressions, or their tone of voice that they were joking. . . ."
+  },
+  {
+    "id": "hard-sham-b-daniels-hearing-epithet",
+    "split": "heldout",
+    "transcript1": "Q: All right. And, again, just looking at number 37, who in your hearing at the Sherman yard used the word “nigger”?\nA: Except for Tyson told that, you know, they use it out there in engineering.\nQ: Okay, did you ever hear that used in your presence?\nA: Not in my presence, no.",
+    "transcript2": "Q: What is your testimony?\nA: In January 2001, I overheard Frank Shearin saying that if he got a promotion he would “get rid of the niggers.” Given that I was the only African American working at the Sherman Yard at the time, it was clear that Shearin was referring to me directly. Shearin was speaking to John Ward and Jimmy Brayer when he called me a “nigger” . . ."
+  },
+  {
+    "id": "hard-sham-b-daniels-physical-limitations",
+    "split": "heldout",
+    "transcript1": "Q: Okay. And any other tasks you can think of that bending was a problem?\nA: Not at this moment.\nQ: Okay. Has the difficulty bending affected you outside of work?\nA: It’s the same at work and outside of work.\nQ: Okay. How is it affecting your life outside of work?\nA: Well, just doing – just mowing the yard and different tasks around the house, you know, walking a long distance. Just doing, you know, everyday tasks, you know, around the home is the same way.\nQ: What sort of household tasks is it interfering with?\nA: Excuse me. What?\nQ: Sure. What household tasks is your bending a problem in?\nA: Well, just like mowing the yard, I mentioned. And you’ve got to weed-eat. You know, just constantly I bend over. And just – a lot of times just picking trash up where people done…\nQ: Any other impact to your normal everyday activities?\nA: It – best – right now I can’t – you know, to the best of my knowledge, I can’t think of anymore, you know, at this time.",
+    "transcript2": "Q: What is your testimony?\nA: As a result of the blockages in my arteries in my legs, I had a surgery in October 2012. Since then, I continue to have trouble bending, lifting, climbing, walking, and engaging in sustained exertion of any of these activities without becoming in pain or excessively tired."
+  },
+  {
+    "id": "hard-sham-b-david-tro-idea",
+    "split": "heldout",
+    "transcript1": "Q. (to Keahiolalo): Your testimony earlier today was that it was Gina [Kaulukukui] who prepared the paperwork to request a temporary restraining order; is that correct?\nA. (Keahiolalo): Yes.\nQ.: Whose idea was it to put [B.D.] on to that paperwork?\nA.: My idea.",
+    "transcript2": "Q: What is your testimony?\nA: [i]t was Kaulukukui that suggested that B.D. be added to the TRO, which I did not know was an alternative."
+  },
+  {
+    "id": "hard-sham-b-ecology-voicemail-content",
+    "split": "tuning",
+    "transcript1": "Q: You previously mentioned Robin from human resources. Did you ever talk to Robin from human resources about the fact that you had resigned your employment?\nA: I called that day and left a message.\nQ: And did Robin call you back?\nA: I can’t remember if she did or not.",
+    "transcript2": "Q: What is your testimony?\nA: I left a voicemail message stating that I quit because Carlos Paz sexually harassed me."
+  },
+  {
+    "id": "hard-sham-b-gattineri-april15-call",
+    "split": "heldout",
+    "transcript1": "Q. Okay, the next note he has is from April 15th. “I called Mr. Gattineri to let him know the Globe is doing a story about the land deal in Everett and will consider using eminent domain to take the land.” Do you see that?\nA. Yes.\nQ. Do you recall receiving that phone call from Bob?\nA. I don’t recall it.",
+    "transcript2": "Q: What is your testimony?\nA: On April 15, 2014, Mr. DeSalvio called me to discuss the Certificate and my share of the $40 million price reduction."
+  },
+  {
+    "id": "hard-sham-b-gattineri-april17-call",
+    "split": "heldout",
+    "transcript1": "Q. Do you recall, Mr. Gattineri, that Mr. DeSalvio called you on the 17th to ask if the meeting on the 18th was on and to find out where the location was? Do you recall that?\nA. I don’t. We met at Doherty’s office.",
+    "transcript2": "Q: What is your testimony?\nA: On April 17, 2014, Mr. DeSalvio called me to confirm a meeting for April 18, 2014."
+  },
+  {
+    "id": "hard-sham-b-gattineri-innocence-condition",
+    "split": "heldout",
+    "transcript1": "Q. So one of the conditions of your agreement was that you not be found guilty of a crime in connection with the property?\nA. Guilty of anything.\nQ. And that’s something that you and Mr. DeSalvio discussed?\nA. Yep.\nQ. And so that was a condition of your agreement?\nA. Again, the conversation was that you will find that I’ve done nothing wrong. I’ve broken no laws. My reputation’s clean. You met me three or four times. You asked me questions about my family, my father, what your father did. We went through all this stuff. I was totally comfortable that this gentleman was a stand-up guy and we operated on good faith and a handshake deal was done.\nQ. A handshake deal –\nA. It happens all the time.\nQ. -- a handshake deal for between 18 and $19 million?\nA. I’ve done it for 9 and 10 million.\nQ. And with this one here, there was also a condition that you not be found guilty of any crime?\nA. Absolutely. I was willing to roll the dice, as they say.",
+    "transcript2": "Q: What is your testimony?\nA: My innocence was not a condition to the San Diego Agreement, nor was it discussed at the San Diego Meeting."
+  },
+  {
+    "id": "hard-sham-b-gattineri-krum-conversation",
+    "split": "heldout",
+    "transcript1": "Q. When did you talk with Jacqui Krum?\nA. I don’t know if it was a – I can’t recall, but I definitely spoke to her.\nQ. Was it in the last -- well, your criminal trial was in April of 2016. Was it before or after April of 2016?\nA. I just don’t recall.\nQ. Do you recall was it just one conversation with Ms. Krum?\nA. It may have been more than one.\nQ. Do you remember whether it was on the phone or in person?\nA. I don’t. One or two would have been in person, and I don’t know if I was involved in any phone calls where she was calling in. I don’t -- I just don’t recall.\nQ. Do you remember what you talked about?\nA. Not in particular.",
+    "transcript2": "Q: What is your testimony?\nA: Immediately after my acquittal of the federal charges on April 26, 2016, while still inside the courtroom, as I was walking out, I told Attorney Jacqui Krum, Senior Vice President and General Counsel of Wynn (who attended every day of my trial), that “[n]ow we can finish our business—up to you whether it’s in the boardroom or the courtroom.”"
+  },
+  {
+    "id": "hard-sham-b-gattineri-price",
+    "split": "heldout",
+    "transcript1": "Q. Exhibit 69 is Bates-stamped Gattineri-Wynn 001024 to 10841. The first document, sir, do you recognize that as your email to Mr. DeSalvio –\nA. Yes.\nQ. -- the evening of April 14th?\nA. Yes.\nQ. And then attached to it is a copy of your email and Mr. DeSalvio’s response later that evening. “Sounds good. Thanks for the update. Bob”?\nA. Yes.\n--\nQ. And you said [in your email], “Let’s make a strong effort so we can do this before Easter,” right?\nA. Okay.\nQ. Strong effort to do what?\nA. To meet to discuss the land, the pricing of the land and all that.",
+    "transcript2": "Q: What is your testimony?\nA: I emailed Mr. DeSalvio later that evening and expressed my interest in coming to an agreement on my desire to be made whole on my percentage of the price reduction."
+  },
+  {
+    "id": "hard-sham-b-gattineri-role",
+    "split": "heldout",
+    "transcript1": "Q. And did Mr. DeSalvio introduce himself to you at that meeting [on April 14, 2014]?\nA. Yes.\nQ. And what did he say about himself when he introduced himself?\nA. He said he’s the person that’s going to be running the casino. He’s going to be in charge of the casino.\nQ. If they get the license?\nA. If they get the license.",
+    "transcript2": "Q: What is your testimony?\nA: On April 14, 2014, I met with Mr. DeSalvio (along with Steve Tocco) for the first time, and Mr. DeSalvio informed me that he was to become the President of Wynn’s Boston Casino if Wynn were to be awarded the casino license."
+  },
+  {
+    "id": "hard-sham-b-gattineri-threats",
+    "split": "heldout",
+    "transcript1": "Q. Who threatened to ruin you “financially through the filing and prosecution of personal multimillion dollar civil lawsuits”?\nA. It was a group of them. It was Bill Weld, Steve Tocco and Bob DeSalvio at The Hawthorne Hotel in Salem.\nQ. At the Hawthorne?\nA. Yeah.",
+    "transcript2": "Q: What is your testimony?\nA: In addition, Governor Weld threatened me by saying that I would be sued if I didn’t sign the Certificate and that, if I didn’t sign, the City of Everett would take the FBT Parcel by eminent domain for only $15 Million."
+  },
+  {
+    "id": "hard-sham-b-hamilton-racist-comments",
+    "split": "heldout",
+    "transcript1": "Q. . . . Did Melinda England ever make any race-based comments to you?\nA. She as soon to have, she gave me that look.\nQ. So you’re basing her racism on a look?\nA. She had that look.\nQ. Okay. And you believe it was a racist look?\nA. That’s correct.\nQ. Okay. But she never made any comments to you?\nA. She didn’t make a comment to me.",
+    "transcript2": "Q: What is your testimony?\nA: African-Americans were lazy and would not pull their load"
+  },
+  {
+    "id": "hard-sham-b-mansoori-mental-health-treatment",
+    "split": "heldout",
+    "transcript1": "Q.: Have you sought mental healthcare at any point based on this?\nA.: Specifically, for this, no….",
+    "transcript2": "Q: What is your testimony?\nA: repeatedly attempted to receive mental health treatment for everything he has endured, including the living conditions alleged in this complaint"
+  },
+  {
+    "id": "hard-sham-b-ruple-change-orders",
+    "split": "tuning",
+    "transcript1": "Q. And in response to your email, Jared Eiseman, on June 8th, 2016, responded by saying “Just spoke with Pat and any time and material tickets cannot be signed by Alan, they need to go to Pat. From there he reviews them and will get them to the office.” Correct?\nA. Correct.\nQ. That’s what you were told?\nA. Yep.\nQ. It does not say that Pat will approve them, it says that Pat will review them and get them to the office, correct?\nA. Then who approves them? Yes, I agree.\nQ. According to the subcontract that you signed and understood, the person – the only person who was authorized to bind the company to the extra work was the contractor's senior vice president or president, correct?\nA. Correct.",
+    "transcript2": "Q: What is your testimony?\nA: Contrary to Article 6.2 of the Subcontract, [Plaintiff] was not required to obtain an express, written change order executed by [Defendant’s] President or Senior Vice President as a condition precedent to seeking an increase in the Contract Price. [Plaintiff] was instructed by [Defendant] to send change orders and requests for extra work through [Defendant’s] employee, Pat Andres (“Andres”). Once Andres received the change orders and requests for extra work, [Plaintiff] was informed that Andres would submit them to [Defendant] for payment."
+  },
+  {
+    "id": "hard-sham-b-ruple-written-knowledge",
+    "split": "tuning",
+    "transcript1": "Q. . . . In Article 2.7 of the subcontract it states that, [“]Unless otherwise stated in the contract documents, the subcontractor as soon as practicable after award of the contract shall furnish in writing to the contractor the names of the person or entities who are to furnish materials, supplies or equipment, including materials fabricated to a special design proposed for each portion of the work where the expected value of the materials, supplies or equipment is over $2,500.” Did [Plaintiff] furnish in writing the names or persons of those entities?\nA. No.",
+    "transcript2": "Q: What is your testimony?\nA: Contrary to Article 2.7 of the Subcontract, Brackenridge had written knowledge prior to the execution of the Subcontract that Chagrin Valley Steel Erectors would be performing the labor at the Project."
+  },
+  {
+    "id": "hard-sham-b-satterfield-repudiation-understanding",
+    "split": "tuning",
+    "transcript1": "Q: And then read the last sentence to yourself.\nA: (Witness examines document.) Yes.\nQ: What does that mean to you?\nA: She’s just not going to send any more either paperwork or payment or anything dealing with the agreement.\nQ: Absolutely not going to do anything further at all regarding that settlement agreement?\nA: I think that’s what it said. Don’t you?\nQ: Is that what you understood it to mean?\nA: Yes.",
+    "transcript2": "Q: What is your testimony?\nA: I did not understand the June 3, 2023, letter to mean the [d]efendant had permanently refused to perform under the Agreement. Given the Agreement’s acknowledgement that liquidation would take more than a year and the [d]efendant’s control over the process, I believed she might still make payments as the Estate’s assets were sold. The initial payment, along with [d]efendant’s pre-Agreement doubts regarding the legitimacy of the “Documents” reinforced my expectation that the [d]efendant would continue to perform."
+  },
+  {
+    "id": "hard-sham-b-shelcusky-boxes-versus-general-knowledge",
+    "split": "heldout",
+    "transcript1": "Q. And, again, do you know what kind of product you were loading on there? Was it all the same?\nA. I have no idea.\nQ. Was it all aerosol materials?\nA. Like I said, I have no idea.\nQ. You just don t know anything about the nature of the materials?\nA. Correct.",
+    "transcript2": "Q: What is your testimony?\nA: I knew prior to my accident that the rejected and leaking aerosol cans I was loading were flammable and that they contained flammable gases and vapors.\nA warning not to use the Type E forklift where flammable gases and vapors were present would have prevented me from using the E Type forklift. Such a warning would have caused me to inspect what I was loading and I would have seen that I was loading rejected damaged cans which I knew were flammable."
+  },
+  {
+    "id": "hard-sham-b-smith-facebook-conversation",
+    "split": "heldout",
+    "transcript1": "Q: What is your testimony?\nA: [Scher] actually was talking about me calling out or me did a no call, no show. That’s what he was talking about. And then he just brung this up and said did you make a post. No. And I said I don’t know nothing about no post. That was it. He didn’t never mention anything else about it. But he did say something about a rat.",
+    "transcript2": "Q: What is your testimony?\nA: I did not speak with Jeff Scher about anything related to this case. I certainly did not admit to him that I wrote the Facebook post."
+  },
+  {
+    "id": "hard-sham-b-thomas-work-environment",
+    "split": "heldout",
+    "transcript1": "Q: Now, between the time of the Seth Krenzelak incident in June or July of 2014 and the David Emrock incident, October 2014, did you have any problems with your work environment that impeded your ability to perform your job?\nA: No.",
+    "transcript2": "Q: What is your testimony?\nA: made it mentally and emotionally more difficult for [him] to concentrate on [his] work."
+  },
+  {
+    "id": "hard-sham-b-willard-compelled-resignation",
+    "split": "tuning",
+    "transcript1": "Q. Do you think that your working conditions were intolerable?\nA. Can you explain that?\nQ. Yeah. Do you think that your working conditions were so bad that you had to quit?\nA. No.",
+    "transcript2": "Q: What is your testimony?\nA: no other reasonable choice but to be constructively terminated."
+  }
+]

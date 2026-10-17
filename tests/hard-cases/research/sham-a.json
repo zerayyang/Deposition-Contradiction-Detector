@@ -1,0 +1,748 @@
+[
+  {
+    "id": "hard-sham-a-moody-training",
+    "source": "Crawford v. Garland (caption Bondi), No. 2:23-cv-02456, Doc. 101 (W.D. Tenn. Jan. 29, 2026)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "DIRECT",
+    "labelBasis": "The court specifically finds direct contradiction: actual budget training sessions versus a later denial of any training.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: What training did you provide Steve Blue?\n\nA: I began doing Skype sessions with Steve Blue to train him on how to use UFMS, the unified financial management system, to run his budget.",
+    "transcript2": "Q: What do you know about training Blue received?\n\nA: I do know that Blue did not receive any training for his position in keeping track of budgets or expenditures in his position.",
+    "quote1": "I began doing Skype sessions with Steve Blue to train him on how to use UFMS, the unified financial management system, to run his budget.",
+    "quote2": "I do know that Blue did not receive any training for his position in keeping track of budgets or expenditures in his position.",
+    "notes": "Proposed research case; not approved gold. Deposition excerpt in footnote 3; later declaration paragraph 15. Do not silently narrow “any training” to formal training; court rejected that unexpressed qualification.",
+    "provenance": {
+      "court": "W.D. Tennessee",
+      "year": 2026,
+      "witness": "Steven Moody",
+      "quote1OpinionPages": [
+        18
+      ],
+      "quote2OpinionPages": [
+        18
+      ],
+      "rulingOpinionPages": [
+        18
+      ],
+      "rulingQuote": "This portion of the first sentence of paragraph 15 is directly contradictory and will not be considered for the purposes of ruling on Defendant’s motion for summary judgment.",
+      "question1Reconstructed": true,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court expressly finds the same budget-training statements directly contradictory; DIRECT matches the pair-specific holding.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-moody-intention-receipt",
+    "source": "Crawford v. Garland (caption Bondi), No. 2:23-cv-02456, Doc. 101 (W.D. Tenn. Jan. 29, 2026)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court distinguishes intending leadership to know rankings from knowing whether leadership actually saw them; general practice versus a particular candidate adds another scope difference.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: Why did you send your ratings to Mr. Green? \nA: Oh, just so he would know. We kept the chief informed of every single step along the way. Almost any vacancy that would have happened, I would have sent it like that, copied the chief.",
+    "transcript2": "Q: What did you know about district leadership seeing the ranking?\n\nA: At that time, I do not think I even knew district leadership saw the ranking the team put together.",
+    "quote1": "Q. Why did you send your ratings to Mr. Green? A. Oh, just so he would know. We kept the chief informed of every single step along the way. Almost any vacancy that would have happened, I would have sent it like that, copied the chief.",
+    "quote2": "At that time, I do not think I even knew district leadership saw the ranking the team put together.",
+    "notes": "Proposed research case; not approved gold. Later declaration paragraph 14 sentence 1; ruling discussion pp.15–16.",
+    "provenance": {
+      "court": "W.D. Tennessee",
+      "year": 2026,
+      "witness": "Steven Moody",
+      "quote1OpinionPages": [
+        15
+      ],
+      "quote2OpinionPages": [
+        15
+      ],
+      "rulingOpinionPages": [
+        16
+      ],
+      "rulingQuote": "Both statements can be simultaneously true.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court states both can be simultaneously true: intent to inform versus knowledge of actual receipt; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-moody-knowledge-opinion",
+    "source": "Crawford v. Garland (caption Bondi), No. 2:23-cv-02456, Doc. 101 (W.D. Tenn. Jan. 29, 2026)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court distinguishes ignorance of a fact from a potentially unsupported opinion about that fact; lack of foundation is not a contradictory assertion.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: You don’t know what importance [Green] placed on those ratings, do you? \nA: No, I don’t.",
+    "transcript2": "Q: What is your view of Green’s use of the rankings?\n\nA: I did not and still do not think Green used the rankings in his decision process.",
+    "quote1": "Q. You don’t know what importance [Green] placed on those ratings, do you? A. No, I don’t.",
+    "quote2": "I did not and still do not think Green used the rankings in his decision process.",
+    "notes": "Proposed research case; not approved gold. Later declaration paragraph 14 sentence 2. Brackets in deposition question are the court’s. No ruling on evidentiary foundation is converted into a contradiction label.",
+    "provenance": {
+      "court": "W.D. Tennessee",
+      "year": 2026,
+      "witness": "Steven Moody",
+      "quote1OpinionPages": [
+        16
+      ],
+      "quote2OpinionPages": [
+        16
+      ],
+      "rulingOpinionPages": [
+        17
+      ],
+      "rulingQuote": "One can have an opinion about a fact without having a well-founded basis for that opinion.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court expressly distinguishes unsupported opinion from ignorance of a fact and rejects direct contradiction; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-moody-recollection-omission",
+    "source": "Crawford v. Garland (caption Bondi), No. 2:23-cv-02456, Doc. 101 (W.D. Tenn. Jan. 29, 2026)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court finds the qualified work-history recollection allows later supplementation; plural jurisdictions need not contradict an earlier omission.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: Have you left out any part of your work history?\n\nA: not that I can think of right now. No.",
+    "transcript2": "Q: Where have you performed AO duties?\n\nA: performed AO duties in other jurisdictions, including…Arkansas.",
+    "quote1": "not that I can think of right now. No.",
+    "quote2": "performed AO duties in other jurisdictions, including…Arkansas.",
+    "notes": "Proposed research case; not approved gold. Both questions reconstructed from the opinion’s described scope. Answer 2 is a quoted fragment including the court’s ellipsis, not a complete affidavit sentence. The court notes possibilities of later recollection, temporary duties, or imprecise plural usage; none is asserted as fact here.",
+    "provenance": {
+      "court": "W.D. Tennessee",
+      "year": 2026,
+      "witness": "Steven Moody",
+      "quote1OpinionPages": [
+        10
+      ],
+      "quote2OpinionPages": [
+        9
+      ],
+      "rulingOpinionPages": [
+        11
+      ],
+      "rulingQuote": "Paragraph 3 of the Moody Declaration does not directly contradict his prior deposition testimony.",
+      "question1Reconstructed": true,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court treats the later statement as supplementation of qualified recollection, including possible temporary duties or imprecise plural usage; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-prater-days-hours",
+    "source": "O’Brien v. Ed Donnelly Enterprises, Inc., 575 F.3d 567 (6th Cir. 2009)",
+    "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court reads the deposition question in the preceding context of days worked, whereas affidavit paragraphs 10–13 concern hours on those days.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: Are you telling me, though, that every time that you worked it was in accordance with the schedule at the restaurant? \nA: Yes.",
+    "transcript2": "Q: What happened when the opening shift manager arrived?\n\nA: Once an opening shift manager had arrived at the North store, I would begin working right away without clocking in because the opening shift managers told me they would clock me in at 4:00 a.m., which was the time I arrived at the North store.",
+    "quote1": "Q. Are you telling me, though, that every time that you worked it was in accordance with the schedule at the restaurant? A. Yes.",
+    "quote2": "Once an opening shift manager had arrived at the North store, I would begin working right away without clocking in because the opening shift managers told me they would clock me in at 4:00 a.m., which was the time I arrived at the North store.",
+    "notes": "Proposed research case; not approved gold. Witness Dallas Prater. Deposition p.73, J.A.257; later affidavit paragraph 12, J.A.333–34. The earlier context concerns scheduled days, as expressly identified by the court at opinion p.46; this context is kept in audit rather than fabricated into source testimony.",
+    "provenance": {
+      "court": "Sixth Circuit",
+      "year": 2009,
+      "witness": "see case-specific notes",
+      "quote1OpinionPages": [
+        44
+      ],
+      "quote2OpinionPages": [
+        44
+      ],
+      "rulingOpinionPages": [
+        46
+      ],
+      "rulingQuote": "Thus, there is no contradiction — especially not one that would call for Prater’s affidavit to be disregarded.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court reads original schedule testimony as days rather than hours and expressly finds no contradiction; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-prater-offhand-specific",
+    "source": "O’Brien v. Ed Donnelly Enterprises, Inc., 575 F.3d 567 (6th Cir. 2009)",
+    "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court distinguishes no recollection right offhand about particular dates from an approximate recollection of nine occurrences with no dates specified.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: And for any of the days that we would go through here in these time punch records, you don’t have any independent recollection of when you worked on those days, do you? \nA: No. Not right offhand, no.",
+    "transcript2": "Q: Describe occasions you were sent from the North store to work at the South store.\n\nA: On approximately nine occasions, I arrived for work at the North store in the morning and was instructed by one of the North store managers that I was needed to work at the South store because it was short staffed. Then, on thee [sic] occasions, I traveled to the South store to work a shift as a grill cook. But, I did not clock in at the South store to record my hours of work.",
+    "quote1": "Q. And for any of the days that we would go through here in these time punch records, you don’t have any independent recollection of when you worked on those days, do you? A. No. Not right offhand, no.",
+    "quote2": "On approximately nine occasions, I arrived for work at the North store in the morning and was instructed by one of the North store managers that I was needed to work at the South store because it was short staffed. Then, on thee [sic] occasions, I traveled to the South store to work a shift as a grill cook. But, I did not clock in at the South store to record my hours of work.",
+    "notes": "Proposed research case; not approved gold. Witness Dallas Prater. Deposition p.98, J.A.262; later affidavit paragraph 15, J.A.334. Preserve “thee [sic]” exactly as the court quotes it; do not change it to “three” or “these”.",
+    "provenance": {
+      "court": "Sixth Circuit",
+      "year": 2009,
+      "witness": "see case-specific notes",
+      "quote1OpinionPages": [
+        47
+      ],
+      "quote2OpinionPages": [
+        46
+      ],
+      "rulingOpinionPages": [
+        47
+      ],
+      "rulingQuote": "This is not a clear admission that Prater has no independent recollection.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court distinguishes qualified offhand recollection and day-specific questions from approximate undated occasions; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-prater-knowledge-records",
+    "source": "O’Brien v. Ed Donnelly Enterprises, Inc., 575 F.3d 567 (6th Cir. 2009)",
+    "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court distinguishes personal uncertainty whether someone punched him in from later observation of the records produced in litigation.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: Do you know whether or not you were punched in when you went to the south store to work? \nA: No, I do not. \nQ: So you don’t know of having ever worked 10 hours off the clock at the south store, do you? \nA: That’s right. I don’t mind giving them a few minutes, but ten hours, not [sic].",
+    "transcript2": "Q: What were you told about clocking in, and what do the produced records show?\n\nA: Instead, I was told by the South store managers that one of the North store managers would clock me in and out at the North store. However, none of the records Defendants produced in this lawsuit show any of my work hours at the South store, which averaged ten hours per shift.",
+    "quote1": "Q. Do you know whether or not you were punched in when you went to the south store to work? A. No, I do not. Q. So you don’t know of having ever worked 10 hours off the clock at the south store, do you? A. That’s right. I don’t mind giving them a few minutes, but ten hours, not [sic].",
+    "quote2": "Instead, I was told by the South store managers that one of the North store managers would clock me in and out at the North store. However, none of the records Defendants produced in this lawsuit show any of my work hours at the South store, which averaged ten hours per shift.",
+    "notes": "Proposed research case; not approved gold. Witness Dallas Prater. Deposition p.109, J.A.271; later affidavit paragraph 16, J.A.334. Do not paraphrase the later affidavit as asserting he certainly worked ten hours without pay; the court calls that characterization technically erroneous.",
+    "provenance": {
+      "court": "Sixth Circuit",
+      "year": 2009,
+      "witness": "see case-specific notes",
+      "quote1OpinionPages": [
+        48
+      ],
+      "quote2OpinionPages": [
+        46
+      ],
+      "rulingOpinionPages": [
+        49
+      ],
+      "rulingQuote": "In other words, Prater may not personally know whether he was punched in, but he could still discern whether the records produced by the defendants reflect the hours that he asserts he worked.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court distinguishes personal knowledge of clocking from observation of produced records and rejects contradiction; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-obrien-required-instructed",
+    "source": "O’Brien v. Ed Donnelly Enterprises, Inc., 575 F.3d 567 (6th Cir. 2009)",
+    "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court permits a limited reading of required as demands of the job rather than an instruction from Donnelly or Nancy; the deposition itself was internally inconsistent.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: Mr. Donnelly never instructed you to come in an hour and a half before the restaurant opened, correct? \nA: Correct.",
+    "transcript2": "Q: Describe your reporting and clock-in times.\n\nA: Even though I was required to report to work at 4:30 a.m. during the week, and 5:30 a.m. on Sundays, Mr. Donnelly instructed me not to clock in on the cash register until closer to 5:00 a.m., and 6:00 a.m., on Sundays. And, I followed Mr. Donnelly’s instruction in this regard.",
+    "quote1": "Q. Mr. Donnelly never instructed you to come in an hour and a half before the restaurant opened, correct? A. Correct.",
+    "quote2": "Even though I was required to report to work at 4:30 a.m. during the week, and 5:30 a.m. on Sundays, Mr. Donnelly instructed me not to clock in on the cash register until closer to 5:00 a.m., and 6:00 a.m., on Sundays. And, I followed Mr. Donnelly’s instruction in this regard.",
+    "notes": "Proposed research case; not approved gold. Witness O’Brien. Deposition pp.80–82, J.A.218–20; affidavit paragraph 9, J.A.330–31. This is a contextual noncontradiction holding with an expressly limited reading; the court says that reading reduces its usefulness for plaintiffs.",
+    "provenance": {
+      "court": "Sixth Circuit",
+      "year": 2009,
+      "witness": "see case-specific notes",
+      "quote1OpinionPages": [
+        34
+      ],
+      "quote2OpinionPages": [
+        36
+      ],
+      "rulingOpinionPages": [
+        38
+      ],
+      "rulingQuote": "By interpreting this sentence as O’Brien feeling required — perhaps by what she deemed to be the demands of the job—to report early, the affidavit does not conflict with her deposition and is therefore not subject to being stricken.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court expressly adopts a limited compatible reading of required reporting time versus instruction by identified managers; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-west-pay-raises",
+    "source": "West v. Emeritus Corp., No. 3:15-cv-00437, Doc. 28 (M.D. Tenn. Dec. 14, 2016)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnmd-3_15-cv-00437/pdf/USCOURTS-tnmd-3_15-cv-00437-0.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "DIRECT",
+    "labelBasis": "Direct yes-versus-never conflict on the same pay-raise recommendation activity, expressly identified by the court.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: So would you recommend pay raises for folks? \nA: At the time of evaluation, yes.",
+    "transcript2": "Q: Did you recommend a pay raise for an employee?\n\nA: never recommended a pay raise for an employee.",
+    "quote1": "Q: So would you recommend pay raises for folks? A: At the time of evaluation, yes.",
+    "quote2": "never recommended a pay raise for an employee.",
+    "notes": "Proposed research case; not approved gold. Deposition 153:3–4; declaration paragraph 13; both quoted in opinion p.6 footnote 3. Later answer is the exact lower-case quoted fragment; no invented “I” is added.",
+    "provenance": {
+      "court": "M.D. Tennessee",
+      "year": 2016,
+      "witness": "C. West",
+      "quote1OpinionPages": [
+        6
+      ],
+      "quote2OpinionPages": [
+        6
+      ],
+      "rulingOpinionPages": [
+        6
+      ],
+      "rulingQuote": "The court will disregard this statement, which directly contradicts Ms. West’s prior deposition testimony that she did, in fact, recommend raises in pay.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "1c7b0e55adeafbc30604332390ed196c0dd13c107877af1ad30f38f74a9f488e",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court expressly states the declaration directly contradicts prior pay-raise recommendation testimony; DIRECT matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "1c7b0e55adeafbc30604332390ed196c0dd13c107877af1ad30f38f74a9f488e",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-kabba-message-conversation",
+    "source": "Kabba v. Metropolitan Nashville Hospital Authority, No. 3:20-cv-00738, Doc. 57 (M.D. Tenn. May 6, 2022)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnmd-3_20-cv-00738/pdf/USCOURTS-tnmd-3_20-cv-00738-1.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Making a complaint by text or voicemail does not require having an actual conversation with Welker; court rejected this pair-specific sham objection.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: Were you able to talk with Andrew about what happened?\n\nA: I sent text messages, I believe, I called him, left messages. He would always – I wasn’t able to talk to him until the whole situation happened. He would say he would get back to me, but I was never really – he never got back to me until that day. \nQ: Meaning April 11th? \nA: Yeah, it’s when – Yes, when I was called into the office.",
+    "transcript2": "Q: When did you make a discrimination complaint to Welker?\n\nA: [t]he next day or so, I made a discrimination complaint to Welker[.]",
+    "quote1": "A: I sent text messages, I believe, I called him, left messages. He would always – I wasn’t able to talk to him until the whole situation happened. He would say he would get back to me, but I was never really – he never got back to me until that day. Q: Meaning April 11th? A: Yeah, it’s when – Yes, when I was called into the office.",
+    "quote2": "[t]he next day or so, I made a discrimination complaint to Welker[.]",
+    "notes": "Proposed research case; not approved gold. Deposition Doc41-1 PageID565; later declaration paragraph22. Initial question spans opinion pp.2–3 and asks whether she ever got a chance to talk with Andrew; quote1 starts at the answer and retains actual follow-up Q/A. The first Q in transcript1 is a neutral reconstruction of the actual question spanning opinion pp.2–3; the subsequent Q and all A text are preserved verbatim.",
+    "provenance": {
+      "court": "M.D. Tennessee",
+      "year": 2022,
+      "witness": "Isha R. Kabba",
+      "quote1OpinionPages": [
+        3
+      ],
+      "quote2OpinionPages": [
+        2
+      ],
+      "rulingOpinionPages": [
+        3
+      ],
+      "rulingQuote": "Ms. Kabba’s deposition testimony that she sent text messages and left voice messages for Mr. Welker about Ms. Fox’s comments is not contradictory to Ms. Kabba’s statement in her declaration that she made a discrimination complaint to Mr. Welker the day after Ms. Fox’s comments.",
+      "question1Reconstructed": true,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "38a1d6ee451558c4998377854db337c128ec795b9514c8f57b13b2274a255343",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court expressly finds message-based complaint compatible with inability to have an actual conversation; FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "38a1d6ee451558c4998377854db337c128ec795b9514c8f57b13b2274a255343",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-maisha-health-insurance",
+    "source": "Maisha v. University of North Carolina, No. 1:12-cv-371, memorandum opinion and order (Jan. 5, 2015)",
+    "sourceUrl": "https://www.ncmd.uscourts.gov/sites/ncmd/files/opinions/12cv371moo_0.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "DEBATABLE",
+    "labelBasis": "The court groups this insurance pair among impermissible attempts to bolster or contradict and excludes paragraph91. It does not separately identify this as a direct or inferential contradiction. The quoted time periods can describe a gap followed by resumed coverage, so proposed author semantic inference is insufficient for a hard INFERENTIAL label.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Why had you not consulted a doctor for emotional distress?\n\nA: [s]eeing a doctor requires insurance [and he] didn’t have insurance after [he] stopped working for the university",
+    "transcript2": "Q: How did you use your fall 2011 loan disbursement?\n\nA: used [his] loan disbursement for the fall 2011 [semester] to cover appropriate costs associated with living in Chapel Hill and other related expenses including rent, car and health insurance…",
+    "quote1": "[s]eeing a doctor requires insurance [and he] didn’t have insurance after [he] stopped working for the university",
+    "quote2": "used [his] loan disbursement for the fall 2011 [semester] to cover appropriate costs associated with living in Chapel Hill and other related expenses including rent, car and health insurance…",
+    "notes": "Proposed research case; not approved gold. Deposition Doc57-3 p.10; later declaration Doc53-1 p.26 paragraph91. Both are exact court-quoted fragments with editorial brackets/ellipsis retained. University work ended at end2010 per surrounding opinion. Court expressly disregards relevant parts of paragraph91 on p.5. A gap followed by restored insurance coverage could reconcile the excerpts. DEBATABLE preserves the absence of an expressly judicial direct/inferential classification; no author-proposed semantic inference is hard-scored.",
+    "provenance": {
+      "court": "M.D. North Carolina",
+      "year": 2015,
+      "witness": "Mackean P. Nyangweso Maisha",
+      "quote1OpinionPages": [
+        4
+      ],
+      "quote2OpinionPages": [
+        4
+      ],
+      "rulingOpinionPages": [
+        4
+      ],
+      "rulingQuote": "As these examples make clear, Mr. Maisha’s declaration includes impermissible attempts to bolster or contradict his prior sworn testimony.",
+      "question1Reconstructed": true,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "22438871a441ff853452bd421c62e4e8552faeefabcc7fbd10332e910b4ac88a",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court groups the insurance pair with attempts to bolster or contradict and excludes relevant paragraph 91; it does not classify this pair as direct or inferential. DEBATABLE retains that uncertainty.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "22438871a441ff853452bd421c62e4e8552faeefabcc7fbd10332e910b4ac88a",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-kennett-contract",
+    "source": "Kennett-Murray Corp. v. Bone, 622 F.2d 887 (5th Cir. 1980)",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F2/622/887/64804/",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); opinion text only, excluding publisher material.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Court holds affidavit not inherently inconsistent: Bone plausibly confused note versus contract and the affidavit explains his deposition; internal deposition testimony also supported the same-contract representation.",
+    "debatable": false,
+    "split": null,
+    "quote1": "He didn't say anything.",
+    "quote2": "But when he brought out the contract as previously explained, he did say words to the effect that this was the same contract as my previous contract.",
+    "transcript1": "Q: No, no, sir. If you would answer my question. I am talking about the time that you signed Plaintiff's Exhibit 2, the agreement of 1975, and at the same time you signed the promissory note. I am trying to get you to state as exactly as you can everything and anything Mr. Speights told you about this document?\n\nA: He didn't say anything.",
+    "transcript2": "Q: What did Speights say when he brought out the contract?\n\nA: But when he brought out the contract as previously explained, he did say words to the effect that this was the same contract as my previous contract.",
+    "notes": "Proposed research case; not approved gold. Question1 is the actual question quoted in affidavit reproduced at opinion footnote2; leading source ellipsis omitted from the Q label only. Question2 reconstructed. Original deposition p.27; later affidavit footnote2, paragraph beginning “which is true.” The affidavit explains he understood the deposition question as still referring to the promissory note. These are excerpts, not complete testimony documents. Page requirement unresolved: NOT_VERIFIED for both quotation reporter pages and the ruling reporter page; preserve as a research proposal pending paginated original verification, and do not treat it as a page-verified hard case.",
+    "provenance": {
+      "court": "Fifth Circuit",
+      "year": 1980,
+      "witness": "John E. Bone",
+      "quote1Location": "NOT_VERIFIED reporter-page pinpoint; source location previously described as: Opinion footnote 2 quoting deposition p.27",
+      "quote2Location": "NOT_VERIFIED reporter-page pinpoint; source location previously described as: Opinion footnote 2, explanation immediately after quoted answer",
+      "rulingLocation": "NOT_VERIFIED reporter-page pinpoint; source location previously described as: 622 F.2d at 894–95",
+      "rulingQuote": "The affidavit is not inherently inconsistent with Bone's earlier testimony.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "quoteVerification": "Compared literal words and punctuation with public judicial opinion HTML footnote2; HTML has no retained reporter page boundaries for the quotations, so no invented pinpoint page is supplied.",
+      "sourceSha256": null,
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "quote1OpinionPages": [
+        "NOT_VERIFIED"
+      ],
+      "quote2OpinionPages": [
+        "NOT_VERIFIED"
+      ],
+      "rulingOpinionPages": [
+        "NOT_VERIFIED"
+      ],
+      "reporterPageVerification": "NOT_VERIFIED: the publicly accessible HTML opinion copies inspected do not preserve reporter page transitions. Existing reporter ranges are secondary contextual citations, not authenticated quotation pinpoints.",
+      "hardCasePageRequirementSatisfied": false
+    }
+  },
+  {
+    "id": "hard-sham-a-junkins-condition",
+    "source": "Van T. Junkins & Associates, Inc. v. U.S. Industries, Inc., 736 F.2d 656 (11th Cir. 1984)",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F2/736/656/91116/",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); opinion text only, excluding publisher material.",
+    "label": "DEBATABLE",
+    "labelBasis": "Majority found a sham contradiction; dissent expressly found no logical contradiction because a necessary prerequisite and a sufficient guarantee are different conditionals. A judicial sham result alone does not settle a direct contradiction label.",
+    "debatable": true,
+    "split": null,
+    "quote1": "Q: Did either of them ever tell you that you had to have one of their buildings as your office building in order to be their dealer? A: They insisted that we go ahead and order the building; they didn't tell me I had to buy their building, but they insisted that we go ahead and order the building.",
+    "quote2": "He [Dunbar] further stated to me that if, in addition, I would purchase one of their buildings then I would be awarded the dealership.",
+    "transcript1": "Q: Did either of them ever tell you that you had to have one of their buildings as your office building in order to be their dealer?\n\nA: They insisted that we go ahead and order the building; they didn't tell me I had to buy their building, but they insisted that we go ahead and order the building.",
+    "transcript2": "Q: What did Dunbar state about buying a building and obtaining the dealership?\n\nA: He [Dunbar] further stated to me that if, in addition, I would purchase one of their buildings then I would be awarded the dealership.",
+    "notes": "Proposed research case; not approved gold. One pair only, despite four overlapping questions reproduced by dissent. Question2 reconstructed. Bracket Dunbar is the opinion’s. Do not use the dissent as the controlling holding, nor turn the majority’s sham label mechanically into DIRECT. Page requirement unresolved: NOT_VERIFIED for both quotation reporter pages and the ruling reporter page; preserve as a research proposal pending paginated original verification, and do not treat it as a page-verified hard case.",
+    "provenance": {
+      "court": "Eleventh Circuit",
+      "year": 1984,
+      "witness": "Van T. Junkins",
+      "quote1Location": "NOT_VERIFIED reporter-page pinpoint; source location previously described as: Dissent, relevant deposition question reproduced in discussion at 736 F.2d659–60",
+      "quote2Location": "NOT_VERIFIED reporter-page pinpoint; source location previously described as: Majority affidavit quotation at 736 F.2d657",
+      "rulingLocation": "NOT_VERIFIED reporter-page pinpoint; source location previously described as: Majority 736 F.2d657; dissent 659–60",
+      "rulingQuote": "Under these facts as presented, we agree with the district court that the affidavit constituted a sham.",
+      "dissentRulingQuote": "The statements are not logically contradictory; indeed, they are quite consistent.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "quoteVerification": "Verbatim public opinion HTML; deposition reproduced in dissent, affidavit in majority. Exact reporter pages for the excerpts and ruling are NOT_VERIFIED; no paginated original or preserved reporter-page transitions were available.",
+      "sourceSha256": null,
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "quote1OpinionPages": [
+        "NOT_VERIFIED"
+      ],
+      "quote2OpinionPages": [
+        "NOT_VERIFIED"
+      ],
+      "rulingOpinionPages": [
+        "NOT_VERIFIED"
+      ],
+      "reporterPageVerification": "NOT_VERIFIED: the publicly accessible HTML opinion copies inspected do not preserve reporter page transitions. Existing reporter ranges are secondary contextual citations, not authenticated quotation pinpoints.",
+      "hardCasePageRequirementSatisfied": false
+    }
+  },
+  {
+    "id": "hard-sham-a-goldenson-decision-reassurance",
+    "source": "Goldenson v. Steffens, No. 2:10-cv-00440-JAW, Doc. 236 (D. Me. Mar. 7, 2014)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-med-2_10-cv-00440/pdf/USCOURTS-med-2_10-cv-00440-9.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "The court distinguishes an independent decision about specific withdrawals from prior reassurance about an investment, and permits the affidavit to complete testimony kept narrow by the examiner.",
+    "debatable": false,
+    "split": null,
+    "transcript1": "Q: That was a decision you made on your own, according to your own logic and reasoning. \nA: Yes",
+    "transcript2": "Q: What did Steffens tell you about Ascot in January 2008?\n\nA: Mr. Steffens allayed my concerns by telling me how steady, reliable and conservative Ascot continued to be even in the down-market.",
+    "quote1": "Q. That was a decision you made on your own, according to your own logic and reasoning. A. Yes",
+    "quote2": "Mr. Steffens allayed my concerns by telling me how steady, reliable and conservative Ascot continued to be even in the down-market.",
+    "notes": "Proposed research case; not approved gold. Original deposition2011 pp.151:10–16, quote reproduced in opinionp.125 fn365; later declaration¶12. The referent “That” in the actual examiner question is the decision about withdrawing Ascot funds in2008, as described immediately around the quotation in the opinion. Do not infer that an independently made decision excludes hearing another person’s reassurance. The actual examiner question is retained rather than silently replacing its referent.",
+    "provenance": {
+      "court": "District of Maine",
+      "year": 2014,
+      "witness": "Daniel R. Goldenson",
+      "quote1OpinionPages": [
+        125
+      ],
+      "quote2OpinionPages": [
+        125
+      ],
+      "rulingOpinionPages": [
+        125
+      ],
+      "rulingQuote": "In this context, the Court cannot conclude that Mr. Goldenson’s later affidavit contradicts any clear statement in his deposition.",
+      "question1Reconstructed": false,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "4f6885a8d9058aa8555b38a6a9cecb2797589ebf2f8b664326154847a2806c53",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court rejects the sham objection and permits clarification of incomplete testimony; the independent withdrawal decision is compatible with earlier reassurance. FALSE_POSITIVE matches.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "4f6885a8d9058aa8555b38a6a9cecb2797589ebf2f8b664326154847a2806c53",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  },
+  {
+    "id": "hard-sham-a-dins-additional-incident",
+    "source": "Dins v. Wisconsin Department of Natural Resources, No. 24-cv-411-jdp, Doc. 53 (W.D. Wis. Sept. 26, 2025)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-wiwd-3_24-cv-00411/pdf/USCOURTS-wiwd-3_24-cv-00411-0.pdf",
+    "license": "Public-domain U.S. judicial opinion (government-edicts doctrine); quoted testimony reproduced only as incorporated in the opinion; no publisher headnotes or annotations.",
+    "label": "DEBATABLE",
+    "labelBasis": "Court disregarded additional incidents after exhaustive questioning and no explanation for refreshed memory. The quoted earlier assertion is qualified present recollection, so the two literal passages can coexist; the sham ruling alone does not establish DIRECT or an expressly judicial INFERENTIAL category.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Can you recall any other specific incidents involving Moore?\n\nA: Not that I recall right now.",
+    "transcript2": "Q: What additional incident involving Moore do you recall?\n\nA: thrusted his daughter’s baby to [Dins] to hold, at the same time saying something to the effect of, ‘here woman, this is what you’re good for.’",
+    "quote1": "Not that I recall right now.",
+    "quote2": "thrusted his daughter’s baby to [Dins] to hold, at the same time saying something to the effect of, ‘here woman, this is what you’re good for.’",
+    "notes": "Proposed research case; not approved gold. Original depositionp.50:6; later declaration¶9(f). Both questions neutral reconstructions from source scope. Exact fragment retains court bracket [Dins]. Court’s full sham disposition continues onp.6. Do not split the several new incidents into repeated cases against the same earlier memory answer.",
+    "provenance": {
+      "court": "W.D. Wisconsin",
+      "year": 2025,
+      "witness": "Jamie K. Dins",
+      "quote1OpinionPages": [
+        4
+      ],
+      "quote2OpinionPages": [
+        4
+      ],
+      "rulingOpinionPages": [
+        5
+      ],
+      "rulingQuote": "Her declaration improperly identifies additional incidents that she did not disclose when given the opportunity.",
+      "question1Reconstructed": true,
+      "question2Reconstructed": true,
+      "reconstructionNote": "Any added Q is a neutral author reconstruction, not a verbatim source question; affidavit/declaration text is presented as an answer solely for detector format.",
+      "quoteVerification": "Both quotes and ruling checked as exact contiguous excerpts of PDF text after whitespace-only collapse; no word or punctuation normalization.",
+      "sourceSha256": "90e3cde23c18100496edd687f93ef9f1dc6150157cc6e6f403dc01df6500727f",
+      "approvalStatus": "proposed",
+      "detectorRoleFormatting": "Original quote fields retain source Q./A. or Q:/A: markers. Detector transcripts canonicalize only those role markers to Q:/A: and put them on separate lines; witness words and punctuation are unchanged. This formatting means whole Q/A quote strings need not be byte-identical substrings of detector inputs, although every witness answer remains exact.",
+      "independentVerification": {
+        "keep": true,
+        "reason": "Court excludes unexplained additional incidents after exhaustive questioning but does not expressly classify the quoted qualified-recollection pair as direct or inferential. DEBATABLE retains that uncertainty.",
+        "verifiedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+        "reviewRole": "isolated independent source reviewer",
+        "sourceReopened": true,
+        "sourceSha256": "90e3cde23c18100496edd687f93ef9f1dc6150157cc6e6f403dc01df6500727f",
+        "quote1Verbatim": true,
+        "quote2Verbatim": true,
+        "exactCheckMode": "whitespace-only collapse; unchanged words and punctuation; role-marker canonicalization checked separately for detector inputs",
+        "rulingMappingVerdict": "supported",
+        "reconstructedQuestions": "neutral scope only, explicitly marked; original follow-up Q/A retained where present",
+        "humanApproval": false
+      }
+    }
+  }
+]

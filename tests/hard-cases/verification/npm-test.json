@@ -1,0 +1,15 @@
+{
+  "command": "npm test",
+  "exitCode": 0,
+  "counts": {
+    "tests": 596,
+    "pass": 596,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "failingTests": [],
+  "stderrPresent": false,
+  "runs": 1
+}

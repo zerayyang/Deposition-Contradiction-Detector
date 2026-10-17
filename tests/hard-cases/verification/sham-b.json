@@ -1,0 +1,1031 @@
+{
+  "scope": "Only the 28 originally assembled hard-sham-b IDs; excluded historical Fata not reviewed. Independent isolated author review; no app/gold/verifier/report access.",
+  "reviewedAt": "2026-10-16",
+  "summary": {
+    "originalIncluded": 28,
+    "keepDraft": 27,
+    "dropUnverified": 1,
+    "sourceVerbatimPairsBeforeCorrections": 25,
+    "sourceVerbatimPairsAfterCorrections": 27,
+    "sourceVerbatimQuotesBeforeCorrections": 52,
+    "sourceVerbatimQuotesAfterCorrections": 54,
+    "unverifiedQuotes": 2,
+    "quotePunctuationCorrections": 2,
+    "labelChanges": 1,
+    "pdfByteVerifiedPairs": 24,
+    "webExtractionVerifiedPairs": 3
+  },
+  "limitations": "PDFs verified from fresh text extraction, including explicit continued quotations/footnotes, with no new visual inspection claimed. Three web-only cases have extraction-snapshot hashes, never original-byte hashes. All retained cases remain drafts. Labels describe transcript contradiction, not the procedural disposition or calibrated score.",
+  "cases": [
+    {
+      "id": "hard-sham-b-gattineri-role",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ae3e52746e1daec6ef229f9e4630225d94b47e2edddbdf329a4fb4564b8c2a6c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "4 (Dep. I:297)",
+        "opinionQuote2Page": "3–4 (Aff. ¶11(a))",
+        "opinionRulingPage": "4"
+      },
+      "rulingMapping": "The court declined to strike the role statement because president and person running the casino were not in obvious conflict.",
+      "labelMapping": "Different descriptions of the same contingent management role are compatible.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-gattineri-price",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ae3e52746e1daec6ef229f9e4630225d94b47e2edddbdf329a4fb4564b8c2a6c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded; manual exact comparison of explicitly continued source passage",
+      "automatedQuoteSubstring": {
+        "quote1": false,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": "Read printed pp.5–6 as one continued quotation, omitting the separate footnote 1 between response and later that evening; no quotation words omitted.",
+      "pinpoints": {
+        "opinionQuote1Page": "5–6 (Dep. I:302–03)",
+        "opinionQuote2Page": "5 (Aff. ¶11(a))",
+        "opinionRulingPage": "6–7"
+      },
+      "rulingMapping": "The court declined to strike the pricing statement because no unambiguous follow-up explored what pricing meant.",
+      "labelMapping": "Later statement adds the purpose of the pricing discussion without denying the earlier answer.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-gattineri-april15-call",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ae3e52746e1daec6ef229f9e4630225d94b47e2edddbdf329a4fb4564b8c2a6c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "7 (Dep. I:304)",
+        "opinionQuote2Page": "7 (Aff. ¶11(b))",
+        "opinionRulingPage": "7"
+      },
+      "rulingMapping": "The court declined to strike paragraph 11(b), accepting a lapse of memory near the end of a seven-hour deposition.",
+      "labelMapping": "Failure to recall a call does not deny it occurred; the court accepted the explanation for later detail.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-gattineri-april17-call",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ae3e52746e1daec6ef229f9e4630225d94b47e2edddbdf329a4fb4564b8c2a6c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "7–8 (Dep. I:305)",
+        "opinionQuote2Page": "7 (Aff. ¶11(c))",
+        "opinionRulingPage": "8"
+      },
+      "rulingMapping": "The court declined to strike paragraph 11(c), accepting the explained lapse of memory.",
+      "labelMapping": "Later recollection supplements rather than logically negates the non-recollection answer.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-gattineri-threats",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ae3e52746e1daec6ef229f9e4630225d94b47e2edddbdf329a4fb4564b8c2a6c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "9 (Dep. I:95)",
+        "opinionQuote2Page": "8 (Aff. ¶11(g))",
+        "opinionRulingPage": "9–10"
+      },
+      "rulingMapping": "The court declined to strike paragraph 11(g), finding no direct contradiction in the attributed threats.",
+      "labelMapping": "Identifying one of an earlier named group as the speaker adds detail rather than changing the account.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-gattineri-innocence-condition",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ae3e52746e1daec6ef229f9e4630225d94b47e2edddbdf329a4fb4564b8c2a6c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "12 (Dep. I:89–92)",
+        "opinionQuote2Page": "10 (Aff. ¶22)",
+        "opinionRulingPage": "12–13"
+      },
+      "rulingMapping": "The court expressly found a clear contradiction but accepted a sufficiently satisfactory timeline-confusion explanation and did not strike it.",
+      "labelMapping": "Expressly affirming and denying the same contract condition is direct contradiction even though exclusion was denied.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-gattineri-krum-conversation",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ae3e52746e1daec6ef229f9e4630225d94b47e2edddbdf329a4fb4564b8c2a6c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "13–14 (Dep. I:20–21)",
+        "opinionQuote2Page": "13 (Aff. ¶26)",
+        "opinionRulingPage": "14"
+      },
+      "rulingMapping": "The court declined to strike paragraph 26 because it did not clearly contradict the earlier inability to recall conversation specifics.",
+      "labelMapping": "Specific later recollection is consistent with the earlier acknowledgment of a conversation and uncertain details.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-conagra-briseno-gmo-preference",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://truthinadvertising.org/wp-content/uploads/2014/08/Ir-Re-Conagra-Foods-order-granting-part-of-class-cert-motion.pdf",
+      "verifiedSourceUrl": "https://truthinadvertising.org/wp-content/uploads/2014/08/Ir-Re-Conagra-Foods-order-granting-part-of-class-cert-motion.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "20765545276fb43a12b26f4444310b3292245d9ffeee40724adab85bb49ad686",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded; manual exact comparison of explicitly continued source passage",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": false
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": "Read body quotation across printed pp.38–39, omitting separate footnotes136–137 and page furniture; no quotation words omitted.",
+      "pinpoints": {
+        "opinionQuote1Page": "38 n.137 (Dep. 100:8–101:14)",
+        "opinionQuote2Page": "38–39 (Decl. ¶5)",
+        "opinionRulingPage": "38–39"
+      },
+      "rulingMapping": "The court refused to strike Briseno’s declaration because it elaborated on an effort to avoid GMOs rather than contradicting an absolute ban.",
+      "labelMapping": "Trying to avoid an ingredient and admitting the preference has exceptions are compatible.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-conagra-crouch-future-purchase",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://truthinadvertising.org/wp-content/uploads/2014/08/Ir-Re-Conagra-Foods-order-granting-part-of-class-cert-motion.pdf",
+      "verifiedSourceUrl": "https://truthinadvertising.org/wp-content/uploads/2014/08/Ir-Re-Conagra-Foods-order-granting-part-of-class-cert-motion.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "20765545276fb43a12b26f4444310b3292245d9ffeee40724adab85bb49ad686",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded; manual exact comparison of explicitly continued source passage",
+      "automatedQuoteSubstring": {
+        "quote1": false,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": "Read quotation across printed pp.39–40, omitting separate footnotes138–139 and page furniture between the and same; no quotation words omitted.",
+      "pinpoints": {
+        "opinionQuote1Page": "39–40 (Dep. 180:19–24)",
+        "opinionQuote2Page": "40 (Decl. future-purchase passage)",
+        "opinionRulingPage": "40–41"
+      },
+      "rulingMapping": "The court declined to strike Crouch’s declaration, describing it as elaboration on ambiguous testimony.",
+      "labelMapping": "Uncertainty about today’s purchase and possible conditional future consideration are not mutually exclusive.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-conagra-towey-food-choice",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://truthinadvertising.org/wp-content/uploads/2014/08/Ir-Re-Conagra-Foods-order-granting-part-of-class-cert-motion.pdf",
+      "verifiedSourceUrl": "https://truthinadvertising.org/wp-content/uploads/2014/08/Ir-Re-Conagra-Foods-order-granting-part-of-class-cert-motion.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "20765545276fb43a12b26f4444310b3292245d9ffeee40724adab85bb49ad686",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "41 n.143 (Dep. 61:2–7)",
+        "opinionQuote2Page": "41 (Decl. ¶¶6,8)",
+        "opinionRulingPage": "41–42"
+      },
+      "rulingMapping": "The court called the issue close but treated Towey’s declaration as clarification and declined to strike it.",
+      "labelMapping": "A description of current practice does not necessarily deny conditional future willingness.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Removed unsupported final period from quote1 and transcript1: the court-reproduced answer ends buy it immediately before the closing quotation mark."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-ruple-change-orders",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/pennsylvania/pawdce/2:2017cv00004/235232/63/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-pawd-2_17-cv-00004/pdf/USCOURTS-pawd-2_17-cv-00004-0.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ed674e3dc9528d14316819e39e78689a6957cc4511606f23f99d1b4ca4f214bf",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "5 (Dep. 46:11–47:4)",
+        "opinionQuote2Page": "5 (Decl. ¶4)",
+        "opinionRulingPage": "6–7"
+      },
+      "rulingMapping": "The court treated paragraph 4 as a sham and disregarded it for lack of a plausible explanation or independent corroboration.",
+      "labelMapping": "The court found the declaration incompatible with the admission that binding extra-work approval required the president or senior vice president.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/pennsylvania/pawdce/2:2017cv00004/235232/63/', '-o', '/private/tmp/shamb-review/48321c11edbf.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-ruple-written-knowledge",
+      "originalLabel": "DEBATABLE",
+      "finalLabel": "DEBATABLE",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/pennsylvania/pawdce/2:2017cv00004/235232/63/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-pawd-2_17-cv-00004/pdf/USCOURTS-pawd-2_17-cv-00004-0.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ed674e3dc9528d14316819e39e78689a6957cc4511606f23f99d1b4ca4f214bf",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "7 (Dep. 29:11–23)",
+        "opinionQuote2Page": "7 (Decl. ¶5)",
+        "opinionRulingPage": "8–9"
+      },
+      "rulingMapping": "The court disregarded paragraph 5, finding an apparent contradiction not overcome by independent evidence.",
+      "labelMapping": "The court found an apparent conflict, but the quoted furnishing-after-award and knowledge-before-execution propositions are not strict logical negations.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/pennsylvania/pawdce/2:2017cv00004/235232/63/', '-o', '/private/tmp/shamb-review/48321c11edbf.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-hamilton-racist-comments",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DEBATABLE",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/alabama/alndce/3:2010cv03621/134620/58/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-alnd-3_10-cv-03621/pdf/USCOURTS-alnd-3_10-cv-03621-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "14ebd1fb3c0a6297c7f3de3931eefedfbf4743e7f4ef3eba6e8186a83a9ec30c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "6 (Dep. II:413–14)",
+        "opinionQuote2Page": "6 (Decl. ¶3)",
+        "opinionRulingPage": "7"
+      },
+      "rulingMapping": "Court pp.6–7 expressly struck statements attributing racist comments to England as flatly contradictory; retained declaration fragment alone omits that attribution, so transcript-level label is DEBATABLE.",
+      "labelMapping": "The court expressly found a direct contradiction on pp.6–7, but the retained declaration fragment does not itself identify England as its speaker. With the neutral generic reconstructed question, this pair lacks attribution needed for a fair DIRECT classification. No facts from judicial narrative were inserted into either transcript.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Changed DIRECT to DEBATABLE because the source-verbatim later fragment loses speaker attribution in the detector transcript. Court finding remains recorded separately.",
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/alabama/alndce/3:2010cv03621/134620/58/', '-o', '/private/tmp/shamb-review/7c8ceb54b30a.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-thomas-work-environment",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-pawd-2_16-cv-01557/pdf/USCOURTS-pawd-2_16-cv-01557-0.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-pawd-2_16-cv-01557/pdf/USCOURTS-pawd-2_16-cv-01557-0.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "e44ea4241133ed8c8cdf1dfe1d891f5e89d082d6da3f47bc39c2240ae0be33b0",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "6 n.7 (Dep. 57:25–58:5)",
+        "opinionQuote2Page": "6 n.7 (Decl. pp.3–4)",
+        "opinionRulingPage": "6–7 n.7"
+      },
+      "rulingMapping": "The court disregarded the declaration’s attempt to limit the earlier unequivocal no to the physical work environment.",
+      "labelMapping": "The court found the later claim of impeded concentration incompatible with the unqualified denial in context.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-shelcusky-boxes-versus-general-knowledge",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/new-jersey/supreme-court/2002/a-52-01-opn.html",
+      "verifiedSourceUrl": "https://law.justia.com/cases/new-jersey/supreme-court/2002/a-52-01-opn.html",
+      "fetchStatus": "fresh web opinion extraction",
+      "sourceHash": "e83ccf85a6aa6211e94273c7e2f7eccbbfda85cb94b54d8a24146e8508c46204",
+      "sourceHashType": "web tool returned extraction snapshot SHA-256; NOT source bytes",
+      "checkMode": "exact whitespace-only substring against freshly reopened public court-opinion text via web tool; no local PDF/HTML bytes available",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "HTML Part I, lines129–134 in fresh web extraction",
+        "opinionQuote2Page": "HTML Part I, lines173–174",
+        "opinionRulingPage": "HTML Part III, lines240–255"
+      },
+      "rulingMapping": "The majority held the statements could be reconciled as general knowledge versus ignorance of specific box contents and reversed summary judgment.",
+      "labelMapping": "The full later passage explains that inspection would have revealed unknown contents, compatible with general knowledge of flammability.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Local direct download failed; both quotations and pair-specific ruling freshly reopened through web tool. Hash identifies extraction snapshot only."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/new-jersey/supreme-court/2002/a-52-01-opn.html', '-o', '/private/tmp/shamb-review/fe50036d19c2.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-willard-compelled-resignation",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-txsd-3_18-cv-00233/pdf/USCOURTS-txsd-3_18-cv-00233-2.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-txsd-3_18-cv-00233/pdf/USCOURTS-txsd-3_18-cv-00233-2.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "617e340ed73d2498d1b5f5702f83fbd964893b07cb3fc7ede6b966259d2514bf",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "10 (Dep. Dkt.29-1 p.26)",
+        "opinionQuote2Page": "10 n.2 (Decl. Dkt.32-2 p.3)",
+        "opinionRulingPage": "10 n.2"
+      },
+      "rulingMapping": "The magistrate judge disregarded the declaration’s compelled-resignation assertions as directly contradicting the deposition.",
+      "labelMapping": "No need to quit and no reasonable alternative to termination are directly opposed in the court’s analysis.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-american-rena-drafting",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://ttabvue.uspto.gov/ttabvue/ttabvue-92058196-CAN-11.pdf",
+      "verifiedSourceUrl": "https://ttabvue.uspto.gov/ttabvue/ttabvue-92058196-CAN-11.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "5f07d4e6876c8597b75765c33e0808bcc786bb29019591aca21601b7f82798fa",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "opinion p.19, PDF p.24 (Dep. Oct.2013 p.281)",
+        "opinionQuote2Page": "opinion p.11, PDF p.16 (Decl. ¶29)",
+        "opinionRulingPage": "opinion p.11, PDF p.16"
+      },
+      "rulingMapping": "The court struck paragraph 29 as a sham directly contradicting Alice Lin’s deposition.",
+      "labelMapping": "Writing the declarations and denying drafting them are direct opposites.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-daniels-additional-speakers",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/texas/txedce/4:2015cv00702/163282/62/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-txed-4_15-cv-00702/pdf/USCOURTS-txed-4_15-cv-00702-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "4048fedf8b628c865864ebba115cacd2923d13c83cf44ff2e1b1ac06cb98a435",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "13 (Dep. 159:5–12 as printed)",
+        "opinionQuote2Page": "13 (Sworn Statement ¶6, p.2)",
+        "opinionRulingPage": "14–15"
+      },
+      "rulingMapping": "The court found no clear inconsistency because the later statement supplied details the witness previously said he could not recall.",
+      "labelMapping": "The earlier answer expressly reserves other incidents rather than excluding other speakers.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/texas/txedce/4:2015cv00702/163282/62/', '-o', '/private/tmp/shamb-review/ece1273abc63.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-daniels-hearing-epithet",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/texas/txedce/4:2015cv00702/163282/62/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-txed-4_15-cv-00702/pdf/USCOURTS-txed-4_15-cv-00702-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "4048fedf8b628c865864ebba115cacd2923d13c83cf44ff2e1b1ac06cb98a435",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "13 (Dep. 159:13–20 as printed)",
+        "opinionQuote2Page": "13 (Sworn Statement ¶31, p.8)",
+        "opinionRulingPage": "15–16"
+      },
+      "rulingMapping": "The court found an inconsistency but declined to strike because independent workplace records made it a credibility issue.",
+      "labelMapping": "Denying hearing the epithet and affirmatively claiming to have overheard it is direct contradiction despite admission of the affidavit.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Corrected terminal ellipsis in quote2 and transcript2 from three adjacent periods to source-spaced . . .; no wording changed.",
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/texas/txedce/4:2015cv00702/163282/62/', '-o', '/private/tmp/shamb-review/ece1273abc63.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-daniels-physical-limitations",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/texas/txedce/4:2015cv00702/163282/62/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-txed-4_15-cv-00702/pdf/USCOURTS-txed-4_15-cv-00702-1.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "4048fedf8b628c865864ebba115cacd2923d13c83cf44ff2e1b1ac06cb98a435",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded; manual exact comparison of explicitly continued source passage",
+      "automatedQuoteSubstring": {
+        "quote1": false,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": "Read deposition across printed pp.13–14, omitting ORDER page footer and case header between your and bending; no quotation words omitted.",
+      "pinpoints": {
+        "opinionQuote1Page": "13–14 (Dep. 111:11–112:11)",
+        "opinionQuote2Page": "13 (Sworn Statement ¶26, p.7)",
+        "opinionRulingPage": "14–15"
+      },
+      "rulingMapping": "The court found no clear inconsistency in the added descriptions of physical limitations.",
+      "labelMapping": "Repeated present inability to think of more examples is not a denial of additional limitations.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/texas/txedce/4:2015cv00702/163282/62/', '-o', '/private/tmp/shamb-review/ece1273abc63.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-cole-wet-substance",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/california/caedce/1:2019cv01384/362315/20/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-caed-1_19-cv-01384/pdf/USCOURTS-caed-1_19-cv-01384-0.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "ea9d5a6f28bd2246e1c29adf90d58f2178da6a622a1f5c1e64f666cc0715ceee",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "5 (Dep. Dkt.11-3 p.11 lines18–19)",
+        "opinionQuote2Page": "6 (Aff. Dkt.13-3 pp.2–3 ¶7)",
+        "opinionRulingPage": "6–8"
+      },
+      "rulingMapping": "The court found a clear direct contradiction and struck assertions implying she perceived a wet substance.",
+      "labelMapping": "The court expressly treated the later identified wet cause as contradicting repeated inability to identify the cause.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/california/caedce/1:2019cv01384/362315/20/', '-o', '/private/tmp/shamb-review/28709f292a85.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-mansoori-mental-health-treatment",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/illinois/ilndce/1:2017cv08846/347101/253/",
+      "verifiedSourceUrl": "https://law.justia.com/cases/federal/district-courts/illinois/ilndce/1:2017cv08846/347101/253/",
+      "fetchStatus": "fresh web opinion extraction",
+      "sourceHash": "06021d657a9d8e437586317ce670a460c7d9424b836f1716bf746fc9f2e19515",
+      "sourceHashType": "web tool returned extraction snapshot SHA-256; NOT source bytes",
+      "checkMode": "exact whitespace-only substring against freshly reopened public court-opinion text via web tool; no local PDF/HTML bytes available",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "10 n.4 (Dep. Dkt.231-5 pp.20–21)",
+        "opinionQuote2Page": "10 n.4 (Decl. Dkt.251 ¶8)",
+        "opinionRulingPage": "10 n.4 (fresh public court-text extraction lines115–118)"
+      },
+      "rulingMapping": "The court barred reliance on the declaration under the sham-affidavit rule because Mansoori previously denied seeking treatment for these conditions.",
+      "labelMapping": "Expressly denying seeking treatment for the conditions and later asserting repeated attempts for those conditions are directly opposed in the court’s analysis.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Local direct download failed; both quotations and pair-specific ruling freshly reopened through web tool. Hash identifies extraction snapshot only."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/illinois/ilndce/1:2017cv08846/347101/253/', '-o', '/private/tmp/shamb-review/f32d3ff4f203.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-ecology-voicemail-content",
+      "originalLabel": "FALSE_POSITIVE",
+      "finalLabel": "FALSE_POSITIVE",
+      "keep": true,
+      "originalSourceUrl": "https://www2.mdd.uscourts.gov/Opinions/Opinions/18-cv-1065%20EEOC%20v.%20Ecology%20Servs%20Inc.%20MSJ%20v.%20Final.pdf",
+      "verifiedSourceUrl": "https://www2.mdd.uscourts.gov/Opinions/Opinions/18-cv-1065%20EEOC%20v.%20Ecology%20Servs%20Inc.%20MSJ%20v.%20Final.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "3be1630a0e4edf2f7416aacefab7aa5d3202b582028c4376e13091bdc54ab12c",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "30 (Dep. ECF57-1 p.10)",
+        "opinionQuote2Page": "11 (Decl. ECF51-11 ¶9)",
+        "opinionRulingPage": "30"
+      },
+      "rulingMapping": "The court found no contradiction because defense counsel had not asked about the voicemail’s content and left discrepancies for the jury.",
+      "labelMapping": "The later statement specifies the content of a message already acknowledged rather than denying that message or reversing an earlier account.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-walter-right-to-sue-recollection",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": false,
+      "originalSourceUrl": "https://cases.justia.com/federal/district-courts/louisiana/lawdce/3%3A2015cv01938/147301/43/0.pdf",
+      "verifiedSourceUrl": null,
+      "fetchStatus": "unavailable; search excerpts only",
+      "sourceHash": null,
+      "sourceHashType": null,
+      "checkMode": "unverified: direct PDF and web open failed; search excerpts insufficient for both full quotations",
+      "automatedQuoteSubstring": {
+        "quote1": false,
+        "quote2": false
+      },
+      "quote1VerbatimVerified": false,
+      "quote2VerbatimVerified": false,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "7 (Dep. Apr.22,2016 pp.134–135, Record Docs17-4,19-5)",
+        "opinionQuote2Page": "7 (Aff. June8,2016, Record Doc23)",
+        "opinionRulingPage": "8–9"
+      },
+      "rulingMapping": "The court expressly found direct contradiction and struck both the unsigned affidavit and its signed replacement as sham affidavits.",
+      "labelMapping": "The earlier express recollection of receipt at home is reversed by the later disclaimer of any recollection, which the court treated as direct contradiction.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "DROP: could not freshly retrieve both complete quotations. Original URL curl/web failed; official govinfo alternate returned non-opinion content; search excerpts do not establish full exact text."
+      ],
+      "verdict": "DROP_UNVERIFIED",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://cases.justia.com/federal/district-courts/louisiana/lawdce/3%3A2015cv01938/147301/43/0.pdf', '-o', '/private/tmp/shamb-review/ade38f6cbbf3.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": false
+    },
+    {
+      "id": "hard-sham-b-bauer-rental-agreement",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://law.justia.com/cases/federal/district-courts/alabama/alndce/3:2015cv00348/154439/75/",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-alnd-3_15-cv-00348/pdf/USCOURTS-alnd-3_15-cv-00348-0.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "e83767236c35df0871aa2b720c4b13232a99cf17489bdab08ecd4c75e370e29a",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "5 (Deposition of Rosalee Stella Bauer pp.45–46, Doc.55-5)",
+        "opinionQuote2Page": "4 (Affidavit of Rose Bauer p.9, Doc.61-1)",
+        "opinionRulingPage": "6"
+      },
+      "rulingMapping": "The court struck the denial of renting as inherently contradictory and held that payment directly to the mortgage company did not change the rental agreement.",
+      "labelMapping": "Witness identified the homeowner as the lady she rents from, then denied renting the same Los Angeles house; the court expressly found inherent contradiction.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://law.justia.com/cases/federal/district-courts/alabama/alndce/3:2015cv00348/154439/75/', '-o', '/private/tmp/shamb-review/2f38a8da02fe.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-satterfield-repudiation-understanding",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://docs.justia.com/cases/federal/district-courts/tennessee/tnedce/3:2024cv00249/114825/63",
+      "verifiedSourceUrl": "https://docs.justia.com/cases/federal/district-courts/tennessee/tnedce/3:2024cv00249/114825/63",
+      "fetchStatus": "fresh web opinion extraction",
+      "sourceHash": "ff13ef2e9eb228447c46bded6ac7665305f12db689bc4a56e7c9c77d8f5c9afb",
+      "sourceHashType": "web tool returned extraction snapshot SHA-256; NOT source bytes",
+      "checkMode": "exact whitespace-only substring against freshly reopened public court-opinion text via web tool; no local PDF/HTML bytes available",
+      "automatedQuoteSubstring": {
+        "quote1": false,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": "Source footnote marker3 follows the first question; marker is a reference annotation, omitted from transcript quotation. All spoken words and punctuation compared exactly.",
+      "pinpoints": {
+        "opinionQuote1Page": "11 (Deposition Doc.42 pp.17–18)",
+        "opinionQuote2Page": "11 (Declaration Doc.51-1 p.3)",
+        "opinionRulingPage": "11–13"
+      },
+      "rulingMapping": "The court found the declaration clearly contradictory, rejected the asserted unexamined-topic justification, and excluded it.",
+      "labelMapping": "Affirmed understanding that the defendant would do nothing further under the agreement, then denied understanding the letter as a permanent refusal; the court found clear direct contradiction and rejected the timing distinction.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Local direct download failed; both quotations and pair-specific ruling freshly reopened through web tool. Hash identifies extraction snapshot only."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://docs.justia.com/cases/federal/district-courts/tennessee/tnedce/3:2024cv00249/114825/63', '-o', '/private/tmp/shamb-review/056b16effa95.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-david-tro-idea",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://caselaw.findlaw.com/court/us-dis-crt-d-haw/116187917.html",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-hid-1_20-cv-00002/pdf/USCOURTS-hid-1_20-cv-00002-4.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "a992f606a2c2d6ab1bb3056c74346c609a844272310d61c7cd8bb86ead82c9a7",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded; manual exact comparison of explicitly continued source passage",
+      "automatedQuoteSubstring": {
+        "quote1": false,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": "Read footnote24 continuation across printed pp.47–48, omitting continuation notice, page furniture and intervening main-body paragraph; continuation explicitly linked by the opinion.",
+      "pinpoints": {
+        "opinionQuote1Page": "47–48 n.24 (Dep. ECF395-2 PageID.3814)",
+        "opinionQuote2Page": "47 n.24 (Decl. ECF378-1 PageID.3602)",
+        "opinionRulingPage": "47–48 n.24"
+      },
+      "rulingMapping": "The court struck the statement as a sham because it flatly contradicted the deposition and no explanation was offered.",
+      "labelMapping": "Witness claimed the idea to add B.D. to the TRO was his own, then attributed the suggestion to Kaulukukui and denied knowing it was an alternative; the court expressly found a flat contradiction.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [
+        "Replaced inaccessible URL with freshly retrieved govinfo PDF of the same court, docket, document and decision."
+      ],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "failed",
+        "method": "curl with system trust",
+        "error": "Command '['curl', '-L', '--fail', '--max-time', '50', '-sS', 'https://caselaw.findlaw.com/court/us-dis-crt-d-haw/116187917.html', '-o', '/private/tmp/shamb-review/e0f0fca9e209.download', '-w', '%{url_effective}']' returned non-zero exit status 56."
+      },
+      "rulingVerified": true
+    },
+    {
+      "id": "hard-sham-b-smith-facebook-conversation",
+      "originalLabel": "DIRECT",
+      "finalLabel": "DIRECT",
+      "keep": true,
+      "originalSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mdd-1_17-cv-03014/pdf/USCOURTS-mdd-1_17-cv-03014-0.pdf",
+      "verifiedSourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mdd-1_17-cv-03014/pdf/USCOURTS-mdd-1_17-cv-03014-0.pdf",
+      "fetchStatus": "fresh PDF bytes",
+      "sourceHash": "5bf49a9861d7a54921b4f864e892051e28b44a47dfdb74ca1b0f488365a13ab9",
+      "sourceHashType": "downloaded PDF bytes SHA-256",
+      "checkMode": "exact whitespace-only substring against fresh PDF text, with headers/isolated line numbers excluded",
+      "automatedQuoteSubstring": {
+        "quote1": true,
+        "quote2": true
+      },
+      "quote1VerbatimVerified": true,
+      "quote2VerbatimVerified": true,
+      "documentedLayoutHandling": null,
+      "pinpoints": {
+        "opinionQuote1Page": "18 (June28,2018 deposition, ECF43-1 pp.4:18–5:3)",
+        "opinionQuote2Page": "18 (Oct.1,2018 declaration, ECF40-1 ¶20)",
+        "opinionRulingPage": "18"
+      },
+      "rulingMapping": "The court found the unexplained conflict subject to the sham-affidavit rule and disregarded the declaration wherever it conflicted with the earlier deposition.",
+      "labelMapping": "Deposition describes a conversation with Scher about the Facebook post at issue; declaration denies any conversation about anything related to the case, which the court expressly found inconsistent.",
+      "transcriptReview": "No judicial rationale inserted into transcripts; original Q/A preserved where supplied; neutral presentation questions remain explicitly marked reconstructed. No contextual factual question invented.",
+      "issues": [],
+      "verdict": "KEEP_DRAFT",
+      "originalUrlFetch": {
+        "status": "fetched",
+        "method": "curl with system trust",
+        "error": null
+      },
+      "rulingVerified": true
+    }
+  ]
+}

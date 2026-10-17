@@ -1,0 +1,685 @@
+{
+  "reviewedAtUtc": "2026-10-17T05:32:50.516306+00:00",
+  "scope": "All 13 originally assembled hard-sham-a-* cases only; two previously excluded research rows untouched.",
+  "operation": "independent source quote and judicial-label review; no app execution or model API calls",
+  "counts": {
+    "originallyIncluded": 13,
+    "reviewed": 13,
+    "kept": 13,
+    "dropped": 0,
+    "auditNotesCorrected": 1,
+    "quoteOrLabelCorrections": 0,
+    "distinctSourcesReopened": 7
+  },
+  "findings": [
+    {
+      "id": "hard-sham-a-moody-training",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            18
+          ],
+          "declaredOpinionPages": [
+            18
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            18,
+            19
+          ],
+          "declaredOpinionPages": [
+            18
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          18
+        ],
+        "declaredOpinionPages": [
+          18
+        ],
+        "contextReviewed": true
+      },
+      "label": "DIRECT",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court expressly finds the same budget-training statements directly contradictory; DIRECT matches the pair-specific holding.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-moody-intention-receipt",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            14,
+            15
+          ],
+          "declaredOpinionPages": [
+            15
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            15
+          ],
+          "declaredOpinionPages": [
+            15
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          9,
+          16
+        ],
+        "declaredOpinionPages": [
+          16
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court states both can be simultaneously true: intent to inform versus knowledge of actual receipt; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-moody-knowledge-opinion",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            16
+          ],
+          "declaredOpinionPages": [
+            16
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            16
+          ],
+          "declaredOpinionPages": [
+            16
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          17
+        ],
+        "declaredOpinionPages": [
+          17
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court expressly distinguishes unsupported opinion from ignorance of a fact and rejects direct contradiction; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-moody-recollection-omission",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "35ce4def585618a2ce8495cde0af457e1e8b0400eef7c09ed891e908c03943a4",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            10
+          ],
+          "declaredOpinionPages": [
+            10
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            9
+          ],
+          "declaredOpinionPages": [
+            9
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          11
+        ],
+        "declaredOpinionPages": [
+          11
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court treats the later statement as supplementation of qualified recollection, including possible temporary duties or imprecise plural usage; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-prater-days-hours",
+      "keep": true,
+      "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            44
+          ],
+          "declaredOpinionPages": [
+            44
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            44
+          ],
+          "declaredOpinionPages": [
+            44
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          46
+        ],
+        "declaredOpinionPages": [
+          46
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court reads original schedule testimony as days rather than hours and expressly finds no contradiction; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-prater-offhand-specific",
+      "keep": true,
+      "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            47
+          ],
+          "declaredOpinionPages": [
+            47
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            46
+          ],
+          "declaredOpinionPages": [
+            46
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          47
+        ],
+        "declaredOpinionPages": [
+          47
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court distinguishes qualified offhand recollection and day-specific questions from approximate undated occasions; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-prater-knowledge-records",
+      "keep": true,
+      "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            48
+          ],
+          "declaredOpinionPages": [
+            48
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            46
+          ],
+          "declaredOpinionPages": [
+            46
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          49
+        ],
+        "declaredOpinionPages": [
+          49
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court distinguishes personal knowledge of clocking from observation of produced records and rejects contradiction; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-obrien-required-instructed",
+      "keep": true,
+      "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "a168d553b419b6388b9b776a0c7d4d4e1db8d845268a0f22e332af4b388d3acd",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            34
+          ],
+          "declaredOpinionPages": [
+            34
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            36
+          ],
+          "declaredOpinionPages": [
+            36
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          38
+        ],
+        "declaredOpinionPages": [
+          38
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court expressly adopts a limited compatible reading of required reporting time versus instruction by identified managers; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-west-pay-raises",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnmd-3_15-cv-00437/pdf/USCOURTS-tnmd-3_15-cv-00437-0.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "1c7b0e55adeafbc30604332390ed196c0dd13c107877af1ad30f38f74a9f488e",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            6
+          ],
+          "declaredOpinionPages": [
+            6
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            6
+          ],
+          "declaredOpinionPages": [
+            6
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          6
+        ],
+        "declaredOpinionPages": [
+          6
+        ],
+        "contextReviewed": true
+      },
+      "label": "DIRECT",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court expressly states the declaration directly contradicts prior pay-raise recommendation testimony; DIRECT matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-kabba-message-conversation",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnmd-3_20-cv-00738/pdf/USCOURTS-tnmd-3_20-cv-00738-1.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "38a1d6ee451558c4998377854db337c128ec795b9514c8f57b13b2274a255343",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            3
+          ],
+          "declaredOpinionPages": [
+            3
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            2
+          ],
+          "declaredOpinionPages": [
+            2
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          3
+        ],
+        "declaredOpinionPages": [
+          3
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court expressly finds message-based complaint compatible with inability to have an actual conversation; FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [
+        "Removed contradictory audit-note claim that no reconstructed first question was added; question is already explicitly marked reconstructed. No testimony or label change."
+      ],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-maisha-health-insurance",
+      "keep": true,
+      "sourceUrl": "https://www.ncmd.uscourts.gov/sites/ncmd/files/opinions/12cv371moo_0.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "22438871a441ff853452bd421c62e4e8552faeefabcc7fbd10332e910b4ac88a",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            4
+          ],
+          "declaredOpinionPages": [
+            4
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            4
+          ],
+          "declaredOpinionPages": [
+            4
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          4
+        ],
+        "declaredOpinionPages": [
+          4
+        ],
+        "contextReviewed": true
+      },
+      "label": "DEBATABLE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court groups the insurance pair with attempts to bolster or contradict and excludes relevant paragraph 91; it does not classify this pair as direct or inferential. DEBATABLE retains that uncertainty.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-goldenson-decision-reassurance",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-med-2_10-cv-00440/pdf/USCOURTS-med-2_10-cv-00440-9.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "4f6885a8d9058aa8555b38a6a9cecb2797589ebf2f8b664326154847a2806c53",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            125
+          ],
+          "declaredOpinionPages": [
+            125
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            125
+          ],
+          "declaredOpinionPages": [
+            125
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          125
+        ],
+        "declaredOpinionPages": [
+          125
+        ],
+        "contextReviewed": true
+      },
+      "label": "FALSE_POSITIVE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court rejects the sham objection and permits clarification of incomplete testimony; the independent withdrawal decision is compatible with earlier reassurance. FALSE_POSITIVE matches.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    },
+    {
+      "id": "hard-sham-a-dins-additional-incident",
+      "keep": true,
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-wiwd-3_24-cv-00411/pdf/USCOURTS-wiwd-3_24-cv-00411-0.pdf",
+      "fetchStatus": {
+        "httpStatus": 200,
+        "networkReopened": true,
+        "transport": "curl with default TLS certificate verification",
+        "initialPythonFetch": "local certificate-chain verification failed; curl succeeded with normal TLS verification"
+      },
+      "sourceSha256": "90e3cde23c18100496edd687f93ef9f1dc6150157cc6e6f403dc01df6500727f",
+      "exactCheckMode": "whitespace-only collapse, no word/punctuation normalization",
+      "quoteChecks": {
+        "quote1": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            4
+          ],
+          "declaredOpinionPages": [
+            4
+          ]
+        },
+        "quote2": {
+          "verbatim": true,
+          "mode": "exact contiguous substring after whitespace-only collapse; no word or punctuation changes",
+          "pdfPages": [
+            4
+          ],
+          "declaredOpinionPages": [
+            4
+          ]
+        }
+      },
+      "rulingCheck": {
+        "verbatim": true,
+        "pdfPages": [
+          5
+        ],
+        "declaredOpinionPages": [
+          5
+        ],
+        "contextReviewed": true
+      },
+      "label": "DEBATABLE",
+      "rulingMappingVerdict": "supported",
+      "reason": "Court excludes unexplained additional incidents after exhaustive questioning but does not expressly classify the quoted qualified-recollection pair as direct or inferential. DEBATABLE retains that uncertainty.",
+      "detectorFormattingVerdict": "only source-role marker/whitespace canonicalization; reconstructed questions marked and neutral; no court ruling in detector inputs",
+      "corrections": [],
+      "humanApproval": false
+    }
+  ],
+  "approval": "Research drafts only. No human approval inferred or recorded."
+}

@@ -1,0 +1,625 @@
+[
+  {
+    "id": "famous-clinton-definition",
+    "source": "William J. Clinton; Jones deposition and federal grand jury testimony (1998), quoted in H. Doc. 105-310",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "The deposition uses a specific definition; wrong conduct alone does not logically identify a defined sexual act. OIC accusation is not a judicial determination of this pair.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Did you have sexual relations with Monica Lewinsky under the deposition definition?\nA: I have never had sexual relations with Monica \n        Lewinsky. I've never had an affair with \n        her.",
+    "transcript2": "Q: Describe your conduct when alone with Ms. Lewinsky.\nA: When I was alone with Ms. Lewinsky on certain \n        occasions in early 1996 and once in early 1997, I \n        engaged in conduct that was wrong.",
+    "quote1": "I have never had sexual relations with Monica \n        Lewinsky. I've never had an affair with \n        her.",
+    "quote2": "When I was alone with Ms. Lewinsky on certain \n        occasions in early 1996 and once in early 1997, I \n        engaged in conduct that was wrong.",
+    "notes": "Definition-dependent conflict candidate; the later statement is not a full act-by-act admission. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton, Jones v. Clinton, E.D. Ark., January 17, 1998 deposition p.78; report Grounds I.A.1, footnote 11",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          144
+        ],
+        "extractedTextOffsetCodePoints": [
+          562664,
+          562772
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton, federal grand jury, August 17, 1998 pp.9-10; report Grounds II.A.3, footnote 144",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          164
+        ],
+        "extractedTextOffsetCodePoints": [
+          633268,
+          633416
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "potential conflict",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-clinton-alone",
+    "source": "William J. Clinton; Jones deposition and federal grand jury testimony (1998), quoted in H. Doc. 105-310",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "Earlier lack of specific recollection and later affirmative recollection may conflict pragmatically, but changed recall is not a logical denial. No pair-specific judicial finding used.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Had you and Ms. Lewinsky ever been alone in a White House room?\nA: I think I testified to that earlier. I think \n        that there is a, it is--I have no specific \n        recollection, but it seems to me that she was on duty \n        on a couple of occasions working for the legislative \n        affairs office and brought me some things to sign, \n        something on the weekend. That's--I have a general \n        memory of that.",
+    "transcript2": "Q: Describe occasions alone with Ms. Lewinsky.\nA: When I was alone with Ms. Lewinsky on certain \n        occasions in early 1996 and once in early 1997, I \n        engaged in conduct that was wrong.",
+    "quote1": "I think I testified to that earlier. I think \n        that there is a, it is--I have no specific \n        recollection, but it seems to me that she was on duty \n        on a couple of occasions working for the legislative \n        affairs office and brought me some things to sign, \n        something on the weekend. That's--I have a general \n        memory of that.",
+    "quote2": "When I was alone with Ms. Lewinsky on certain \n        occasions in early 1996 and once in early 1997, I \n        engaged in conduct that was wrong.",
+    "notes": "Keep uncertainty and the general memory qualification intact. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton January 17, 1998 deposition p.59; report Grounds II.A.1, footnote 124",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          163
+        ],
+        "extractedTextOffsetCodePoints": [
+          628401,
+          628767
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton August 17, 1998 grand jury pp.9-10; report Grounds II.A.3, footnote 144",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          164
+        ],
+        "extractedTextOffsetCodePoints": [
+          633268,
+          633416
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "potential conflict",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-clinton-gifts",
+    "source": "William J. Clinton; Jones deposition and federal grand jury testimony (1998), quoted in H. Doc. 105-310",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "A later explanation of gift giving contrasts with earlier failed recall, but neither establishes a logically contradictory proposition without memory and scope assumptions.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Had you given gifts to Monica Lewinsky?\nA: I don't recall. Do you know what they were?",
+    "transcript2": "Q: Why did you give gifts to Ms. Lewinsky?\nA: it was a \nright thing to do to give her gifts back.",
+    "quote1": "I don't recall. Do you know what they were?",
+    "quote2": "it was a \nright thing to do to give her gifts back.",
+    "notes": "Short response excerpts; the first was prompted without naming gifts; later deposition answers already allowed gifts. Full deposition is required before approval. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton, Jones v. Clinton, E.D. Ark., January 17, 1998 deposition p.75; report Grounds II.B.1, footnote 152",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          166
+        ],
+        "extractedTextOffsetCodePoints": [
+          639101,
+          639144
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton August 17, 1998 grand jury p.47; H. Doc. 105-310 Narrative F (Gifts), footnote 83; same statement also cited in Grounds II.B.5, footnote 182.",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          33,
+          169
+        ],
+        "extractedTextOffsetCodePoints": [
+          123382,
+          123433
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "potential conflict",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-clinton-testimony-discussion",
+    "source": "William J. Clinton; Jones deposition and federal grand jury testimony (1998), quoted in H. Doc. 105-310",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "The earlier answer expressly allows a discussion. Later admission may add detail rather than negate the earlier qualified account. OIC characterization remains separate.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Had you discussed with Ms. Lewinsky the possibility she might testify in the Jones lawsuit?\nA: I'm not sure, and let me tell you why I'm not \n        sure. It seems to me the, the, the--I want to be as \n        accurate as I can here. Seems to me the last time she \n        was there to see Betty before Christmas we were joking \n        about how you-all [Ms. Jones's attorneys], with the \n        help of the Rutherford Institute, were going to call \n        every woman I'd ever talked to * * * and ask them that, \n        and so I said you [Ms. Lewinsky] would qualify, or \n        something like that. I don't, I don't think we ever had \n        more of a conversation than that about it, but I might \n        have mentioned something to her about it, because when \n        I saw how long the witness list was, or I heard about \n        it, before I saw, but actually by the time I saw it her \n        name was on it, but I think that was after all this had \n        happened. I might have said something like that, so I \n        don't want to say for sure I didn't, because I might \n        have said something like that.",
+    "transcript2": "Q: Did you discuss testimony with Ms. Lewinsky?\nA: talking \nwith Ms. Lewinsky about her testimony, or about the prospect \nthat she might have to give testimony. And she, she talked to \nme about that.",
+    "quote1": "I'm not sure, and let me tell you why I'm not \n        sure. It seems to me the, the, the--I want to be as \n        accurate as I can here. Seems to me the last time she \n        was there to see Betty before Christmas we were joking \n        about how you-all [Ms. Jones's attorneys], with the \n        help of the Rutherford Institute, were going to call \n        every woman I'd ever talked to * * * and ask them that, \n        and so I said you [Ms. Lewinsky] would qualify, or \n        something like that. I don't, I don't think we ever had \n        more of a conversation than that about it, but I might \n        have mentioned something to her about it, because when \n        I saw how long the witness list was, or I heard about \n        it, before I saw, but actually by the time I saw it her \n        name was on it, but I think that was after all this had \n        happened. I might have said something like that, so I \n        don't want to say for sure I didn't, because I might \n        have said something like that.",
+    "quote2": "talking \nwith Ms. Lewinsky about her testimony, or about the prospect \nthat she might have to give testimony. And she, she talked to \nme about that.",
+    "notes": "Preserves the full qualified answer as reproduced; report inserted clarifications and asterisk omissions are retained literally. These are already editorially excerpted testimony. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton January 17, 1998 deposition pp.70-71; report Grounds III.A.1, footnote 194",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          171
+        ],
+        "extractedTextOffsetCodePoints": [
+          658991,
+          660023
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton, federal grand jury, August 17, 1998 p.33; report Narrative XII.E, footnote 867",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          112
+        ],
+        "extractedTextOffsetCodePoints": [
+          439297,
+          439445
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Only the first 45 alphanumeric characters match the stated PDF page; complete quote independently exact in official HTML, so PDF is a location aid only.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "potential conflict",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-clinton-subpoena",
+    "source": "William J. Clinton; Jones deposition and federal grand jury testimony (1998), quoted in H. Doc. 105-310",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "The explicit lack-of-knowledge clause contrasts with later recalled prior knowledge; recipient-of-information and temporal scope must be resolved. No pair-specific judicial finding applied.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Did Ms. Lewinsky tell you she had been served with a subpoena in the Jones case?\nA: No. I don't know if she had been.",
+    "transcript2": "Q: What did you recall knowing at the December 28, 1997 conversation?\nA: my recollection is I knew by then, of course, that she \nhad gotten a subpoena. And I knew that she was, therefore * * * \nslated to testify.",
+    "quote1": "No. I don't know if she had been.",
+    "quote2": "my recollection is I knew by then, of course, that she \nhad gotten a subpoena. And I knew that she was, therefore * * * \nslated to testify.",
+    "notes": "The first question asks whether she told him; this differs from whether anyone informed him. Report omission marks retained. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton January 17, 1998 deposition p.68; report Grounds III.B.1, footnote 209",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          174
+        ],
+        "extractedTextOffsetCodePoints": [
+          669628,
+          669661
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+        "citation": "Clinton August 17, 1998 grand jury p.36; report Grounds III.B.1, footnote 211",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/pdf/CDOC-105hdoc310.pdf",
+        "publicationPdfPages1Based": [
+          174
+        ],
+        "extractedTextOffsetCodePoints": [
+          670403,
+          670542
+        ],
+        "extractedTextSha256": "3b0e622bcdf617e5a78e2bf1598055984a408a0bc0ac0a68020b10c43a3b71c1",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "f36e225ff3cf98077ab9708e11d04b06eb6b09a592a8592b8e5189d30022f63c",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "potential conflict",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "William J. Clinton",
+        "testimony1SourceRole": "OIC report quotes Clinton deposition testimony with original testimony citation.",
+        "testimony2SourceRole": "OIC report quotes Clinton grand jury testimony with original testimony citation."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-clemens-hgh-discussion",
+    "source": "U.S. House Oversight hearing, February 13, 2008, serial 110-63; quoted deposition/affidavit and hearing answers",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "Broad ever denial versus later acknowledged discussion is a conflict candidate; witness offers a before-wife temporal qualification. Congressional assertions and indictment are allegations, not truth findings.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Had you ever spoken with Brian McNamee about human growth hormone?\nA: I have \nnot.",
+    "transcript2": "Q: What discussions did you have with Brian McNamee about human growth hormone?\nA: Very heated conversation about it. And again, \nprior to that, we had not had discussions about HGH.",
+    "quote1": "I have \nnot.",
+    "quote2": "Very heated conversation about it. And again, \nprior to that, we had not had discussions about HGH.",
+    "notes": "First answer is reproduced by examiner in official hearing, not independently checked against the original deposition. It is not a new witness utterance at the hearing. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted. Source-role clarification: transcript1 reproduces Clemens testimony as read aloud by Rep. John Tierney at the hearing; it is attributed prior testimony, not a new direct Clemens answer at that point. Transcript2 is Clemens speaking at the hearing.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+        "citation": "Roger Clemens February 5, 2008 House deposition p.66, answer read aloud by Rep. Tierney at February 13 hearing",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf",
+        "publicationPdfPages1Based": [
+          101
+        ],
+        "extractedTextOffsetCodePoints": [
+          79023,
+          79035
+        ],
+        "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Exact quote plus surrounding 200-character HTML context matched to publication PDF page 101 after removing non-alphanumeric characters; other generic-answer matches excluded.",
+        "sourceDocumentSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+        "citation": "Roger Clemens February 13, 2008 House Oversight hearing, Tierney examination",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf",
+        "publicationPdfPages1Based": [
+          102
+        ],
+        "extractedTextOffsetCodePoints": [
+          84403,
+          84502
+        ],
+        "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "potential conflict",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "Roger Clemens",
+        "testimony1SourceRole": "Rep. John Tierney reads a passage attributed to Clemens in an earlier deposition; source is hearing readback, not independently fetched deposition.",
+        "testimony2SourceRole": "Clemens answers during hearing."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-clemens-research",
+    "source": "U.S. House Oversight hearing, February 13, 2008, serial 110-63; quoted deposition/affidavit and hearing answers",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "Learning through television or recent events is compatible with never conducting research; the later answer remains qualified. Plausibility criticism is not proof of contradiction.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Had you done research about human growth hormone?\nA: no, I haven't. I've never researched it. I couldn't \ntell you the first thing about it.",
+    "transcript2": "Q: What steps did you take to learn about HGH after your wife received an injection?\nA: I didn't take a lot of steps, Mr. Congressman. \nTo be--in the last 2 months since this has been going on, I've \nlearned more about HGH than I--than I ever thought. I still \ndon't know enough about it. I--you know I've heard--I've seen \nthings on TV that these guys talk about how it helps them, \nactors and different things of that nature. I don't know \nanything about it.",
+    "quote1": "no, I haven't. I've never researched it. I couldn't \ntell you the first thing about it.",
+    "quote2": "I didn't take a lot of steps, Mr. Congressman. \nTo be--in the last 2 months since this has been going on, I've \nlearned more about HGH than I--than I ever thought. I still \ndon't know enough about it. I--you know I've heard--I've seen \nthings on TV that these guys talk about how it helps them, \nactors and different things of that nature. I don't know \nanything about it.",
+    "notes": "First excerpt is an examiner readback. Knowledge, research, and incidental exposure are different predicates. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted. Source-role clarification: transcript1 reproduces Clemens testimony as read aloud by Rep. John Tierney at the hearing; it is attributed prior testimony, not a new direct Clemens answer at that point. Transcript2 is Clemens speaking at the hearing.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+        "citation": "Clemens February 5, 2008 House deposition p.67, quoted by Tierney at February 13 hearing",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf",
+        "publicationPdfPages1Based": [
+          103
+        ],
+        "extractedTextOffsetCodePoints": [
+          85879,
+          85966
+        ],
+        "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+        "citation": "Clemens February 13, 2008 House Oversight hearing, Tierney examination",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf",
+        "publicationPdfPages1Based": [
+          103
+        ],
+        "extractedTextOffsetCodePoints": [
+          87622,
+          87994
+        ],
+        "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "possible compatible control",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "Roger Clemens",
+        "testimony1SourceRole": "Rep. John Tierney reads a passage attributed to Clemens in an earlier deposition; source is hearing readback, not independently fetched deposition.",
+        "testimony2SourceRole": "Clemens answers during hearing."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-clemens-wife-consistency",
+    "source": "U.S. House Oversight hearing, February 13, 2008, serial 110-63; quoted deposition/affidavit and hearing answers",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "This is an apparent consistency control: the witness confirms his earlier account. The confirmation does not establish factual truth of the account.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: What did you know about the HGH injection your wife received?\nA: I was not \npresent at the time. I found out later in the evening, and the \nreason I had found out is she was telling me that something was \ngoing wrong with her circulation and this concerned me.",
+    "transcript2": "Q: Is the account just read back about your wife and your response correct?\nA: That is correct, sir, yes.",
+    "quote1": "I was not \npresent at the time. I found out later in the evening, and the \nreason I had found out is she was telling me that something was \ngoing wrong with her circulation and this concerned me.",
+    "quote2": "That is correct, sir, yes.",
+    "notes": "Second answer depends on the immediately preceding readback. Review should keep that prompt; broad reconstructed wording is deliberately identified as such. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted. Source-role clarification: transcript1 reproduces Clemens testimony as read aloud by Rep. John Tierney at the hearing; it is attributed prior testimony, not a new direct Clemens answer at that point. Transcript2 is Clemens speaking at the hearing.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+        "citation": "Clemens February 5, 2008 House deposition p.174, quoted by Tierney at February 13 hearing",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf",
+        "publicationPdfPages1Based": [
+          101
+        ],
+        "extractedTextOffsetCodePoints": [
+          80721,
+          80916
+        ],
+        "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+        "citation": "Clemens February 13, 2008 House Oversight hearing, response immediately after Tierney readback of deposition pp.174 and 176",
+        "pdfUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/pdf/CHRG-110hhrg43333.pdf",
+        "publicationPdfPages1Based": [
+          101
+        ],
+        "extractedTextOffsetCodePoints": [
+          81316,
+          81342
+        ],
+        "extractedTextSha256": "257b9ec2241cd662a1753798878dff63b7974143da83312e2154632962e97592",
+        "method": "Literal contiguous substring of HTML tag-stripped, entity-decoded text; whitespace retained.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "13c0462ae7f39ab9bbf00938e54136a5811ad7da473fdd13cf270f8aba864ed8",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "possible compatible control",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "Roger Clemens",
+        "testimony1SourceRole": "Rep. John Tierney reads a passage attributed to Clemens in an earlier deposition; source is hearing readback, not independently fetched deposition.",
+        "testimony2SourceRole": "Clemens answers during hearing."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  },
+  {
+    "id": "famous-bonds-evasion-followup",
+    "source": "United States v. Bonds, No. 11-10669, Ninth Circuit en banc opinion, April 22, 2015; quoting 2003 grand jury testimony",
+    "sourceUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+    "license": "Public federal government/court publication. No item-specific open license asserted for third-party witness testimony; short attributed public-record excerpts retained for research/review.",
+    "label": "DEBATABLE",
+    "labelBasis": "Nonresponsive statement followed by direct denial does not itself supply incompatible assertions. Reversal concerns insufficient materiality of Statement C, not a judicial finding that all steroid denials were true.",
+    "debatable": true,
+    "split": null,
+    "transcript1": "Q: Did Greg Anderson ever give you anything requiring a syringe to inject yourself?\nA: I’ve only had one doctor touch me.  And\nthat’s my only personal doctor.  Greg, like\nI said, we don’t get into each others’\npersonal lives.  We’re friends, but I\ndon’t—we don’t sit around and talk\nbaseball, because he knows I don’t\nwant— don’t come to my house talking\nbaseball.  If you want to come to my\nhouse and talk about fishing, some other\nstuff, we’ll be good friends.  You come\naround talking about baseball, you go on. \nI don’t talk about his business.  You know\nwhat I mean?\nQ: Right.\nA: That’s what keeps our friendship.  You\nknow, I am sorry, but that—you know,\nthat—I was a celebrity child, not just in\nbaseball by my own instincts.  I became a\ncelebrity child with a famous father.  I just\ndon’t get into other people’s business\nbecause of my father’s situation, you see.",
+    "transcript2": "Q: Did you ever inject yourself with anything Greg Anderson gave you?\nA: I’m not that talented, no.",
+    "quote1": "I’ve only had one doctor touch me.  And\nthat’s my only personal doctor.  Greg, like\nI said, we don’t get into each others’\npersonal lives.  We’re friends, but I\ndon’t—we don’t sit around and talk\nbaseball, because he knows I don’t\nwant— don’t come to my house talking\nbaseball.  If you want to come to my\nhouse and talk about fishing, some other\nstuff, we’ll be good friends.  You come\naround talking about baseball, you go on. \nI don’t talk about his business.  You know\nwhat I mean?\nQ: Right.\nA: That’s what keeps our friendship.  You\nknow, I am sorry, but that—you know,\nthat—I was a celebrity child, not just in\nbaseball by my own instincts.  I became a\ncelebrity child with a famous father.  I just\ndon’t get into other people’s business\nbecause of my father’s situation, you see.",
+    "quote2": "I’m not that talented, no.",
+    "notes": "First excerpt includes an intervening Q: Right. and A: marker exactly as the opinion reproduces it. Preserve these role labels in detector input rather than nesting the entire passage as a single A. Second question is reconstructed because appellate opinion only gives an edited fragment. Both Q prompts are neutral reconstructed context, not verbatim questions. A text alone is verbatim from the cited publication; original speaker labels are omitted. SAME_SESSION: two answers in the same 2003 grand-jury examination, not separate proceedings. The 2015 opinion reproduces the earlier testimony; it is not a second testimony event.",
+    "provenance": {
+      "testimony1": {
+        "url": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+        "citation": "Barry Bonds 2003 federal grand jury testimony quoted in United States v. Bonds, Ninth Circuit en banc, April 22, 2015 opinion p.6",
+        "pdfUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+        "publicationPdfPages1Based": [
+          6
+        ],
+        "extractedTextOffsetCodePoints": [
+          6379,
+          7164
+        ],
+        "extractedTextSha256": "c386c3b6e7fcc00e4df8add240da5e05e396bcf546535c0a58179ac112847731",
+        "method": "Literal contiguous substring of PyMuPDF get_text page extraction joined with form-feed.",
+        "pageMatchMethod": "Complete quote matched to opinion PDF page 6 ignoring punctuation/whitespace; partial repeated prefixes on later pages excluded.",
+        "sourceDocumentSha256": "c77a27f7291ab92bfe8950e2ac151604267f5c7cd37c4c9aca68baac109b0eaa",
+        "independentlyVerifiedExactQuote": true
+      },
+      "testimony2": {
+        "url": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+        "citation": "Same grand jury testimony, follow-up answer quoted in 2015 opinion p.7",
+        "pdfUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+        "publicationPdfPages1Based": [
+          7
+        ],
+        "extractedTextOffsetCodePoints": [
+          7502,
+          7528
+        ],
+        "extractedTextSha256": "c386c3b6e7fcc00e4df8add240da5e05e396bcf546535c0a58179ac112847731",
+        "method": "Literal contiguous substring of PyMuPDF get_text page extraction joined with form-feed.",
+        "pageMatchMethod": "Complete quote matched after removing non-alphanumeric characters; physical publication PDF pages, not original testimony pagination.",
+        "sourceDocumentSha256": "c77a27f7291ab92bfe8950e2ac151604267f5c7cd37c4c9aca68baac109b0eaa",
+        "independentlyVerifiedExactQuote": true
+      },
+      "candidateIntent": "nonresponsive/compatible control",
+      "status": "research draft; unapproved",
+      "scope": "Not a judicial contradiction finding or calibrated score; no app execution.",
+      "relationship": "SAME_SESSION",
+      "attributionReview": {
+        "sameWitness": true,
+        "witness": "Barry Bonds",
+        "testimony1SourceRole": "Court opinion reproduces Bonds grand jury testimony.",
+        "testimony2SourceRole": "Same grand jury, follow-up answer reproduced in court opinion."
+      },
+      "independentVerification": {
+        "keep": true,
+        "reason": "Both complete statements verified and attributed to the same witness; interpretation remains DEBATABLE. Corrected metadata where a citation or generic PDF prefix selected an overbroad location.",
+        "checkedAtUtc": "2026-10-17T05:34:30.501302+00:00",
+        "auditFile": "tests/hard-cases/verification/other.json",
+        "quote1Exact": true,
+        "quote2Exact": true,
+        "sourceClassification": "DEBATABLE research draft; no adjudicated app type"
+      }
+    }
+  }
+]
