@@ -242,38 +242,38 @@
   {
     "id": "hard-sham-b-american-rena-drafting",
     "split": "tuning",
-    "transcript1": "Q: What is your testimony?\nA: I wrote them down in Chinese. And then essentially my sister translated them through Google or some sort of Hong Kong translation software. And then after they were translated, then my sister [Annie] typed them up.",
+    "transcript1": "Q: [Question reconstructed from the opinion, p.19: the deposition question concerned the three declarations, including the Win declaration.] What is your testimony about how the three declarations were prepared?\nA: I wrote them down in Chinese. And then essentially my sister translated them through Google or some sort of Hong Kong translation software. And then after they were translated, then my sister [Annie] typed them up.",
     "transcript2": "Q: What is your testimony?\nA: I did not draft the declarations themselves, do not know how the signatures were obtained, and did not know whether they were falsified."
   },
   {
     "id": "hard-sham-b-bauer-rental-agreement",
     "split": "tuning",
     "transcript1": "Q. Now, based on the discovery responses that you’ve previously given us and filed in the case, it is my understanding that you are currently residing at this [redacted] address?\nA. Yes.\nQ. And, again, that’s [redacted] in Los Angeles?\nA. Yes.\nQ. Now, who is Barbara S. Brody?\nA. She is the elderly lady that I rent from.\nQ. How long have you lived at [redacted] Avenue?\nA. I moved from [redacted] to there [during] October of 2013.",
-    "transcript2": "Q: What is your testimony?\nA: did not rent the Los Angeles house. Rather, I assisted my friend, the Los Angeles homeowner, in getting out of foreclosure, in exchange for accommodating myself and my dogs. The cost was approximately the same."
+    "transcript2": "Q: [Question reconstructed from the opinion, p.4: the statement responds to the assertion that the plaintiff lived in a rental house in Los Angeles from October 2013 to the present.] Did you live in a rental house in Los Angeles from October 2013 to the present?\nA: did not rent the Los Angeles house. Rather, I assisted my friend, the Los Angeles homeowner, in getting out of foreclosure, in exchange for accommodating myself and my dogs. The cost was approximately the same."
   },
   {
     "id": "hard-sham-b-cole-wet-substance",
     "split": "heldout",
     "transcript1": "Q. Was it water that you slipped on?\nA. It’s unknown to me what I slipped on.",
-    "transcript2": "Q: What is your testimony?\nA: she felt herself slip on a wet substance"
+    "transcript2": "Q: [Question reconstructed from the opinion, p.6: the affidavit statement describes the witness’s own fall.] What is your testimony about your own fall?\nA: she felt herself slip on a wet substance"
   },
   {
     "id": "hard-sham-b-conagra-briseno-gmo-preference",
     "split": "tuning",
     "transcript1": "Q. So it’s a challenge, but you – it’s your testimony that you try to avoid purchasing GMO-ingredient foods for yourself and your family. Is that your testimony?\nA. Yes. We try to avoid it.",
-    "transcript2": "Q: What is your testimony?\nA: preference to avoid GMOs [is] not always absolute."
+    "transcript2": "Q: [Question reconstructed from the opinion, pp.38–39: the declaration describes the witness’s own preference.] What is your testimony about your own preference to avoid GMOs?\nA: preference to avoid GMOs [is] not always absolute."
   },
   {
     "id": "hard-sham-b-conagra-crouch-future-purchase",
     "split": "tuning",
     "transcript1": "Q. Would you buy Wesson oil today if it were at a lower price point?\nA. I don’t think so.\nQ. Would you buy Wesson oil today if it changed its label but the contents were the same?\nA. I don’t know.",
-    "transcript2": "Q: What is your testimony?\nA: might consider buying Wesson Oil in the future depending on the price and the other products conveniently available"
+    "transcript2": "Q: [Question reconstructed from the opinion, p.40: the statement concerns what the witness would do if ConAgra removed the “100% Natural” label.] If ConAgra removed the “100% Natural” label, would you consider buying Wesson Oil?\nA: might consider buying Wesson Oil in the future depending on the price and the other products conveniently available"
   },
   {
     "id": "hard-sham-b-conagra-towey-food-choice",
     "split": "tuning",
     "transcript1": "Q. Your knowledge of GMOs, has it changed the way you purchase foods?\nA. Yes.\nQ. How so?\nA. I don’t – if I know that it’s GMO, I don’t buy it",
-    "transcript2": "Q: What is your testimony?\nA: might consider buying Wesson Oils depending on the price and the other products conveniently available"
+    "transcript2": "Q: [Question reconstructed from the opinion, p.41: the statement concerns what the witness would do if the products were no longer labeled “100% Natural.”] If Wesson Oils were no longer labeled “100% Natural,” would you consider buying them?\nA: might consider buying Wesson Oils depending on the price and the other products conveniently available"
   },
   {
     "id": "hard-sham-b-daniels-additional-speakers",
@@ -357,7 +357,7 @@
     "id": "hard-sham-b-mansoori-mental-health-treatment",
     "split": "heldout",
     "transcript1": "Q.: Have you sought mental healthcare at any point based on this?\nA.: Specifically, for this, no….",
-    "transcript2": "Q: What is your testimony?\nA: repeatedly attempted to receive mental health treatment for everything he has endured, including the living conditions alleged in this complaint"
+    "transcript2": "Q: [Question reconstructed from the opinion, p.10 n.4: the declaration statement describes the witness himself.] What is your testimony about your own attempts to obtain mental health treatment?\nA: repeatedly attempted to receive mental health treatment for everything he has endured, including the living conditions alleged in this complaint"
   },
   {
     "id": "hard-sham-b-ruple-change-orders",
@@ -374,7 +374,7 @@
   {
     "id": "hard-sham-b-satterfield-repudiation-understanding",
     "split": "tuning",
-    "transcript1": "Q: And then read the last sentence to yourself.\nA: (Witness examines document.) Yes.\nQ: What does that mean to you?\nA: She’s just not going to send any more either paperwork or payment or anything dealing with the agreement.\nQ: Absolutely not going to do anything further at all regarding that settlement agreement?\nA: I think that’s what it said. Don’t you?\nQ: Is that what you understood it to mean?\nA: Yes.",
+    "transcript1": "Q: [Context from the opinion, p.11 n.3: the document is the June 3, 2023 letter.] And then read the last sentence to yourself.\nA: (Witness examines document.) Yes.\nQ: What does that mean to you?\nA: She’s just not going to send any more either paperwork or payment or anything dealing with the agreement.\nQ: Absolutely not going to do anything further at all regarding that settlement agreement?\nA: I think that’s what it said. Don’t you?\nQ: Is that what you understood it to mean?\nA: Yes.",
     "transcript2": "Q: What is your testimony?\nA: I did not understand the June 3, 2023, letter to mean the [d]efendant had permanently refused to perform under the Agreement. Given the Agreement’s acknowledgement that liquidation would take more than a year and the [d]efendant’s control over the process, I believed she might still make payments as the Estate’s assets were sold. The initial payment, along with [d]efendant’s pre-Agreement doubts regarding the legitimacy of the “Documents” reinforced my expectation that the [d]efendant would continue to perform."
   },
   {
@@ -393,12 +393,12 @@
     "id": "hard-sham-b-thomas-work-environment",
     "split": "heldout",
     "transcript1": "Q: Now, between the time of the Seth Krenzelak incident in June or July of 2014 and the David Emrock incident, October 2014, did you have any problems with your work environment that impeded your ability to perform your job?\nA: No.",
-    "transcript2": "Q: What is your testimony?\nA: made it mentally and emotionally more difficult for [him] to concentrate on [his] work."
+    "transcript2": "Q: [Question reconstructed from the opinion, p.6 n.7: the statement describes the effect of the witness’s fear of being the target of racial attacks.] What effect did your fear of being the target of racial attacks have on your work?\nA: made it mentally and emotionally more difficult for [him] to concentrate on [his] work."
   },
   {
     "id": "hard-sham-b-willard-compelled-resignation",
     "split": "tuning",
     "transcript1": "Q. Do you think that your working conditions were intolerable?\nA. Can you explain that?\nQ. Yeah. Do you think that your working conditions were so bad that you had to quit?\nA. No.",
-    "transcript2": "Q: What is your testimony?\nA: no other reasonable choice but to be constructively terminated."
+    "transcript2": "Q: [Question reconstructed from the opinion, p.10 n.2: the declaration concerns the witness’s own resignation.] What is your testimony about your own resignation?\nA: no other reasonable choice but to be constructively terminated."
   }
 ]

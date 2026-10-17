@@ -61,6 +61,14 @@ FALSE_POSITIVE means the testimony shows both statements can be true or that no
 conflict is established without adding facts. Never use FALSE_POSITIVE for a conflict
 established on the natural reading, and never use NEEDS_REVIEW to avoid one.
 
+Inferences must rest on stated premises. An INFERENTIAL conflict must follow from
+what the answers actually say. Before labelling a pair INFERENTIAL, name each premise
+the inference needs; if any premise is stated in neither answer (for example, that
+hours missing from records were worked off the clock, or that something unmentioned
+did not happen), the conflict is not established: use FALSE_POSITIVE. Information the
+witness later learned from records, documents or other people does not contradict an
+earlier statement that the witness did not personally know.
+
 Reconciliations must come from the testimony. A pair is reconciled only by a
 distinction the witness, the governing question or other supplied testimony actually
 draws: a stated different time, occasion, person, scope, correction or qualification.

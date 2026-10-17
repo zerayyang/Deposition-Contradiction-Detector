@@ -122,3 +122,18 @@ cases. An explicitly approved paid run saves raw responses under a new temporary
 audit directory and reports only its path plus counts/statuses. The directory is
 not a durable report; preserve it deliberately if needed. Use the isolated verifier
 for an approved evaluation rather than treating these statuses as accuracy results.
+
+## Known hard cases (owner decision 2026-10-17)
+
+- `hard-sham-b-ruple-change-orders` stays DIRECT, as the court ruled. The later statement opens
+  "Contrary to Article 6.2…", so the witness draws a contract-versus-practice distinction, and the
+  detector has read it as a reconciliation in every run so far. It is kept as a known hard miss and
+  is not relabelled or tuned for specifically.
+
+## Fixture-fidelity audit (2026-10-17)
+
+Rule fixed before editing: where a quoted answer is a fragment with no subject, or refers to an
+unnamed thing, and the opinion explicitly states what it concerns, the reconstructed question
+carries that court-stated context in brackets with the page. Witness words are never changed.
+Applied to both splits: 7 tuning (American Rena, Bauer, three ConAgra, Willard, Satterfield) and
+3 held-out (Cole, Mansoori, Thomas). Hamilton and Maisha were not audited (no local opinion text).
