@@ -53,6 +53,7 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
         evidenceCoverage:index.factsCompared.total ? index.factsCompared.compared / index.factsCompared.total : 0,
         coverageCapped:false,coverageCap:null,basis:verified ? index.status : "UNVERIFIED",
         comparisons:Object.fromEntries(index.rulesFired.map(r=>[r.id,r.verdict])),
-        flag:review ? "REVIEW" : "NONE",
-        reasons:review ? [!verified ? "Source evidence is unverified." : `Not evaluable by code rules: ${index.notEvaluableReason}.`] : []};
+        flag:review || candidate.reviewNote ? "REVIEW" : "NONE",
+        reasons:[...(review ? [!verified ? "Source evidence is unverified." : `Not evaluable by code rules: ${index.notEvaluableReason}.`] : []),
+            ...(candidate.reviewNote ? [`Check: ${candidate.reviewNote}`] : [])]};
 }

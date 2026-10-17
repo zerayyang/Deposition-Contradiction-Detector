@@ -68,7 +68,7 @@ export function validateComparisonResponse(response,task){
           const id=JSON.stringify([task.id,left.id,right.id,comparisonIndex]);
           const decided=applyDecision(structuredClone(c),sourceStrings(task.input));
           comparisons.push({...decided,id,pairId,leftId:left.id,rightId:right.id,leftSources,rightSources,
-            reviewReasons:[...record.reviewReasons,...c.missingContext,...(pair.relation==='UNRESOLVED'?[pair.reason]:[])],reviewRequired:record.reviewRequired||c.missingContext.length>0||decided.type==='NEEDS_REVIEW',sourceVerified:true,taskId:task.id});
+            reviewReasons:[...record.reviewReasons,...c.missingContext,...(decided.reviewNote?[decided.reviewNote]:[]),...(pair.relation==='UNRESOLVED'?[pair.reason]:[])],reviewRequired:record.reviewRequired||c.missingContext.length>0||decided.type==='NEEDS_REVIEW'||Boolean(decided.reviewNote),sourceVerified:true,taskId:task.id});
           record.comparisonIds.push(id);
         }catch(error){add('COMPARISON_SOURCE',error.message,{pairId,comparisonIndex});rejected.push({pairId,comparisonIndex,comparison:structuredClone(c),error:error.message});}
       }

@@ -11,9 +11,9 @@ const types=['DIRECT','INFERENTIAL','NEEDS_REVIEW','FALSE_POSITIVE'];
 
 // Both methods classify with one procedure. The new method reads the shared text up to
 // "## 6. Required Output"; its own prompt may add transport rules but no classification rules.
-test('both methods share one classification procedure and the same four types',()=>{
+test('both methods share one classification procedure and the same label set',()=>{
  const definitions=shared.slice(0,shared.indexOf('## 6. Required Output'));
- for(const heading of ['### Step 4: The core test','### Step 5: Which type of conflict?','### Step 6: Consistency check','### NEEDS_REVIEW'])assert.ok(definitions.includes(heading),heading);
+ for(const heading of ['### Step 2: List every difference','### Step 4: The core test','### Step 5: Which type of conflict?','### Step 6: Consistency check','### Step 7: Record your answers','### Missing facts'])assert.ok(definitions.includes(heading),heading);
  assert.deepEqual(directWireSchema.properties.contradictions.items.properties.type.enum,types);
  const issue=comparisonWireSchema.properties.rows.items.properties.pairs.items.properties.comparisons.items;
  assert.deepEqual([...issue.properties.type.enum].sort(),[...types].sort());

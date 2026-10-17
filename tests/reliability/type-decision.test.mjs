@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 import {buildEventExtractionPlan,executeEventExtraction} from '../../server/events/extract.js';
 import {buildEventComparisonPlan,previewEventComparisonPlan,executeEventComparison} from '../../server/events/compare.js';
 import {scoreEventComparisons} from '../../server/events/scoringAdapter.js';
-import {deriveType,quoteFound} from '../../server/typeDecision.js';
+import {deriveType,quoteFound,compareValues} from '../../server/typeDecision.js';
 import {assessCandidate} from '../../server/humanConfidencePipeline.js';
 import {directWireSchema} from '../../server/directOutput.js';
 import {comparisonWireSchema} from '../../server/events/comparisonProtocol.js';
@@ -30,30 +30,52 @@ const run=(plan,reply=related,extra={})=>executeEventComparison({plan,approval:a
 
 
 // Fictional decisions only. The AI answers small questions; fixed rules pick the type.
-const d=(over={})=>({sameFact:'YES',canBothBeTrue:'NO',reconciliation:'NONE',reconciliationQuote:'',conflictForm:'NONE',missingFact:'',...over});
-const texts=['Q: Did you sign?\nA: I don\'t remember signing anything that day.','Q: Did you sign?\nA: I signed the lease at noon.'];
+const d=(over={})=>({sameSubject:'YES',sameCircumstances:'SAME',circumstancesQuote:'',canBothBeTrue:'NO',reconciliation:'NONE',reconciliationQuote:'',conflictForm:'NONE',value1:'',value2:'',missingFact:'',...over});
+const texts=["Q: Did you sign on Monday?\nA: I don't remember signing anything that day. I left around 8 PM. We had three or four cars.",
+ 'Q: Did you sign?\nA: I signed the lease at noon on Tuesday. I left at 11 PM. I left at 8:15 PM. We had 9 cars.'];
 
-test('each decision pattern always maps to the same type',()=>{
+test('each decision pattern always maps to one of the three types, the same way every time',()=>{
  const table=[
-  [d({sameFact:'NO'}),'FALSE_POSITIVE'],
-  [d({sameFact:'UNCLEAR',missingFact:'Which lease "it" refers to.'}),'NEEDS_REVIEW'],
+  [d({sameSubject:'NO'}),'FALSE_POSITIVE'],
+  [d({sameCircumstances:'DIFFERENT_STATED',circumstancesQuote:'on Monday',conflictForm:'AFFIRM_VS_DENY'}),'FALSE_POSITIVE'],
   [d({canBothBeTrue:'YES',reconciliation:'UNCERTAIN_RECOLLECTION',reconciliationQuote:"I don't remember signing"}),'FALSE_POSITIVE'],
   [d({conflictForm:'AFFIRM_VS_DENY'}),'DIRECT'],
-  [d({conflictForm:'DIFFERENT_EXACT_VALUES'}),'DIRECT'],
   [d({conflictForm:'EXHAUSTIVE_VS_EXCEPTION'}),'DIRECT'],
+  [d({conflictForm:'DIFFERENT_EXACT_VALUES'}),'DIRECT'],
   [d({conflictForm:'REQUIRES_INFERENCE'}),'INFERENTIAL'],
-  [d({conflictForm:'NON_OVERLAPPING_APPROXIMATIONS'}),'INFERENTIAL'],
-  [d({canBothBeTrue:'YES'}),'FALSE_POSITIVE'],
   [d({canBothBeTrue:'NO'}),'INFERENTIAL'],
+  [d({canBothBeTrue:'YES'}),'FALSE_POSITIVE'],
+  [d({sameSubject:'UNCLEAR',missingFact:'Which lease "it" refers to.',conflictForm:'AFFIRM_VS_DENY'}),'DIRECT'],
  ];
  for(const [decision,type] of table)for(let i=0;i<3;i++)assert.equal(deriveType(decision,texts).type,type,JSON.stringify(decision));
 });
-test('a reconciliation counts only when its words are in the record; invented ones fall back to the clash',()=>{
- assert.ok(quoteFound("I DON’T remember  signing",texts));
- assert.ok(!quoteFound('',texts));assert.ok(!quoteFound('it was a different day',texts));
- const invented=deriveType(d({canBothBeTrue:'YES',reconciliation:'DIFFERENT_STATED_SCOPE',reconciliationQuote:'it was a different day',conflictForm:'AFFIRM_VS_DENY'}),texts);
+test('missing facts become a review note, never a fourth label',()=>{
+ const r=deriveType(d({sameSubject:'UNCLEAR',missingFact:'Which lease is meant.',conflictForm:'AFFIRM_VS_DENY'}),texts);
+ assert.equal(r.type,'DIRECT');assert.equal(r.reviewNote,'Which lease is meant.');
+ assert.equal(deriveType(d({conflictForm:'AFFIRM_VS_DENY'}),texts).reviewNote,null);
+});
+test('stated differences and reconciliations count only when their words are in the record',()=>{
+ assert.ok(quoteFound("I DON’T remember  signing",texts));assert.ok(!quoteFound('',texts));
+ const unstated=deriveType(d({sameCircumstances:'DIFFERENT_STATED',circumstancesQuote:'on a different day',conflictForm:'AFFIRM_VS_DENY'}),texts);
+ assert.equal(unstated.type,'DIRECT');
+ const invented=deriveType(d({canBothBeTrue:'YES',reconciliation:'CORRECTION_OR_QUALIFICATION',reconciliationQuote:'I corrected that',conflictForm:'AFFIRM_VS_DENY'}),texts);
  assert.equal(invented.type,'DIRECT');assert.equal(invented.reconciliationVerified,false);
- assert.equal(deriveType(d({sameFact:'UNCLEAR',conflictForm:'AFFIRM_VS_DENY'}),texts).type,'DIRECT','UNCLEAR without a named missing fact is not a review dump');
+});
+test('code, not the model, settles time and quantity clashes',()=>{
+ assert.deepEqual(compareValues('8 PM','11 PM'),{kind:'time',overlap:false,exact:true});
+ assert.equal(compareValues('around 8 PM','8:15 PM').overlap,true);
+ assert.equal(compareValues('three or four cars','9 dollars'),null,'different units are not compared');
+ assert.deepEqual(compareValues('three or four cars','9 cars'),{kind:'quantity',overlap:false,exact:false});
+ const v=(value1,value2,conflictForm='DIFFERENT_EXACT_VALUES')=>deriveType(d({conflictForm,value1,value2}),texts);
+ assert.equal(v('around 8 PM','8:15 PM').type,'FALSE_POSITIVE','overlapping approximations are compatible even if the AI called them a clash');
+ assert.equal(v('around 8 PM','11 PM','NON_OVERLAPPING_APPROXIMATIONS').type,'INFERENTIAL');
+ assert.equal(v('8:15 PM','11 PM').type,'DIRECT');
+ assert.equal(v('8 PM','11 PM').type,'DIRECT','value missing from the record falls back to the stated form');
+ assert.equal(v('three or four','9').type,'INFERENTIAL');
+});
+test('older saved decisions with one sameFact question still map',()=>{
+ assert.equal(deriveType({sameFact:'YES',canBothBeTrue:'NO',reconciliation:'NONE',reconciliationQuote:'',conflictForm:'AFFIRM_VS_DENY',missingFact:''},texts).type,'DIRECT');
+ assert.equal(deriveType({sameFact:'NO',canBothBeTrue:'YES',reconciliation:'NONE',reconciliationQuote:'',conflictForm:'NONE',missingFact:''},texts).type,'FALSE_POSITIVE');
 });
 test('both methods ask the questions before the label',()=>{
  const direct=directWireSchema.properties.contradictions.items;
@@ -64,10 +86,11 @@ test('both methods ask the questions before the label',()=>{
  const keys=Object.keys(issue.properties);assert.ok(keys.indexOf('decision')<keys.indexOf('type'));
 });
 const claim=original=>({original,activityPhrase:null,timePhrase:null,locationPhrase:null,personPhrase:null,objectPhrase:null,quantityPhrase:null,statePhrase:null,qualifierPhrases:[]});
-test('old method: code type replaces the model label, which is kept for audit',()=>{
+test('old method: code type replaces the model label, which is kept for audit; notes flag review',()=>{
  const a='I signed the form.',b='I did not sign the form.';
- const r=assessCandidate({type:'FALSE_POSITIVE',decision:d({conflictForm:'AFFIRM_VS_DENY'}),reasoning:'Fictional.',claim1:claim(a),claim2:claim(b)},`Q: Did you sign?\nA: ${a}`,`Q: Did you sign?\nA: ${b}`);
+ const r=assessCandidate({type:'FALSE_POSITIVE',decision:d({conflictForm:'AFFIRM_VS_DENY',missingFact:'Which form is meant.'}),reasoning:'Fictional.',claim1:claim(a),claim2:claim(b)},`Q: Did you sign?\nA: ${a}`,`Q: Did you sign?\nA: ${b}`);
  assert.equal(r.type,'DIRECT');assert.equal(r.modelType,'FALSE_POSITIVE');assert.match(r.typeRule,/affirm vs deny/);
+ assert.equal(r.flag,'REVIEW');assert.ok(r.reasons.some(x=>/Which form is meant/.test(x)));
  const legacy=assessCandidate({type:'INFERENTIAL',reasoning:'Fictional.',claim1:claim(a),claim2:claim(b)},`Q: Did you sign?\nA: ${a}`,`Q: Did you sign?\nA: ${b}`);
  assert.equal(legacy.type,'INFERENTIAL');assert.equal(legacy.modelType,undefined);
 });
@@ -75,6 +98,6 @@ test('new method: code type replaces the model label inside comparison validatio
  const result=await run(planFor(),input=>related(input,{type:'FALSE_POSITIVE',decision:d({conflictForm:'AFFIRM_VS_DENY'})}));
  assert.ok(result.comparisons.length>0);
  for(const c of result.comparisons){assert.equal(c.type,'DIRECT');assert.ok(c.variants.every(v=>v.modelType==='FALSE_POSITIVE'));}
- const review=await run(planFor(),input=>related(input,{type:'DIRECT',decision:d({sameFact:'UNCLEAR',missingFact:'Which form is meant.'}),missingContext:['Which form is meant.']}));
- assert.ok(review.comparisons.every(c=>c.type==='NEEDS_REVIEW'&&c.reviewRequired));
+ const noted=await run(planFor(),input=>related(input,{type:'DIRECT',decision:d({sameSubject:'UNCLEAR',missingFact:'Which form is meant.',conflictForm:'AFFIRM_VS_DENY'})}));
+ assert.ok(noted.comparisons.every(c=>c.type==='DIRECT'&&c.reviewRequired&&c.variants.every(v=>v.reviewReasons.includes('Which form is meant.'))));
 });

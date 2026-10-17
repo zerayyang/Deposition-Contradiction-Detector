@@ -47,9 +47,11 @@ Work through these steps in order for every pair of statements on a shared topic
 
 List every factual topic that appears in BOTH transcripts (for example: whereabouts, times, activities, people met or known, vehicles, quantities, locations, communications, physical states, sources of information). Review every one. Do not stop after the first conflict found.
 
-### Step 2: Gather all testimony on each topic
+### Step 2: List every difference on each topic
 
-For each topic, gather ALL of the witness's answers on it from both transcripts, not only the closest-matching pair. Connect answers given to different questions. If the witness explicitly corrects or withdraws an earlier answer within the same transcript, compare the corrected version and mention the correction in `reasoning`.
+Your first job is to FIND, not to judge. For each topic, gather ALL of the witness's answers on it from both transcripts and list every point where the two accounts state different facts: who, what, when, where, how many, how, or whether something happened, was known or was said. Include differences that may turn out to be compatible; Steps 4–7 decide that. Ignore pure wording changes that state the same fact ("car" versus "vehicle"). Do not drop a difference because you expect it to be explained.
+
+Gather all answers on the topic, not only the closest-matching pair. Connect answers given to different questions. If the witness explicitly corrects or withdraws an earlier answer within the same transcript, compare the corrected version and mention the correction in `reasoning`.
 
 ### Step 3: Pin down exactly what each statement asserts
 
@@ -81,7 +83,7 @@ Outcomes:
 
 - One of reconciliations 1–7 makes both true → FALSE_POSITIVE.
 - No permitted reconciliation exists → the statements conflict; go to Step 5.
-- The answer cannot be decided because the testimony leaves the meaning itself undetermined (an answer fragment with no stated subject, a pronoun or "that" whose referent neither the question nor the answer identifies, or an open time reference that decides whether they conflict) → NEEDS_REVIEW. Use NEEDS_REVIEW only for these gaps in the text, never for doubts the testimony does not raise.
+- If the testimony leaves something genuinely undetermined (an answer fragment with no stated subject, a pronoun whose referent neither the question nor the answer identifies, or an open time reference that decides whether they conflict), still decide on the most natural reading, and record exactly what is missing in `decision.missingFact`. The reviewer sees that note; it does not replace the classification.
 
 A denial of knowing or perceiving a fact ("I don't know", "I didn't see", "I have no idea") conflicts with a later assertion that the witness knew or perceived that same fact at the same time; reconciliation 6 does not cover it.
 
@@ -113,20 +115,23 @@ Apply the same answer to the same pattern every time:
 - "Don't remember" versus a later account → FALSE_POSITIVE.
 - "Didn't know" versus "I knew it then" → DIRECT.
 - Torn between FALSE_POSITIVE and a conflict: choose FALSE_POSITIVE only if you can name which of reconciliations 1–7 applies and quote the testimony that supplies it. Otherwise it is a conflict.
-- Torn between NEEDS_REVIEW and a decision: if the needed fact is in the testimony, decide; NEEDS_REVIEW only when it is genuinely absent.
+- Something genuinely missing: decide on the most natural reading and record the missing fact; never leave a pair unclassified.
 
 ### Step 7: Record your answers in `decision`
 
 For every pair you return, answer these questions in `decision` BEFORE writing `reasoning` and `type`. Application code computes the final type from these answers with fixed rules, so answer each question on its own, literally and consistently.
 
-- `sameFact`: "YES" if both statements are about the same fact (Step 3); "NO" if they are about different facts; "UNCLEAR" only when the testimony leaves it undetermined (Step 4, NEEDS_REVIEW gaps).
+- `sameSubject`: are both statements about the same person, thing or act? "YES", "NO", or "UNCLEAR" only when the testimony leaves it undetermined.
+- `sameCircumstances`: are they about the same time, occasion and scope? "SAME"; "DIFFERENT_STATED" only when the questions or answers actually state a different time, occasion or scope; "NOT_STATED" when neither says (an unstated difference is not a difference).
+- `circumstancesQuote`: for DIFFERENT_STATED, the exact words from either transcript that state the difference; otherwise "". Code checks these words exist.
 - `canBothBeTrue`: the Step 4 answer, "YES" or "NO".
 - `reconciliation`: if YES, which permitted reconciliation from Step 4 applies: DIFFERENT_STATED_SCOPE (1), CORRECTION_OR_QUALIFICATION (2), NARROWER_QUESTION (3), OVERLAPPING_APPROXIMATIONS (4), UNCERTAIN_RECOLLECTION (5), LATER_OPINION_OR_LEARNED (6), ADDED_DETAIL (7); otherwise NONE.
-- `reconciliationQuote`: the exact words from either transcript (question or answer) that supply that reconciliation, copied verbatim; "" when NONE. Code checks these words exist. A reconciliation without supporting words does not count.
+- `reconciliationQuote`: the exact words from either transcript that supply that reconciliation; "" when NONE. A reconciliation without supporting words does not count.
 - `conflictForm`: the Step 5 form of the clash, judged on the words as stated: AFFIRM_VS_DENY, DIFFERENT_EXACT_VALUES, EXHAUSTIVE_VS_EXCEPTION, REQUIRES_INFERENCE, NON_OVERLAPPING_APPROXIMATIONS, or NONE if the statements do not clash at all.
-- `missingFact`: when `sameFact` is UNCLEAR, the exact missing fact; otherwise "".
+- `value1` / `value2`: when the clash is about a time, date, amount or count, the exact literal value phrase from each statement (for example "around 8 PM", "three or four"); otherwise "". Code compares these values itself.
+- `missingFact`: a fact genuinely absent from the testimony that would settle the pair; otherwise "".
 
-The rules code applies: different facts → FALSE_POSITIVE; UNCLEAR with a missing fact → NEEDS_REVIEW; a permitted reconciliation whose words are found → FALSE_POSITIVE; AFFIRM_VS_DENY, DIFFERENT_EXACT_VALUES or EXHAUSTIVE_VS_EXCEPTION → DIRECT; REQUIRES_INFERENCE or NON_OVERLAPPING_APPROXIMATIONS → INFERENTIAL; no clash → FALSE_POSITIVE. Set `type` to the result of these rules.
+The rules code applies: different subject → FALSE_POSITIVE; a different time, occasion or scope whose stated words are found → FALSE_POSITIVE; a permitted reconciliation whose words are found → FALSE_POSITIVE; for time or quantity clashes, code compares the two values (overlapping → FALSE_POSITIVE, different exact values → DIRECT, non-overlapping approximations → INFERENTIAL); AFFIRM_VS_DENY or EXHAUSTIVE_VS_EXCEPTION → DIRECT; REQUIRES_INFERENCE → INFERENTIAL; no clash → FALSE_POSITIVE. Set `type` to the result of these rules.
 
 ## 3. Classification Types
 
@@ -142,9 +147,9 @@ No opposing assertion under the directness test, but the implications cannot bot
 
 Statements that superficially appear to conflict but can reasonably both be true: approximate times, uncertain recollection, different levels of detail, clarification, different scope, ordinary imprecision. The reconciliation must be one of the permitted reconciliations in Step 4.
 
-### NEEDS_REVIEW
+### Missing facts
 
-A possible conflict that cannot be decided because the supplied testimony leaves the meaning undetermined (fragment without a subject, unidentified referent, or a deciding time reference left open). State exactly what is missing and one neutral follow-up question. It is not a finding either way and receives no score.
+The three types above are the only classifications. When the testimony leaves something genuinely undetermined, classify on the most natural reading and state the missing fact in `decision.missingFact` and `reasoning`, with one neutral follow-up question. The reviewer is shown that note.
 
 ### Duplicates and multiple answers
 
@@ -182,7 +187,7 @@ Check both directions: uncertainty is not a denial; reviewing is not necessarily
 ## 4. What to Report
 
 - Report pairs that concern the same factual issue and conflict, with type DIRECT or INFERENTIAL.
-- Report undecidable possible conflicts as NEEDS_REVIEW, stating the missing fact in `reasoning`.
+- Report every listed difference on a shared topic with its classification; compatible differences are FALSE_POSITIVE. Record any genuinely missing fact in `decision.missingFact`.
 - Report independent apparent mismatches with type FALSE_POSITIVE after applying the consolidation rules; compatible supporting details already covered by another card belong in that card’s reasoning.
 - Preserve one independently assessed comparison when two answers assign materially different values, bounds, or precision to the same factual attribute of the same event, even if their permitted ranges overlap. If compatible, return it as FALSE_POSITIVE with the actual literal evidence and explain the overlap or boundary relationship. Do not omit this independent comparison merely because it is compatible. This does not require a separate card for supporting details of an already reported issue.
 - Do not report pairs that are merely differently worded or plainly identical in factual content. A substantive range-versus-point or restriction-versus-occurrence comparison is different from a wording-only change.
@@ -242,11 +247,15 @@ Top-level structure:
         "qualifierPhrases": []
       },
       "decision": {
-        "sameFact": "YES",
+        "sameSubject": "YES",
+        "sameCircumstances": "SAME",
+        "circumstancesQuote": "",
         "canBothBeTrue": "NO",
         "reconciliation": "NONE",
         "reconciliationQuote": "",
         "conflictForm": "AFFIRM_VS_DENY",
+        "value1": "",
+        "value2": "",
         "missingFact": ""
       },
       "reasoning": "Concise explanation of the factual issue, compatibility analysis, directness or inference analysis, and why the classification follows.",
@@ -277,7 +286,7 @@ Include Transcript 1/2 page and line references only when explicitly supplied; o
 
 Allowed values:
 
-- `type`: "DIRECT", "INFERENTIAL", "NEEDS_REVIEW", "FALSE_POSITIVE"
+- `type`: "DIRECT", "INFERENTIAL", "FALSE_POSITIVE" (the application computes the final type from `decision`)
 - `severity`: "HIGH", "MEDIUM", "LOW"
 - `semanticAssist.relationship`: "MATCH", "POSSIBLE_CONFLICT", "UNRELATED", "UNCERTAIN"
 
@@ -349,7 +358,7 @@ Before returning, confirm:
 2. Each claim's `original` comes from the right transcript and is the witness's exact words.
 3. Every non-null literal field and every qualifier appears verbatim in its own `original`.
 4. Affirm-vs-deny pairs, exhaustive-versus-exception pairs and exact-value conflicts were labeled DIRECT, even when the witness hedged. Conflicts that depend on comparing approximate values were labeled INFERENTIAL.
-5. Every FALSE_POSITIVE names one permitted reconciliation from Step 4 that the testimony supplies; every NEEDS_REVIEW names the missing fact.
+5. Every FALSE_POSITIVE names a different subject, a stated different circumstance, or a permitted reconciliation from Step 4 that the testimony supplies; any genuinely missing fact is recorded in `decision.missingFact`.
 6. Each distinct factual issue is reported once. Every returned FALSE_POSITIVE passes the independent-card test; no compatible supporting detail repeats an event conflict already reported.
 7. No outside assumptions, no credibility or intent judgments, no confidence numbers.
 8. Each inferential candidate identifies an actual supported incompatibility and the necessary overlapping time/scope; none relies solely on suspiciousness, expected behavior, or unfamiliar wording.
