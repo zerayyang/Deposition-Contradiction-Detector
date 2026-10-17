@@ -19,6 +19,22 @@ function claimFor(source,event,document,index){
  claim.qualifierPhrases=(event?.qualifiers??[]).filter(q=>q.sourceId===source.id&&source.quote.includes(q.phrase)).map(q=>q.phrase);
  return claim;
 }
+// Reading sees one document range, so a reference to testimony outside it stays
+// unresolved there. Comparison sees both sides; when it reports nothing missing and
+// nothing else needs review, that reference no longer withholds the score.
+// Corrections, ambiguity, disagreement and unconfirmed identity still block.
+function resolvedOutsideLink(comparison,records,comparisonResult){
+ if(!comparisonResult.context?.sameWitnessConfirmed||comparison.typeDisagreement||comparison.reportDisagreement)return false;
+ if(records.some(e=>!e)||!records.some(e=>e.relations.length>0))return false;
+ const outside=e=>e.relations.every(r=>r.targetEventId===null&&['QUALIFIES','REPORTS'].includes(r.kind))
+  &&!(e.attributes??[]).some(a=>a.state==='AMBIGUOUS')&&(e.unresolvedReasons??[]).length<=e.relations.length
+  &&(!e.reviewRequired||e.relations.length>0);
+ if(!records.every(outside))return false;
+ const tasks=comparisonResult.tasks??[],pairs=new Map(tasks.flatMap(t=>t.pairs??[]).map(p=>[p.pairId,p]));
+ return comparison.variants.every(v=>{const pair=pairs.get(v.pairId);
+  return pair?.relation==='RELATED'&&!pair.coverageConflict&&(v.missingContext??[]).length===0
+   &&!tasks.some(t=>(t.rejected??[]).some(r=>r.pairId===v.pairId));});
+}
 export function scoreEventComparisons(comparisonResult,extractionPlan){
  const indexes=extractionPlan.documents.map(d=>parseTestimonySource(d.text,{speakerRoles:d.speakerRoles,pages:d.pages}));
  const multipleWitnesses=indexes.some(index=>new Set(index.turns.filter(t=>t.role==='WITNESS'&&t.speaker).map(t=>t.speaker.trim().toUpperCase())).size>1);
@@ -33,7 +49,10 @@ export function scoreEventComparisons(comparisonResult,extractionPlan){
   const scored=assessCandidate({type:comparison.type,reasoning:variant.reasoning,claim1:claims[0],claim2:claims[1]},...extractionPlan.documents.map(d=>d.text),options);
   // Multiple supporting passages are kept, never stitched into fabricated text.
   // Unresolved event/identity/context cannot activate a numeric score.
-  const blocked=multipleWitnesses||comparison.reviewRequired||sources.some(side=>side.length!==1)||records.some(e=>!e||e.reviewRequired||e.relations.length>0);
+  const outsideLink=resolvedOutsideLink(comparison,records,comparisonResult);
+  const blocked=multipleWitnesses||sources.some(side=>side.length!==1)||records.some(e=>!e)
+   ||!outsideLink&&(comparison.reviewRequired||records.some(e=>e.reviewRequired||e.relations.length>0));
+  if(!blocked&&outsideLink)Object.assign(scored,{flag:'REVIEW',reasons:[...(scored.reasons??[]),'Refers to other testimony; check the link.']});
   if(blocked)Object.assign(scored,{score:null,humanConfidence:null,evidenceScore:null,evidenceStrength:null,band:'NOT_EVALUABLE',status:'NOT_EVALUABLE',basis:'NOT_EVALUABLE',notEvaluableReason:'MISSING_CONTEXT',rulesFired:[],evidenceDetails:[],comparisons:{},flag:'REVIEW',reasons:['Event identity, context or multiple source passages require review.'],rulesLimiting:[{id:'event-context',explanation:'A source-valid quotation alone does not establish a shared event or resolve corrections.'}]});
   return {...scored,id:comparison.id,report:comparison.report,reviewRequired:comparison.reviewRequired,
    sourceReferences:Object.fromEntries(sources.map((side,i)=>['claim'+(i+1),side.flatMap(s=>s.pageRefs.length?s.pageRefs.map(p=>({...p,start:s.start,end:s.end})):[{start:s.start,end:s.end}])])),
