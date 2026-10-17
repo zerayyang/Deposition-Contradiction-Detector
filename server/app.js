@@ -7,6 +7,7 @@ import path from 'node:path';
 import {DOCUMENT_LIMITS} from '../shared/documentLimits.js';
 import {createAnalysisHandlers} from './analysisHandlers.js';
 import {createAdmission,createRateLimit} from './runtimeControls.js';
+import {requestIdFrom,runWithRequest} from './requestContext.js';
 // Factory imports start no listener, invoke no model and read no credentials.
 export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIMITS.requestBytes,authenticate=null,jobStore=null,codeFingerprint,runtimeIdentity=null,maxRequests,maxBudgetUsd,log=()=>{},staticDirectory=null,readApprovedMemory=null,cloudStoreForRequest=null}) {
  const identity=runtimeIdentity??{version:1,codeFingerprint:codeFingerprint??null,promptSha256:digest(instructions??''),model:MODEL.id,startedAt:null,commit:null};
@@ -14,9 +15,11 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
  app.use((_req,res,next)=>{res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY'});next();});
  app.get('/api/health',(_req,res)=>res.set('Cache-Control','no-store').json({status:'ok',service:'deposition-backend',uptimeSeconds:Math.floor(process.uptime()),externalServices:'not checked',callsClaude:false,provenance:identity}));
  app.use('/api',function auditApiRequest(req,res,next){
-  const began=performance.now();let recorded=false;
-  const record=()=>{if(recorded)return;recorded=true;res.off('finish',record);res.off('close',record);log({event:'http_request_finished',method:req.method,route:typeof req.route?.path==='string'?req.route.path:'/api',status:res.statusCode,durationMs:Math.round(performance.now()-began),connectionEnded:!res.writableEnded});};
-  res.once('finish',record);res.once('close',record);next();
+  const began=performance.now(),requestId=requestIdFrom(req.headers?.['x-request-id']);let recorded=false;
+  // The ID is returned to the browser so an error report can be matched to server logs.
+  req.requestId=requestId;res.set?.('X-Request-Id',requestId);
+  const record=()=>{if(recorded)return;recorded=true;res.off('finish',record);res.off('close',record);log({event:'http_request_finished',requestId,method:req.method,route:typeof req.route?.path==='string'?req.route.path:'/api',status:res.statusCode,durationMs:Math.round(performance.now()-began),connectionEnded:!res.writableEnded});};
+  res.once('finish',record);res.once('close',record);runWithRequest(requestId,next);
  });
  app.use('/api',async(req,res,next)=>{
   if(!ipAllowed(req.socket?.remoteAddress??'test-local'))return res.status(429).set('Retry-After','60').json({error:'Too many requests. Wait one minute.'});
@@ -38,7 +41,7 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   if(error.type==='entity.too.large')return res.status(413).json({error:'Analysis request exceeds the server size budget. No document was truncated and no model request started.'});
   if(error instanceof SyntaxError)return res.status(400).json({error:'Invalid JSON request.'});next(error);
  });
- const cloud=cloudStoreForRequest?createCloudAnalysis({instructions,callModel,storeForRequest:cloudStoreForRequest,codeFingerprint,maxRequests,maxBudgetUsd,readApprovedMemory}):null;
+ const cloud=cloudStoreForRequest?createCloudAnalysis({instructions,callModel,storeForRequest:cloudStoreForRequest,codeFingerprint,maxRequests,maxBudgetUsd,readApprovedMemory,log}):null;
  const events=createEventHandlers({callModel,jobStore,codeFingerprint,maxRequests,maxBudgetUsd,log,readApprovedMemory});
  app.post('/api/events/sources',events.sources);app.post('/api/events/plan',cloud?cloud.preview:events.preview);app.post('/api/events/stream',cloud?(_req,res)=>res.status(428).json({error:'Refresh the app and approve a hosted step plan; this older stream cannot run paid work on Vercel.'}):events.stream);
  app.get('/api/events/jobs',events.list);app.get('/api/events/jobs/:id',events.recover);app.post('/api/events/jobs/:id/cancel',events.cancel);app.delete('/api/events/jobs/:id',events.remove);

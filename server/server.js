@@ -12,11 +12,12 @@ import {createJobStore} from './jobStore.js';
 import {createAuthentication} from './authentication.js';
 import {runtimeConfiguration} from './configuration.js';
 import {createMeasuredModel} from './runtimeControls.js';
+import {withRequestContext} from './requestContext.js';
 // Vercel supplies deployment secrets through environment variables.
 if(!process.env.VERCEL)dotenv.config({path:['.env.local','.env'],quiet:true});
 const root=fileURLToPath(new URL('../',import.meta.url));
 const {production,host,port,allowedUserIds,directory,maxBudgetUsd,maxRequests,timeoutMs}=runtimeConfiguration(process.env,root);
-const log=event=>process.stdout.write(JSON.stringify({timestamp:new Date().toISOString(),...event})+'\n');
+const log=event=>process.stdout.write(JSON.stringify({timestamp:new Date().toISOString(),...withRequestContext(event)})+'\n');
 const authenticate=createAuthentication({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY,allowLocal:!process.env.VERCEL&&!production&&host==='127.0.0.1',allowedUserIds});
 if(!process.env.ANTHROPIC_API_KEY)throw new Error('ANTHROPIC_API_KEY is required.');
 const instructions=fs.readFileSync(new URL('./proper_prompts.md',import.meta.url),'utf8');

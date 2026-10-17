@@ -8,7 +8,9 @@ const cents=n=>Math.ceil(n*1e6)/1e6;
 const sourceBody=body=>Object.fromEntries(['transcript1','transcript2','documents','originalDocuments','caseId','workflow','phase','speakerRoles','sourceRolesReviewed','sameWitnessConfirmed','witnessTestimonyConfirmed','acknowledgeExtractionGaps','extractionGapDigest','useApprovedMemory','eventState'].filter(k=>body[k]!==undefined).map(k=>[k,body[k]]));
 export function requestUpperCost(params){return cents(((utf8Bytes(JSON.stringify(params))+8192)*MODEL.inputUsdPerMillion+params.max_tokens*MODEL.outputUsdPerMillion)/1e6);}
 function observedCost(message,reserved){const u=message?.usage;if(!Number.isSafeInteger(u?.input_tokens)||!Number.isSafeInteger(u?.output_tokens)||u.input_tokens<0||u.output_tokens<0||u.cache_read_input_tokens||u.cache_creation_input_tokens)return reserved;return Math.max(0,(u.input_tokens*MODEL.inputUsdPerMillion+u.output_tokens*MODEL.outputUsdPerMillion)/1e6);}
-export function createCloudAnalysis({instructions,callModel,storeForRequest,codeFingerprint,maxRequests=512,maxBudgetUsd=25,readApprovedMemory=null,stepTimeoutMs=240000,legacyPlanOptions={}}){
+export function createCloudAnalysis({instructions,callModel,storeForRequest,codeFingerprint,maxRequests=512,maxBudgetUsd=25,readApprovedMemory=null,stepTimeoutMs=240000,legacyPlanOptions={},log=()=>{}}){
+ // Step logs hold identifiers, counts, costs and error codes only: never testimony or keys.
+ const errorCode=e=>e?.code??(e?.name==='TimeoutError'||e?.name==='AbortError'?'TIMEOUT_OR_CANCELLED':'STEP_ERROR');
  async function prepare(req,body){
   if(body.workflow!=='events-v1'){const plan=buildPlan([body.transcript1,body.transcript2],body.documents,instructions,{...legacyPlanOptions,speakerRoles:body.speakerRoles,sourceRolesReviewed:body.sourceRolesReviewed,witnessTestimonyConfirmed:body.witnessTestimonyConfirmed});return {plan,preview:previewPlan(plan)};}
   let approvedMemory=null,checkMemory=null;
@@ -45,11 +47,12 @@ export function createCloudAnalysis({instructions,callModel,storeForRequest,code
    if(maxUsd<preview.cost.conservativeBudget&&req.body.allowPartialBudget!==true)throw new Error('The approved budget does not cover this full phase. No paid work started.');
    const meta={body,planId:preview.id,codeFingerprint,maxUsd,createdAt:new Date().toISOString(),sourceHash:digest(JSON.stringify(body))};
    if(!await store.put(caseId,jobId,'manifest',meta)){const old=await store.get(caseId,jobId,'manifest');if(old?.sourceHash!==meta.sourceHash||old?.maxUsd!==maxUsd||old.codeFingerprint!==codeFingerprint)throw new Error('Job identity already belongs to a different approval.');}
+   log({event:'cloud_job_started',jobId,workflow:body.workflow??'direct',phase:body.phase??null,requestCount:preview.requestCount,maxUsd});
    return res.json({jobId,caseId,execution:'durable-steps',recoveryEnabled:true});
   }catch(e){return error(res,e);}},
   async status(req,res){try{return res.json(reply(await load(req,{allowStale:true})));}catch(e){return error(res,e);}},
-  async cancel(req,res){try{const j=await load(req,{allowStale:true});await j.store.put(j.caseId,j.jobId,'cancelled',{at:new Date().toISOString()});return res.json({cancelled:true,notice:'Already-started work may still be billed. Saved results remain available.'});}catch(e){return error(res,e);}},
-  async step(req,res){let j;try{
+  async cancel(req,res){try{const j=await load(req,{allowStale:true});await j.store.put(j.caseId,j.jobId,'cancelled',{at:new Date().toISOString()});log({event:'cloud_job_cancel_requested',jobId:j.jobId,sequence:j.sequence});return res.json({cancelled:true,notice:'Already-started work may still be billed. Saved results remain available.'});}catch(e){return error(res,e);}},
+  async step(req,res){let j;const began=performance.now();try{
    j=await load(req);if(j.cancelled||final(j.latest))return res.json(reply(j));if(j.claimed)return res.status(409).json({...reply(j),error:'A step is already claimed. Do not retry it; inspect saved progress.'});
    const body={...j.meta.body};if(j.latest?.analysis.eventState)body.eventState=j.latest.analysis.eventState;
    const prepared=await prepare(req,body);
@@ -71,7 +74,8 @@ export function createCloudAnalysis({instructions,callModel,storeForRequest,code
     else result=await executePlan({plan:prepared.plan,texts:[body.transcript1,body.transcript2],instructions,callModel:invoke,signal,resume:j.latest,maxNewRequests:1,provenance:{codeFingerprint}});
    }finally{stopped=true;clearInterval(timer);}
    if(!await j.store.put(j.caseId,j.jobId,`s${j.sequence}-result`,{result,costUsd,totalSpentUsd:j.spent+costUsd,paidRequests:paid,savedAt:new Date().toISOString()}))throw new Error('A checkpoint already exists; inspect saved progress.');
+   log({event:'cloud_step_finished',jobId:j.jobId,sequence:j.sequence,paidRequests:paid,costUsd,totalSpentUsd:j.spent+costUsd,status:result?.analysis?.status??null,durationMs:Math.round(performance.now()-began)});
    j.latest=result;j.spent+=costUsd;j.claimed=null;return res.json(reply(j));
-  }catch(e){return error(res,e);}}
+  }catch(e){log({event:'cloud_step_failed',jobId:j?.jobId??req.params?.jobId??null,sequence:j?.sequence??null,errorCode:errorCode(e),durationMs:Math.round(performance.now()-began)});return error(res,e);}}
  };
 }
