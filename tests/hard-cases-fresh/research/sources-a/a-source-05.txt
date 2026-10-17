@@ -1,0 +1,104 @@
+Source URL: https://www.govinfo.gov/content/pkg/USCOURTS-pamd-3_21-cv-01628/pdf/USCOURTS-pamd-3_21-cv-01628-0.pdf
+Extraction: PyMuPDF; relevant PDF pages only.
+
+[Opinion page 1]
+THE UNITED STATES DISTRICT COURT 
+FOR THE MIDDLE DISTRICT OF PENNSYLVANIA 
+MARTIN J. WALSH, SECRET ARY OF LABOR, 
+UNITED STATES DEPARTMENT OF LABOR, 
+Plaintiff, 
+V. 
+LA TOL TECA WILKES BARRE, INC. d/b/a 
+LA TOL TECA AUTHENTIC MEXICAN 
+RESTAURANT and CARLOS DE LEON, 
+Defendants. 
+3:21-CV-1628 
+(JUDGE MARIANI) 
+MEMORANDUM OPINION 
+I. INTRODUCTION 
+Before the Court is Plaintiffs Motion for Partial Summary Judgment (Doc. 21 ). 
+Plaintiff seeks partial summary judgment on various alleged Fair Labor Standards Act 
+("FLSA") violations and their associated remedies. For the reasons that follow, the Court will 
+grant Plaintiffs Motion in its entirety. 
+II. STATEMENT OF UNDISPUTED MATERIAL FACTS1 
+This action arises out of employment activities and practices that allegedly took 
+place at the La Tolteca Authentic Mexican Restaurant in Wilkes-Barre, Pennsylvania. The 
+facts below are undisputed by the parties. 
+1 In some instances, the parties partially admit or qualify their responses. In the Statement of 
+Undisputed Facts, the Court includes only those facts which are agreed upon by the parties. The parties 
+provide citations to the record in support of their stated facts which have been verified by the Court, but the 
+Court does not include them in the recitation set out in the text. 
+Case 3:21-cv-01628-RDM   Document 35   Filed 12/06/23   Page 1 of 48
+
+
+[Opinion page 28]
+declaration testimony indicating that employees were informed of the relevant tip notice 
+requirements. (Doc. 27 at 11-12.) Specifically, Lopez and Figueroa each stated in their post-
+discovery declarations that they informed employees of the required notices and that they 
+were informed of the proper tip notice requirements when hired. ( See Lopez Dec. (Doc. 28-
+4) fflI 4-5; Figueroa Dec. (Doc. 28-5) ~ 4.)14 Defendants also reference the deposition 
+14 The Court declines to consider the statements in De Leon's declaration (De Leon Dec. ,r 6) that 
+contradict his earlier deposition testimony as it relates to providing the required notice to employees. 
+Specifically, De Leon testified in his deposition that he did not recall telling servers the information in the 
+five tip notice requirements: 
+Q .. .. So you would tell them the amount that they were paid, the percentage, the tip out 
+process that we talked about and the side work that they would have to do as a server 
+because obviously, there's side work to be done. Anything else that you can recall telling 
+any server? 
+A. No. I mean, I'm pretty sure the manager explain, you know what I mean, show them 
+there's a form that they needed to fill out. That's what we document if they give it to manager, 
+you know, (unintelligible.) 
+(De Leon Dep. at 134:3-12). 
+This testimony is contradicted by De Leon's later-provided post-deposition declaration: 
+From 2016 to the present, I have always verbally informed new hires who are paid the tip 
+credit reduced minimum wage of the following: 
+a. The hourly rate La Tolteca was going to pay them (i.e. $3.00); 
+b. What the full minimum wage was at that time (i.e. $7.25); 
+c. 
+The difference between the hourly pay rate and the minimum wage rate (i.e. $4.25); 
+d. 
+If the employee did not earn sufficient tips to cover the full minimum wage, the restaurant 
+would pay them the difference; 
+e. That the restaurant had a mandatory tip pool between server, bartenders, food runners, 
+and bussers, and that he/she needed to contribute to the pool if working as a server or 
+bartender, but otherwise all other tips received belong to the employee; 
+f. 
+That only after receiving this tip credit information would the restaurant begin to pay 
+he/her on a tip credit basis. 
+(De Leon Dec. ,r 6). 
+28 
+Case 3:21-cv-01628-RDM   Document 35   Filed 12/06/23   Page 28 of 48
+
+
+[Opinion page 29]
+testimony of Lopez, who testified that she informed servers of information regarding "the tip, 
+tip out" that is included in the Wage Notification: 
+Q. If you were to hire someone, you're telling me you have to do certain things, 
+right? 
+A. Yes. 
+Q. What are they? 
+A. I need to explain like the -- I pay how much per hour, what positions, and I 
+explain about the -- if it's a server, I need to explain about the tip, tip-out. Most 
+of the same paper, the Wage Notification. And what is the full-time, if the 
+people wants to work full-time or part-time. And explain everything like what 
+is the work, what I need the people to do. 
+(Lopez Dep. 56:1-12.) 
+Lopez also testified in her deposition that De Leon provided her with the Wage 
+Notification form when he hired her: 
+A. He explain me like everything. 
+In reviewing a motion for summary judgment, the Third Circuit has explained that contradictory 
+post-deposition declarations by witnesses may be disregarded under the "sham affidavit" doctrine: 
+The sham affidavit rule allows a court to disregard a later statement by a deponent on two 
+conditions: the later statement contradicts the witness's deposition testimony, and the 
+discrepancy between the two statements is neither supported by record evidence nor 
+otherwise satisfactorily explained. See {Daubert v. NRA Grp., LLC, 861 F.3d 382, 391-92 
+(3d Cir. 2017]); Jiminez v. All Am. Rathskeller, Inc., 503 F.3d 247, 254 (3d Cir. 2007) 
+(explaining that "courts generally have refused to disregard the affidavit" where there is 
+"independent evidence in the record to bolster an otherwise questionable affidavit" (internal 
+quotation marks omitted)); see generally 10A Charles Alan Wright, Arthur R. Miller & Mary 
+K. Kane, Federal Practice and Procedure§ 2726.1 (4th ed. 2021). 
+SodexoMAGIC, LLC v. Drexel Univ. , 24 F.4th 183, 209-10 (3d Cir. 2022). 
+The Court concludes that De Leon's unexplained contradictory assertions in his declaration relating 
+to providing adequate notice to employees will not be considered. 
+29 
+Case 3:21-cv-01628-RDM   Document 35   Filed 12/06/23   Page 29 of 48

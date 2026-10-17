@@ -1,0 +1,52 @@
+[
+  {
+    "candidate": "candidate-c-01",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-azd-2_15-cv-00357/pdf/USCOURTS-azd-2_15-cv-00357-0.pdf",
+    "reason": "Earlier TRO testimony and later deposition, not requested deposition followed by affidavit."
+  },
+  {
+    "candidate": "candidate-c-02",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-alnd-2_09-cv-01489/pdf/USCOURTS-alnd-2_09-cv-01489-0.pdf",
+    "reason": "Affidavit proposition is summarized rather than quoted verbatim."
+  },
+  {
+    "candidate": "candidate-c-03",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-gud-1_14-cv-00023/pdf/USCOURTS-gud-1_14-cv-00023-0.pdf",
+    "reason": "Candidate pairs lack full verbatim affidavit statement; reference fragments alone insufficient."
+  },
+  {
+    "candidate": "candidate-c-04",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-insd-1_18-cv-03844/pdf/USCOURTS-insd-1_18-cv-03844-9.pdf",
+    "reason": "Relevant testimony is summarized rather than quoted in the opinion."
+  },
+  {
+    "candidate": "candidate-c-05",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-utd-2_15-cv-00766/pdf/USCOURTS-utd-2_15-cv-00766-1.pdf",
+    "reason": "Later declaration statement is summarized rather than quoted verbatim."
+  },
+  {
+    "candidate": "candidate-c-06",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-moed-4_21-cv-00923/pdf/USCOURTS-moed-4_21-cv-00923-3.pdf",
+    "reason": "Affidavit wording not quoted verbatim for the eligible pairs."
+  },
+  {
+    "candidate": "candidate-c-07",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-almd-2_16-cv-00391/pdf/USCOURTS-almd-2_16-cv-00391-0.pdf",
+    "reason": "First affidavit appears in support of summary-judgment motion before deposition is used in opposition; required deposition-then-affidavit chronology not established."
+  },
+  {
+    "candidate": "candidate-c-08",
+    "sourceUrl": "https://law.justia.com/cases/federal/district-courts/FSupp/678/1423/1474980/",
+    "reason": "Direct-download access failed; no retained source snapshot proving both exact passages."
+  },
+  {
+    "candidate": "candidate-c-09",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-wawd-2_16-cv-01106/pdf/USCOURTS-wawd-2_16-cv-01106-0.pdf",
+    "reason": "Accessible source acquisition failed; direct conflict was verified-complaint/affidavit, outside required testimony forms."
+  },
+  {
+    "candidate": "candidate-c-10",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-cod-1_19-cv-03027/pdf/USCOURTS-cod-1_19-cv-03027-2.pdf",
+    "reason": "Manufacturing versus purchasing statements do not explicitly exclude doing both; flat logical conflict not established despite court sham finding. Avoid padding with disputed inference."
+  }
+]

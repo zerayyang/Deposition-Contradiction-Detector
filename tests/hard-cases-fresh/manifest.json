@@ -1,0 +1,38 @@
+{
+  "cases": 40,
+  "opinions": 30,
+  "byLabel": {
+    "DIRECT": 20,
+    "FALSE_POSITIVE": 20,
+    "INFERENTIAL": 0,
+    "DEBATABLE": 0
+  },
+  "split": "heldout",
+  "selectionPolicy": {
+    "seed": "fresh-heldout-20261017-v1",
+    "maxPerDefiniteLabel": 20,
+    "rule": "Deterministic hash rank before any model evaluation; verified extras remain sealed research reserves."
+  },
+  "excluded": [
+    {
+      "id": "fresh-c-007",
+      "reason": "Opinion-page pinpoints not verified"
+    },
+    {
+      "id": "fresh-b-013",
+      "reason": "Verified reserve: deterministic pre-evaluation balance cap"
+    },
+    {
+      "id": "fresh-a-003",
+      "reason": "Verified reserve: deterministic pre-evaluation balance cap"
+    }
+  ],
+  "oldOpinionOverlap": 0,
+  "maxCasesPerOpinion": 2,
+  "minimumQuoteShingleCoverage": 1,
+  "inputsSha256": "822433f868c6d7187ece1761a9b43fed325b3a0c743078290a81ba96f896b729",
+  "referencesSha256": "61c3d529efa47d397597124af6be6a6658e911632629ac9fda834c1dfe46c1ca",
+  "casesSha256": "9827736f103970a2dee9337ebd65c45862a32de23bbf9bbe7c40f512f1df588d",
+  "exclusionsSha256": "4598361c7b05fa26195f946f56ed01c85d3d639458d2831ff2eeb08efb7332f9",
+  "approval": "Draft external-source expectations; no promotion or model accuracy measured."
+}

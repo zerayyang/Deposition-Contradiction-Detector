@@ -1,0 +1,163 @@
+[
+  {
+    "candidate": "Colantuoni v. Alfred Calcagni & Sons",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F3/44/1/513103/",
+    "disposition": "dropped",
+    "reason": "Deposition knowledge is paraphrased, not a verbatim witness quotation; later affidavit alone is quoted.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Hackman v. Valley Fair",
+    "sourceUrl": "https://openjurist.org/932/f2d/239/hackman-v-valley-fair",
+    "disposition": "dropped",
+    "reason": "Relevant deposition and affidavit facts both primarily paraphrased; no eligible verbatim pair.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Palazzo v. Corio",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F3/232/38/514873/",
+    "disposition": "dropped",
+    "reason": "Later statement is hearing testimony, not qualifying post-deposition affidavit/declaration.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Rule v. Brine",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F3/85/1002/490860/",
+    "disposition": "dropped",
+    "reason": "Later quoted evidence is summary-judgment hearing testimony, not an affidavit/declaration.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "In re CitX",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F3/448/672/637035/",
+    "disposition": "dropped",
+    "reason": "Affidavit preceded deposition; wrong chronology for requested pair.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Baer v. Chase",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F3/392/609/598209/",
+    "disposition": "dropped",
+    "reason": "Verbatim pair exists, but literal all-services-complete versus later dated service conflicts even though independent evidence corroborates the later account. Did not force a clean false-positive label.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Daubert v. NRA Group",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/ca3/16-3613/16-3613-2017-07-03.html",
+    "disposition": "dropped",
+    "reason": "Different organizational witnesses; narrower same-witness pairs preferred, not expanded to satisfy counts.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Escribano-Reyes v. Professional HEPA",
+    "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/ca1/15-1259/15-1259-2016-03-30.html",
+    "disposition": "dropped",
+    "reason": "Later specific derogatory-comment affidavit assertion paired with quoted deposition is paraphrased, not both verbatim.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Medina v. Canovanas Plaza Rial",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-prd-3_17-cv-01943/pdf/USCOURTS-prd-3_17-cv-01943-0.pdf",
+    "disposition": "dropped",
+    "reason": "Declaration disability and earlier-visit assertions are paraphrased; quotation of deposition alone insufficient.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Wang v. Leo Chuliya",
+    "sourceUrl": "https://law.justia.com/cases/federal/district-courts/new-york/nysdce/1:2020cv10395/550214/95/",
+    "disposition": "dropped",
+    "reason": "General no-direct-contradiction ruling; no sufficiently specific literal quote pair established in reviewed passage.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Niles v. Wakefield",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_13-cv-13086/pdf/USCOURTS-mad-1_13-cv-13086-0.pdf",
+    "disposition": "dropped",
+    "reason": "General affidavit rejection ruling does not set out both relevant quotations.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "DaCosta v. Plymouth",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_11-cv-12133/pdf/USCOURTS-mad-1_11-cv-12133-0.pdf",
+    "disposition": "dropped",
+    "reason": "Specific contradiction ruling at p.11; no complete eligible paired witness quotations established.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Bumbarger v. New Enterprise Stone",
+    "sourceUrl": "https://law.justia.com/cases/federal/district-courts/pennsylvania/pawdce/3:2014cv00137/217351/41/",
+    "disposition": "dropped",
+    "reason": "Affidavit/deposition allegations and clarification are predominantly paraphrased; did not convert paraphrases into witness answers.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Doe v. McDonalds USA",
+    "sourceUrl": "https://law.justia.com/cases/federal/district-courts/pennsylvania/paedce/2:2019cv05925/565494/71/",
+    "disposition": "dropped",
+    "reason": "Quoted phone-number account potentially useable but primarily omission/addition and not a clean flat direct pair; no forced label.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Wong v. RWJ Barnabas",
+    "sourceUrl": "https://law.justia.com/cases/federal/district-courts/new-jersey/njdce/2:2020cv05510/434057/62/",
+    "disposition": "dropped",
+    "reason": "Court finds no direct contradiction but key post-discovery complaint assertion is paraphrased.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Pasquale v. Tropicana Atlantic City",
+    "sourceUrl": "https://app.midpage.ai/document/pasquale-v-tropicana-atlantic-city-10273394",
+    "disposition": "dropped",
+    "reason": "Deposition quoted, certification notice assertion paraphrased. Not enough verbatim testimony on both sides.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Ratcliffe v. BRP",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-med-1_20-cv-00234/pdf/USCOURTS-med-1_20-cv-00234-2.pdf",
+    "disposition": "dropped",
+    "reason": "Clear expansion ruling but both corresponding full witness passages not established; did not recast court narrative as testimony.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "NextEra v. Macquarie",
+    "sourceUrl": "https://cases.justia.com/federal/district-courts/new-york/nysdce/1:2022cv01345/575140/167/0.pdf",
+    "disposition": "dropped",
+    "reason": "Deposition memory and refreshed-recollection declaration primarily paraphrased in relevant pp.60-64.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Solid21 v. Breitling",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-ctd-3_19-cv-00514/pdf/USCOURTS-ctd-3_19-cv-00514-1.pdf",
+    "disposition": "dropped",
+    "reason": "General no-contradiction footnote not sufficiently specific to a verified literal pair.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Gillen v. Fallon Ambulance",
+    "sourceUrl": "https://openjurist.org/283/f3d/11/gillen-v-fallon-ambulance-service-inc",
+    "disposition": "dropped",
+    "reason": "Appellate opinion quotes deposition but summarizes relevant affidavit; rejected for two-sided fidelity.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Li v. Massachusetts General Hospital",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_11-cv-11557/pdf/USCOURTS-mad-1_11-cv-11557-6.pdf",
+    "disposition": "dropped",
+    "reason": "Primary-language affidavit assertion paraphrased while deposition is quoted; no complete verbatim affidavit side.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Selfridge v. Boston Home Health",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_13-cv-11108/pdf/USCOURTS-mad-1_13-cv-11108-0.pdf",
+    "disposition": "dropped",
+    "reason": "Overtime requested versus overtime paid ruling is useful but witness passages paraphrased.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  },
+  {
+    "candidate": "Robinson v. De Niro",
+    "sourceUrl": "https://www.casemine.com/judgement/us/64a8e8b86657545a79efa981",
+    "disposition": "dropped",
+    "reason": "Two plausible literal false-positive pairs found in public reproduction; primary opinion page pinpoints could not be independently established. Excluded rather than invent pages.",
+    "excludedOpinionCheck": "Compared to supplied excluded-opinions metadata; no eligible row emitted."
+  }
+]

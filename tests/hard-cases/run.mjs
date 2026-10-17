@@ -14,13 +14,14 @@ export function optionsFor(args){
  for(let i=0;i<args.length;i++){
   if(args[i]==='--skip-datasets'){options.skipDatasets=true;continue;}
   const [key,...parts]=args[i].split('=');
-  if(!['--method','--split','--repeat','--approve-usd'].includes(key))throw new Error('Unknown argument. Use --method direct|events --split tuning|heldout|all --repeat N [--skip-datasets] [--approve-usd=CAP].');
+  if(!['--method','--split','--repeat','--approve-usd','--corpus'].includes(key))throw new Error('Unknown argument. Use --method direct|events --split tuning|heldout|all --repeat N [--skip-datasets] [--corpus DIR] [--approve-usd=CAP].');
   const value=parts.length?parts.join('='):args[++i];
   if(value===undefined||value.startsWith('--'))throw new Error('An option value is missing.');
   if(key==='--method')options.method=value;
   if(key==='--split')options.split=value;
   if(key==='--repeat')options.repeat=Number(value);
   if(key==='--approve-usd')options.approveUsd=Number(value);
+  if(key==='--corpus'){if(!value.trim())throw new Error('Corpus directory is required.');options.corpus=resolve(value);}
  }
  if(!['direct','events'].includes(options.method)||!['tuning','heldout','all'].includes(options.split))throw new Error('Invalid method or split.');
  if(!Number.isSafeInteger(options.repeat)||options.repeat<1||options.repeat>10)throw new Error('Repeat must be an integer from 1 to 10.');
@@ -112,7 +113,7 @@ export async function executeCases(prepared,options,callModel){
 }
 async function main(){
  const options=optionsFor(process.argv.slice(2));
- const cases=JSON.parse(await fs.readFile(new URL('inputs.json',here),'utf8'));
+ const cases=JSON.parse(await fs.readFile(options.corpus?join(options.corpus,'inputs.json'):new URL('inputs.json',here),'utf8'));
  const prepared=await prepareCases(cases,options);
  console.log(JSON.stringify(prepared.preview,null,2));
  if(options.approveUsd===null)return;
@@ -133,7 +134,7 @@ async function main(){
  result.auditDirectory=auditDirectory;
  await fs.writeFile(join(auditDirectory,'results.json'),JSON.stringify({options:{...options,approveUsd:options.approveUsd},...result},null,2),{mode:0o600});
  console.log(JSON.stringify(result,null,2));
- console.log(`Grade with: node tests/hard-cases/grade.mjs ${join(auditDirectory,'results.json')}`);
+ console.log(`Grade with: node tests/hard-cases/grade.mjs ${join(auditDirectory,'results.json')}${options.corpus?' '+JSON.stringify(join(options.corpus,'reference-findings.json')):''}`);
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))main().catch(()=>{
  // Provider exceptions may contain submitted data. Do not print them.

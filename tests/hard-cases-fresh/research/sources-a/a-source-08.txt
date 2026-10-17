@@ -1,0 +1,94 @@
+Source URL: https://www.govinfo.gov/content/pkg/USCOURTS-nyed-1_15-cv-06217/pdf/USCOURTS-nyed-1_15-cv-06217-0.pdf
+Extraction: PyMuPDF; relevant PDF pages only.
+
+[Opinion page 1]
+ 
+UNITED STATES DISTRICT COURT 
+EASTERN DISTRICT OF NEW YORK 
+ 
+C/M 
+----------------------------------------------------------- 
+X 
+ 
+ 
+LESLIE E. BROWN, 
+ 
+ 
+ 
+ 
+ 
+               Plaintiff, 
+ 
+- against - 
+ 
+CITY OF NEW YORK and POLICE OFFICER 
+JESSE MCKAY, Shield # 22289, 
+ 
+ 
+ 
+ 
+ 
+              Defendants. 
+: 
+: 
+: 
+: 
+: 
+: 
+: 
+: 
+: 
+: 
+ 
+MEMORANDUM  
+DECISION AND ORDER 
+ 
+ 15-cv-6217 (BMC) (LB) 
+----------------------------------------------------------- 
+X 
+ 
+COGAN, District Judge. 
+Plaintiff pro se is a serial litigant who has sued the City of New York, its departments, 
+and its police officers at least seven times since 2008, usually for false arrest or related claims.  
+The City has settled several of these actions for de minimis amounts, and so now plaintiff 
+appears to sue the City for every interaction he has with any member of law enforcement, no 
+matter how frivolously pursued, like this complaint.  The present action arises from a street 
+encounter where plaintiff was walking with his girlfriend and was issued a summons for 
+disorderly conduct by Officer Jesse McKay.  Plaintiff was handcuffed and made to sit on a curb 
+so that his girlfriend could have an opportunity to get away from him, which she did.  He was 
+then released, and the summons was ultimately dismissed for facial insufficiency.  
+BACKGROUND 
+I am taking the facts from defendants’ Local Rule 56.1 statement for several reasons.  
+First, it is well supported by citations to evidence in the record, principally the deposition 
+testimony of plaintiff’s girlfriend, Felicia Kinnion, the arrest documents, and, to a lesser extent, 
+the affidavit of Officer McKay, although it is somewhat conclusory.  Second, plaintiff has not 
+Case 1:15-cv-06217-BMC-LB   Document 43   Filed 12/22/16   Page 1 of 5 PageID #: <pageID>
+
+
+[Opinion page 2]
+ 
+2
+filed an opposing Local Rule 56.1 statement, and even a pro se litigant, especially one as 
+experienced as plaintiff, is bound by an unrefuted Local Rule 56.1 statement.  See Triestman v. 
+Fed. Bureau of Prisons, 470 F.3d 471, 477 (2d Cir. 2006) (finding “that pro se status does not 
+exempt a party from compliance with relevant rules of procedural and substantive law” (internal 
+quotation marks omitted)); Wali v. One Source Co., 678 F. Supp. 2d 170, 178 (S.D.N.Y. 2009) 
+("Pro se litigants are then not excused from meeting the requirements of Local Rule 56.1.").  
+Third, the key issue in this case is the interaction between plaintiff and Ms. Kinnion, which 
+caused Officer McKay to pull his marked police vehicle over and intervene between them.  
+Plaintiff has put in virtually no evidence of what transpired; indeed, when asked at his 
+deposition: “When you were walking with Ms. Kinnion, were you having a conversation?” 
+plaintiff answered, “I can’t remember.”   
+It is true that in his affidavit opposing summary judgment, which consists almost entirely 
+of conclusions and legal empty-talk – and thus is not properly considered in opposition to 
+summary judgment – plaintiff includes a sentence that says “plaintiff was [not] being loud or 
+obnoxious toward Ms. Kinnion or the defendant.”  However, not only is this sentence itself a 
+conclusion and characterization, but it also flatly contradicts plaintiff’s deposition testimony that 
+he could not even remember if he was talking to Ms. Kinnion, and thus may be disregarded on 
+summary judgment.  See Brown v. Henderson, 257 F.3d 246, 252 (2d Cir. 2001); Crawford v. 
+N.Y. Life Ins. Co., No. 04 CV 1853, 2006 WL 2792779, at *5 (E.D.N.Y. Sept. 27, 2006) 
+(rejecting pro se plaintiff’s affidavit as “self-serving and contradicted by her previous deposition 
+testimony”). 
+Ms. Kinnion’s sworn deposition testimony, in contrast, was quite clear that plaintiff was 
+being loud and obnoxious and was engaged in, at the very least, disorderly conduct.  She testified 
+Case 1:15-cv-06217-BMC-LB   Document 43   Filed 12/22/16   Page 2 of 5 PageID #: <pageID>

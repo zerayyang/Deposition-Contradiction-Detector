@@ -1,0 +1,42 @@
+{
+  "protectedHardCaseFiles": {
+    "tests/hard-cases/EXPECTED.md": "a8066031ddae82d0aeade89d40af91a8f4d694c7c9f9d92cab3b7adca7d0b428",
+    "tests/hard-cases/assemble.mjs": "0febb493bded1cfade1c22789904121c0465ab781b3fa084567ee195070ab1b2",
+    "tests/hard-cases/cases.json": "e951601ac294b365bd10ce6b1b3a3c9de5d6db60e5d523e3aed2519e410e9b4c",
+    "tests/hard-cases/corpus.test.mjs": "2518a2d564ad0be323db8828b2c4103c6e34bbd7b0b4a860bd3ba2bf3d80d34a",
+    "tests/hard-cases/cost-previews.json": "1fc086ca14755e7eb335db67289092a95b625e0b032d396bcc3324e811fc0710",
+    "tests/hard-cases/grade.test.mjs": "ed0bcb98b0fb17e68da415c3ba7407f517423f0bd4cb89568903d9e97eae84d9",
+    "tests/hard-cases/inputs.json": "9a24b570e13ac22d8f5911fa48ee57db4445eaac97d9484572586f3c47351055",
+    "tests/hard-cases/manifest.json": "aad485aea17e48a5679a971a3457f64a0c2060116446de3bbea518b609433047",
+    "tests/hard-cases/reference-findings.json": "f2a1b2723252a5514a1bce027312cc619fefe8639a6bbdeeae60c3efdc4494d1",
+    "tests/hard-cases/research/datasets.json": "93109034fdc57828616207cf81503c02af9b01fd9cd402bd3ac2332e2772113a",
+    "tests/hard-cases/research/datasets.md": "4df0a0d5812d81271c351553012cae709c0a2d96297c6f8fce8fd4e90eb0a625",
+    "tests/hard-cases/research/famous.json": "bcef1fc7371030aff070841f7a0b1b2451fa4f7066c8036b7c77b3fa1e203c37",
+    "tests/hard-cases/research/famous.md": "f815364ae3ce56121b20ee46b33c54eeb9cad4959e1587cbb4c819581c1f1488",
+    "tests/hard-cases/research/sham-a.json": "3d31304168b686a6051e998e3843ff68d1624024d606519bee30fe2ece844785",
+    "tests/hard-cases/research/sham-a.md": "22614308e00f0c8cb6652224ebfc67d991f3d45f56b74f9b91bf3afbf7c8ae86",
+    "tests/hard-cases/research/sham-b.json": "70565188846f39a0c642163ad3018b1be80ac7f8e3e824b8e40d1dd3bdf93e3b",
+    "tests/hard-cases/research/sham-b.md": "32c0b84c2fb5caa55d0f6cfe6ca5878abe36f9c6748c0769c1c88354d65c360f",
+    "tests/hard-cases/runner.test.mjs": "f213932099c4502cf0b5be20ae76af2a7ec1b11e7d5ab179e3648429fafd43c1",
+    "tests/hard-cases/verification/compact.md": "63c88cac5341e28ca476c73d25bb9c7580b04d04b79316b1b7f2474596310bc4",
+    "tests/hard-cases/verification/lint.json": "dd308ee578daf426aef2d9de819b3312043791e8ade3952e4495c7ccf0f167a2",
+    "tests/hard-cases/verification/npm-test.json": "d3958e154c8370caea7b7bc2ce1204feaed56bbcebf693a4b9b4d470d66e0b70",
+    "tests/hard-cases/verification/original-inventory.json": "67c3166df0e4fa27185f5697db9ded7358c2e3f232d412ce6590417327f6b6b9",
+    "tests/hard-cases/verification/other.json": "f8cdb309dce46199672c9d724358ec3fbc48ab8606a79c1d9252e96b83e26448",
+    "tests/hard-cases/verification/parser-final.json": "bf1a2cbccb895508d24672e3972b6e7a0b717eb4d5b875388fd280f7e2c41320",
+    "tests/hard-cases/verification/parser-initial.json": "4b0b381b0ab02711065c570bab1ca34d7a7b1ed78e2121918ffc89b655b0d687",
+    "tests/hard-cases/verification/prompt-separation.json": "898c774f2dd2ad3c76da66a41e1fdffe728fe94a5082b95f0e03f898aa055d3b",
+    "tests/hard-cases/verification/sham-a.json": "7117c1a89a6b38cec29716e46cdcf361f1d66f67977b8b739e0ca00c16fe8e05",
+    "tests/hard-cases/verification/sham-a.md": "bb156e87b19d7d32f34ba412405127d4a143bb03deb8bf81ffec1d537233f24e",
+    "tests/hard-cases/verification/sham-b.json": "d556a96e72759e560197007197543347c5f381bb66f91f3a81b9c5b717d5a6c0",
+    "tests/hard-cases/verification/sham-b.md": "713f63c51885a9a5a29e5d73506b469f4f6f413bc9a08e7a8198579ba4bf915d",
+    "tests/hard-cases/verification/summary.json": "b9882a807bc72c641ac4b2431eef9147f045d86d77e058aaa7cf4174e18e66fe",
+    "tests/hard-cases/verification.test.mjs": "26a92de98523855bc95504bf9301b53ccbbb507626f20ede4fdddc07f75398c3"
+  },
+  "productionPrompts": {
+    "server/events/COMPARISON_PROMPT.md": "8c3d7c6d21ad30afc7006beabfe551368fb445ed771a52b6130f12e84b4eeddd",
+    "server/events/EXTRACTION_GUIDELINES.md": "1cbdd637d38454f90006f3743a2bb8ddfdb21bb1578d7da031654d3e3cdc974d",
+    "server/events/EXTRACTION_PROMPT.md": "83edfcab85cb557b5596397ea9a1790ff169bf9ccabf804919b554778c1b8806",
+    "server/proper_prompts.md": "a08a5bf691a9bbbda881345cf49d63161317bc14769a20a22185b848df4f4b80"
+  }
+}

@@ -1,0 +1,174 @@
+Source URL: https://ecf.ctd.uscourts.gov/cgi-bin/show_public_doc?2018cv1422-43=
+Extraction: PyMuPDF; relevant PDF pages only.
+
+[Opinion page 23]
+because the evidence is “self-contradictory . . . and speculative.”  Def.’s Reply at 6.  Plaintiff does
+not respond to DHD’s contention.  
+For the reasons discussed below, the Court agrees with DHD in part.  Plaintiff’s declaration
+that Curtin called Plaintiff “old”—which is part of the allegation that Curtin called Plaintiff “old and
+broken”—contradicts his prior testimony and should be disregarded under the “sham issue of fact”
+doctrine.  As the Court will explain, however, it does not arrive at the same conclusion regarding the
+second half of Curtin’s alleged statement, that Plaintiff was “broken.”
+Plaintiff states in his declaration opposing DHD’s motion for summary judgment that, “[a]t
+the meeting where I was terminated I was told that I was old and broken.”  Horwath Decl. ¶ 26
+(emphasis added).  However, as DHD points out, Plaintiff readily admitted in his deposition that his
+supervisors did not reference Plaintiff’s age during his termination meeting.  As Plaintiff testified:
+Q. What occurred in the conference room regarding your age?
+A.  I was told—age actually didn’t come up, it was just about my
+health.
+Q.  Thank you.
+A.  Uh-huh.  You won, boom, that one.
+Horwath Dep. at 163–64 (emphasis added).  This is the sort of “real, unequivocal, and inescapable”
+contradiction that the “sham issue of fact” doctrine aims to prevent from defeating summary
+judgment.  Rivera, 743 F.3d at 23.
+To be sure, at an earlier point in Plaintiff’s deposition, Plaintiff did purport to recall the
+comment that he was “old and broken.”  Id. at 115–16.  But Plaintiff repeatedly reversed himself
+even in the context of that testimony.  Plaintiff first recalled that the comment was “old and broken”;
+then just “broken”; then “old and broken” again; and then, just “old.”  Id.  Immediately after,
+Plaintiff once again backtracked, stating that he did not have a basis for his age discrimination claim:
+23
+
+
+[Opinion page 24]
+Q.  What is your basis for your claim that it was the Defendant’s intent to
+replace you because of your age?
+A.  I don’t know.
+Q.  Well, do you think there were comments made about your age?
+A.  I don’t know.  I don’t remember.  I just—I can’t answer if I don’t
+remember.  I don’t remember.
+Q.  Well, you’ve brought a claim for discrimination on the basis of your
+age claiming that Pella fired you because of your age. I want to know
+what your factual basis is for that claim.
+A.  I don’t have anything, thank you.  I don’t have anything. There’s no
+sense in beating this out of me.
+Q.  I’m not trying to beat anything out of you.  You don’t have any factual
+basis for your claim that you were discriminated on the basis of your
+age when they terminated your employment?
+A.  No.  
+Q. Do you recall any other comments made regarding your age?
+A.  No.
+Q. What was the reason provided by the Defendant to you for your
+termination?
+A.  I couldn’t perform my job due to my broken hip.
+Id. at 116–17.
+In addition to Plaintiff’s outright denial that his age arose during the termination meeting
+conversation, and his otherwise vacillating testimony on the subject, other reasons warrant
+disregarding the evidence under the “sham issue of fact” doctrine.  In particular, courts have applied
+the doctrine if a litigant’s “deposition testimony . . . [is] contradicted by all the Plaintiff’s previous
+statements regarding these claims, to include the allegations in her complaint.”  Tracey, 2019 WL
+2526299, at *6.  In Tracey, which was also an employment discrimination lawsuit, this Court
+disregarded the plaintiff’s deposition testimony.  See id.  The Court arrived at that decision because
+the allegations “lack[ed] corroboration elsewhere in the record” and were “substantially undermined”
+by her failure to assert the allegations in prior proceedings including, inter alia, her failure to report
+the alleged discriminatory conduct to human resources, and the fact that her pleadings contained no
+24
+
+
+[Opinion page 25]
+allegations of discriminatory remarks.  Id. at *7; see also Jenkins v. Rd. Scholar Transportation,
+LLC, No. 16 Civ. 554 (JBA), 2019 WL 145516, at *4 (D. Conn. Jan. 9, 2019) (“A plaintiff’s
+deposition testimony need not be credited by the Court in the context of summary judgment where
+the testimony is ‘so replete with inconsistencies and improbabilities that no reasonable juror would
+undertake the suspension of disbelief necessary to credit the allegations made in his complaint.’”
+(quoting Jeffreys, 426 F.3d at 555).
+In the case at bar and, similar to Tracey and the Second Circuit’s observations in Jeffreys,
+the Court finds nothing in the record to support Plaintiff’s allegations other than Plaintiff’s own
+contradictory deposition testimony and now, his declaration.  For example, Plaintiff’s pleadings fail
+to mention any specifics regarding the “old” comment.  See, e.g., Cunningham v. New York Junior
+Tennis League, Inc., No. 18 Civ. 1743 (JMF), 2020 WL 916964, at *4 (S.D.N.Y. Feb. 26, 2020)
+(disregarding the plaintiff’s testimony in opposition to summary judgment that an employer made
+discriminatory remarks because plaintiff did not make any allegations in his amended complaint; and
+when asked at his deposition whether anyone ever made a “derogatory,” “discriminatory,” or
+“racially motivated” comment to him, the plaintiff testified, “no”).  
+Nor, for that matter, did Plaintiff reference the alleged “old” comment in his interrogatories. 
+Cf. Johnson, 750 F. App’x at 17 (omission of allegedly derogatory remark in interrogatories and the
+plaintiff’s failure to explain the omission contributed to the court’s decision to disregard the
+plaintiff’s subsequent declaration regarding the remark in opposition to summary judgment).  On the
+contrary, during Plaintiff’s deposition, when Defense Counsel asked Plaintiff, “[i]n your
+interrogatories you said Gary had said to you you can’t do the job, you are broken,” Plaintiff
+responded, “Okay.  That’s the statement.”  Horwath Dep. at 116 (emphasis added).
+25
+
+
+[Opinion page 26]
+Additionally, the Court concludes that disregarding Plaintiff’s statement is warranted because
+“the nature of the contradictions are not the sort of mere ambiguities or incompleteness that . . . [are]
+viewed as forgiveable.”  Paul v. Postgraduate Ctr. for Mental Health, 97 F. Supp. 3d 141, 181
+(E.D.N.Y. 2015).  Plaintiff has not merely supplemented his prior “ambiguous, confusing, or simply
+incomplete” testimony—rather, his declaration in support of summary judgment explicitly
+contradicts his deposition testimony that age did not come up at his termination meeting and that he
+had no factual basis to conclude that he was terminated on the basis of age.  Jeffreys, 426 F.3d at
+554; see also, e.g., Smith v. Cingular Wireless, 579 F. Supp. 2d 231, 236 (D. Conn. 2008) (“[T]he
+sham affidavit rule simply prohibits a party from relying on an affidavit that contradicts her prior
+sworn testimony.  If there is no conflict, a party is free to submit an affidavit that amplifies or
+explains her prior testimony.” (citations omitted)); see also Paul, 97 F. Supp. 3d at 181 (disregarding
+the plaintiff’s testimony in part because, “the inconsistencies are not the result of one version being
+more detailed than the other; instead, Plaintiff describes important aspects of the incident in
+completely different ways”).
+Lastly, the Court concludes that the “sham issue of fact” doctrine is applicable to Plaintiff’s
+allegation because the Court cannot discern—and Plaintiff does not provide—any plausible
+explanation for the discrepancies in his testimony.  See Jeffreys, 426 F. 3d at 554; see also Stajic v.
+City of New York, No. 16 Civ. 1258 (GHW), 2018 WL 4636829, at *10 n.5 (S.D.N.Y. Sept. 27,
+2018) (declining to “find that Plaintiff’s explanation for the discrepancy is not plausible and . . .
+consider[ing] her version of the relevant facts, as appropriate”); cf. Jin Dong Wang v. LW Rest., Inc.,
+81 F. Supp. 3d 241, 260 (E.D.N.Y. 2015) (declining to disregard testimony because many of the
+potentially inconsistent statements were “not directly contradictory with prior testimony and may be
+26
+
+
+[Opinion page 27]
+explained when read in context with the record as a whole, or may have another plausible
+explanation, such as the witness’ lapse in memory”).  Nor does the Court believe that Plaintiff’s
+deposition testimony was “ambiguous, confusing, or simply incomplete,” particularly where Plaintiff
+overtly admitted that his age was not discussed at the meeting.  Jeffreys, 426 F.3d at 554.  
+In sum, even while drawing all inferences in the light most favorable to Plaintiff, no
+reasonable person could believe his testimony on this particular point.  Accordingly, the Court rejects
+Plaintiff’s evidence regarding the “old” comment.13  
+The Court now turns to the question whether it should similarly disregard the second—i.e.,
+the “broken”—portion of the alleged termination meeting remark that Plaintiff was “old and broken.” 
+Although Plaintiff does not argue that being called “broken” provides a basis for his age
+discrimination claim, which the Court is currently addressing, the remainder of the comment is still
+relevant to Plaintiff’s disability discrimination claims, discussed infra.
+13  DHD makes an additional argument in support of the Court’s disregard of the disputed
+“old” remark, that it is “the exact same statement that plaintiff claims a former employer made to
+him about being ‘old and broken’ when she terminated his employment.”  Def.’s Reply at 4.  DHD
+cites to an “almost identical” lawsuit that Plaintiff brought against a different former employer, in
+which he similarly alleged that he was discriminated against on the basis of age and disability when
+he was terminated.  Id.  In that lawsuit, when Plaintiff was questioned during a deposition about the
+factual underpinnings of his discrimination claim, Plaintiff stated that the owner of the company
+“came into my home, called me a broken, old man.”  Id.  DHD argues that this statement is similar
+to the statement that Minor allegedly made to Plaintiff during Plaintiff’s termination meeting.  Id. 
+DHD does not cite to any case law to support its argument.  As an initial matter, as the Court has
+explained at other points in this Ruling, it is not the Court’s role to assess Plaintiff’s credibility on
+this motion: it is ultimately the jury’s prerogative to make a credibility determination regarding
+Plaintiff’s testimony, and assess whether Plaintiff is credible or if he was merely repeating a
+comment that a previous employer allegedly made.  In any event, because the Court concludes that
+the “sham issue of fact” doctrine applies to the alleged “old” remark, the Court need not extensively
+address this argument.
+27
+
+
+[Opinion page 28]
+The Court concludes that the factors that warranted disregarding the “old” portion of the
+remark under the “sham issue of fact” doctrine are not present with respect to the “broken” portion
+of the remark.  In contrast to Plaintiff’s allegation that he was called “old,” Plaintiff in his
+interrogatories originally specified that he was called “broken.”  See Horwath Dep. at 116
+(responding “Okay.  That’s the statement” to the question, “In your interrogatories you said Gary had
+said to you you can't do the job, you are broken.”).  Additionally, Plaintiff’s deposition testimony
+regarding being called “broken” is far less contradictory; and, in contrast to Plaintiff’s concession
+in his deposition that he lacked a basis for his age discrimination claim, see Horwath Dep. at 116–17,
+and that “age didn’t actually come up” during his termination meeting, id. at 163–64, Plaintiff
+consistently testified that his health was discussed at the termination meeting.  See id.  If anything,
+Plaintiff’s testimony regarding being called “broken” is “ambiguous, confusing, or simply
+incomplete.”  Jeffreys, 426 F.3d at 554.  Therefore, the Court finds no basis to disregard Plaintiff’s
+allegation that he was called “broken.”  
+I conclude  that Plaintiff’s evidence regarding being called “old” should be disregarded under
+the “sham issue of fact” doctrine.  Plaintiff provides no other evidentiary support for his age
+discrimination claim.  Therefore, Plaintiff has not presented “at least a minimal amount of evidence”
+demonstrating that his termination occurred under circumstances that would support an inference
+of age discrimination, and in turn he has failed to make out a prima facie case under the ADEA. 
+Kaytor, 609 F.3d at 552–53. 
+Accordingly, Defendant’s motion for summary judgment will be GRANTED with respect
+to his claim under the ADEA.  The same reasoning applies to the Plaintiff’s age discrimination claim
+under the CFEPA.  Summary judgment will also be GRANTED with respect to that claim.
+28

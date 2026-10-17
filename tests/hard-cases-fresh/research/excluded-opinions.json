@@ -1,0 +1,463 @@
+{
+  "scope": "All opinion metadata from prior corpus and all research JSON records; no testimony or answer keys.",
+  "sources": [
+    {
+      "sourceUrl": "https://stanfordnlp.github.io/contract-nli/resources/contract-nli.zip",
+      "caseNames": [
+        "ContractNLI (Koreeda and Manning, EMNLP 2021), official dataset release"
+      ],
+      "dockets": [],
+      "metadata": []
+    },
+    {
+      "sourceUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2015/04/22/11-10669.pdf",
+      "caseNames": [
+        "United States v. Bonds, No. 11-10669, Ninth Circuit en banc opinion, April 22, 2015; quoting 2003 grand jury testimony"
+      ],
+      "dockets": [
+        "11-10669"
+      ],
+      "metadata": []
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CHRG-110hhrg43333/html/CHRG-110hhrg43333.htm",
+      "caseNames": [
+        "U.S. House Oversight hearing, February 13, 2008, serial 110-63; quoted deposition/affidavit and hearing answers"
+      ],
+      "dockets": [],
+      "metadata": []
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/CDOC-105hdoc310/html/CDOC-105hdoc310.htm",
+      "caseNames": [
+        "William J. Clinton; Jones deposition and federal grand jury testimony (1998), quoted in H. Doc. 105-310"
+      ],
+      "dockets": [],
+      "metadata": []
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-wiwd-3_24-cv-00411/pdf/USCOURTS-wiwd-3_24-cv-00411-0.pdf",
+      "caseNames": [
+        "Dins v. Wisconsin Department of Natural Resources, No. 24-cv-411-jdp, Doc. 53 (W.D. Wis. Sept. 26, 2025)"
+      ],
+      "dockets": [
+        "24-cv-411-jdp"
+      ],
+      "metadata": [
+        {
+          "court": "W.D. Wisconsin",
+          "year": 2025
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-med-2_10-cv-00440/pdf/USCOURTS-med-2_10-cv-00440-9.pdf",
+      "caseNames": [
+        "Goldenson v. Steffens, No. 2:10-cv-00440-JAW, Doc. 236 (D. Me. Mar. 7, 2014)"
+      ],
+      "dockets": [
+        "2:10-cv-00440-JAW"
+      ],
+      "metadata": [
+        {
+          "court": "District of Maine",
+          "year": 2014
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnmd-3_20-cv-00738/pdf/USCOURTS-tnmd-3_20-cv-00738-1.pdf",
+      "caseNames": [
+        "Kabba v. Metropolitan Nashville Hospital Authority, No. 3:20-cv-00738, Doc. 57 (M.D. Tenn. May 6, 2022)"
+      ],
+      "dockets": [
+        "3:20-cv-00738"
+      ],
+      "metadata": [
+        {
+          "court": "M.D. Tennessee",
+          "year": 2022
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.ncmd.uscourts.gov/sites/ncmd/files/opinions/12cv371moo_0.pdf",
+      "caseNames": [
+        "Maisha v. University of North Carolina, No. 1:12-cv-371, memorandum opinion and order (Jan. 5, 2015)"
+      ],
+      "dockets": [
+        "1:12-cv-371"
+      ],
+      "metadata": [
+        {
+          "court": "M.D. North Carolina",
+          "year": 2015
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnwd-2_23-cv-02456/pdf/USCOURTS-tnwd-2_23-cv-02456-1.pdf",
+      "caseNames": [
+        "Crawford v. Garland (caption Bondi), No. 2:23-cv-02456, Doc. 101 (W.D. Tenn. Jan. 29, 2026)"
+      ],
+      "dockets": [
+        "2:23-cv-02456"
+      ],
+      "metadata": [
+        {
+          "court": "W.D. Tennessee",
+          "year": 2026
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.opn.ca6.uscourts.gov/opinions.pdf/09a0273p-06.pdf",
+      "caseNames": [
+        "O\u2019Brien v. Ed Donnelly Enterprises, Inc., 575 F.3d 567 (6th Cir. 2009)"
+      ],
+      "dockets": [],
+      "metadata": [
+        {
+          "court": "Sixth Circuit",
+          "year": 2009
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-tnmd-3_15-cv-00437/pdf/USCOURTS-tnmd-3_15-cv-00437-0.pdf",
+      "caseNames": [
+        "West v. Emeritus Corp., No. 3:15-cv-00437, Doc. 28 (M.D. Tenn. Dec. 14, 2016)"
+      ],
+      "dockets": [
+        "3:15-cv-00437"
+      ],
+      "metadata": [
+        {
+          "court": "M.D. Tennessee",
+          "year": 2016
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://ttabvue.uspto.gov/ttabvue/ttabvue-92058196-CAN-11.pdf",
+      "caseNames": [
+        "American Rena International Corp. v. Sis-Joyce International Co., No. CV 12-6972 FMO (JEMx), Doc. 284 (Dec. 14, 2015)"
+      ],
+      "dockets": [
+        "CV 12-6972 FMO",
+        "CV 12-6972 FMO"
+      ],
+      "metadata": [
+        {
+          "court": "C.D. Cal.",
+          "year": 2015,
+          "sourceGroup": "sham-b-a"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-alnd-3_15-cv-00348/pdf/USCOURTS-alnd-3_15-cv-00348-0.pdf",
+      "caseNames": [
+        "Bauer v. The Travelers Home and Marine Insurance Company, No. 3:15-CV-348-CLS, Doc. 75 (Jan. 20, 2017)"
+      ],
+      "dockets": [
+        "3:15-CV-348-CLS"
+      ],
+      "metadata": [
+        {
+          "court": "N.D. Ala.",
+          "year": 2017,
+          "sourceGroup": "sham-b-bauer"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-caed-1_19-cv-01384/pdf/USCOURTS-caed-1_19-cv-01384-0.pdf",
+      "caseNames": [
+        "Cole v. CVS Pharmacy, Inc., No. 1:19-cv-01384-JLT-EPG, Doc. 20 (July 14, 2022)"
+      ],
+      "dockets": [
+        "1:19-cv-01384-JLT-EPG"
+      ],
+      "metadata": [
+        {
+          "court": "E.D. Cal.",
+          "year": 2022,
+          "sourceGroup": "sham-b-v"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://truthinadvertising.org/wp-content/uploads/2014/08/Ir-Re-Conagra-Foods-order-granting-part-of-class-cert-motion.pdf",
+      "caseNames": [
+        "In re ConAgra Foods, Inc., No. CV 11-05379 MMM (AGRx), Doc. 545 (Feb. 23, 2015)"
+      ],
+      "dockets": [
+        "CV 11-05379 MMM",
+        "CV 11-05379 MMM",
+        "CV 11-05379 MMM",
+        "CV 11-05379 MMM",
+        "CV 11-05379 MMM",
+        "CV 11-05379 MMM"
+      ],
+      "metadata": [
+        {
+          "court": "C.D. Cal.",
+          "year": 2015,
+          "sourceGroup": "sham-b-c"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-txed-4_15-cv-00702/pdf/USCOURTS-txed-4_15-cv-00702-1.pdf",
+      "caseNames": [
+        "Daniels v. Texas Department of Transportation, No. 4:15-CV-00702-CAN, Doc. 62 (Dec. 10, 2016)"
+      ],
+      "dockets": [
+        "4:15-CV-00702-CAN"
+      ],
+      "metadata": [
+        {
+          "court": "E.D. Tex.",
+          "year": 2016,
+          "sourceGroup": "sham-b-d"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-hid-1_20-cv-00002/pdf/USCOURTS-hid-1_20-cv-00002-4.pdf",
+      "caseNames": [
+        "David v. Betts, No.20-00002 JMS-WRP, Order (May15,2024), footnote24"
+      ],
+      "dockets": [],
+      "metadata": [
+        {
+          "court": "D. Haw.",
+          "year": 2024,
+          "sourceGroup": "sham-b-david"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www2.mdd.uscourts.gov/Opinions/Opinions/18-cv-1065%20EEOC%20v.%20Ecology%20Servs%20Inc.%20MSJ%20v.%20Final.pdf",
+      "caseNames": [
+        "U.S. EEOC v. Ecology Services, Inc., No. ELH-18-1065, Memorandum Opinion (Mar. 19, 2020)"
+      ],
+      "dockets": [
+        "ELH-18-1065"
+      ],
+      "metadata": [
+        {
+          "court": "D. Md.",
+          "year": 2020,
+          "sourceGroup": "sham-b-ecology"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_18-cv-11229/pdf/USCOURTS-mad-1_18-cv-11229-1.pdf",
+      "caseNames": [
+        "Gattineri v. Wynn MA, LLC, No. 18-11229-FDS, Doc. 167 (Jan. 13, 2022)"
+      ],
+      "dockets": [
+        "18-11229-FDS"
+      ],
+      "metadata": [
+        {
+          "court": "D. Mass.",
+          "year": 2022,
+          "sourceGroup": "sham-b-g"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-alnd-3_10-cv-03621/pdf/USCOURTS-alnd-3_10-cv-03621-1.pdf",
+      "caseNames": [
+        "Hamilton v. Coffee Health Group, No. CV-10-S-3621-NW, Doc. 58 (June 6, 2013)"
+      ],
+      "dockets": [
+        "CV-10-S-3621-NW"
+      ],
+      "metadata": [
+        {
+          "court": "N.D. Ala.",
+          "year": 2013,
+          "sourceGroup": "sham-b-h"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://law.justia.com/cases/federal/district-courts/illinois/ilndce/1:2017cv08846/347101/253/",
+      "caseNames": [
+        "Mansoori v. Brown, No. 17-cv-8846, Doc. 253 (Feb. 19, 2026)"
+      ],
+      "dockets": [
+        "17-cv-8846"
+      ],
+      "metadata": [
+        {
+          "court": "N.D. Ill.",
+          "year": 2026,
+          "sourceGroup": "sham-b-mansoori"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-pawd-2_17-cv-00004/pdf/USCOURTS-pawd-2_17-cv-00004-0.pdf",
+      "caseNames": [
+        "Ruple Builders, Inc. v. Brackenridge Construction Co., No. 2:17-cv-00004, Doc. 63 (2019)"
+      ],
+      "dockets": [
+        "2:17-cv-00004"
+      ],
+      "metadata": [
+        {
+          "court": "W.D. Pa.",
+          "year": 2019,
+          "sourceGroup": "sham-b-r"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://docs.justia.com/cases/federal/district-courts/tennessee/tnedce/3:2024cv00249/114825/63",
+      "caseNames": [
+        "Hill-Satterfield v. Lauderdale, No. 3:24-CV-249-TAV-DCP, Doc.63 (Dec.19,2025)"
+      ],
+      "dockets": [
+        "3:24-CV-249-TAV-DCP"
+      ],
+      "metadata": [
+        {
+          "court": "E.D. Tenn.",
+          "year": 2025,
+          "sourceGroup": "sham-b-satterfield"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://law.justia.com/cases/new-jersey/supreme-court/2002/a-52-01-opn.html",
+      "caseNames": [
+        "Shelcusky v. Garjulio, 172 N.J. 185 (2002)"
+      ],
+      "dockets": [],
+      "metadata": [
+        {
+          "court": "N.J. Supreme Court",
+          "year": 2002,
+          "sourceGroup": "sham-b-s"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-mdd-1_17-cv-03014/pdf/USCOURTS-mdd-1_17-cv-03014-0.pdf",
+      "caseNames": [
+        "Smith v. Caesars Baltimore Management Company, L.L.C., No.ELH-17-3014, Doc.45 (Aug.9,2019)"
+      ],
+      "dockets": [],
+      "metadata": [
+        {
+          "court": "D. Md.",
+          "year": 2019,
+          "sourceGroup": "sham-b-smith"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-pawd-2_16-cv-01557/pdf/USCOURTS-pawd-2_16-cv-01557-0.pdf",
+      "caseNames": [
+        "Thomas v. Bronco Oilfield Services, No. 2:16-cv-01557-MRH, Doc. 130 (Nov. 30, 2020)"
+      ],
+      "dockets": [
+        "2:16-cv-01557-MRH"
+      ],
+      "metadata": [
+        {
+          "court": "W.D. Pa.",
+          "year": 2020,
+          "sourceGroup": "sham-b-t"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-txsd-3_18-cv-00233/pdf/USCOURTS-txsd-3_18-cv-00233-2.pdf",
+      "caseNames": [
+        "Willard v. Friendswood ISD, No. 3:18-CV-00233, Doc. 39, Memorandum and Recommendation (Dec. 12, 2019)"
+      ],
+      "dockets": [
+        "3:18-CV-00233"
+      ],
+      "metadata": [
+        {
+          "court": "S.D. Tex.",
+          "year": 2019,
+          "sourceGroup": "sham-b-w"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://www.wicourts.gov/ca/opinion/DisplayDocument.html?content=html&seqNo=27535",
+      "caseNames": [
+        "Fata v. School District of Horicon, No. 2006AP234 (Dec. 21, 2006)"
+      ],
+      "dockets": [
+        "2006AP234"
+      ],
+      "metadata": [
+        {
+          "court": "Wis. Ct. App.",
+          "year": 2006,
+          "sourceGroup": "sham-b-f"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://cases.justia.com/federal/district-courts/louisiana/lawdce/3%3A2015cv01938/147301/43/0.pdf",
+      "caseNames": [
+        "Walter v. Bullock / JPS Aviation, LLC, No. 15-1938, Doc. 43 (Jan. 10, 2017)"
+      ],
+      "dockets": [
+        "15-1938"
+      ],
+      "metadata": [
+        {
+          "court": "W.D. La.",
+          "year": 2017,
+          "sourceGroup": "sham-b-walter"
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F2/622/887/64804/",
+      "caseNames": [
+        "Kennett-Murray Corp. v. Bone, 622 F.2d 887 (5th Cir. 1980)"
+      ],
+      "dockets": [],
+      "metadata": [
+        {
+          "court": "Fifth Circuit",
+          "year": 1980
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://law.justia.com/cases/federal/appellate-courts/F2/736/656/91116/",
+      "caseNames": [
+        "Van T. Junkins & Associates, Inc. v. U.S. Industries, Inc., 736 F.2d 656 (11th Cir. 1984)"
+      ],
+      "dockets": [],
+      "metadata": [
+        {
+          "court": "Eleventh Circuit",
+          "year": 1984
+        }
+      ]
+    }
+  ],
+  "sourceFilesSha256": {
+    "tests/hard-cases/cases.json": "78966b74ec38caffcb5a79d347c23e50646c4418957cece68d206368300a4918",
+    "tests/hard-cases/research/sham-b.json": "b9ec07da1560e2a55028e7d46585a4ec3bc3c325999da4729e1f227fd63981c9",
+    "tests/hard-cases/research/datasets.json": "93109034fdc57828616207cf81503c02af9b01fd9cd402bd3ac2332e2772113a",
+    "tests/hard-cases/research/famous.json": "bcef1fc7371030aff070841f7a0b1b2451fa4f7066c8036b7c77b3fa1e203c37",
+    "tests/hard-cases/research/sham-a.json": "7ba855451beaec69aeb057b04f09790dc9c66fb706806c05624ec6a89c4f6ad0"
+  }
+}

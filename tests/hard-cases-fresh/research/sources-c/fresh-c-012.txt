@@ -1,0 +1,9 @@
+McCullough's challenges to specific paragraphs of Anderson's affidavit begin with paragraph 3. That paragraph states the following:
+
+> As a part of the purchase [of CPI by CSIS], Central States Industrial Supply, Inc. and CPI Sales, Inc. negotiated an Employment Agreement with Steve McCullough sending several drafts back and forth. I was directly involved in this process.
+Anderson Affidavit at ¶ 3. McCullough contends that the statement that "several drafts" were exchanged is contrary to Anderson's deposition testimony, in which Anderson responded to a question about who prepared the Employment Agreement by stating that "my guess would have been Bob Guinan [CSIS's corporate attorney] working with us." Defendant's Appendix at 31, Anderson Deposition at 38.
+The plaintiffs contend that there is no contradiction between Anderson's deposition testimony and his affidavit on this point, merely clarification.
+Assuming, for the sake of argument, that this paragraph actually creates an issue of fact of significance to the disposition of McCullough's motion for summary judgment, the court is not convinced that this paragraph of Anderson's affidavit is plainly contrary to Anderson's prior deposition testimony that he "guess[ed]" that CSIS's corporate attorney prepared the Employment Agreement.
+Rather, this paragraph of Anderson's affidavit simply adds more detailed information concerning the negotiation of the Employment Agreement. See Helm Fin. Corp., 214 F. Supp. 2d at 955 (where the affidavit testimony simply adds more detailed information, the court may properly consider the affidavit on summary judgment).
+Moreover, the court finds that this is a situation where any ambiguities or even conflicts between Anderson's deposition testimony and this paragraph of his affidavit should be left to the jury to sort out. Id. The court will not strike paragraph 3 of Anderson's affidavit.
+

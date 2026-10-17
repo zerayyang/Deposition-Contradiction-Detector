@@ -1,0 +1,636 @@
+[
+  {
+    "id": "fresh-c-001",
+    "source": "Barrera Solano v. A Navas Party Production, Inc., Doc. 64 (S.D. Fla. July 26, 2010)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-flsd-1_09-cv-22847/pdf/USCOURTS-flsd-1_09-cv-22847-0.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "A negative answer to a negatively phrased supervision question is ambiguous; the affidavit clarifies occasional supervision. The opinion expressly identifies that ambiguity.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: Is it true that Francisco did not supervise you?\nA: No.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.4: The court quotes this affidavit passage about Francisco giving plaintiff orders when Jose was unavailable.] How often would Francisco give you orders?\nA: Francisco Navarette [sic] would give me orders approximately once a week.",
+    "quote1": "Q. Is it true that Francisco did not supervise you? A. No.",
+    "quote2": "Francisco Navarette [sic] would give me orders approximately once a week.",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "S.D. Fla.",
+      "year": 2010,
+      "docket": "09-22847-CIV-ALTONAGA/Brown",
+      "opinionId": "S.D. Fla. | 09-22847-CIV-ALTONAGA/Brown | Doc. 64",
+      "quote1Page": [
+        4
+      ],
+      "quote2Page": [
+        4
+      ],
+      "rulingPage": [
+        4
+      ],
+      "rulingQuote": "Because the Plaintiff’s prior testimony was not “clear” the Court may properly consider the Affidavit at the summary judgment stage; whether Plaintiff’s testimony is credible is for the jury to decide.",
+      "sourceSha256": "3df981e5814c15f031b3e7e7c15e1c4ae2588c34ce51fa4fef84c407e137faf2",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-001.txt",
+      "coverageSourceSha256": "3e32eaf473b7b2b5439addc8be2c1de215d93d124b698ea5f2e9a15e38872b6f",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-001.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 64"
+    }
+  },
+  {
+    "id": "fresh-c-002",
+    "source": "Dockhorn v. Kitchens by Kleweno, Doc. 195 (D. Kan. Mar. 23, 2010)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-ksd-2_08-cv-02307/pdf/USCOURTS-ksd-2_08-cv-02307-4.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "General knowledge that bulbs get hot is compatible with lacking knowledge about a specific indirect countertop ignition hazard; court calls the questions general and affidavit more specific.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: Regardless of whether or not you were warned, you knew that halogen lights got hot?\nA: Correct.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.10: The court quotes this affidavit passage about the halogen lights in plaintiff’s kitchen and laundry room.] What did you know about a possible fire hazard from items on the countertop below the halogen lights?\nA: Even though I knew that all light bulbs get hot, I had no reason to know that clothes and bed sheets sitting on the countertop below the halogen lights, but not in direct contact with the lights, would be a fire hazard.",
+    "quote1": "Q. Regardless of whether or not you were warned, you knew that halogen lights got hot? A. Correct.",
+    "quote2": "Even though I knew that all light bulbs get hot, I had no reason to know that clothes and bed sheets sitting on the countertop below the halogen lights, but not in direct contact with the lights, would be a fire hazard.",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "D. Kan.",
+      "year": 2010,
+      "docket": "08-2307-JAR",
+      "opinionId": "D. Kan. | 08-2307-JAR | Doc. 195",
+      "quote1Page": [
+        9
+      ],
+      "quote2Page": [
+        10
+      ],
+      "rulingPage": [
+        10,
+        11
+      ],
+      "rulingQuote": "The Court agrees with plaintiff that the deposition testimony and these three paragraphs are not necessarily inconsistent on this point.",
+      "sourceSha256": "e3ee00ece5afd95a0fe0c66b63f2be7552e618fdf1692cd03b83dba7aa73b450",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-002.txt",
+      "coverageSourceSha256": "bd782a1529ffb898fdee0d4acc22409ffaf7b88e6eede3c41a749a1c95cae91b",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-002.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 195"
+    }
+  },
+  {
+    "id": "fresh-c-003",
+    "source": "Dockhorn v. Kitchens by Kleweno, Doc. 195 (D. Kan. Mar. 23, 2010)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-ksd-2_08-cv-02307/pdf/USCOURTS-ksd-2_08-cv-02307-4.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Possible inclusion of instructions in delivered paperwork does not establish that the witness saw or reviewed them. The court reads the affidavit paragraphs together to reject the inconsistency claim.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: [Question reconstructed from the opinion, p.11: The court states that plaintiff did not recall whether the warning was left in delivered paperwork and admitted it could have been.] Could the warning have been left in the paperwork?\nA: It could have been.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.11: The court quotes this affidavit passage about the mounting instructions for plaintiff’s kitchen and laundry-room puck lights.] Did you see or review those mounting instructions before this litigation?\nA: Before this litigation, I never saw or reviewed the Mounting Instructions for the puck lights, which were installed in my kitchen and laundry room.",
+    "quote1": "It could have been.",
+    "quote2": "Before this litigation, I never saw or reviewed the Mounting Instructions for the puck lights, which were installed in my kitchen and laundry room.",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "D. Kan.",
+      "year": 2010,
+      "docket": "08-2307-JAR",
+      "opinionId": "D. Kan. | 08-2307-JAR | Doc. 195",
+      "quote1Page": [
+        11
+      ],
+      "quote2Page": [
+        11
+      ],
+      "rulingPage": [
+        12
+      ],
+      "rulingQuote": "The issue of whether plaintiff received adequate warnings about the light fixture has always been in dispute, and plaintiff’s declarations do not create a sham fact issue where none existed before.",
+      "sourceSha256": "e3ee00ece5afd95a0fe0c66b63f2be7552e618fdf1692cd03b83dba7aa73b450",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-003.txt",
+      "coverageSourceSha256": "b909d64349bc2d3bb6c0f0b9e6a80a7ac346a7572e417ae96e4157e99443e570",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-003.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 195"
+    }
+  },
+  {
+    "id": "fresh-c-004",
+    "source": "Svec v. Davis, Doc. 64 (D. Ariz. July 23, 2025)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-azd-2_23-cv-01116/pdf/USCOURTS-azd-2_23-cv-01116-1.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "DIRECT",
+    "labelBasis": "Existing partnership belief is opposed to a later condition that no binding agreement exists until subsequent formal documents are executed; court expressly finds clear inconsistency.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: So you did believe that you were 50/50 partners as of August 18, 2020?\nA: Yes.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.17: The court states that this declaration passage describes the August 2020 letter of intent.] How did you understand the binding effect of that letter of intent?\nA: expressly conditioned on and would not constitute a binding agreement on me and Svec until we executed a final partnership agreement or membership purchase agreement memorializing the final terms of any business venture",
+    "quote1": "Q: So you did believe that you were 50/50 partners as of August 18, 2020? A: Yes.",
+    "quote2": "expressly conditioned on and would not constitute a binding agreement on me and Svec until we executed a final partnership agreement or membership purchase agreement memorializing the final terms of any business venture",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "D. Ariz.",
+      "year": 2025,
+      "docket": "CV-23-01116-PHX-DWL",
+      "opinionId": "D. Ariz. | CV-23-01116-PHX-DWL | Doc. 64",
+      "quote1Page": [
+        15
+      ],
+      "quote2Page": [
+        17
+      ],
+      "rulingPage": [
+        20
+      ],
+      "rulingQuote": "This claim is clearly and unambiguously inconsistent with Davis’s earlier deposition testimony and Defendants have not proffered a valid explanation for the inconsistency.",
+      "sourceSha256": "01c2f0663873b9895732195667e972682b0ca037572c84b34063b406893cd9dc",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-004.txt",
+      "coverageSourceSha256": "8fb1b232a72f5b8dfe8ff011673d64cfb1e7e701062f46130aff6c379b2a9ff7",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-004.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 64"
+    }
+  },
+  {
+    "id": "fresh-c-005",
+    "source": "Svec v. Davis, Doc. 64 (D. Ariz. July 23, 2025)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-azd-2_23-cv-01116/pdf/USCOURTS-azd-2_23-cv-01116-1.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "DIRECT",
+    "labelBasis": "The deposition expressly denies Svec agreed to substitute distribution rights; declaration expressly asserts mutual agreement to that substitute.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: And did Mr. Svec agree that the $30,000 was going to—rather than be an ownership interest, that he was merely purchasing a right to distribute XPin product?\nA: He did not agree to that.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.29: The court quotes this declaration passage about the business relationship between Davis and Svec concerning 21 Electronics and XPin products.] What did you and Svec agree about the business relationship over the course of your dealings?\nA: [o]ver the course of our dealings, rather than acquiring the interest in 21 Electronics, through our conduct, Mr. Svec and I mutually agreed that Mr. Svec would be considered a re-seller with special considerations, and Mr. Svec would be paid a share of profits from the sale and distribution of XPin products",
+    "quote1": "Q: And did Mr. Svec agree that the $30,000 was going to—rather than be an ownership interest, that he was merely purchasing a right to distribute XPin product? A: He did not agree to that.",
+    "quote2": "[o]ver the course of our dealings, rather than acquiring the interest in 21 Electronics, through our conduct, Mr. Svec and I mutually agreed that Mr. Svec would be considered a re-seller with special considerations, and Mr. Svec would be paid a share of profits from the sale and distribution of XPin products",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "D. Ariz.",
+      "year": 2025,
+      "docket": "CV-23-01116-PHX-DWL",
+      "opinionId": "D. Ariz. | CV-23-01116-PHX-DWL | Doc. 64",
+      "quote1Page": [
+        28
+      ],
+      "quote2Page": [
+        29
+      ],
+      "rulingPage": [
+        29
+      ],
+      "rulingQuote": "However, these passages flatly contradict Davis’s earlier deposition testimony.",
+      "sourceSha256": "01c2f0663873b9895732195667e972682b0ca037572c84b34063b406893cd9dc",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-005.txt",
+      "coverageSourceSha256": "c34649c206630419f70330194077ff36ef60d5a255ed47440ae3f9465bc74994",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-005.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 64"
+    }
+  },
+  {
+    "id": "fresh-c-006",
+    "source": "Dunn v. Menard, Inc., 880 F.3d 899 (7th Cir. 2018)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-ca7-17-01870/pdf/USCOURTS-ca7-17-01870-0.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "DIRECT",
+    "labelBasis": "Denial of any distraction is directly opposed to the same witness’s later statement that loading the van distracted him during the falling-stack incident.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: Did you do anything to distract you prior to your incident?\nA: No.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.20: The court quotes this affidavit passage about the falling stack of insulation while plaintiff was loading his van.] What were you focused on when the stack fell?\nA: When the leaning stack fell on me I was distracted from looking at it because I was focused on loading insulation into the van.",
+    "quote1": "Q. Did you do anything to distract you prior to your incident? A. No.",
+    "quote2": "When the leaning stack fell on me I was distracted from looking at it because I was focused on loading insulation into the van.",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "Seventh Circuit",
+      "year": 2018,
+      "docket": "17-1870",
+      "opinionId": "Seventh Circuit | 17-1870 | Doc. 32, Jan. 29, 2018",
+      "quote1Page": [
+        20
+      ],
+      "quote2Page": [
+        20
+      ],
+      "rulingPage": [
+        20
+      ],
+      "rulingQuote": "Here, the district court’s decision was clearly reasonable, as plaintiff’s affidavit directly contradicts his deposition testimony.",
+      "sourceSha256": "38ccd334b0c619fd8417dcfaeec253e79f675de11560ec71251cce16b869b33f",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-006.txt",
+      "coverageSourceSha256": "516a7a3b9ccfc0c9d7c65ea887ac017ffc8e865316e7d453f7a4729f861a237c",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-006.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 32, Jan. 29, 2018"
+    }
+  },
+  {
+    "id": "fresh-c-007",
+    "source": "Ralston v. Smith & Nephew Richards, Inc., 275 F.3d 965 (10th Cir. 2001)",
+    "sourceUrl": "https://law.resource.org/pub/us/case/reporter/F3/275/275.F3d.965.00-3395.html",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "DIRECT",
+    "labelBasis": "Under the same durability counterfactual, deposition says probably would not choose the alternative nail because of two fractures; affidavit says would choose it. Court expressly identifies contradiction; the qualifier probably is preserved.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: At the time you selected the 12 millimeter multi-holed Smith & Nephew nail in April of '96, if you had known there was a five hole design of the same nail that didn't have holes through the length of the nail and was much more durable, would you have selected that nail instead? A: Probably not, because of that additional fracture, the two fractures.",
+    "transcript2": "[a]t that time in the surgery, had I had the five-hole nail available to me and had I known of the significant durability advantage of the five-hole nail, I would have used the five-hole nail.",
+    "quote1": "Q: At the time you selected the 12 millimeter multi-holed Smith & Nephew nail in April of '96, if you had known there was a five hole design of the same nail that didn't have holes through the length of the nail and was much more durable, would you have selected that nail instead? A: Probably not, because of that additional fracture, the two fractures.",
+    "quote2": "[a]t that time in the surgery, had I had the five-hole nail available to me and had I known of the significant durability advantage of the five-hole nail, I would have used the five-hole nail.",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked. HTML paragraph references are exact; reporter-page boundaries are not present in this source.",
+    "provenance": {
+      "court": "Tenth Circuit",
+      "year": 2001,
+      "docket": "00-3395",
+      "opinionId": "Tenth Circuit | 00-3395 | 275 F.3d 965, Dec. 26, 2001",
+      "quote1Page": null,
+      "quote2Page": null,
+      "rulingPage": null,
+      "rulingQuote": "However, in his October 3rd Declaration, Dr. Bohn again contradicted his deposition testimony by stating",
+      "sourceSha256": "986a6e91b33005cc580e13f63d27fd1ef4004e23c9bb1810999341bd87eece93",
+      "sourceHashScope": "Downloaded public opinion HTML bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-007.txt",
+      "coverageSourceSha256": "b591de190bb83ac099ec97ae2cc029cff5a9dd266da2dd4edccffca73092bf00",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "html",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-007.txt",
+      "pageReferenceLimitation": "The public HTML preserves numbered opinion paragraphs but no reporter-page boundaries. Exact paragraph locators are supplied; reporter pagination has not been guessed.",
+      "eligible": false,
+      "exclusionReason": "Opinion-page pinpoints not verified",
+      "opinionIdOriginal": "275 F.3d 965, Dec. 26, 2001"
+    }
+  },
+  {
+    "id": "fresh-c-008",
+    "source": "Robles v. Agreserves, Inc., Doc. 57 (E.D. Cal. Jan. 27, 2016)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-caed-1_14-cv-00540/pdf/USCOURTS-caed-1_14-cv-00540-5.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "DIRECT",
+    "labelBasis": "Deposition expressly closes the set of speakers to two named people; affidavit adds a different speaker on an almost-daily basis. Court expressly finds contradiction.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: My question was – I’m sorry, the words “stupid Mexican,” you know, when was it said and who said it. Right now you said Jay Payne said and Lee said, right?\nA: Yes.\nQ: Anybody else say that?\nA: That I’ve heard it’s just them.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.22: The court quotes this declaration passage about what Campo said to Robles during his employment.] What did Campo say to you, and how often?\nA: Campo said to me ‘stupid Mexican’ almost every day.",
+    "quote1": "Q: My question was – I’m sorry, the words “stupid Mexican,” you know, when was it said and who said it. Right now you said Jay Payne said and Lee said, right? A: Yes. Q: Anybody else say that? A: That I’ve heard it’s just them.",
+    "quote2": "Campo said to me ‘stupid Mexican’ almost every day.",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "E.D. Cal.",
+      "year": 2016,
+      "docket": "1:14-CV-540 AWI JLT",
+      "opinionId": "E.D. Cal. | 1:14-CV-540 AWI JLT | Doc. 57",
+      "quote1Page": [
+        23
+      ],
+      "quote2Page": [
+        22
+      ],
+      "rulingPage": [
+        23,
+        24
+      ],
+      "rulingQuote": "Now declaring that Campo used the term “stupid Mexican” on a daily basis contradicts Robles’s deposition testimony.",
+      "sourceSha256": "c4a7f3ad8dfc0c03f7ee3aad71679136e17f5eb43f8e3c8613d614b86cf1407d",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-008.txt",
+      "coverageSourceSha256": "b29e743ee73c8c8444703f28f518482cada4b54a479bf8ff8db9cb41f5a1aa1a",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-008.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 57"
+    }
+  },
+  {
+    "id": "fresh-c-009",
+    "source": "Buckhalter v. Torres, Doc. 57 (E.D. Cal. Aug. 7, 2019)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-caed-2_17-cv-02072/pdf/USCOURTS-caed-2_17-cv-02072-5.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "DIRECT",
+    "labelBasis": "Deposition denies pain anywhere other than the left shoulder; declaration reports wrist pain before hospital arrival. Court specifically finds this inconsistent.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: [Question reconstructed from the opinion, p.3: The court states plaintiff was asked in deposition whether he was feeling pain anywhere other than his left shoulder before arriving at the hospital.] Were you feeling pain anywhere other than your left shoulder before arriving at the hospital?\nA: no",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.2: The court states this declaration passage reports what plaintiff told Torres shortly after being secured in the patrol vehicle, before arriving at the hospital.] What did you tell Torres about the handcuffs before arriving at the hospital?\nA: the handcuffs are really tight–they’re hurting my wrists",
+    "quote1": "no",
+    "quote2": "the handcuffs are really tight–they’re hurting my wrists",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "E.D. Cal.",
+      "year": 2019,
+      "docket": "2:17-cv-02072-KJM-AC",
+      "opinionId": "E.D. Cal. | 2:17-cv-02072-KJM-AC | Doc. 57",
+      "quote1Page": [
+        3
+      ],
+      "quote2Page": [
+        2
+      ],
+      "rulingPage": [
+        3
+      ],
+      "rulingQuote": "This testimony directly contradicts plaintiff’s statements in his declaration that he told Torres the handcuffs were hurting his wrists and asked Torres to loosen them before they arrived at the hospital.",
+      "sourceSha256": "4612ea9b9694ec207aa513e199d9daad238d2498b366dffffbb6427f78bea9ff",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-009.txt",
+      "coverageSourceSha256": "a2fbd95e80d97f7d306ff134cf07962473b3db5ec7890859737266eb6ceadd88",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-009.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 57"
+    }
+  },
+  {
+    "id": "fresh-c-010",
+    "source": "Oyarzo v. Tuolumne Fire District, Doc. 107 (E.D. Cal. July 1, 2013)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-caed-1_11-cv-01271/pdf/USCOURTS-caed-1_11-cv-01271-16.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Deposition question concerns criticism of past annexation work; declaration describes reaction to intent to resume it. Court expressly distinguishes those subjects.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: Did Mr. Turner ever say anything else to you which you took as a possible criticism of your work in connection with the annexation?\nA: I can’t remember.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.21: The court quotes this declaration passage about Oyarzo’s conversation with Turner the week after annexation was placed on hold in April 2010.] What happened during that conversation about your plans for annexation?\nA: The following week, I communicated my intent to continue pursuing the annexation to Joe Turner while visiting him at his house. Mr. Turner informed me that he no longer supported the annexation and became visibly angry with me when I stated my intent to continue pursuing the annexation after June 30, 2010.",
+    "quote1": "Q. Did Mr. Turner ever say anything else to you which you took as a possible criticism of your work in connection with the annexation? A. I can’t remember.",
+    "quote2": "The following week, I communicated my intent to continue pursuing the annexation to Joe Turner while visiting him at his house. Mr. Turner informed me that he no longer supported the annexation and became visibly angry with me when I stated my intent to continue pursuing the annexation after June 30, 2010.",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "E.D. Cal.",
+      "year": 2013,
+      "docket": "1:11-cv-01271-SAB",
+      "opinionId": "E.D. Cal. | 1:11-cv-01271-SAB | Doc. 107",
+      "quote1Page": [
+        22
+      ],
+      "quote2Page": [
+        21
+      ],
+      "rulingPage": [
+        22
+      ],
+      "rulingQuote": "However, the deposition questioning was not specific enough to permit a finding of a “clear and unambiguous conflict” between the declaration and deposition testimony.",
+      "sourceSha256": "8a606e36efcbdc31edbbcecd2837f0e3683f4d455e32ba3d055fd7c79c5b330b",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-010.txt",
+      "coverageSourceSha256": "921a2f97960fbefd9a3c9cc0fe3c1172cf270ca45bad8f3269b88e4081d8dc28",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-010.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Doc. 107"
+    }
+  },
+  {
+    "id": "fresh-c-011",
+    "source": "Van Asdale v. International Game Technology, 577 F.3d 989 (9th Cir. 2009)",
+    "sourceUrl": "https://cdn.ca9.uscourts.gov/datastore/opinions/2009/08/13/07-16597.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "A general statement about potential fraud does not exclude shareholder fraud; the later declaration specifies two fraud subjects. Court holds it clarifies cursory deposition testimony.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: [Question reconstructed from the opinion, p.17: The court states Shawn was asked about the content of discussion with Johnson regarding deliberate nondisclosure of the Australian Flyer and related documents.] What did you tell Johnson about that nondisclosure?\nA: [t]hat it at least appears suspicious and there is a potential of fraud.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.6: The court states Shawn’s declaration describes what he told supervisors about possible fraud.] What possible fraud did you report to your supervisors?\nA: consistently told [his] supervisors of two possible frauds, the first a general fraud on IGT (including [Shawn] and other IGT shareholders) arising out of the omissions by Anchor during due diligence affecting the value of its Wheel patents, and the second, a specific fraud against the U.S. Patent Office arising out of the non-disclosure of what have been called the ‘Trask-Britt documents.’",
+    "quote1": "[t]hat it at least appears suspicious and there is a potential of fraud.",
+    "quote2": "consistently told [his] supervisors of two possible frauds, the first a general fraud on IGT (including [Shawn] and other IGT shareholders) arising out of the omissions by Anchor during due diligence affecting the value of its Wheel patents, and the second, a specific fraud against the U.S. Patent Office arising out of the non-disclosure of what have been called the ‘Trask-Britt documents.’",
+    "notes": "Proposed author expectation; no detector execution or scoring calibration. Quoted text is preserved from the opinion; reconstructed questions are expressly marked.",
+    "provenance": {
+      "court": "Ninth Circuit",
+      "year": 2009,
+      "docket": "07-16597",
+      "opinionId": "Ninth Circuit | 07-16597 | Opinion Aug. 13, 2009",
+      "quote1Page": [
+        17
+      ],
+      "quote2Page": [
+        6
+      ],
+      "rulingPage": [
+        17
+      ],
+      "rulingQuote": "This statement does not contradict his earlier deposition testimony.",
+      "sourceSha256": "c9dfd500bcfe43d9ab36bd9da94e50c2bd4fc4b57358fb8690d133eda37e3d3e",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-011.txt",
+      "coverageSourceSha256": "2115bb3fa5253d643943b142a72384d40bfc8348f01032ea8c91ced149b2c11d",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse and removal of PDF printed line-wrap hyphenation; words and punctuation unchanged.",
+      "sourceFormat": "pdf",
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-011.txt",
+      "eligible": true,
+      "opinionIdOriginal": "Opinion Aug. 13, 2009"
+    }
+  },
+  {
+    "id": "fresh-c-012",
+    "source": "Central States Industrial Supply, Inc. v. McCullough, 279 F. Supp. 2d 1005 (N.D. Iowa Sept. 3, 2003)",
+    "sourceUrl": "https://law.justia.com/cases/federal/district-courts/FSupp2/279/1005/2386428/",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "A tentative identification of who prepared an agreement does not deny exchanging drafts or personal participation. The court expressly treats the affidavit as added negotiation detail.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: [Question reconstructed from the opinion, p.1020: The court states Anderson was asked who prepared the Employment Agreement.] Who prepared the Employment Agreement?\nA: my guess would have been Bob Guinan [CSIS's corporate attorney] working with us",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.1020: The court quotes this affidavit passage about the purchase of CPI by CSIS and negotiation of the Employment Agreement.] What was your involvement in negotiation of the Employment Agreement?\nA: As a part of the purchase [of CPI by CSIS], Central States Industrial Supply, Inc. and CPI Sales, Inc. negotiated an Employment Agreement with Steve McCullough sending several drafts back and forth. I was directly involved in this process.",
+    "quote1": "my guess would have been Bob Guinan [CSIS's corporate attorney] working with us",
+    "quote2": "As a part of the purchase [of CPI by CSIS], Central States Industrial Supply, Inc. and CPI Sales, Inc. negotiated an Employment Agreement with Steve McCullough sending several drafts back and forth. I was directly involved in this process.",
+    "notes": "Proposed author expectation; no detector run or scoring calibration. This source is a web-tool opinion-text snapshot because direct HTML retrieval was denied. Only relevant opinion paragraphs retained.",
+    "provenance": {
+      "court": "N.D. Iowa",
+      "year": 2003,
+      "docket": "C02-0052-MWB",
+      "opinionId": "N.D. Iowa | C02-0052-MWB | 279 F. Supp. 2d 1005, Sept. 3, 2003",
+      "quote1Page": [
+        1020
+      ],
+      "quote2Page": [
+        1020
+      ],
+      "rulingPage": [
+        1020
+      ],
+      "rulingQuote": "Rather, this paragraph of Anderson's affidavit simply adds more detailed information concerning the negotiation of the Employment Agreement.",
+      "sourceSha256": "75b2090a2b5a78a2517fd466dde44ba0d984550a6613291bd4e79c4801fd8b01",
+      "sourceHashScope": "Retained web-tool opinion-text snapshot; not original HTML/PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-012.txt",
+      "coverageSourceSha256": "75b2090a2b5a78a2517fd466dde44ba0d984550a6613291bd4e79c4801fd8b01",
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring of captured public judicial opinion text.",
+      "sourceFormat": "web-opinion-text",
+      "status": "draft",
+      "freshnessCheckedAgainst": "tests/hard-cases-fresh/research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias review plus exact URL and docket comparison; no excluded opinion reused.",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-012.txt",
+      "eligible": true,
+      "opinionIdOriginal": "279 F. Supp. 2d 1005, Sept. 3, 2003"
+    }
+  },
+  {
+    "id": "fresh-c-013",
+    "source": "A.C. v. Jefferson County R-1 School District, Doc. 171 (D. Colo. Mar. 6, 2024)",
+    "sourceUrl": "https://www.govinfo.gov/content/pkg/USCOURTS-cod-1_20-cv-00078/pdf/USCOURTS-cod-1_20-cv-00078-3.pdf",
+    "license": "Public-domain United States federal judicial opinion; opinion quotations only.",
+    "label": "FALSE_POSITIVE",
+    "labelBasis": "Agreement to a class schedule change does not deny that it was the only proposed alternative for avoiding two students. The court expressly treats the affidavit as explaining why the witness agreed.",
+    "debatable": false,
+    "split": "heldout",
+    "transcript1": "Q: [Question reconstructed from the opinion, p.21: The court states this deposition exchange concerns the school meeting about changing S.T.C.’s eighth-grade class schedule to avoid two boys.] And—you and your mom indicated that this change was—was okay with you, right?\nA: Yes.",
+    "transcript2": "Q: [Question reconstructed from the opinion, p.21: The court quotes this affidavit passage about the school’s proposed class schedule change to avoid two boys.] What solution did Principal Gomez offer for avoiding those students?\nA: The only solution that Mr. Gomez was willing to offer was that I should move to the remedial hallway to avoid [S.R.] and [R.R.].",
+    "quote1": "Q: And—you and your mom indicated that this change was—was okay with you, right? A: Yes.",
+    "quote2": "The only solution that Mr. Gomez was willing to offer was that I should move to the remedial hallway to avoid [S.R.] and [R.R.].",
+    "notes": "Proposed author expectation only. Reconstructed question is marked context, followed by the opinion’s actual Q/A. No app or paid API execution.",
+    "provenance": {
+      "court": "D. Colo.",
+      "year": 2024,
+      "docket": "1:20-cv-00078-CMA-KAS",
+      "opinionId": "D. Colo. | 1:20-cv-00078-CMA-KAS | Doc. 171, Mar. 6, 2024",
+      "quote1Page": [
+        21
+      ],
+      "quote2Page": [
+        21
+      ],
+      "rulingPage": [
+        21
+      ],
+      "rulingQuote": "The Court finds no direct contradiction between these pieces of evidence.",
+      "sourceSha256": "2f687caf3274ac6aceaa4da66090b131af9bfc35aa5f9176fd4fc03bbaeea531",
+      "sourceHashScope": "Downloaded opinion PDF bytes",
+      "coverageSourceFile": "research/sources-c/fresh-c-013.txt",
+      "coverageSourceFileRepoRelative": "tests/hard-cases-fresh/research/sources-c/fresh-c-013.txt",
+      "coverageSourceSha256": "816c443843444b0579def770e7208d35f0757019b28c73d8a73cbbb0b3379daf",
+      "quote1Verbatim": true,
+      "quote2Verbatim": true,
+      "quote1LiteralVerified": true,
+      "quote2LiteralVerified": true,
+      "literalVerificationMethod": "Exact substring after whitespace collapse; words and punctuation preserved.",
+      "freshnessCheckedAgainst": "research/excluded-opinions.json",
+      "freshnessMethod": "Manual case-name/docket/URL-alias check against supplied exclusion index; no excluded opinion reused.",
+      "eligible": true,
+      "status": "draft",
+      "quote1ShingleCoverage": 1,
+      "quote2ShingleCoverage": 1,
+      "opinionIdOriginal": "Doc. 171, Mar. 6, 2024"
+    }
+  }
+]

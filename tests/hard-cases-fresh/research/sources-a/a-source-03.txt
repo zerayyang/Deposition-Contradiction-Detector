@@ -1,0 +1,73 @@
+Source URL: https://www.govinfo.gov/content/pkg/USCOURTS-mad-1_09-cv-11315/pdf/USCOURTS-mad-1_09-cv-11315-1.pdf
+Extraction: PyMuPDF; relevant PDF pages only.
+
+[Opinion page 30]
+     10  Defendants cite pages 185 to 187 and page 208 as
+containing the above testimony.  The summary judgment record does
+not include pages 185 to 187 of the deposition.  It also fails to
+include page 32.  
+     11  The testimony is as follows:
+Q.  But you chose Mr. Murphy.  Correct?
+A.  Mr. Murphy?  Yes.
+(Docket Entry # 87, Ex. B, p. 206).  
+     12  The testimony is as follows:
+Q.  And he [Attorney Murphy] was chosen because he was the
+best.  Right?  At least in your mind.
+A.  First off, I didn’t make the choice.
+Q.  Well, Ms. Herman is not a stupid woman, is she?
+A.  Not likely.
+(Docket Entry # 87, Ex. B, p. 208).  
+     13  The relevant deposition testimony reads as follows:
+Q.  Were you paying Wayne Murphy by the hour?
+A.  No.
+30
+Hernandez-Loring v. Universidad Metropolitana, 233 F.3d 49, 54
+(1st Cir. 2000) (“lapse of memory, new sources of information or
+other events can often explain a revision”).
+In paragraph 50, Caplitz avers that, “Left without coverage,
+Herman, FRNI and I hired Attorney Wayne Murphy . . .  to
+represent us.”  (Docket Entry # 95, ¶ 85).  Defendants submit
+that Caplitz testified at his deposition that Herman, not
+Caplitz, chose Attorney Murphy to serve as their counsel in the
+Indianapolis action.  (Docket Entry # 104, p. 6).10  Elsewhere
+during his deposition, however, Caplitz testified at one point
+that he chose Attorney Murphy,11 at another point that Herman
+chose Attorney Murphy12 and at another point that “other attorneys
+were interviewed” in addition to Attorney Murphy.  (Docket Entry
+# 87, Ex. B, p. 208).  Caplitz also testified that Attorney
+Murphy was on a quarterly retainer as opposed to being paid by
+the hour.13  The fact that “Herman, FRN1 and [Caplitz] hired
+Case 1:09-cv-11315-MBB   Document 107   Filed 03/31/12   Page 30 of 69
+
+
+[Opinion page 31]
+Q.  You weren’t paying him by the hour?
+A.  No.  He was on a quarterly retainer, as I understand.
+Q.  Of how much?
+A.  I believe it at one point was [$]12,000 a quarter and I
+believe it increased to 20.
+(Docket Entry # 87, Ex. B, pp. 209-210).  The existence of a
+quarterly retainer does not directly contradict a statement
+regarding which entity and/or person made the decision to hire
+Attorney Murphy.  
+31
+Attorney” Murphy to represent them in the Indianapolis action, as
+stated in the affidavit, does not directly or necessarily
+contradict the prior deposition testimony that Caplitz or Herman
+chose Attorney Murphy as counsel.  Although paragraph 50 raises
+credibility questions regarding Caplitz and his memory, it is not
+contradictory with the prior testimony and therefore constitutes
+part of the summary judgment record. 
+Turning to paragraph 85, Caplitz avers by affidavit that,
+“Furthermore, although I paid none of those attorneys’ fees, I
+have an agreement with Herman to reimburse her for half that
+amount, with interest at 6% per annum.  To date, I owe over
+$900,000 with interest.”  (Docket Entry # 95, ¶ 85).  In a
+previous interrogatory, Caplitz stated that he had paid $262,533
+in attorneys’ fees to Cohan, Rasnick & Meyerson, LLP and $172,000
+in attorneys’ fees to Attorney Murphy and his law firm to defend
+against the Indianapolis action and the Meiselman cross claim. 
+(Docket Entry # 87, Ex. Z).  In December 2006, Attorney Cohan of
+Cohan, Rasnick & Meyerson, LLP began representing Herman and
+Caplitz in the Indianapolis action after the default judgment and
+Case 1:09-cv-11315-MBB   Document 107   Filed 03/31/12   Page 31 of 69

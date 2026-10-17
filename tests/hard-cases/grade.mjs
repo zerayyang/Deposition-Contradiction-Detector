@@ -36,9 +36,9 @@ export function gradeRun(results,references){
   note:'Draft reference labels from court rulings; not approved gold. Debatable and incomplete cases are not graded.'};
 }
 async function main(){
- const file=process.argv[2];if(!file)throw new Error('Usage: node tests/hard-cases/grade.mjs <results.json>');
+ const file=process.argv[2];if(!file)throw new Error('Usage: node tests/hard-cases/grade.mjs <results.json> [reference-findings.json]');
  const results=JSON.parse(await fs.readFile(file,'utf8'));
- const references=JSON.parse(await fs.readFile(new URL('./reference-findings.json',import.meta.url),'utf8'));
+ const references=JSON.parse(await fs.readFile(process.argv[3]??new URL('./reference-findings.json',import.meta.url),'utf8'));
  const {rows,summary,note}=gradeRun(results,references);
  for(const r of rows.filter(r=>r.correct===false))console.log(`WRONG ${r.id}: expected ${r.expected}, got ${r.predicted}`);
  console.log(JSON.stringify({summary,note},null,2));

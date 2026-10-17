@@ -1,0 +1,67 @@
+[
+  {
+    "candidate": "adefila",
+    "reason": "Relevant rulings located, but the opinion paraphrases the key contradictory deposition/affidavit statements rather than quoting sufficient witness language. Not retained."
+  },
+  {
+    "candidate": "ogbonnah",
+    "reason": "Employer-status ruling located; disputed witness assertions largely paraphrased rather than quoted as matching witness passages. Not retained."
+  },
+  {
+    "candidate": "whyde",
+    "reason": "Deposition extensively quoted, but corresponding porch-incident declaration not quoted sufficiently for a faithful pair. Not retained."
+  },
+  {
+    "candidate": "werner",
+    "reason": "One specific pair characterized by the court as tension rather than direct contradiction; the separate recall contradiction relies on a paraphrased deposition statement. Not forced into a requested label."
+  },
+  {
+    "candidate": "waterhouse",
+    "reason": "Affidavit quoted, but the contradictory earlier deposition not quoted in the retrieved appellate opinion. Not retained."
+  },
+  {
+    "candidate": "gorsky",
+    "reason": "PDF retrieval yielded a court site error document; no reproducible source excerpt retained."
+  },
+  {
+    "candidate": "sws",
+    "reason": "Judicial text located online, but no reliable downloadable primary PDF obtained within this batch; not retained."
+  },
+  {
+    "candidate": "briggs",
+    "reason": "Initial source download failed. A later authorized research pass recovered the primary court PDF; one source-validated case is now retained.",
+    "status": "recovered"
+  },
+  {
+    "candidate": "hall",
+    "reason": "PDF mirror retrieval yielded a challenge/error document. Not retained."
+  },
+  {
+    "candidate": "bell",
+    "reason": "PDF retrieval yielded an error document. Not retained."
+  },
+  {
+    "candidate": "green",
+    "reason": "PDF mirror retrieval yielded a challenge page. Not retained."
+  },
+  {
+    "candidate": "anderson",
+    "reason": "Ruling and deposition quoted, but no sufficient literal affidavit passage in the relevant ruling section. Not retained."
+  },
+  {
+    "candidate": "gonzalez",
+    "reason": "PDF mirror retrieval yielded a challenge page. Not retained."
+  },
+  {
+    "candidate": "wagoner",
+    "reason": "Corresponding quoted deposition and affidavit passages were located, but the court expressly describes inconsistencies while denying exclusion on expert-evidence and credibility grounds. Not forced into FALSE_POSITIVE."
+  },
+  {
+    "candidate": "newton",
+    "reason": "Two clear contradiction pairs located, but not appended because the requested supplemental batch sought balanced additions; the potential noncontradiction pair lacks sufficient literal deposition text."
+  },
+  {
+    "candidate": "lehman",
+    "reason": "Source located via a public HTML mirror, but the requested balanced addition did not require further direct cases. No unquoted remainder was forced into FALSE_POSITIVE."
+  }
+]

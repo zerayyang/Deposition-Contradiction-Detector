@@ -1,0 +1,18 @@
+{
+  "mode": "COST PREVIEW ONLY",
+  "method": "events",
+  "split": "all",
+  "cases": 40,
+  "repeat": 1,
+  "skipDatasets": false,
+  "model": "claude-opus-5-5",
+  "plannedRequests": 80,
+  "phase": "extraction only",
+  "estimatedUsd": 5.701273,
+  "conservativeBudgetUsd": 60.153905,
+  "comparisonRequests": "UNKNOWN until validated extraction; no fabricated event counts",
+  "completeWorkflowCost": "UNKNOWN; extraction estimate excludes comparison",
+  "pricing": "Current application-configured uncached USD rates; not verified billing. No automatic retries.",
+  "answerKeyStatus": "Draft proposals, not approved gold. This runner does not grade or promote them.",
+  "inputsSha256": "822433f868c6d7187ece1761a9b43fed325b3a0c743078290a81ba96f896b729"
+}
