@@ -31,7 +31,8 @@ one or more independently assessed factual issues. A pair can contain MULTIPLE
 independent issues: do not impose one issue per event pair. Each issue has a type
 DIRECT, INFERENTIAL, NEEDS_REVIEW or FALSE_POSITIVE under the procedure above,
 report (whether it warrants a standalone finding under the existing reporting
-rules), issue, reasoning, leftSourceIds, rightSourceIds and missingContext.
+rules), issue, decision (the Step 7 answers, given before type; code computes the
+final type from them), reasoning, leftSourceIds, rightSourceIds and missingContext.
 missingContext lists only absent facts NECESSARY to establish this issue's identity, scope, overlap or incompatibility. It is not a list of everything an investigator could ask. Unknown details that cannot change the particular comparison belong in an optional follow-up in reasoning, not missingContext. An imagined reconciliation is not missing evidence by itself. Conversely, if the shared person/occasion, relevant interval or logical exclusion genuinely is unresolved, state it and keep review required. Never clear missingContext just to obtain a score; the model does not decide whether code can score an issue. A NEEDS_REVIEW issue must list its missing facts here and set report:true.
 
 Use FALSE_POSITIVE for independently compared compatible/identical details; set

@@ -115,6 +115,19 @@ Apply the same answer to the same pattern every time:
 - Torn between FALSE_POSITIVE and a conflict: choose FALSE_POSITIVE only if you can name which of reconciliations 1–7 applies and quote the testimony that supplies it. Otherwise it is a conflict.
 - Torn between NEEDS_REVIEW and a decision: if the needed fact is in the testimony, decide; NEEDS_REVIEW only when it is genuinely absent.
 
+### Step 7: Record your answers in `decision`
+
+For every pair you return, answer these questions in `decision` BEFORE writing `reasoning` and `type`. Application code computes the final type from these answers with fixed rules, so answer each question on its own, literally and consistently.
+
+- `sameFact`: "YES" if both statements are about the same fact (Step 3); "NO" if they are about different facts; "UNCLEAR" only when the testimony leaves it undetermined (Step 4, NEEDS_REVIEW gaps).
+- `canBothBeTrue`: the Step 4 answer, "YES" or "NO".
+- `reconciliation`: if YES, which permitted reconciliation from Step 4 applies: DIFFERENT_STATED_SCOPE (1), CORRECTION_OR_QUALIFICATION (2), NARROWER_QUESTION (3), OVERLAPPING_APPROXIMATIONS (4), UNCERTAIN_RECOLLECTION (5), LATER_OPINION_OR_LEARNED (6), ADDED_DETAIL (7); otherwise NONE.
+- `reconciliationQuote`: the exact words from either transcript (question or answer) that supply that reconciliation, copied verbatim; "" when NONE. Code checks these words exist. A reconciliation without supporting words does not count.
+- `conflictForm`: the Step 5 form of the clash, judged on the words as stated: AFFIRM_VS_DENY, DIFFERENT_EXACT_VALUES, EXHAUSTIVE_VS_EXCEPTION, REQUIRES_INFERENCE, NON_OVERLAPPING_APPROXIMATIONS, or NONE if the statements do not clash at all.
+- `missingFact`: when `sameFact` is UNCLEAR, the exact missing fact; otherwise "".
+
+The rules code applies: different facts → FALSE_POSITIVE; UNCLEAR with a missing fact → NEEDS_REVIEW; a permitted reconciliation whose words are found → FALSE_POSITIVE; AFFIRM_VS_DENY, DIFFERENT_EXACT_VALUES or EXHAUSTIVE_VS_EXCEPTION → DIRECT; REQUIRES_INFERENCE or NON_OVERLAPPING_APPROXIMATIONS → INFERENTIAL; no clash → FALSE_POSITIVE. Set `type` to the result of these rules.
+
 ## 3. Classification Types
 
 ### DIRECT
@@ -228,6 +241,14 @@ Top-level structure:
         "statePhrase": null,
         "qualifierPhrases": []
       },
+      "decision": {
+        "sameFact": "YES",
+        "canBothBeTrue": "NO",
+        "reconciliation": "NONE",
+        "reconciliationQuote": "",
+        "conflictForm": "AFFIRM_VS_DENY",
+        "missingFact": ""
+      },
       "reasoning": "Concise explanation of the factual issue, compatibility analysis, directness or inference analysis, and why the classification follows.",
       "type": "DIRECT",
       "severity": "HIGH",
@@ -239,6 +260,8 @@ Top-level structure:
     }
   ]
 }
+
+`decision` holds your Step 7 answers; the application computes the final `type` from them.
 
 `topicsReviewed` is the list from Step 1: every shared topic you considered, including topics with no reportable candidate.
 

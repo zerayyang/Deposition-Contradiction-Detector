@@ -4,6 +4,7 @@ import { validateClaim } from "./evidenceValidator.js";
 import { TestimonyFact } from "./TestimonyFact.js";
 import { scoreFacts } from "./scoring/engine.js";
 import { witnessQuoteMatches, resolveWitnessSource } from "./sourceEvidence.js";
+import { applyDecision } from './typeDecision.js';
 
 function sourceContext(transcript, quote, binding, options={}) {
     const matches = witnessQuoteMatches(transcript, quote, options).filter(m=>binding.status==='BOUND'&&m.index===binding.selected.start);
@@ -15,6 +16,8 @@ function sourceContext(transcript, quote, binding, options={}) {
 
 // Orchestration preserves model metadata, but passes only validated literal facts to scoring.
 export function assessCandidate(candidate, transcript1, transcript2, sourceOptions={}) {
+    // When the model answered the decision questions, code sets the type from them.
+    candidate = applyDecision(candidate, [transcript1, transcript2]);
     if (!candidate || typeof candidate !== "object" ||
         !["DIRECT", "INFERENTIAL", "NEEDS_REVIEW", "FALSE_POSITIVE"].includes(candidate.type)) {
         throw new Error("Invalid candidate classification in model response");

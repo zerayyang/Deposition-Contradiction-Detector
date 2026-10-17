@@ -225,7 +225,7 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
           const assessed=assessCandidate(c,texts[0],texts[1],{claim1:{...a,map:quoteMaps[0],speakerRoles:plan.speakerRoles?.[0],manifest:plan.manifests[0]},claim2:{...b,map:quoteMaps[1],speakerRoles:plan.speakerRoles?.[1],manifest:plan.manifests[1]}});
           assessed.sourceGrounding=grounding;
           assessed.sourceReferences={claim1:sourceReferences(texts[0],c.claim1.original,plan.manifests[0],assessed.sourceBindings.claim1),claim2:sourceReferences(texts[1],c.claim2.original,plan.manifests[1],assessed.sourceBindings.claim2)};
-          const variant={pairId:task.id,type:c.type,severity:c.severity,reasoning:c.reasoning,semanticAssist:c.semanticAssist,sourceAnchors:Object.fromEntries(['claim1','claim2'].map(key=>[key,{sourceQuestion:c[key]?.sourceQuestion??null,sourceAnswer:c[key]?.sourceAnswer??null}]))};
+          const variant={pairId:task.id,type:assessed.type,modelType:c.type,severity:c.severity,reasoning:c.reasoning,semanticAssist:c.semanticAssist,sourceAnchors:Object.fromEntries(['claim1','claim2'].map(key=>[key,{sourceQuestion:c[key]?.sourceQuestion??null,sourceAnswer:c[key]?.sourceAnswer??null}]))};
           const key=findingKey(assessed),existing=findings.get(key);
           if(existing){existing.supportingAnalyses.push(variant);duplicatesCombined++;}
           else findings.set(key,{...assessed,supportingAnalyses:[variant]});

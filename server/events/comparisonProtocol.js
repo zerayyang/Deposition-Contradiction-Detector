@@ -1,11 +1,15 @@
 import Ajv from 'ajv';
 import {decodeEventJson} from './jsonTransport.js';
+import {decisionSchema,applyDecision} from '../typeDecision.js';
 
 const text={type:'string',minLength:1},ids={type:'array',items:text,uniqueItems:true};
+// The model answers `decision` first; code sets the type from it (server/typeDecision.js).
+// Saved results from before the decision field still validate and keep their own type.
 const issue={type:'object',additionalProperties:false,required:['issue','type','report','reasoning','leftSourceIds','rightSourceIds','missingContext'],properties:{
-  issue:text,type:{enum:['DIRECT','INFERENTIAL','NEEDS_REVIEW','FALSE_POSITIVE']},report:{type:'boolean'},reasoning:text,leftSourceIds:ids,rightSourceIds:ids,missingContext:{type:'array',items:text}}};
+  issue:text,decision:decisionSchema,type:{enum:['DIRECT','INFERENTIAL','NEEDS_REVIEW','FALSE_POSITIVE']},report:{type:'boolean'},reasoning:text,leftSourceIds:ids,rightSourceIds:ids,missingContext:{type:'array',items:text}}};
+const wireIssue={...issue,required:['issue','decision',...issue.required.filter(k=>k!=='issue')]};
 export const comparisonWireSchema={type:'object',additionalProperties:false,required:['schemaVersion','rows'],properties:{schemaVersion:{const:1},rows:{type:'array',items:{type:'object',additionalProperties:false,required:['leftId','pairs','unrelatedRanges'],properties:{
-  leftId:text,pairs:{type:'array',items:{type:'object',additionalProperties:false,required:['rightId','relation','reason','comparisons'],properties:{rightId:text,relation:{enum:['RELATED','UNRESOLVED']},reason:text,comparisons:{type:'array',items:issue}}}},
+  leftId:text,pairs:{type:'array',items:{type:'object',additionalProperties:false,required:['rightId','relation','reason','comparisons'],properties:{rightId:text,relation:{enum:['RELATED','UNRESOLVED']},reason:text,comparisons:{type:'array',items:wireIssue}}}},
   unrelatedRanges:{type:'array',items:{type:'object',additionalProperties:false,required:['start','end','reason'],properties:{start:{type:'integer',minimum:0},end:{type:'integer',minimum:0},reason:text}}}
 }}}}};
 const ajv=new Ajv({allErrors:true,jsonPointers:true,removeAdditional:false,useDefaults:false,coerceTypes:false});
@@ -29,6 +33,14 @@ function sideSources(side,ids,primary){
   });
   if(!found.some(s=>s.role==='WITNESS'&&primary.event.sources.some(p=>p.id===s.id)))throw new Error('Comparison needs a literal witness source from each primary event.');
   return structuredClone(found);
+}
+// Every text the model was shown for this block (answers, questions, context), so a
+// claimed reconciliation can be checked against the record.
+function sourceStrings(value,out=[]){
+  if(typeof value==='string')out.push(value);
+  else if(Array.isArray(value))for(const v of value)sourceStrings(v,out);
+  else if(value&&typeof value==='object')for(const v of Object.values(value))sourceStrings(v,out);
+  return out;
 }
 export function validateComparisonResponse(response,task){
   const issues=[],pairs=[],comparisons=[],unrelated=[],rejected=[],seen=new Set(),rowCounts=new Map();let accountedPairs=0;
@@ -54,8 +66,9 @@ export function validateComparisonResponse(response,task){
         try{
           const leftSources=sideSources(task.input.left,c.leftSourceIds,left),rightSources=sideSources(task.input.right,c.rightSourceIds,right);
           const id=JSON.stringify([task.id,left.id,right.id,comparisonIndex]);
-          comparisons.push({...structuredClone(c),id,pairId,leftId:left.id,rightId:right.id,leftSources,rightSources,
-            reviewReasons:[...record.reviewReasons,...c.missingContext,...(pair.relation==='UNRESOLVED'?[pair.reason]:[])],reviewRequired:record.reviewRequired||c.missingContext.length>0||c.type==='NEEDS_REVIEW',sourceVerified:true,taskId:task.id});
+          const decided=applyDecision(structuredClone(c),sourceStrings(task.input));
+          comparisons.push({...decided,id,pairId,leftId:left.id,rightId:right.id,leftSources,rightSources,
+            reviewReasons:[...record.reviewReasons,...c.missingContext,...(pair.relation==='UNRESOLVED'?[pair.reason]:[])],reviewRequired:record.reviewRequired||c.missingContext.length>0||decided.type==='NEEDS_REVIEW',sourceVerified:true,taskId:task.id});
           record.comparisonIds.push(id);
         }catch(error){add('COMPARISON_SOURCE',error.message,{pairId,comparisonIndex});rejected.push({pairId,comparisonIndex,comparison:structuredClone(c),error:error.message});}
       }
