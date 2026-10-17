@@ -22,6 +22,16 @@ async function replayExtraction(plan,saved){
  // A completed record is a strict cache claim, never an acknowledged gap.
  return executeEventExtraction({plan,approval:approval(plan),cachedResponses,retainedTasks,callModel:async()=>{throw new Error('Local replay must not call a model.');}});
 }
+const canonicalRoles=roles=>Object.fromEntries(Object.entries(roles??{}).sort(([a],[b])=>a<b?-1:a>b?1:0));
+const permutations=list=>list.length<2?[list]:list.flatMap((item,i)=>permutations([...list.slice(0,i),...list.slice(i+1)]).map(rest=>[item,...rest]));
+// Tries each key order of the same role maps (bounded) to find a previously saved plan ID.
+// Only the order differs, so the matched plan has exactly the same roles and sources.
+function matchingRoleOrder(maps,planWith,planId,limit=720){
+ const orders=maps.map(m=>{const keys=Object.keys(m??{});return keys.length<=6?permutations(keys):[keys];});
+ if(orders.reduce((n,o)=>n*o.length,1)>limit)return null;
+ for(const a of orders[0])for(const b of orders[1]){const plan=planWith([Object.fromEntries(a.map(k=>[k,maps[0][k]])),Object.fromEntries(b.map(k=>[k,maps[1][k]]))]);if(plan.id===planId)return plan;}
+ return null;
+}
 export async function prepareEventWorkflow(body,{codeFingerprint='local-test',maxRequests=12,maxBudgetUsd=25,approvedMemory=null,checkMemory=null}={}){
  if(body?.useApprovedMemory!==undefined&&typeof body.useApprovedMemory!=='boolean')throw new Error('Memory preference must be a boolean.');
  if(body?.phase==='compare'&&body.useApprovedMemory&&!approvedMemory)throw new Error('Approved memory must be checked by the server before comparison.');
@@ -30,8 +40,12 @@ export async function prepareEventWorkflow(body,{codeFingerprint='local-test',ma
  const sourceOptions=body.speakerRoles??[{},{}];
  if(!Array.isArray(sourceOptions)||sourceOptions.length!==2)throw new Error('Supply two reviewed speaker-role maps.');
  [body.transcript1,body.transcript2].forEach((text,i)=>requireSpeakerReview(text,sourceOptions[i]));
- const extractionPlan=buildEventExtractionPlan([body.transcript1,body.transcript2].map((text,i)=>({documentId:`transcript-${i+1}`,text,extraction:body.documents?.[i]?.extraction,pageMappingStale:body.documents?.[i]?.pageMappingStale,speakerRoles:sourceOptions[i],witnessTestimonyConfirmed:body.witnessTestimonyConfirmed?.[i]??false})),{maxRequests});
+ const planWith=maps=>buildEventExtractionPlan([body.transcript1,body.transcript2].map((text,i)=>({documentId:`transcript-${i+1}`,text,extraction:body.documents?.[i]?.extraction,pageMappingStale:body.documents?.[i]?.pageMappingStale,speakerRoles:maps[i],witnessTestimonyConfirmed:body.witnessTestimonyConfirmed?.[i]??false})),{maxRequests});
+ // Saved cases store role maps as JSONB, which reorders keys, so plans use one fixed order.
+ let extractionPlan=planWith(sourceOptions.map(canonicalRoles));
  const state=body.eventState;
+ // Readings saved before the fixed order may have used another key order of the same roles.
+ if(state?.extraction?.planId&&state.extraction.planId!==extractionPlan.id)extractionPlan=matchingRoleOrder(sourceOptions,planWith,state.extraction.planId)??extractionPlan;
  // Fresh plan IDs, raw schema/source validation and comparison pipeline hashes
  // govern reuse. A deployment fingerprint alone must not force repeated charges.
  if(state&&state.extraction?.planId!==extractionPlan.id)throw new Error('Saved extraction belongs to different sources, roles or instructions. Start a new reading plan; existing results remain available.');
