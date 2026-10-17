@@ -9,7 +9,7 @@ import {createAnalysisHandlers} from './analysisHandlers.js';
 import {createAdmission,createRateLimit} from './runtimeControls.js';
 import {requestIdFrom,runWithRequest} from './requestContext.js';
 // Factory imports start no listener, invoke no model and read no credentials.
-export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIMITS.requestBytes,authenticate=null,jobStore=null,codeFingerprint,runtimeIdentity=null,maxRequests,maxBudgetUsd,log=()=>{},staticDirectory=null,readApprovedMemory=null,cloudStoreForRequest=null}) {
+export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIMITS.requestBytes,authenticate=null,jobStore=null,codeFingerprint,runtimeIdentity=null,maxRequests,maxBudgetUsd,log=()=>{},staticDirectory=null,readApprovedMemory=null,cloudStoreForRequest=null,cronHealth=null}) {
  const identity=runtimeIdentity??{version:1,codeFingerprint:codeFingerprint??null,promptSha256:digest(instructions??''),model:MODEL.id,startedAt:null,commit:null};
  const app=express(),admission=createAdmission(),recoveryAdmission=createAdmission(),allowed=createRateLimit(),ipAllowed=createRateLimit({limit:90});app.disable('x-powered-by');
  app.use((_req,res,next)=>{res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY'});next();});
@@ -21,6 +21,8 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   const record=()=>{if(recorded)return;recorded=true;res.off('finish',record);res.off('close',record);log({event:'http_request_finished',requestId,method:req.method,route:typeof req.route?.path==='string'?req.route.path:'/api',status:res.statusCode,durationMs:Math.round(performance.now()-began),connectionEnded:!res.writableEnded});};
   res.once('finish',record);res.once('close',record);runWithRequest(requestId,next);
  });
+ // Scheduled checks authenticate with the cron secret, not a user session.
+ if(cronHealth)app.get('/api/cron/health',cronHealth);
  app.use('/api',async(req,res,next)=>{
   if(!ipAllowed(req.socket?.remoteAddress??'test-local'))return res.status(429).set('Retry-After','60').json({error:'Too many requests. Wait one minute.'});
   try{req.identity=authenticate?await authenticate(req):{id:'test-local'};}catch{return res.status(401).json({error:'Sign in again before accessing analysis or recovery.'});}
