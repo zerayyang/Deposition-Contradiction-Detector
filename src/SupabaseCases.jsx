@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "./lib/supabaseClient.js";
+import { LOCAL_SESSION, localModeEnabled } from "./lib/localStores.js";
 
 function SignIn() {
   const [signup, setSignup] = useState(false);
@@ -41,7 +42,9 @@ function SignIn() {
   </section></main>;
 }
 
-export default function AuthGate({ children }) {
+export default function AuthGate({ children, hostname = globalThis.location?.hostname }) {
+  // Localhost without Supabase runs in no-account mode; hosted sites always need sign-in.
+  const local = localModeEnabled({ supabaseConfigured: Boolean(supabase), hostname });
   const [auth, setAuth] = useState({ loading: true, session: null, error: "" });
   useEffect(() => {
     if (!supabase) return;
@@ -59,6 +62,7 @@ export default function AuthGate({ children }) {
     return () => { active = false; subscription.unsubscribe(); };
   }, []);
 
+  if (local) return children(LOCAL_SESSION);
   if (!supabase) return <main className="login-page"><section className="login-card"><h1>Connection needed</h1><p>Add the Supabase URL and publishable key to .env.local, then restart the app.</p></section></main>;
   if (auth.loading) return <main className="session-loading" role="status">Opening your workspace…</main>;
   if (auth.session) return children(auth.session);

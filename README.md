@@ -8,7 +8,7 @@ This is a review aid, not a legal conclusion. Scores are rule-based evidence ind
 
 - **Node.js 24** and **Git**.
 - An **Anthropic API key** with access to `claude-opus-5-5`. Calls are billed to that key's account.
-- A **Supabase project**. The app saves cases and original files there and requires sign-in, including when run locally. Without it the first screen shows "Connection needed". Apply the SQL files in `supabase/migrations/` in date order; see `docs/SUPABASE_SETUP.md`.
+- **Optional: a Supabase project.** Without one, the app runs locally in **no-account mode**: no sign-in, and cases, transcripts, results and original files are saved in your browser on this computer. With Supabase configured, the app requires sign-in and saves everything to your project instead (apply the SQL files in `supabase/migrations/` in date order; see `docs/SUPABASE_SETUP.md`). The hosted (Vercel) site always requires Supabase sign-in.
 
 ## Quick start
 
@@ -18,7 +18,9 @@ cd Deposition-Contradiction-Detector
 node start.mjs
 ```
 
-On first run the launcher asks for your Anthropic key (input hidden), saves it to `.env`, installs dependencies, starts the API (port 3000) and the web app (port 5173), and opens http://localhost:5173. Add your Supabase values to `.env.local` (see Configuration), restart, create an account, and sign in.
+On first run the launcher asks for your Anthropic key (input hidden), saves it to `.env`, installs dependencies, starts the API (port 3000) and the web app (port 5173), and opens http://localhost:5173. With no Supabase values configured, the workspace opens directly in no-account mode (the sidebar says "No-account mode · saved in this browser"). Click **Save sample as case**, then **Review reading cost** to try the included sample.
+
+No-account mode works only on `localhost` with no Supabase configured; the API then accepts unsigned requests only from the same computer. Feedback review and approved lessons need accounts and are hidden in this mode. Clearing the browser's site data deletes locally saved cases.
 
 Practice files: `public/examples/riley-morgan-*.pdf`, with expected answers in `public/examples/expected-results.html`.
 
@@ -72,7 +74,7 @@ Only literal witness words reach the rules. A card keeps its review flag when it
 | Variable | Where | Purpose |
 | --- | --- | --- |
 | `ANTHROPIC_API_KEY` | server `.env` / Vercel | Claude access |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | `.env.local` / Vercel build | Browser sign-in and case storage |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | `.env.local` / Vercel build | Browser sign-in and case storage (leave unset for local no-account mode) |
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | server / Vercel | Server-side sign-in checks and hosted job storage (defaults to the VITE values) |
 | `DEMO_USER_IDS` | production | Comma-separated Supabase user IDs allowed to run analyses |
 | `ANALYSIS_JOB_SIGNING_KEY` | Vercel | Signs hosted job records; set it separately from the API key |
@@ -104,7 +106,7 @@ npm run build
 | Path | Purpose |
 | --- | --- |
 | `start.mjs` | One-command local launcher |
-| `src/` | React app (upload, review cards, reports) |
+| `src/` | React app (upload, review cards, reports); `src/lib/localStores.js` is the no-account storage |
 | `server/app.js`, `server/server.js`, `api/index.js` | API, logging and Vercel entry |
 | `server/events/` | Read, then compare: reading, comparison, validation, scoring bridge |
 | `server/documentAnalysis.js`, `server/proper_prompts.md` | Direct comparison and the classification instructions |
