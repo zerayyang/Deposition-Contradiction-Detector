@@ -258,6 +258,7 @@ Top-level structure:
         "value2": "",
         "missingFact": ""
       },
+      "headline": "Signing the lease",
       "reasoning": "Concise explanation of the factual issue, compatibility analysis, directness or inference analysis, and why the classification follows.",
       "type": "DIRECT",
       "severity": "HIGH",
@@ -274,7 +275,9 @@ Top-level structure:
 
 `topicsReviewed` is the list from Step 1: every shared topic you considered, including topics with no reportable candidate.
 
-`reasoning` must be 2–4 concise sentences, normally no more than 70 words. Analyze fully before writing; shorten the explanation, not the factual review. Cover the following points without repeating quotes or boilerplate:
+`headline` is a 2–6 word plain-language name for the factual issue (for example "Time he left the party"); no labels, verdicts or quotes.
+
+`reasoning` must be 1–2 short sentences, normally no more than 35 words. Analyze fully before writing; shorten the explanation, not the factual review. Cover the following points without repeating quotes or boilerplate:
 
 1. The shared factual issue and any uncertainty about person, event, time period, or scope.
 2. What each claim says and the precise tension between them.

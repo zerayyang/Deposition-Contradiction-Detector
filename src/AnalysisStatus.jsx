@@ -17,7 +17,8 @@ export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }
   const failures = (analysis.tasks ?? []).filter(task => task.status === 'failed' || task.status === 'partial').map(task=>withReadingDiagnostics(analysis,task));
   const coverage = analysis.coverage ?? [];
   const reviewIssues = (analysis.issues ?? []).filter(issue => !failures.some(task => task.id === issue.pairId));
-  return <section className="analysis-status" aria-label="Analysis progress">
+  const failedRun = !running && ["failed","partial","cancelled"].includes(analysis?.status) && !unscoredOnlyCount(analysis);
+  return <section className={`analysis-status${failedRun ? " is-error" : ""}`} aria-label="Analysis progress">
     <div className="analysis-status-heading"><h2>{title}</h2><span>{processed} of {total} {unit} finished</span></div>
     {documents.length>0&&<div aria-label="Reading coverage by document">{documents.map(doc=><p key={doc.document}><strong>{readingDocumentLabel(doc)}</strong></p>)}</div>}
     {gaps&&!inProgress&&<aside className="event-gap-review" role="note"><strong>{retainedNotesLabel}</strong><p>{readingGapWarning}</p></aside>}

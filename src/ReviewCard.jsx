@@ -1,5 +1,6 @@
 import {sourceBindingMessage} from './lib/sourceStatus.js';
 import { scoreBadge } from "./lib/scoreBadge.js";
+import { shortRule, firstSentence } from "./lib/shortLabels.js";
 const percent = value => Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Unavailable";
 const ruleNames = {time:"Time comparison",state:"Opposing states",timeline:"Timeline conflict","activity polarity":"Action affirmed vs denied","location+activity":"Home presence vs departure","point-location":"Same-time location comparison",knowledge:"Awareness or meeting",quantity:"Amount comparison"};
 const reasonLabels = {LABEL_DISAGREEMENT:"Comparisons of the same witness answers reached different categories. A person should decide before any score is shown.",NO_FACTS:"The code has no supported facts to compare.",UNSUPPORTED_PATTERN:"This comparison is outside the patterns the code can verify.",MISSING_CONTEXT:"The comparison needs clearer person, event, day or time context.",UNVERIFIED_SOURCE:"A quote or extracted phrase could not be verified against the source."};
@@ -36,14 +37,14 @@ export function ReviewCard({result:r, dismissed=false}) {
   const label = r.labelDisagreement ? "Labels disagree" : labelFor(r.type);
   const review = notEvaluable || r.flag === "REVIEW" || /^(Unresolved timing|Question meaning unresolved)/i.test(reasoning);
   return <article className={`review-card ${r.type?.toLowerCase() ?? ""}`}>
-    <header className="card-heading"><span className={`type-chip ${r.type?.toLowerCase()}`}>{label}</span><span className="muted">AI importance: {r.severity?.toLowerCase() ?? "unspecified"}</span>{review && <span className="review-chip">Clarification needed</span>}</header>
-    {r.typeRule && <p className="type-rule"><b>Why this label:</b> {r.typeRule}</p>}
+    <header className="card-heading"><span className={`type-chip ${r.type?.toLowerCase()}`}>{label}</span>{shortRule(r.typeRule) && <span className="rule-chip">{shortRule(r.typeRule)}</span>}{review && <span className="review-chip">Check</span>}</header>
     {(() => { const badge = scoreBadge(r); return <div className={`score-hero ${badge.kind}`}><b>{badge.value}</b><span>{badge.text}</span></div>; })()}
     {r.labelDisagreement && <section className="label-disagreement"><b>Labels disagree — review.</b> These comparisons of the same witness answers reached different categories:<ul>{(r.mergedViews ?? []).map(v=><li key={v.id}><b>{labelFor(v.type)}:</b> {v.issue}<details><summary>Reasoning</summary><p>{v.reasoning}</p></details></li>)}</ul></section>}
     <div className="quote-grid">{[r.claim1,r.claim2].map((claim,i)=><blockquote key={i}><span className="eyebrow">Transcript {i+1}</span><p>“{claim?.original ?? "No quote available."}”</p></blockquote>)}</div>
-    <section className="finding"><h3>What the testimony shows</h3><p>{assessment || "Review the source quotes and suggested follow-up below."}</p><small className="muted">Claude's assessment of the two statements.</small></section>
-    {question && <div className="suggested-question"><small>Suggested follow-up</small><p>“{question}”</p></div>}
+    <section className="finding"><p className="summary-line">{firstSentence(assessment) || "Compare the two quotes."}</p></section>
+    {question && <div className="suggested-question"><small>Ask</small><p>“{question}”</p></div>}
     <details className="more-details"><summary>More details</summary>
+    <section className="finding"><h4>Full explanation</h4><p>{assessment}</p>{r.typeRule && <p><b>Label rule:</b> {r.typeRule}</p>}{r.reviewNote && <p><b>Check:</b> {r.reviewNote}</p>}</section>
     {r.eventDetails && <details><summary>Source-linked event details</summary><p>{r.eventDetails.notice}</p>{r.eventDetails.records.map((event,i)=><section key={i}><h4>Transcript {i+1}: {event.summary}</h4><ul>{event.attributes.map((a,n)=><li key={n}>{a.name}: {a.value??a.state.toLowerCase()}</li>)}</ul>{event.sources.map(s=><blockquote key={s.id}>{s.quote}<small> · {s.pageRefs.length?s.pageRefs.map(p=>'PDF page '+p.pdfPage).join(', '):'text offsets '+s.start+'–'+s.end}</small></blockquote>)}</section>)}</details>}
     {r.sourceReferences && <section className="source-citations"><b>Source references</b>{['claim1','claim2'].map((key,i)=><p key={key}>Transcript {i+1}: {(r.sourceReferences[key]??[]).map((p,j)=><span key={j}>{j>0?' · ':''}{p.pdfPage?`PDF page ${p.pdfPage} (label ${p.pageLabel})`:`text characters ${p.start}–${p.end}`}</span>)}</p>)}{r.supportingAnalyses?.length>1 && <small>{r.supportingAnalyses.length} matching section findings combined; exact quotes and analysis variants retained.</small>}</section>}
     {r.sourceBindings && <section className="source-citations"><b>Witness context</b>{['claim1','claim2'].map((key,i)=>{

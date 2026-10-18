@@ -15,6 +15,7 @@ import { createCaseStore } from "./lib/caseStore.js";
 import { createLocalCaseStore, createLocalDocumentStore, indexedDbKv } from "./lib/localStores.js";
 import { ReviewCard } from "./ReviewCard.jsx";
 import { scoreBadge } from "./lib/scoreBadge.js";
+import { findingTitle, shortRule } from "./lib/shortLabels.js";
 import { TRANSCRIPT_1, TRANSCRIPT_2 } from "./sampleTranscripts.js";
 import CaseList from "./CaseList.jsx";
 import { DeleteCaseDialog } from "./CaseActions.jsx";
@@ -23,11 +24,6 @@ import "./workspace.css";
 
 const label = type => ({ DIRECT: "Direct", INFERENTIAL: "Inferential", NEEDS_REVIEW: "Needs review", FALSE_POSITIVE: "False positive" }[type] ?? "Finding");
 const blankDraft = (sample = false) => ({ texts: sample ? [TRANSCRIPT_1, TRANSCRIPT_2] : ["", ""], files: [null, null], results: null, seconds: null, analysis: null, selected: 0, reviewed: {}, notes: {}, dirty: false });
-const heading = result => {
-  const a = result.claim1?.original ?? "";
-  const b = result.claim2?.original ?? "";
-  return `${a.slice(0, 54)}${a.length > 54 ? "…" : ""} / ${b.slice(0, 54)}${b.length > 54 ? "…" : ""}`;
-};
 
 // The server's own question/answer and speaker detection decides whether a transcript has
 // testimony structure; the user is never asked to label speakers.
@@ -334,8 +330,8 @@ function Dashboard({ session }) {
       <section className="review-layout" id="review-findings"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{findings.length}</span></div>
         {!draft.results && <div className="findings-empty"><span>⌕</span><h3>{loading ? "Review in progress" : "Start with two transcripts"}</h3><p>{loading ? "Findings will appear when analysis completes. Keep this tab open." : "Preview the text above, then analyze to compare the witness’s accounts."}</p></div>}
         {draft.results && visible.length === 0 && <p className="findings-empty">No findings in this category.</p>}
-        <div className="finding-list">{visible.map(({result,index}) => <button key={index} className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); }}><span className={`type-chip ${result.type.toLowerCase()}`}>{label(result.type)}</span><span className={`score-pill ${scoreBadge(result).kind}`}>{scoreBadge(result).value}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{heading(result)}</h3><p>{result.reasoning?.slice(0,135)}{result.reasoning?.length > 135 ? "…" : ""}</p><span className="finding-arrow">›</span></button>)}</div>
-      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><span className="eyebrow">SELECTED FINDING</span><h2>{label(selected.result.type)} comparison</h2></div><ReviewCard result={selected.result} dismissed={selected.result.type === "FALSE_POSITIVE"} /></> : <div className="detail-empty"><div className="empty-document">≋</div><span className="eyebrow">THE FULL PICTURE</span><h2>Two accounts.<br/>One clear workspace.</h2><p>Select a finding to see the source quotes, AI explanation and independent code verification together.</p><div className="empty-steps"><span>01 &nbsp; Add testimony</span><span>02 &nbsp; Compare accounts</span><span>03 &nbsp; Review evidence</span></div></div>}</div></section>
+        <div className="finding-list">{visible.map(({result,index}) => <button key={index} className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); }}><span className={`type-chip ${result.type.toLowerCase()}`}>{label(result.type)}</span><span className={`score-pill ${scoreBadge(result).kind}`}>{scoreBadge(result).value}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{findingTitle(result)}</h3>{shortRule(result.typeRule)&&<p>{shortRule(result.typeRule)}</p>}<span className="finding-arrow">›</span></button>)}</div>
+      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><h2>{findingTitle(selected.result)}</h2></div><ReviewCard result={selected.result} dismissed={selected.result.type === "FALSE_POSITIVE"} /></> : <div className="detail-empty"><div className="empty-document">≋</div><span className="eyebrow">THE FULL PICTURE</span><h2>Two accounts.<br/>One clear workspace.</h2><p>Select a finding to see the source quotes, AI explanation and independent code verification together.</p><div className="empty-steps"><span>01 &nbsp; Add testimony</span><span>02 &nbsp; Compare accounts</span><span>03 &nbsp; Review evidence</span></div></div>}</div></section>
       {["failed","partial","cancelled"].includes(draft.analysis?.status)&&!unscoredOnlyCount(draft.analysis)&&<RecoveryPanel caseId={activeId} disabled={blocked} fetchImpl={apiFetch} onRecover={recoverAnalysis} onResume={prepareAnalysis} cloudJobId={draft.analysis?.cloudJobId} onCloudRecover={async result=>{const next={...draft,results:result.contradictions,analysis:result.analysis,dirty:true};updateDraft(activeId,next);await persist(activeId,next);}} />}
     </main>
   </div>;
