@@ -11,7 +11,9 @@ test('repeated filing furniture at page ends does not turn a continued witness a
  assert.equal(pdfReportingRanges(d.text,d.pages).filter(r=>d.text.slice(r.start,r.end).startsWith('FILED:')).length,3);
  const options={pages:d.pages},quote='form after reading it.';assert.equal(witnessQuoteMatches(d.text,quote,options).length,1);
  const binding=resolveWitnessSource(d.text,{original:quote,sourceQuestion:'Describe the form.',sourceAnswer:quote},options);assert.equal(binding.status,'BOUND');
- assert.equal(witnessQuoteMatches(d.text,quote).length,0); // No invented page furniture without a supplied map.
+ // Owner decision 2026-10-18: pasted text (no page map) also treats an exact court stamp line
+ // repeated on three or more pages as furniture, so continued answers stay with the witness.
+ assert.equal(witnessQuoteMatches(d.text,quote).length,1);
  const whole='I signed the first form after reading it.',map=pdfQuoteMap(d.text,{pages:d.pages});
  const restored=groundPdfClaim({original:whole},d.text,map,{start:0,end:d.text.length,text:d.text});assert.ok(d.text.includes(restored.claim.original));assert.ok(restored.claim.original.includes('FILED:'));assert.equal(resolveWitnessSource(d.text,restored.claim,{...options,map}).status,'BOUND');
 });
@@ -27,4 +29,8 @@ test('only literal form objections preserve a pending question; instructions and
  for(const words of ['Objection. Do not answer.','Let me explain what happened.','Yes.']){
   const text=`Q: Did you sign on Monday?\nMR. LAWYER: ${words}\nA: Yes.`;assert.equal(resolveWitnessSource(text,{original:'Yes.',sourceQuestion:'Did you sign on Monday?'}).status,'ANCHOR_MISMATCH');
  }
+});
+test('pasted text: a stamp-like line seen fewer than three times is still a boundary',()=>{
+ const text='Q: Did you sign?\nA: I started.\nFILED: NEW YORK COUNTY CLERK 01/01/2026\nI signed the form.\nQ: Next?\nA: Done.\nFILED: NEW YORK COUNTY CLERK 01/01/2026\nmore words.';
+ assert.equal(pdfReportingRanges(text).length,0);assert.equal(witnessQuoteMatches(text,'I signed the form.').length,0);
 });

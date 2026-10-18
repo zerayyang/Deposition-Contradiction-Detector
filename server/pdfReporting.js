@@ -1,7 +1,9 @@
 // Only confirmed, repeated PDF furniture can stop being a speaker boundary.
 // The original text and all offsets remain intact; no testimony is discarded.
 export function pdfReportingRanges(text,pages){
- if(!Array.isArray(pages)||pages.length<3)return [];
+ // Pasted text has no page list: the same stamp line repeated on at least three pages
+ // (identical text) is still page furniture, using the same signature rule.
+ if(!Array.isArray(pages)||pages.length<3)return repeatedStampLines(text);
  const candidates=[],counts=new Map();
  for(const page of pages){
   const lines=[...text.slice(page.start,page.end).matchAll(/[^\n]+/g)].map(m=>({text:m[0],start:page.start+m.index}));
@@ -13,4 +15,12 @@ export function pdfReportingRanges(text,pages){
   }
  }
  return candidates.filter(c=>counts.get(c.signature)>=3).map(c=>({start:c.start,end:c.start+c.text.length,kind:'REPEATED_PDF_HEADER'}));
+}
+
+const STAMP=/^(?:FILED: .+|INDEX NO\. .+|NYSCEF DOC\. NO\. .+|CONFIDENTIAL(?: - .+)?|Proceedings)$/i;
+function repeatedStampLines(text){
+ if(typeof text!=='string')return [];
+ const lines=[...text.matchAll(/[^\n]+/g)].map(m=>({text:m[0],start:m.index,signature:m[0].replace(/^\s*(?:[1-9]|1\d|2[0-5])\s+/,'').trim()})).filter(l=>STAMP.test(l.signature));
+ const counts=new Map();for(const l of lines)counts.set(l.signature,(counts.get(l.signature)??0)+1);
+ return lines.filter(l=>counts.get(l.signature)>=3).map(l=>({start:l.start,end:l.start+l.text.length,kind:'REPEATED_TEXT_HEADER'}));
 }
