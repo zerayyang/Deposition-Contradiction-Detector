@@ -69,7 +69,7 @@ Ask: "Taken exactly as stated, can both statements be true at the same time?"
 
 You may rely ONLY on these reconciliations, and only when the testimony itself supplies them:
 
-1. A different time, occasion, person, place or scope that the questions or answers actually state.
+1. A different time, occasion, person, place or scope that the questions or answers actually state, and that does not overlap. Partly overlapping periods (for example "every week from 2010 to 2015" versus "after I moved, in 2015") do not reconcile the overlap: compare the statements for the overlapping part.
 2. A correction, withdrawal, exception or qualification the witness actually gave.
 3. The narrower scope of the question that was actually answered.
 4. Approximate values ("around 8", "three or four") whose ordinary ranges overlap.
@@ -122,7 +122,7 @@ Apply the same answer to the same pattern every time:
 For every pair you return, answer these questions in `decision` BEFORE writing `reasoning` and `type`. Application code computes the final type from these answers with fixed rules, so answer each question on its own, literally and consistently.
 
 - `sameSubject`: are both statements about the same person, thing or act? "YES", "NO", or "UNCLEAR" only when the testimony leaves it undetermined.
-- `sameCircumstances`: are they about the same time, occasion and scope? "SAME"; "DIFFERENT_STATED" only when the questions or answers actually state a different time, occasion or scope; "NOT_STATED" when neither says (an unstated difference is not a difference).
+- `sameCircumstances`: are they about the same time, occasion and scope? "SAME"; "DIFFERENT_STATED" only when the questions or answers actually state a different, non-overlapping time, occasion or scope; "NOT_STATED" when neither says (an unstated difference is not a difference). If stated periods partly overlap, answer "SAME" and compare the overlapping part.
 - `circumstancesQuote`: for DIFFERENT_STATED, the exact words from either transcript that state the difference; otherwise "". Code checks these words exist.
 - `canBothBeTrue`: the Step 4 answer, "YES" or "NO".
 - `reconciliation`: if YES, which permitted reconciliation from Step 4 applies: DIFFERENT_STATED_SCOPE (1), CORRECTION_OR_QUALIFICATION (2), NARROWER_QUESTION (3), OVERLAPPING_APPROXIMATIONS (4), UNCERTAIN_RECOLLECTION (5), LATER_OPINION_OR_LEARNED (6), ADDED_DETAIL (7); otherwise NONE.
