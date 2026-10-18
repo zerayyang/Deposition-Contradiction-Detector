@@ -55,6 +55,12 @@ export function createLocalCaseStore(kv, { randomId = () => crypto.randomUUID(),
       if (!id || id === "sample") throw new Error("Select a saved case to delete.");
       await existing(id); await kv.delete(key(id)); return { id };
     },
+    async rename(id, value) {
+      const title = String(value ?? "").trim();
+      if (!id || id === "sample") throw new Error("Save this case before renaming it.");
+      if (!title || title.length > 200) throw new Error("Enter a case name between 1 and 200 characters.");
+      const row = await existing(id); row.title = title; await kv.put(key(id), row); return columns(row);
+    },
     async create(value) {
       const title = value.trim();
       if (!title || title.length > 200) throw new Error("Enter a case name between 1 and 200 characters.");

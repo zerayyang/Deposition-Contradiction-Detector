@@ -1,9 +1,7 @@
 import {resumableCloudJobId} from './lib/cloudAnalysisClient.js';
 import { useCallback, useEffect, useRef, useState } from "react";
-import { openReviewReport } from "./lib/reviewReport.js";
 import RecoveryPanel from "./RecoveryPanel.jsx";
 import EventReview from "./EventReview.jsx";
-import {CorrectionForm,FeedbackInbox} from "./FeedbackReview.jsx";
 import { recoveredDraft, recoveryRequest, beginAnalysisDraft, checkpointSaveWarning } from "./lib/recovery.js";
 import AnalysisStatus from "./AnalysisStatus.jsx";
 import { unscoredOnlyCount, elapsedLabel } from "./lib/analysisStatus.js";
@@ -15,10 +13,11 @@ import { checkFileBudget } from "../shared/documentLimits.js";
 import { documentMetadata, createDocumentStore } from "./lib/documentStore.js";
 import { createCaseStore } from "./lib/caseStore.js";
 import { createLocalCaseStore, createLocalDocumentStore, indexedDbKv } from "./lib/localStores.js";
-import { ReviewCard, ScoreGuide } from "./ReviewCard.jsx";
+import { ReviewCard } from "./ReviewCard.jsx";
 import { TRANSCRIPT_1, TRANSCRIPT_2 } from "./sampleTranscripts.js";
 import CaseList from "./CaseList.jsx";
-import { CaseActions, DeleteCaseDialog } from "./CaseActions.jsx";
+import { DeleteCaseDialog } from "./CaseActions.jsx";
+import { testimonyMarkers } from "../server/testimonyMarkers.js";
 import "./workspace.css";
 
 const label = type => ({ DIRECT: "Direct", INFERENTIAL: "Inferential", NEEDS_REVIEW: "Needs review", FALSE_POSITIVE: "False positive" }[type] ?? "Finding");
@@ -29,10 +28,15 @@ const heading = result => {
   return `${a.slice(0, 54)}${a.length > 54 ? "…" : ""} / ${b.slice(0, 54)}${b.length > 54 ? "…" : ""}`;
 };
 
-function TranscriptFile({ index, value, file, onChange, onFile, onOpen, onReadingChange, disabled }) {
+// The server's own question/answer and speaker detection decides whether a transcript has
+// testimony structure; the user is never asked to label speakers.
+function unlabeledTestimony(text) {
+  if (!text?.trim()) return false;
+  try { return !testimonyMarkers(text).some(marker => marker.role === "A" || marker.role === "Q"); } catch { return false; }
+}
+
+function TranscriptFile({ index, value, file, onChange, onFile, onReadingChange, disabled }) {
   const input = useRef(null);
-  // Text is shown for pasting; once a file is loaded it collapses to keep the page short.
-  const [preview, setPreview] = useState(() => !file);
   const [error, setError] = useState("");
   const [fileBusy, setFileBusy] = useState(false);
   const [fileProgress, setFileProgress] = useState("");
@@ -45,28 +49,14 @@ function TranscriptFile({ index, value, file, onChange, onFile, onOpen, onReadin
     if (!/\.(pdf|txt|md)$/i.test(chosen.name)) { setError("Choose a .pdf, .txt or .md transcript."); return; }
     const controller = new AbortController(); importController.current = controller;
     setFileBusy(true); onReadingChange(true); setFileProgress("Reading file…");
-    try { const doc = await readTranscriptDocument(chosen, setFileProgress, {signal:controller.signal}); controller.signal.throwIfAborted(); setFileProgress("Saving original…"); await onFile(doc.text, chosen, doc.extraction, {signal:controller.signal,onProgress:setFileProgress}); setPreview(false); }
+    try { const doc = await readTranscriptDocument(chosen, setFileProgress, {signal:controller.signal}); controller.signal.throwIfAborted(); setFileProgress("Saving original…"); await onFile(doc.text, chosen, doc.extraction, {signal:controller.signal,onProgress:setFileProgress}); }
     catch (err) { setError(err.name === "AbortError" ? "Import cancelled. Previous case contents were kept." : err.message || "This file could not be saved. Try uploading again."); }
     finally { setFileBusy(false); onReadingChange(false); setFileProgress(""); event.target.value = ""; }
   }
-  async function openOriginal() {
-    setError("");
-    // Open on the user gesture before awaiting the private download.
-    const viewer = window.open("about:blank", "_blank");
-    if (!viewer) { setError("Allow pop-ups for this site to open the original file."); return; }
-    viewer.opener = null;
-    try {
-      const blob = await onOpen(file);
-      const url = URL.createObjectURL(blob);
-      viewer.location.replace(url);
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch (err) { viewer.close(); setError(err.message || "The original file could not be opened. Try again."); }
-  }
   return <section className="document-card">
     <div className="document-heading"><span className="document-icon">{file?.type === "application/pdf" ? "PDF" : "TXT"}</span><div><h3>{file?.name ?? `Transcript ${index + 1}`}</h3><span>{file?.path ? "Original saved privately" : file ? "Imported text · not uploaded" : value.trim() ? "Pasted testimony" : "Add testimony to begin"}</span></div><button className="document-upload-primary" disabled={disabled || fileBusy} onClick={() => input.current.click()}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5" /></svg>{fileBusy ? "Importing…" : file ? "Replace file" : "Upload file"}</button></div>
-    <div className="document-actions"><button className="link-button" aria-expanded={preview} aria-controls={`transcript-text-${index}`} onClick={() => setPreview(!preview)}>{preview ? "Hide text" : "Show text"}</button>{file&&<button className="link-button" onClick={openOriginal}>Open original ↗</button>}{!file&&<span className="document-formats">PDF, TXT, MD · up to 50 MiB</span>}</div>
     <input ref={input} type="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown" onChange={readFile} hidden disabled={disabled || fileBusy} />
-    {preview && <textarea id={`transcript-text-${index}`} aria-label={`Transcript ${index + 1}`} value={value} onChange={event => onChange(event.target.value)} disabled={disabled || fileBusy} placeholder="Paste the full questions and answers here…" rows={10} />}
+    {!file && <textarea id={`transcript-text-${index}`} aria-label={`Transcript ${index + 1}`} value={value} onChange={event => onChange(event.target.value)} disabled={disabled || fileBusy} placeholder="Paste the full questions and answers here…" rows={10} />}
     {fileProgress && <p role="status" className="document-progress">{fileProgress} {fileBusy && <button onClick={()=>importController.current?.abort()}>Cancel import</button>}</p>}
     {file?.extraction && <p className="document-progress">{file.extraction.pageCount} PDF pages loaded. {file.extraction.pages.filter(p=>p.warning).length>0 && `Inspect sparse-text PDF pages for missing scanned testimony: ${file.extraction.pages.filter(p=>p.warning).map(p=>p.pdfPage).join(', ')}.`}</p>}
     {(file?.extraction?.ocrPages?.length>0 || file?.extraction?.failedPages?.length>0) && <p role="alert" className="error">Original saved. Pages requiring OCR or repair: {[...file.extraction.ocrPages,...file.extraction.failedPages].join(', ')}. Analysis is blocked until you upload the corrected PDF.</p>}
@@ -99,18 +89,15 @@ function Dashboard({ session }) {
   const [caseBusy, setCaseBusy] = useState(false);
   const [caseError, setCaseError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [confirmedWitnessTexts,setConfirmedWitnessTexts]=useState([null,null]);
   const [pendingPlan, setPendingPlan] = useState(null);
-  const [analysisMode,setAnalysisMode]=useState("legacy");
+  const [analysisMode]=useState("legacy");
   const [preparing, setPreparing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState("");
-  const [reportError, setReportError] = useState("");
+  const [reportError] = useState("");
   const [analysisTiming, setAnalysisTiming] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("ALL");
-  const [showFeedback,setShowFeedback]=useState(false);
-  const [copyMessage, setCopyMessage] = useState("");
   const [store] = useState(() => local ? createLocalCaseStore(localKv) : createCaseStore(supabase));
   const request = useRef(null);
   const timer = useRef(null);
@@ -220,7 +207,7 @@ function Dashboard({ session }) {
       } catch (err) { setCaseError(`Could not open case: ${err.message}`); return; }
       finally { setOpening(false); }
     }
-    setActiveId(id); setError(""); setFilter("ALL"); setCopyMessage("");
+    setActiveId(id); setError(""); setFilter("ALL");
   }
   async function deleteCase() {
     if (!deleteTarget || blocked || deleteLock.current) return;
@@ -239,7 +226,7 @@ function Dashboard({ session }) {
         delete remaining[deleteTarget.id];
         return remaining;
       });
-      setActiveId("sample"); setFilter("ALL"); setError(""); setSaveError(""); setCopyMessage("");
+      setActiveId("sample"); setFilter("ALL"); setError(""); setSaveError("");
       setDeleteTarget(null);
     } catch (err) {
       setDeleteError(`Could not delete this case: ${err.message}. Your case has been kept. You can retry.`);
@@ -258,7 +245,7 @@ function Dashboard({ session }) {
     const controller = new AbortController(); request.current = controller;
     try {
       const source=recoveryRecord?recoveredDraft(draft,recoveryRecord):draft;
-      const body={...analysisBody(source.texts,source.files),caseId:activeId,witnessTestimonyConfirmed:source.texts.map((t,i)=>confirmedWitnessTexts[i]===t),originalDocuments:source.files.map(documentMetadata),...(resumeJobId?{resumeJobId}:{}),...(resumableCloudJobId(source.analysis)?{cloudJobId:resumableCloudJobId(source.analysis)}:{})};
+      const body={...analysisBody(source.texts,source.files),caseId:activeId,witnessTestimonyConfirmed:source.texts.map(()=>true),originalDocuments:source.files.map(documentMetadata),...(resumeJobId?{resumeJobId}:{}),...(resumableCloudJobId(source.analysis)?{cloudJobId:resumableCloudJobId(source.analysis)}:{})};
       const plan=await previewAnalysis(body,{signal:controller.signal,fetchImpl:apiFetch});
       if(!Number.isInteger(plan.requestCount)||plan.requestCount<1||typeof plan.id!=="string")throw new Error("The server returned an invalid analysis plan.");
       setPendingPlan({plan,body,id:activeId,snapshot:source});
@@ -317,11 +304,14 @@ function Dashboard({ session }) {
   const findings = (draft.results ?? []).map((result, index) => ({ result, index }));
   const visible = findings.filter(({ result }) => filter === "ALL" || result.type === filter);
   const selected = visible.find(item => item.index === draft.selected) ?? visible[0];
-  async function copySource() {
+  async function renameCase() {
+    const next = window.prompt("Rename case", caseTitle);
+    if (next === null || next.trim() === caseTitle) return;
     try {
-      await navigator.clipboard.writeText([caseTitle, ...[0,1].map(i => `Transcript ${i+1}: ${selected.result[`claim${i+1}`]?.original ?? ""}\nSources: ${JSON.stringify(selected.result.sourceReferences?.[`claim${i+1}`] ?? "Text reference unavailable (legacy)")}`)].join("\n\n"));
-      setCopyMessage("Quotes copied with transcript and source references.");
-    } catch { setCopyMessage("Could not access the clipboard. Select and copy the quotes manually."); }
+      const row = await store.rename(activeId, next);
+      setCases(previous => previous.map(item => item.id === activeId ? { ...item, title: row.title } : item));
+      setError("");
+    } catch (err) { setError(`Rename failed: ${err.message}`); }
   }
   return <div className="workspace">
     {deleteTarget && <DeleteCaseDialog title={deleteTarget.title} busy={deleting} error={deleteError} onCancel={() => { if (!deleting) { setDeleteTarget(null); setDeleteError(""); } }} onDelete={deleteCase} />}
@@ -331,27 +321,21 @@ function Dashboard({ session }) {
       {caseError && <p className="sidebar-error" role="alert">{caseError}</p>}
       <div className="sidebar-footer"><div className="account-avatar">{session.user.email?.slice(0,2).toUpperCase()}</div><div><span className="account-email">{session.user.email}</span>{local?<span className="muted">No-account mode · saved in this browser</span>:<button className="link-button" disabled={blocked} onClick={signOut}>Sign out</button>}</div></div>
     </aside>
-    <main className="workspace-main"><header className="workspace-header"><div><div className="case-title"><h1>{caseTitle}</h1></div></div><div className="case-save">{!local&&<button disabled={blocked} onClick={()=>setShowFeedback(v=>!v)}>Review &amp; Improve</button>}<span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked || !draft.analysis && !Array.isArray(draft.results)} onClick={() => { try { openReviewReport({title:caseTitle,draft}); setReportError(""); } catch (err) { setReportError(err.message); } }}>Report</button>{(draft.dirty||activeId==="sample")&&<button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save sample as case" : "Save case"}</button>}{activeId !== "sample" && <CaseActions disabled={blocked} onDelete={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }} />}</div></header>
-      {!local&&showFeedback&&<FeedbackInbox client={supabase} userId={session.user.id} onClose={()=>setShowFeedback(false)}/>}
+    <main className="workspace-main"><header className="workspace-header"><div><div className="case-title"><h1>{caseTitle}</h1></div></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save as case" : "Save"}</button>{activeId !== "sample" && <button className="secondary-button" disabled={blocked} onClick={renameCase}>Rename</button>}{activeId !== "sample" && <button className="secondary-button danger" disabled={blocked} onClick={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }}>Delete</button>}</div></header>
       {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review before paid analysis</h2><p className="muted">Starting sends both transcripts to Anthropic for analysis.</p><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p>{pendingPlan.plan.execution==='durable-steps'&&<label>Maximum spend for this review (US$)<input aria-label="Maximum review spend" disabled={pendingPlan.plan.budgetFixed} type="number" min="0.01" step="0.01" value={pendingPlan.plan.approvedBudgetUsd??pendingPlan.plan.cost.conservativeBudget} onChange={e=>setPendingPlan(old=>({...old,plan:{...old.plan,approvedBudgetUsd:Number(e.target.value)}}))}/><small>A lower cap can stop with partial coverage. Completed work is kept.</small></label>}<p>{pendingPlan.plan.resuming?"Only unfinished comparisons will run again. Previously completed comparisons are retained.":"Every section is compared across both documents, including differently ordered sections."} Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start {pendingPlan.plan.requestCount} paid request{pendingPlan.plan.requestCount===1?'':'s'}</button></div>}
       {!loading&&(draft.analysis?.status==="complete"||unscoredOnlyCount(draft.analysis))?<p className="status-line" role="status">✓ Analysis complete · {findings.length} finding{findings.length===1?"":"s"}{Number.isFinite(draft.seconds)?` · ${elapsedLabel(draft.seconds)}`:""}{unscoredOnlyCount(draft.analysis)?` · ${unscoredOnlyCount(draft.analysis)} without a score`:""}</p>:<AnalysisStatus analysis={draft.analysis} active={loading} elapsed={loading ? elapsed : draft.seconds} timing={analysisTiming} />}
-      <section className={`documents-toolbar ${analysisMode==='events'?'documents-pair':''}`} aria-label="Transcript documents">{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onOpen={file => documents.download(activeId, file)} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}{analysisMode==='legacy'&&<div className="analyze-block">{analysisMode==='legacy' && <button className="analyze-button" disabled={blocked} onClick={()=>prepareAnalysis()}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : draft.results ? "Analyze again" : "Analyze"}</button>}{loading&&<p role="status">◌ {elapsed}s elapsed · {analysisProgress}</p>}{analysisMode==='legacy' && (loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div>}</section>
-      <div className="testimony-confirmations" aria-label="Unlabeled testimony confirmations">{draft.texts.map((text,i)=>text.trim()&&!/^(?:\s*\d+\s+)?\s*(?:Q|A|QUESTION|ANSWER)[.:]/im.test(text)&&<label key={i} className="event-confirmation"><input type="checkbox" disabled={blocked} checked={confirmedWitnessTexts[i]===text} onChange={e=>setConfirmedWitnessTexts(old=>old.map((v,n)=>n===i?(e.target.checked?text:null):v))}/><span>Transcript {i+1}: I confirm this is witness testimony.</span></label>)}</div>
-      {analysisMode==='events' && <EventReview key={activeId} caseId={activeId} memoryAvailable={!local} draft={draft} witnessTestimonyConfirmed={draft.texts.map((t,i)=>confirmedWitnessTexts[i]===t)} fetchImpl={apiFetch} disabled={blocked&&!loading} onBusy={setLoading} onTick={setElapsed} onTiming={setAnalysisTiming} onPlanning={setPreparing} onCheckpoint={async snapshot=>{updateDraft(activeId,{...snapshot,dirty:true});await persist(activeId,snapshot);}}/>}
+      <section className={`documents-toolbar ${analysisMode==='events'?'documents-pair':''}`} aria-label="Transcript documents">{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}{analysisMode==='legacy'&&<div className="analyze-block">{analysisMode==='legacy' && <button className="analyze-button" disabled={blocked} onClick={()=>prepareAnalysis()}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : draft.results ? "Analyze again" : "Analyze"}</button>}{loading&&<p role="status">◌ {elapsed}s elapsed · {analysisProgress}</p>}{analysisMode==='legacy' && (loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div>}</section>
+      {draft.texts.some(text=>unlabeledTestimony(text))&&<p className="muted unlabeled-note">No question/answer labels were found in {draft.texts.map((t,i)=>unlabeledTestimony(t)?`Transcript ${i+1}`:null).filter(Boolean).join(" and ")}, so all of that text is treated as the witness\u2019s own words.</p>}
+      {analysisMode==='events' && <EventReview key={activeId} caseId={activeId} memoryAvailable={!local} draft={draft} witnessTestimonyConfirmed={draft.texts.map(()=>true)} fetchImpl={apiFetch} disabled={blocked&&!loading} onBusy={setLoading} onTick={setElapsed} onTiming={setAnalysisTiming} onPlanning={setPreparing} onCheckpoint={async snapshot=>{updateDraft(activeId,{...snapshot,dirty:true});await persist(activeId,snapshot);}}/>}
       {reportError && <p className="error" role="alert">{reportError}</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {saveError && <p className="error" role="alert">{saveError}</p>}
-      <section className="review-layout" id="review-findings"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{findings.length}</span></div>{findings.length>0&&<div className="finding-filters" aria-label="Filter findings">{[["ALL","All"],["DIRECT","Direct"],["INFERENTIAL","Inferential"],["NEEDS_REVIEW","Needs review"],["FALSE_POSITIVE","False positive"]].filter(([value])=>value!=="NEEDS_REVIEW"||findings.some(f=>f.result?.type==="NEEDS_REVIEW")).map(([value,text]) => <button key={value} aria-pressed={filter === value} className={filter === value ? "active" : ""} onClick={() => { setFilter(value); setCopyMessage(""); }}>{text}</button>)}</div>}
+      <section className="review-layout" id="review-findings"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{findings.length}</span></div>
         {!draft.results && <div className="findings-empty"><span>⌕</span><h3>{loading ? "Review in progress" : "Start with two transcripts"}</h3><p>{loading ? "Findings will appear when analysis completes. Keep this tab open." : "Preview the text above, then analyze to compare the witness’s accounts."}</p></div>}
         {draft.results && visible.length === 0 && <p className="findings-empty">No findings in this category.</p>}
-        <div className="finding-list">{visible.map(({result,index}) => <button key={index} className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); setCopyMessage(""); }}><span className={`type-chip ${result.type.toLowerCase()}`}>{label(result.type)}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{heading(result)}</h3><p>{result.reasoning?.slice(0,135)}{result.reasoning?.length > 135 ? "…" : ""}</p><span className="finding-arrow">›</span></button>)}</div>
-      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><span className="eyebrow">SELECTED FINDING</span><h2>{label(selected.result.type)} comparison</h2><button className="link-button" onClick={copySource}>Copy quotes with source ↗</button>{copyMessage && <small role="status">{copyMessage}</small>}</div><ReviewCard result={selected.result} dismissed={selected.result.type === "FALSE_POSITIVE"} />{!local&&<CorrectionForm key={`${activeId}-${selected.index}-${selected.result.type}-${selected.result.claim1?.original}-${selected.result.claim2?.original}`} client={supabase} caseId={activeId} finding={selected.result} findingIndex={selected.index} disabled={blocked} saved={activeId!=="sample"&&!draft.dirty} />}<div className="review-note"><label htmlFor="review-note">Your review note <span>· click Save case to keep changes</span></label><textarea id="review-note" disabled={blocked} rows={2} value={draft.notes[selected.index] ?? ""} onChange={event => patch({ notes: { ...draft.notes, [selected.index]: event.target.value } })} placeholder="Add a review note…" /><button disabled={blocked} onClick={() => patch({ reviewed: { ...draft.reviewed, [selected.index]: !draft.reviewed[selected.index] } })}>{draft.reviewed[selected.index] ? "✓ Reviewed · undo" : "Mark reviewed"}</button></div></> : <div className="detail-empty"><div className="empty-document">≋</div><span className="eyebrow">THE FULL PICTURE</span><h2>Two accounts.<br/>One clear workspace.</h2><p>Select a finding to see the source quotes, AI explanation and independent code verification together.</p><div className="empty-steps"><span>01 &nbsp; Add testimony</span><span>02 &nbsp; Compare accounts</span><span>03 &nbsp; Review evidence</span></div></div>}</div></section>
-      <details className="advanced-panel" open={["failed","partial","cancelled"].includes(draft.analysis?.status)&&!unscoredOnlyCount(draft.analysis)}><summary>Advanced</summary>
-      <ScoreGuide />
-      <div className="workflow-options"><label>Review method<select value={analysisMode} disabled={blocked} onChange={e=>setAnalysisMode(e.target.value)}><option value="events">Read, then compare</option><option value="legacy">Direct comparison (recommended)</option></select></label></div>
-      {analysisMode==='legacy' && <RecoveryPanel caseId={activeId} disabled={blocked} fetchImpl={apiFetch} onRecover={recoverAnalysis} onResume={prepareAnalysis} cloudJobId={draft.analysis?.cloudJobId} onCloudRecover={async result=>{const next={...draft,results:result.contradictions,analysis:result.analysis,dirty:true};updateDraft(activeId,next);await persist(activeId,next);}} />}
-      <div className="workspace-help"><h4>Files, saving & practice samples</h4><p className="session-note">Transcripts and results save when you analyze. Click Save case after editing transcripts, notes or review marks. PDF and text originals save privately and reopen after refresh. PDFs need selectable text; scanned pages need OCR. Practice files: <a href="/examples/riley-morgan-first-deposition.pdf" download>First PDF</a> · <a href="/examples/riley-morgan-second-deposition.pdf" download>Second PDF</a> · <a href="/examples/expected-results.html" target="_blank" rel="noopener noreferrer">Expected results</a>.</p></div>
-      </details>
+        <div className="finding-list">{visible.map(({result,index}) => <button key={index} className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); }}><span className={`type-chip ${result.type.toLowerCase()}`}>{label(result.type)}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{heading(result)}</h3><p>{result.reasoning?.slice(0,135)}{result.reasoning?.length > 135 ? "…" : ""}</p><span className="finding-arrow">›</span></button>)}</div>
+      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><span className="eyebrow">SELECTED FINDING</span><h2>{label(selected.result.type)} comparison</h2></div><ReviewCard result={selected.result} dismissed={selected.result.type === "FALSE_POSITIVE"} /></> : <div className="detail-empty"><div className="empty-document">≋</div><span className="eyebrow">THE FULL PICTURE</span><h2>Two accounts.<br/>One clear workspace.</h2><p>Select a finding to see the source quotes, AI explanation and independent code verification together.</p><div className="empty-steps"><span>01 &nbsp; Add testimony</span><span>02 &nbsp; Compare accounts</span><span>03 &nbsp; Review evidence</span></div></div>}</div></section>
+      {["failed","partial","cancelled"].includes(draft.analysis?.status)&&!unscoredOnlyCount(draft.analysis)&&<RecoveryPanel caseId={activeId} disabled={blocked} fetchImpl={apiFetch} onRecover={recoverAnalysis} onResume={prepareAnalysis} cloudJobId={draft.analysis?.cloudJobId} onCloudRecover={async result=>{const next={...draft,results:result.contradictions,analysis:result.analysis,dirty:true};updateDraft(activeId,next);await persist(activeId,next);}} />}
     </main>
   </div>;
 }

@@ -36,6 +36,15 @@ export function createCaseStore(client) {
       if (!data || data.id !== id) throw new Error("Case was not deleted. Check ownership and delete permission.");
       return data;
     },
+    async rename(id, value) {
+      const title = String(value ?? "").trim();
+      if (!id || id === "sample") throw new Error("Save this case before renaming it.");
+      if (!title || title.length > 200) throw new Error("Enter a case name between 1 and 200 characters.");
+      const { data, error } = await client.from("cases").update({ title }).eq("id", id).select(columns).single();
+      if (error) throw error;
+      if (!data) throw new Error("Case was not renamed. Check that you own this case.");
+      return data;
+    },
     async create(value) {
       const title = value.trim();
       if (!title || title.length > 200) throw new Error("Enter a case name between 1 and 200 characters.");
