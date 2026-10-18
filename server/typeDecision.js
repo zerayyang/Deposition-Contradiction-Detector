@@ -27,6 +27,7 @@ export const decisionSchema=Object.freeze({type:'object',additionalProperties:fa
 const normalize=value=>String(value??'').normalize('NFKC').replace(/[‘’]/g,"'").replace(/[“”]/g,'"')
   .replace(/[‐-―]/g,'-').replace(/\s+/g,' ').trim().toLowerCase();
 const words=value=>value.replaceAll('_',' ').toLowerCase();
+const plural=kind=>kind==='quantity'?'quantities':`${kind}s`;
 
 // Quoted support only counts when the words really are in the record.
 export function quoteFound(quote,sourceTexts){
@@ -79,9 +80,9 @@ export function deriveType(decision,sourceTexts=[]){
   if(VALUE_FORMS.has(d.conflictForm)&&valueFound(d.value1,sourceTexts)&&valueFound(d.value2,sourceTexts)){
     const values=compareValues(d.value1,d.value2);
     if(values){
-      if(values.overlap)return done('FALSE_POSITIVE',`Code check: the ${values.kind}s "${d.value1}" and "${d.value2}" overlap.`,{valueCheck:values,reconciliationVerified});
-      return values.exact?done('DIRECT',`Code check: different exact ${values.kind}s "${d.value1}" and "${d.value2}".`,{valueCheck:values,reconciliationVerified})
-        :done('INFERENTIAL',`Code check: approximate ${values.kind}s "${d.value1}" and "${d.value2}" do not overlap.`,{valueCheck:values,reconciliationVerified});
+      if(values.overlap)return done('FALSE_POSITIVE',`Code check: the ${plural(values.kind)} "${d.value1}" and "${d.value2}" overlap.`,{valueCheck:values,reconciliationVerified});
+      return values.exact?done('DIRECT',`Code check: different exact ${plural(values.kind)} "${d.value1}" and "${d.value2}".`,{valueCheck:values,reconciliationVerified})
+        :done('INFERENTIAL',`Code check: approximate ${plural(values.kind)} "${d.value1}" and "${d.value2}" do not overlap.`,{valueCheck:values,reconciliationVerified});
     }
   }
   if(DIRECT_FORMS.has(d.conflictForm))return done('DIRECT',`Direct conflict: ${words(d.conflictForm)}.`,{reconciliationVerified});

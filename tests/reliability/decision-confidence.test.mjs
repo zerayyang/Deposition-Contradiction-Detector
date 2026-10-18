@@ -28,3 +28,10 @@ test('the decision-based score is displayed by default; CONFIDENCE_SOURCE=rules 
  try{const rules=assessCandidate({type:'DIRECT',decision,reasoning:'Fictional.',claim1:claim(a),claim2:claim(b)},`Q: Did you sign?\nA: ${a}`,`Q: Did you sign?\nA: ${b}`);assert.notEqual(rules.scoreSource,'decision');}
  finally{if(before===undefined)delete process.env.CONFIDENCE_SOURCE;else process.env.CONFIDENCE_SOURCE=before;}
 });
+test('a decision-based score clears the not-evaluable review flag',()=>{
+ const claim=original=>({original,activityPhrase:null,timePhrase:null,locationPhrase:null,personPhrase:null,objectPhrase:null,quantityPhrase:null,statePhrase:null,qualifierPhrases:[]});
+ const a='Yes, we met.',b='We never met.';
+ const decision={sameSubject:'YES',sameCircumstances:'SAME',circumstancesQuote:'',canBothBeTrue:'NO',reconciliation:'NONE',reconciliationQuote:'',conflictForm:'AFFIRM_VS_DENY',value1:'',value2:'',missingFact:''};
+ const r=assessCandidate({type:'DIRECT',decision,reasoning:'Fictional.',claim1:claim(a),claim2:claim(b)},`Q: Did you meet?\nA: ${a}`,`Q: Did you meet?\nA: ${b}`);
+ assert.equal(r.status,'CONFLICT_SUPPORTED');assert.equal(r.flag,'NONE');
+});

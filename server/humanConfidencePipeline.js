@@ -46,12 +46,13 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
     // A possible conflict the AI could not decide is never given a number.
     if (verified && candidate.type === "NEEDS_REVIEW") Object.assign(index, {score:null,band:"NOT_EVALUABLE",status:"NOT_EVALUABLE",
         notEvaluableReason:"NEEDS_REVIEW",evidenceStrength:null,rulesFired:[],rulesLimiting:[{id:"needs-review",explanation:"The AI marked this possible contradiction undecidable from the testimony; a person decides."}]});
-    const review = !verified || index.status === "NOT_EVALUABLE";
     // Displayed score: the decision-based score (AI's checked answers + owner word lists).
     // CONFIDENCE_SOURCE=rules restores the original phrase-matching rule engine.
     const decisionScore = verified ? decisionConfidence(candidate) : null;
     if (decisionScore && process.env.CONFIDENCE_SOURCE !== "rules" && candidate.type !== "NEEDS_REVIEW")
         Object.assign(index, {score:decisionScore.score, band:evidenceBand(decisionScore.score), status:decisionScore.status==="CONFLICT"?"CONFLICT_SUPPORTED":"COMPATIBLE_SUPPORTED", notEvaluableReason:undefined, scoreSource:"decision"});
+    // Decided after the score source is chosen, so a decision-based score clears "not evaluable".
+    const review = !verified || index.status === "NOT_EVALUABLE";
     return {...candidate, ...index, decisionScore, claim1Valid,claim2Valid,claim1LiteralValid,claim2LiteralValid,sourceBindings,
         chronoTimeAnalysis:{claim1:interpretValidatedTime(fact1,claim1Valid),claim2:interpretValidatedTime(fact2,claim2Valid)},
         humanConfidence:index.score, evidenceScore:index.evidenceStrength,
