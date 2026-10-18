@@ -12,7 +12,9 @@ import { pdfQuoteMap, groundPdfClaim } from './pdfQuoteGrounding.js';
 export const MODEL = Object.freeze({id:'claude-opus-5-5',contextTokens:1000000,maxOutputTokens:128000,
   inputUsdPerMillion:4,outputUsdPerMillion:20,checked:'2026-10-14',
   documentation:'https://platform.claude.com/docs/en/models/opus-5-5/overview'});
-export const OUTPUT_TOKENS=10000; // Existing short-document budget.
+// Single-request budget. Listing every difference with its decision answers needs the same
+// room as a section request; 10,000 truncated a real 16-page pair.
+export const OUTPUT_TOKENS=32000;
 export const SECTION_OUTPUT_TOKENS=32000; // Includes adaptive thinking plus answer text.
 export const outputBudget=plan=>plan.outputTokens ?? (plan.mode==='single'?OUTPUT_TOKENS:SECTION_OUTPUT_TOKENS);
 export const directRequest=(plan,a,b,instructions)=>({model:MODEL.id,max_tokens:outputBudget(plan),system:instructions,output_config:{format:directOutputFormat,effort:'medium'},messages:[{role:'user',content:userContent(a,b,plan.mode!=='single')}]});
@@ -124,7 +126,7 @@ export function buildPlan(texts,documents,instructions,options={}) {
     estimatedInputTokens+=Math.ceil(bytes/3);inputTokenUpperBudget+=upper;
     pairs.push({id:`${a.id}:${b.id}`,a:a.id,b:b.id});
   }
-  const cost={currency:'USD',estimated:round((estimatedInputTokens*MODEL.inputUsdPerMillion+requestCount*(single?2500:10000)*MODEL.outputUsdPerMillion)/1e6),
+  const cost={currency:'USD',estimated:round((estimatedInputTokens*MODEL.inputUsdPerMillion+requestCount*10000*MODEL.outputUsdPerMillion)/1e6),
     conservativeBudget:round((inputTokenUpperBudget*MODEL.inputUsdPerMillion+requestCount*outputTokens*MODEL.outputUsdPerMillion)/1e6),
     estimatedInputTokens,inputTokenUpperBudget,outputTokensPerRequest:outputTokens,
     note:`Local UTF-8 estimate, not provider tokenization or a billing guarantee. Estimate assumes ${single?'2,500':'10,000'} output tokens/call; budget reserves ${outputTokens.toLocaleString('en-US')} including thinking. Standard uncached pricing; retries disabled. In-flight cancelled work can still be billed.`};

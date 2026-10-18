@@ -11,7 +11,7 @@ export function remainingPreview(plan,result){
  const reserve=plan.cost.inputTokenUpperBudget-plan.pairs.reduce((n,p)=>n+utf8Bytes(userContent(plan.chunks[0][p.a],plan.chunks[1][p.b],plan.mode!=='single'))+8192,0);
  inputTokenUpperBudget+=Math.ceil(reserve*pairs.length/plan.requestCount);
  estimatedInputTokens+=Math.ceil(reserve*pairs.length/plan.requestCount/3);
- const cost={...plan.cost,estimated:(estimatedInputTokens*plan.model.inputUsdPerMillion+pairs.length*(plan.mode==='single'?2500:10000)*plan.model.outputUsdPerMillion)/1e6,
+ const cost={...plan.cost,estimated:(estimatedInputTokens*plan.model.inputUsdPerMillion+pairs.length*10000*plan.model.outputUsdPerMillion)/1e6,
  conservativeBudget:(inputTokenUpperBudget*plan.model.inputUsdPerMillion+pairs.length*output*plan.model.outputUsdPerMillion)/1e6};
  return {...previewPlan(plan),requestCount:pairs.length,totalRequestCount:plan.requestCount,resuming:true,cost};
 }
