@@ -48,7 +48,11 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
         notEvaluableReason:"NEEDS_REVIEW",evidenceStrength:null,rulesFired:[],rulesLimiting:[{id:"needs-review",explanation:"The AI marked this possible contradiction undecidable from the testimony; a person decides."}]});
     // Displayed score: the decision-based score (AI's checked answers + owner word lists).
     // CONFIDENCE_SOURCE=rules restores the original phrase-matching rule engine.
-    const decisionScore = verified ? decisionConfidence(candidate) : null;
+    // The decision-based score only needs both quotes to be the witness's exact words. A quote
+    // found in witness speech whose governing question could not be pinned is still scored, with
+    // a note; a quote not found in witness speech (e.g. counsel's words) is never scored.
+    const witnessQuotes = claim1LiteralValid && claim2LiteralValid && sourceBindings.claim1.status !== 'NOT_FOUND' && sourceBindings.claim2.status !== 'NOT_FOUND';
+    const decisionScore = witnessQuotes ? decisionConfidence(candidate) : null;
     if (decisionScore && process.env.CONFIDENCE_SOURCE !== "rules" && candidate.type !== "NEEDS_REVIEW")
         Object.assign(index, {score:decisionScore.score, band:evidenceBand(decisionScore.score), evidenceStrength:decisionScore.evidence, commitment:{...index.commitment,...decisionScore.commitments}, status:decisionScore.status==="CONFLICT"?"CONFLICT_SUPPORTED":"COMPATIBLE_SUPPORTED", notEvaluableReason:undefined, scoreSource:"decision"});
     // Decided after the score source is chosen, so a decision-based score clears "not evaluable".
@@ -62,6 +66,6 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
         coverageCapped:false,coverageCap:null,basis:verified ? index.status : "UNVERIFIED",
         comparisons:Object.fromEntries(index.rulesFired.map(r=>[r.id,r.verdict])),
         flag:review || candidate.reviewNote ? "REVIEW" : "NONE",
-        reasons:[...(review ? [!verified ? "Source evidence is unverified." : `Not evaluable by code rules: ${index.notEvaluableReason}.`] : []),
+        reasons:[...(review ? [!verified ? (decisionScore ? "Quotes are the witness's exact words; the exact question each answers could not be pinned." : "Source evidence is unverified.") : `Not evaluable by code rules: ${index.notEvaluableReason}.`] : []),
             ...(candidate.reviewNote ? [`Check: ${candidate.reviewNote}`] : [])]};
 }

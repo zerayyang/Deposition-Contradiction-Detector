@@ -1,4 +1,5 @@
 import {sourceBindingMessage} from './lib/sourceStatus.js';
+import { scoreBadge } from "./lib/scoreBadge.js";
 const percent = value => Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Unavailable";
 const ruleNames = {time:"Time comparison",state:"Opposing states",timeline:"Timeline conflict","activity polarity":"Action affirmed vs denied","location+activity":"Home presence vs departure","point-location":"Same-time location comparison",knowledge:"Awareness or meeting",quantity:"Amount comparison"};
 const reasonLabels = {LABEL_DISAGREEMENT:"Comparisons of the same witness answers reached different categories. A person should decide before any score is shown.",NO_FACTS:"The code has no supported facts to compare.",UNSUPPORTED_PATTERN:"This comparison is outside the patterns the code can verify.",MISSING_CONTEXT:"The comparison needs clearer person, event, day or time context.",UNVERIFIED_SOURCE:"A quote or extracted phrase could not be verified against the source."};
@@ -37,7 +38,7 @@ export function ReviewCard({result:r, dismissed=false}) {
   return <article className={`review-card ${r.type?.toLowerCase() ?? ""}`}>
     <header className="card-heading"><span className={`type-chip ${r.type?.toLowerCase()}`}>{label}</span><span className="muted">AI importance: {r.severity?.toLowerCase() ?? "unspecified"}</span>{review && <span className="review-chip">Clarification needed</span>}</header>
     {r.typeRule && <p className="type-rule"><b>Why this label:</b> {r.typeRule}</p>}
-    {r.decisionScore && <p className="type-rule" title={(r.decisionScore.basis??[]).join(' ')}><b>{r.scoreSource === "decision" ? "Confidence score" : "Decision-based score (preview)"}:</b> {r.decisionScore.score} / 100 · witness commitment {Number(r.decisionScore.commitment).toFixed(2)}</p>}
+    {(() => { const badge = scoreBadge(r); return <div className={`score-hero ${badge.kind}`}><b>{badge.value}</b><span>{badge.text}</span></div>; })()}
     {r.labelDisagreement && <section className="label-disagreement"><b>Labels disagree — review.</b> These comparisons of the same witness answers reached different categories:<ul>{(r.mergedViews ?? []).map(v=><li key={v.id}><b>{labelFor(v.type)}:</b> {v.issue}<details><summary>Reasoning</summary><p>{v.reasoning}</p></details></li>)}</ul></section>}
     <div className="quote-grid">{[r.claim1,r.claim2].map((claim,i)=><blockquote key={i}><span className="eyebrow">Transcript {i+1}</span><p>“{claim?.original ?? "No quote available."}”</p></blockquote>)}</div>
     <section className="finding"><h3>What the testimony shows</h3><p>{assessment || "Review the source quotes and suggested follow-up below."}</p><small className="muted">Claude's assessment of the two statements.</small></section>
