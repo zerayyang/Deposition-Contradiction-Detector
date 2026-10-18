@@ -35,3 +35,12 @@ test('a decision-based score clears the not-evaluable review flag',()=>{
  const r=assessCandidate({type:'DIRECT',decision,reasoning:'Fictional.',claim1:claim(a),claim2:claim(b)},`Q: Did you meet?\nA: ${a}`,`Q: Did you meet?\nA: ${b}`);
  assert.equal(r.status,'CONFLICT_SUPPORTED');assert.equal(r.flag,'NONE');
 });
+test('the displayed evidence and commitment are the ones the score was computed from',()=>{
+ const claim=original=>({original,activityPhrase:null,timePhrase:null,locationPhrase:null,personPhrase:null,objectPhrase:null,quantityPhrase:null,statePhrase:null,qualifierPhrases:[]});
+ const a='I think we met.',b='We never met.';
+ const decision={sameSubject:'YES',sameCircumstances:'SAME',circumstancesQuote:'',canBothBeTrue:'NO',reconciliation:'NONE',reconciliationQuote:'',conflictForm:'AFFIRM_VS_DENY',value1:'',value2:'',missingFact:''};
+ const r=assessCandidate({type:'DIRECT',decision,reasoning:'Fictional.',claim1:claim(a),claim2:claim(b)},`Q: Did you meet?\nA: ${a}`,`Q: Did you meet?\nA: ${b}`);
+ assert.equal(r.evidenceStrength,EVIDENCE.AFFIRM_VS_DENY);assert.equal(r.commitment.pair,r.decisionScore.commitment);
+ assert.ok(r.commitment.claim1<r.commitment.claim2,'hedged claim keeps its own lower commitment');
+ assert.equal(r.humanConfidence,Math.round(100*r.evidenceStrength*(0.5+0.5*r.commitment.pair)));
+});

@@ -14,15 +14,16 @@ export const COMPATIBLE_CAP=15;
 export function decisionConfidence(finding){
   const decision=finding?.decision;
   if(!decision)return null;
-  const commitment=Math.min(commitmentOf(finding.claim1?.original),commitmentOf(finding.claim2?.original));
+  const claim1=commitmentOf(finding.claim1?.original),claim2=commitmentOf(finding.claim2?.original),commitment=Math.min(claim1,claim2);
+  const commitments={claim1,claim2,pair:commitment};
   const basis=[];
   if(finding.type==='FALSE_POSITIVE'){
     basis.push(finding.typeRule??'Compatible statements.');
-    return {score:Math.round(COMPATIBLE_CAP*commitment),status:'COMPATIBLE',evidence:0,commitment,basis};
+    return {score:Math.round(COMPATIBLE_CAP*commitment),status:'COMPATIBLE',evidence:0,commitment,commitments,basis};
   }
   let evidence=finding.valueCheck?(finding.valueCheck.exact?1:0.7):(EVIDENCE[decision.conflictForm]??EVIDENCE.NONE);
   basis.push(finding.valueCheck?`Code compared the ${finding.valueCheck.kind}s.`:`Clash form: ${String(decision.conflictForm).toLowerCase().replaceAll('_',' ')} (${evidence}).`);
   if(finding.reviewNote){evidence=Math.round(evidence*MISSING_FACT_FACTOR*100)/100;basis.push(`Missing fact lowers evidence: ${finding.reviewNote}`);}
   basis.push(`Commitment ${commitment.toFixed(2)} from the witness's own wording.`);
-  return {score:Math.round(100*evidence*(0.5+0.5*commitment)),status:'CONFLICT',evidence,commitment,basis};
+  return {score:Math.round(100*evidence*(0.5+0.5*commitment)),status:'CONFLICT',evidence,commitment,commitments,basis};
 }

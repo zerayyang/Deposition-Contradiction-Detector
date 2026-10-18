@@ -50,7 +50,7 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
     // CONFIDENCE_SOURCE=rules restores the original phrase-matching rule engine.
     const decisionScore = verified ? decisionConfidence(candidate) : null;
     if (decisionScore && process.env.CONFIDENCE_SOURCE !== "rules" && candidate.type !== "NEEDS_REVIEW")
-        Object.assign(index, {score:decisionScore.score, band:evidenceBand(decisionScore.score), status:decisionScore.status==="CONFLICT"?"CONFLICT_SUPPORTED":"COMPATIBLE_SUPPORTED", notEvaluableReason:undefined, scoreSource:"decision"});
+        Object.assign(index, {score:decisionScore.score, band:evidenceBand(decisionScore.score), evidenceStrength:decisionScore.evidence, commitment:{...index.commitment,...decisionScore.commitments}, status:decisionScore.status==="CONFLICT"?"CONFLICT_SUPPORTED":"COMPATIBLE_SUPPORTED", notEvaluableReason:undefined, scoreSource:"decision"});
     // Decided after the score source is chosen, so a decision-based score clears "not evaluable".
     const review = !verified || index.status === "NOT_EVALUABLE";
     return {...candidate, ...index, decisionScore, claim1Valid,claim2Valid,claim1LiteralValid,claim2LiteralValid,sourceBindings,
