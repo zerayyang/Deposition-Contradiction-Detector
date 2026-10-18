@@ -5,6 +5,7 @@ import { TestimonyFact } from "./TestimonyFact.js";
 import { scoreFacts } from "./scoring/engine.js";
 import { witnessQuoteMatches, resolveWitnessSource } from "./sourceEvidence.js";
 import { applyDecision } from './typeDecision.js';
+import { decisionConfidence } from './scoring/decisionConfidence.js';
 
 function sourceContext(transcript, quote, binding, options={}) {
     const matches = witnessQuoteMatches(transcript, quote, options).filter(m=>binding.status==='BOUND'&&m.index===binding.selected.start);
@@ -45,7 +46,12 @@ export function assessCandidate(candidate, transcript1, transcript2, sourceOptio
     if (verified && candidate.type === "NEEDS_REVIEW") Object.assign(index, {score:null,band:"NOT_EVALUABLE",status:"NOT_EVALUABLE",
         notEvaluableReason:"NEEDS_REVIEW",evidenceStrength:null,rulesFired:[],rulesLimiting:[{id:"needs-review",explanation:"The AI marked this possible contradiction undecidable from the testimony; a person decides."}]});
     const review = !verified || index.status === "NOT_EVALUABLE";
-    return {...candidate, ...index, claim1Valid,claim2Valid,claim1LiteralValid,claim2LiteralValid,sourceBindings,
+    // Preview: decision-based score shown next to the live one. CONFIDENCE_SOURCE=decision
+    // makes it the displayed score; by default the live rule engine's score is kept.
+    const decisionScore = verified ? decisionConfidence(candidate) : null;
+    if (decisionScore && process.env.CONFIDENCE_SOURCE === "decision" && candidate.type !== "NEEDS_REVIEW")
+        Object.assign(index, {score:decisionScore.score, status:decisionScore.status==="CONFLICT"?"CONFLICT_SUPPORTED":"COMPATIBLE_SUPPORTED", notEvaluableReason:undefined});
+    return {...candidate, ...index, decisionScore, claim1Valid,claim2Valid,claim1LiteralValid,claim2LiteralValid,sourceBindings,
         chronoTimeAnalysis:{claim1:interpretValidatedTime(fact1,claim1Valid),claim2:interpretValidatedTime(fact2,claim2Valid)},
         humanConfidence:index.score, evidenceScore:index.evidenceStrength,
         evidenceDetails:index.rulesFired.map(r=>({rule:r.id,score:r.strength,verdict:r.verdict})),

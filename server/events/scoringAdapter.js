@@ -72,7 +72,7 @@ export function scoreEventComparisons(comparisonResult,extractionPlan){
   const options=Object.fromEntries(selected.map((source,i)=>['claim'+(i+1),{start:source.start,end:source.end,speakerRoles:extractionPlan.documents[i].speakerRoles,pages:extractionPlan.documents[i].pages}]));
   // A possible conflict that needs a missing fact gets no score; the rules see it as unproven.
   const needsReview=comparison.type==='NEEDS_REVIEW';
-  const scored=assessCandidate({type:needsReview?'INFERENTIAL':comparison.type,reasoning:variant.reasoning,claim1:claims[0],claim2:claims[1]},...extractionPlan.documents.map(d=>d.text),options);
+  const scored=assessCandidate({type:needsReview?'INFERENTIAL':comparison.type,reasoning:variant.reasoning,claim1:claims[0],claim2:claims[1],...(variant.decision?{decision:variant.decision}:{})},...extractionPlan.documents.map(d=>d.text),options);
   if(needsReview)Object.assign(scored,{type:'NEEDS_REVIEW',score:null,humanConfidence:null,evidenceScore:null,evidenceStrength:null,band:'NOT_EVALUABLE',status:'NOT_EVALUABLE',basis:'NOT_EVALUABLE',notEvaluableReason:'NEEDS_REVIEW',rulesFired:[],evidenceDetails:[],comparisons:{},flag:'REVIEW',
    reasons:['Possible contradiction — a fact needed to decide is missing: '+(variant.missingContext??[]).join('; ')]});
   // Multiple supporting passages are kept, never stitched into fabricated text.
