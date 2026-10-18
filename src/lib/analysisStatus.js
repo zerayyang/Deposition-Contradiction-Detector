@@ -1,5 +1,15 @@
 const count = value => Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 
+// Every comparison finished, and the only issues are findings kept without a score because
+// a quote could not be tied to one exact question and answer. The review is complete; those
+// cards simply show "not evaluable". Returns the number of such findings, or 0.
+export function unscoredOnlyCount(analysis) {
+  if (analysis?.status !== 'partial') return 0;
+  const tasks = analysis.tasks ?? [], issues = analysis.issues ?? [];
+  if (!tasks.length || tasks.some(task => task.status !== 'completed')) return 0;
+  return issues.length && issues.every(issue => /retained unscored/i.test(issue?.reason ?? '')) ? issues.length : 0;
+}
+
 export function progressCounts(analysis) {
   const total = count(analysis.planned);
   const completed = Math.min(total, count(analysis.completed));

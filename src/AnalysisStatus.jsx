@@ -1,5 +1,5 @@
 import {readingGapLabel,retainedNotesLabel,readingGapWarning,readingHasGaps,readingDocumentStats,readingDocumentLabel} from '../shared/readingState.js';
-import { elapsedLabel, friendlyFailure, progressCounts, remainingLabel, citationFailureDetails, readingRecoveryAction, withReadingDiagnostics } from './lib/analysisStatus.js';
+import { elapsedLabel, friendlyFailure, progressCounts, unscoredOnlyCount, remainingLabel, citationFailureDetails, readingRecoveryAction, withReadingDiagnostics } from './lib/analysisStatus.js';
 
 export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }) {
   if (!analysis) return null;
@@ -12,7 +12,7 @@ export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }
   const gaps=readingHasGaps(analysis),documents=readingDocumentStats(analysis);
   // Gaps are reported once reading stops; while steps are still running, unread ranges are just pending.
   const inProgress = running && active;
-  const title = inProgress ? 'Reviewing your documents' : gaps ? readingGapLabel : running ? 'Review interrupted' : (titles[analysis.status] ?? 'Review status');
+  const title = inProgress ? 'Reviewing your documents' : gaps ? readingGapLabel : running ? 'Review interrupted' : unscoredOnlyCount(analysis) ? 'Analysis complete · some findings unscored' : (titles[analysis.status] ?? 'Review status');
   const remaining = remainingLabel(analysis, active, elapsed, timing);
   const failures = (analysis.tasks ?? []).filter(task => task.status === 'failed' || task.status === 'partial').map(task=>withReadingDiagnostics(analysis,task));
   const coverage = analysis.coverage ?? [];
@@ -25,7 +25,7 @@ export default function AnalysisStatus({ analysis, active, elapsed = 0, timing }
     <div className="analysis-status-stats"><span>{completed} successful</span>{failed > 0 && <span>{failed} failed</span>}{partial > 0 && <span>{partial} partly completed</span>}{Number.isFinite(elapsed) && <span>Elapsed: {elapsedLabel(elapsed)}</span>}</div>
     {remaining && <p role="status" className="analysis-remaining">{remaining}</p>}
     {running && active && <small>An estimate appears after the first comparison, then updates as comparisons finish. Document length and AI response speed can change the estimate.</small>}
-    {analysis.status !== 'complete' && <p>{running && active ? 'Results will appear as comparisons finish. The review is still in progress.' : 'This is not a complete review. Any finished results have been retained.'}</p>}
+    {analysis.status !== 'complete' && <p>{running && active ? 'Results will appear as comparisons finish. The review is still in progress.' : unscoredOnlyCount(analysis) ? `All sections were compared. ${unscoredOnlyCount(analysis)} finding${unscoredOnlyCount(analysis) === 1 ? '' : 's'} could not be tied to one exact question and answer, so ${unscoredOnlyCount(analysis) === 1 ? 'it is' : 'they are'} shown without a confidence score.` : 'This is not a complete review. Any finished results have been retained.'}</p>}
     {(coverage.length > 0 || failures.length > 0 || reviewIssues.length > 0) && <details open={reading && failures.length > 0}><summary>Review details</summary>
       {coverage.map((document, index) => {
         const pages = document.pages;

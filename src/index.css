@@ -16,3 +16,4 @@
 .label-disagreement details{margin-top:4px}
 .type-chip.needs_review{color:#5b4a9e;background:#efebfb}.review-card.needs_review{border-top-color:#7a66c7}.legend-dot.needs_review{background:#7a66c7}
 .type-rule{font-size:13px;color:#4a5d6e;margin:-8px 0 16px}
+.testimony-confirmations{display:flex;flex-direction:column;gap:8px;margin:12px 0}.testimony-confirmations:empty{display:none}.event-confirmation{display:flex;align-items:center;gap:10px;font-size:13px;color:#33495c}.event-confirmation input{width:auto;margin:0;flex:none}
