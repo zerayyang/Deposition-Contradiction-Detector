@@ -18,7 +18,8 @@ import { checkFileBudget } from "../shared/documentLimits.js";
 import { createDocumentStore } from "./lib/documentStore.js";
 import { createCaseStore } from "./lib/caseStore.js";
 import { createLocalCaseStore, createLocalDocumentStore, indexedDbKv } from "./lib/localStores.js";
-import {openSummaryPdfReport} from "./lib/summaryReport.js";
+import ReportSheet from "./ReportSheet.jsx";
+import { buildPdfReport, printPdfReport } from "./lib/pdfReport.js";
 import { ReviewCard } from "./ReviewCard.jsx";
 import { CorrectionForm } from "./FeedbackReview.jsx";
 import AdminPortal from "./AdminPortal.jsx";
@@ -106,6 +107,7 @@ function Dashboard({ session }) {
   const [preparing, setPreparing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState("");
   const [reportError,setReportError] = useState("");
+  const [showReport, setShowReport] = useState(false);
   const [analysisTiming, setAnalysisTiming] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
@@ -387,7 +389,8 @@ function Dashboard({ session }) {
         {[["DIRECT","Direct"],["INFERENTIAL","Inferential"],["UNCERTAIN","Uncertain"],["FALSE_POSITIVE","Not contradictions"]].filter(([key])=>key!=="UNCERTAIN"||counts.UNCERTAIN).map(([key,name])=><button key={key} className={`summary-tile ${key.toLowerCase()} ${filter===key?"active":""}`} aria-pressed={filter===key} onClick={()=>setFilter(filter===key?"ALL":key)}><b>{counts[key] ?? 0}</b><span>{name}</span></button>)}
       </section>:<AnalysisStatus analysis={draft.analysis} active={loading} elapsed={loading ? elapsed : draft.seconds} timing={analysisTiming} />}
       {draft.texts.some(text=>unlabeledTestimony(text))&&<p className="muted unlabeled-note">Question/answer labels could not be identified in {draft.texts.map((t,i)=>unlabeledTestimony(t)?`Transcript ${i+1}`:null).filter(Boolean).join(" and ")}. Check the original Q/A transcript before confidence review; lawyer and court speech must remain separate.</p>}
-      {draft.results&&<div className="report-actions"><button className="report-pdf-button" disabled={loading} onClick={()=>{setReportError('');try{openSummaryPdfReport({title:caseTitle,draft});}catch(error){setReportError(error.message);}}}>Download PDF report</button><small>Key findings and sources. Choose “Save as PDF” in the print dialog.</small></div>}
+      {draft.results&&<div className="report-actions"><button className="report-pdf-button" disabled={loading} onClick={()=>{setReportError('');setShowReport(true);}}>Export PDF</button><small>Choose what to include, then “Save as PDF”.</small></div>}
+      {showReport&&draft.results&&<ReportSheet findings={draft.results} onCancel={()=>setShowReport(false)} onExport={options=>{setShowReport(false);try{printPdfReport(buildPdfReport({title:caseTitle,draft,options}));}catch(error){setReportError(`PDF export failed: ${error.message}`);}}}/>}
       {reportError && <p className="error" role="alert">{reportError}</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {saveError && <p className="error" role="alert">{saveError}</p>}

@@ -28,3 +28,8 @@ export function findingTitle(result) {
   const quote = String(result?.claim1?.original ?? "").trim();
   return quote ? `“${quote.length > 50 ? `${quote.slice(0, 49)}…` : quote}”` : "Finding";
 }
+// The suggested follow-up question inside an explanation ("Follow-up: …?"), if any.
+export function askQuestion(reasoning) {
+  const match = String(reasoning ?? "").match(/(?:neutral\s+|possible\s+)?follow[- ]up(?:\s+question)?\s*:\s*["'“‘]?([\s\S]*?\?)/i);
+  return match?.[1]?.trim() ?? null;
+}

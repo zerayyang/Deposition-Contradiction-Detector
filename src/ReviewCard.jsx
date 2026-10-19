@@ -1,20 +1,15 @@
 import FindingSource from './FindingSource.jsx';
 import {sourceBindingMessage} from './lib/sourceStatus.js';
 import HybridConfidence from "./HybridConfidence.jsx";
-import { shortRule, firstSentence } from "./lib/shortLabels.js";
+import { shortRule, firstSentence, askQuestion } from "./lib/shortLabels.js";
 export function ScoreGuide() {
   return <details className="score-guide"><summary>About AI agreement</summary><p>Two AI models each read a finding three ways. A separate checker reviews the source without seeing their votes. Exact source checks are required. Agreement describes those reads; it is not measured accuracy or a probability that a witness is lying.</p></details>;
-}
-
-function followUp(reasoning) {
-  const match = reasoning.match(/(?:neutral\s+|possible\s+)?follow[- ]up(?:\s+question)?\s*:\s*["'“‘]?([\s\S]*?\?)/i);
-  return match?.[1]?.trim() ?? null;
 }
 
 export function ReviewCard({result:r,texts=[],files=[],onDownloadOriginal}) {
   const notEvaluable = r.status === "NOT_EVALUABLE";
   const reasoning = r.reasoning ?? "No explanation provided.";
-  const question = followUp(reasoning);
+  const question = askQuestion(reasoning);
   const assessment = question ? reasoning.replace(/(?:neutral\s+|possible\s+)?follow[- ]up(?:\s+question)?\s*:\s*["'“‘]?([\s\S]*?\?)["'”’]?/i, "").trim() : reasoning;
   const labelFor = type => type === "DIRECT" ? "Direct" : type === "INFERENTIAL" ? "Inferential" : type === "NEEDS_REVIEW" ? "Needs review" : "False positive";
   const label = r.labelDisagreement ? "Uncertain" : labelFor(r.type);
