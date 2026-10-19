@@ -10,6 +10,20 @@ export function unscoredOnlyCount(analysis) {
   return issues.length && issues.every(issue => /retained unscored/i.test(issue?.reason ?? '')) ? issues.length : 0;
 }
 
+// Every section was compared, but the AI suggested findings whose quotes are not in the
+// transcript word for word, so they were dropped. That is a complete review, not a partial one.
+const droppedOnly = task => ['partial', 'failed'].includes(task?.status) && task.stopReason === 'end_turn' && (task.rejectedFindings?.length ?? 0) > 0;
+export function droppedSuggestionCount(analysis) {
+  if (!['partial', 'failed'].includes(analysis?.status)) return 0;
+  const tasks = analysis.tasks ?? [];
+  if (!tasks.length || !tasks.every(task => task.status === 'completed' || droppedOnly(task))) return 0;
+  const rejected = new Set(tasks.flatMap(task => (task.rejectedFindings ?? []).map(r => `${task.id}:${r.candidateIndex}`)));
+  const otherIssue = (analysis.issues ?? []).some(issue => !/retained unscored/i.test(issue?.reason ?? '') && !rejected.has(`${issue?.pairId}:${issue?.candidateIndex}`));
+  return otherIssue ? 0 : rejected.size;
+}
+// The whole text was compared: complete, or complete with notes (unscored or dropped findings).
+export const fullyCompared = analysis => analysis?.status === 'complete' || unscoredOnlyCount(analysis) > 0 || droppedSuggestionCount(analysis) > 0;
+
 export function progressCounts(analysis) {
   const total = count(analysis.planned);
   const completed = Math.min(total, count(analysis.completed));

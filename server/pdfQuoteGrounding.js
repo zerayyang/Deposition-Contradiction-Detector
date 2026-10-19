@@ -58,8 +58,46 @@ export function pdfQuoteMap(text, manifest) {
   if(normalized.endsWith(' ')){normalized=normalized.slice(0,-1);starts.pop();ends.pop();}
   return {normalized,starts,ends};
 }
+// Pasted transcripts carry the same reporting layout as PDFs, but without page boundaries:
+// lines repeated 3+ times (running headers, reporter initials, stamps), bare page-number lines,
+// confirmed runs of line numbers and confirmed runs of trailing clock stamps are skipped.
+// Like the PDF map, this is an offset map, not a fuzzy matcher: every other character must match.
+export function textQuoteMap(text) {
+  const lines=[...text.matchAll(/[^\n]+/g)].map(m=>({text:m[0],start:m.index}));
+  const counts=new Map();
+  for(const line of lines){const key=line.text.trim();if(key)counts.set(key,(counts.get(key)??0)+1);}
+  const ignored=new Uint8Array(text.length),remove=(start,end)=>ignored.fill(1,start,end);
+  for(const line of lines){
+    const key=line.text.trim();
+    const furniture=counts.get(key)>=3&&key.length<=90&&!/^(?:\d{1,2}\s+)?(?:Q|A)\b[.:]?/.test(key);
+    if(furniture||/^\d{3,5}$/.test(key))remove(line.start,line.start+line.text.length);
+  }
+  const numbered=lines.flatMap(line=>{const m=line.text.match(/^(\s*)([1-9]|1\d|2[0-5])\s+/);return m?[{...line,number:Number(m[2]),prefix:m[0].length}]:[];});
+  const confirmed=[];
+  for(let start=0;start<numbered.length;){
+    let end=start+1;
+    while(end<numbered.length&&numbered[end].number===numbered[end-1].number+1)end++;
+    if(end-start>=4)confirmed.push(...numbered.slice(start,end));
+    start=end;
+  }
+  for(const line of confirmed)remove(line.start,line.start+line.prefix);
+  const stamp=/\s(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d\s*$/,stamped=lines.filter(line=>stamp.test(line.text));
+  if(stamped.length>=4)for(const line of stamped){const m=line.text.match(stamp);remove(line.start+m.index,line.start+line.text.length);}
+  let normalized='';const starts=[],ends=[];
+  for(let i=0;i<text.length;i++){
+    if(ignored[i])continue;
+    if(/\s/.test(text[i])){
+      if(!normalized)continue;
+      if(normalized.endsWith(' ')){ends[ends.length-1]=i+1;continue;}
+      normalized+=' ';
+    }else normalized+=text[i];
+    starts.push(i);ends.push(i+1);
+  }
+  if(normalized.endsWith(' ')){normalized=normalized.slice(0,-1);starts.pop();ends.pop();}
+  return {normalized,starts,ends};
+}
 const normalize=quote=>quote.replace(/\s+/g,' ').trim();
-export function groundPdfClaim(claim,text,map,section) {
+export function groundPdfClaim(claim,text,map,section,method='PDF_LAYOUT_MAPPED') {
   if(typeof claim?.original!=='string'||!claim.original.trim())throw new Error('A returned quotation is missing.');
   const modelOriginal=claim.original,exact=section.text.includes(modelOriginal);
   if(exact)return {claim:{...claim},audit:{method:'EXACT',modelOriginal,sourceOriginal:modelOriginal}};
@@ -69,7 +107,7 @@ export function groundPdfClaim(claim,text,map,section) {
     if(start>=section.start&&end<=section.end)matches.push({start,end,pos});
     if(matches.length>1)break;
   }
-  if(matches.length!==1)throw new Error(matches.length?'PDF quotation matches more than one source passage.':'A returned quotation cannot be grounded in its submitted PDF section.');
+  if(matches.length!==1)throw new Error(matches.length?(method==='PDF_LAYOUT_MAPPED'?'PDF quotation matches more than one source passage.':'A returned quotation matches more than one source passage.'):method==='PDF_LAYOUT_MAPPED'?'A returned quotation cannot be grounded in its submitted PDF section.':'A returned quotation is outside its submitted section.');
   const match=matches[0],sourceOriginal=text.slice(match.start,match.end),restored={...claim,original:sourceOriginal};
   const fields=['activityPhrase','timePhrase','locationPhrase','personPhrase','objectPhrase','quantityPhrase','statePhrase'];
   const restore=phrase=>{
@@ -81,5 +119,5 @@ export function groundPdfClaim(claim,text,map,section) {
   };
   for(const key of fields)restored[key]=restore(restored[key]);
   if(Array.isArray(restored.qualifierPhrases))restored.qualifierPhrases=restored.qualifierPhrases.map(restore);
-  return {claim:restored,audit:{method:'PDF_LAYOUT_MAPPED',modelOriginal,sourceOriginal,start:match.start,end:match.end,notice:'Reporting layout was mapped to the exact original source span; model wording retained for audit.'}};
+  return {claim:restored,audit:{method,modelOriginal,sourceOriginal,start:match.start,end:match.end,notice:'Reporting layout was mapped to the exact original source span; model wording retained for audit.'}};
 }

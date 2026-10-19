@@ -7,7 +7,7 @@ import { assessCandidate } from './humanConfidencePipeline.js';
 import {checkedSpeakerRoles} from './testimonyMarkers.js';
 import {parseTestimonySource} from './testimonySource.js';
 import { testimonyMarkers } from './testimonyMarkers.js';
-import { pdfQuoteMap, groundPdfClaim } from './pdfQuoteGrounding.js';
+import { pdfQuoteMap, groundPdfClaim, textQuoteMap } from './pdfQuoteGrounding.js';
 
 export const MODEL = Object.freeze({id:'claude-opus-5-5',contextTokens:1000000,maxOutputTokens:128000,
   inputUsdPerMillion:4,outputUsdPerMillion:20,checked:'2026-10-14',
@@ -219,7 +219,13 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
               if(typeof c[key]?.original==='string'&&!section.text.includes(c[key].original))quoteMaps[i]??=pdfQuoteMap(texts[i],plan.manifests[i]);
               const resolved=groundPdfClaim(c[key],texts[i],quoteMaps[i],section);
               c[key]=resolved.claim;grounding[key]=resolved.audit;
-            }else if(typeof c[key]?.original!=='string'||!section.text.includes(c[key].original))throw new Error('A returned quotation is outside its submitted section.');
+            }else if(typeof c[key]?.original!=='string')throw new Error('A returned quotation is outside its submitted section.');
+            else if(!section.text.includes(c[key].original)){
+              // A pasted-text quote that skips line numbers or running headers is mapped back to the exact original span.
+              quoteMaps[i]??=textQuoteMap(texts[i]);
+              const resolved=groundPdfClaim(c[key],texts[i],quoteMaps[i],section,'TEXT_LAYOUT_MAPPED');
+              c[key]=resolved.claim;grounding[key]=resolved.audit;
+            }
           }
           // Anchors are checked inside this submitted section, using only literal
           // source context. Never select a repeated answer from model reasoning.
@@ -232,7 +238,7 @@ export async function executePlan({plan,texts,instructions,callModel,signal,onEv
           if(existing){existing.supportingAnalyses.push(variant);duplicatesCombined++;}
           else findings.set(key,{...assessed,supportingAnalyses:[variant]});
           task.acceptedFindings++;
-          if(Object.values(grounding).some(g=>g.method==='PDF_LAYOUT_MAPPED'))task.grounding.push({candidateIndex,...grounding});
+          if(Object.values(grounding).some(g=>['PDF_LAYOUT_MAPPED','TEXT_LAYOUT_MAPPED'].includes(g.method)))task.grounding.push({candidateIndex,...grounding});
           if(!assessed.claim1Valid||!assessed.claim2Valid)issues.push({pairId:task.id,candidateIndex,reason:'A returned quote/extraction failed source validation; retained unscored for review.'});
         }catch(error){
           task.rejectedFindings.push({candidateIndex,candidate:original,reason:error.message});
