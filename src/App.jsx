@@ -1,3 +1,6 @@
+import ReviewProgress from './ReviewProgress.jsx';
+import ReviewBudget from './ReviewBudget.jsx';
+import {withSuggestedReviewBudget,selectedReviewBudget} from './lib/reviewBudget.js';
 import {reviewRequestBody} from './lib/reviewPlan.js';
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import RecoveryPanel from "./RecoveryPanel.jsx";
@@ -96,6 +99,7 @@ function Dashboard({ session }) {
   const [caseBusy, setCaseBusy] = useState(false);
   const [caseError, setCaseError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [reviewPhase, setReviewPhase] = useState('analysis');
   const [pendingPlan, setPendingPlan] = useState(null);
   const [preparing, setPreparing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState("");
@@ -134,6 +138,17 @@ function Dashboard({ session }) {
     await store.save(id, snapshot);
     updateDraft(id, { dirty: false });
     setSaveError("");
+  }
+  async function downloadOriginal(index) {
+    const file=draft.files[index];
+    if(!file?.path)return;
+    try {
+      const blob=await documents.download(activeId,file);
+      const url=URL.createObjectURL(blob),link=document.createElement('a');
+      link.href=url;link.download=file.name??`transcript-${index+1}`;
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    } catch { setError('The original file could not be downloaded. Your extracted transcript is still available; check your connection and try again.'); }
   }
   async function uploadOriginal(index, text, chosen, extraction, options) {
     if (loading || saving || opening || caseBusy || deleting || uploading || uploadLock.current) throw new Error("Please wait for the current action to finish.");
@@ -256,7 +271,7 @@ function Dashboard({ session }) {
       const plan=await previewAnalysis(body,{signal:controller.signal,fetchImpl:apiFetch});
       if(!Number.isInteger(plan.requestCount)||plan.requestCount<1||typeof plan.id!=="string")throw new Error("The server returned an invalid analysis plan.");
       const confidenceAllowance=await prepareConfidenceAllowance({caseId:activeId,texts:source.texts},{signal:controller.signal,fetchImpl:apiFetch});
-      setPendingPlan({plan,body,id:activeId,snapshot:source,confidenceAllowance});
+      setPendingPlan({plan:withSuggestedReviewBudget(plan),body,id:activeId,snapshot:source,confidenceAllowance});
     } catch(err) {if(err.name !== "AbortError") setError(err.message);}
     finally {setPreparing(false);}
   }
@@ -264,7 +279,7 @@ function Dashboard({ session }) {
     if(inFlight.current || !pendingPlan) return;
     const {plan,body,id,snapshot:source,confidenceAllowance}=pendingPlan; setPendingPlan(null); inFlight.current=true;
     const controller=new AbortController();request.current=controller;
-    setAnalysisTiming(null);setLoading(true);setSaveError("");setError("");setElapsed(0);setFilter("ALL");
+    setAnalysisTiming(null);setReviewPhase('analysis');setLoading(true);setSaveError("");setError("");setElapsed(0);setFilter("ALL");
     setAnalysisProgress(`0 of ${plan.requestCount} comparisons completed`);
     const base=beginAnalysisDraft(source,plan.resuming);
     const start=performance.now();let latest=null,latestProgress=null,runStarted=false;
@@ -292,6 +307,7 @@ function Dashboard({ session }) {
       updateDraft(id,{...completed,dirty:true});
       try{await persist(id,completed);}catch(err){setSaveError(`Results retained in this tab but not saved: ${err.message}. Click Save case.`);}
       let finalSnapshot=completed;
+      setReviewPhase('scoring');
       // Ask-twice: one small request re-reads borderline findings; disagreement shows Uncertain.
       try{
         setAnalysisProgress('Double-checking borderline findings…');
@@ -359,8 +375,9 @@ function Dashboard({ session }) {
       <div className="sidebar-footer"><div className="account-avatar">{session.user.email?.slice(0,2).toUpperCase()}</div><div><span className="account-email">{session.user.email}</span>{local?<span className="muted">No-account mode · saved in this browser</span>:<button className="link-button" disabled={blocked} onClick={signOut}>Sign out</button>}</div></div>
     </aside>
     <main className="workspace-main"><header className="workspace-header"><div><div className="case-title"><h1>{caseTitle}</h1></div></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save as case" : "Save"}</button>{activeId !== "sample" && <button className="secondary-button" disabled={blocked} onClick={renameCase}>Rename</button>}{activeId !== "sample" && <button className="secondary-button danger" disabled={blocked} onClick={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }}>Delete</button>}</div></header>
-      {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review your documents</h2><p className="muted">One review reads both transcripts, then checks confidence automatically. Starting sends testimony to Anthropic. Borderline findings get one small double-check request afterwards (usually under $0.10, at most about $0.35).</p><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p><div className="combined-review-cost"><b>Confidence included · additional allowance US ${pendingPlan.confidenceAllowance.budgetUsd.toFixed(2)}</b><p>7 AI checks per eligible finding. Estimated {pendingPlan.confidenceAllowance.forecastFindings} findings, with 25% budget headroom. Unused reservations are released. Unusually large output may require more approval; spending never silently exceeds this reserve.</p><p>Analysis budget + confidence allowance: US ${(pendingPlan.plan.cost.conservativeBudget+pendingPlan.confidenceAllowance.budgetUsd).toFixed(2)}. The existing borderline double-check is additional, as described above.</p></div>{pendingPlan.plan.lessons?.used>0&&<p className="lessons-note">Uses {pendingPlan.plan.lessons.used} approved lesson{pendingPlan.plan.lessons.used===1?'':'s'} from past corrections.</p>}{pendingPlan.plan.lessons?.notice&&<p className="muted">{pendingPlan.plan.lessons.notice}</p>}{pendingPlan.plan.execution==='durable-steps'&&<label>Maximum spend for this review (US$)<input aria-label="Maximum review spend" disabled={pendingPlan.plan.budgetFixed} type="number" min="0.01" step="0.01" value={pendingPlan.plan.approvedBudgetUsd??pendingPlan.plan.cost.conservativeBudget} onChange={e=>setPendingPlan(old=>({...old,plan:{...old.plan,approvedBudgetUsd:Number(e.target.value)}}))}/><small>A lower cap can stop with partial coverage. Completed work is kept.</small></label>}<p>{pendingPlan.plan.resuming?"Only unfinished comparisons will run again. Previously completed comparisons are retained.":"Every section is compared across both documents, including differently ordered sections."} Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start review</button></div>}
+      {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review your documents</h2><p className="muted">One review reads both transcripts, then checks confidence automatically. Starting sends testimony to Anthropic. Borderline findings get one small double-check request afterwards (usually under $0.10, at most about $0.35).</p><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p><div className="combined-review-cost"><b>Confidence included · additional allowance US ${pendingPlan.confidenceAllowance.budgetUsd.toFixed(2)}</b><p>7 AI checks per eligible finding. Estimated {pendingPlan.confidenceAllowance.forecastFindings} findings, with 25% budget headroom. Unused reservations are released. Unusually large output may require more approval; spending never silently exceeds this reserve.</p><p>Analysis budget + confidence allowance: US ${(selectedReviewBudget(pendingPlan.plan)+pendingPlan.confidenceAllowance.budgetUsd).toFixed(2)}. The existing borderline double-check is additional, as described above.</p></div>{pendingPlan.plan.lessons?.used>0&&<p className="lessons-note">Uses {pendingPlan.plan.lessons.used} approved lesson{pendingPlan.plan.lessons.used===1?'':'s'} from past corrections.</p>}{pendingPlan.plan.lessons?.notice&&<p className="muted">{pendingPlan.plan.lessons.notice}</p>}{pendingPlan.plan.execution==='durable-steps'&&<ReviewBudget plan={pendingPlan.plan} onChange={value=>setPendingPlan(old=>({...old,plan:{...old.plan,approvedBudgetUsd:value}}))}/>}<p>{pendingPlan.plan.resuming?"Only unfinished comparisons will run again. Previously completed comparisons are retained.":"Every section is compared across both documents, including differently ordered sections."} Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start review</button></div>}
       <section className="documents-toolbar" aria-label="Transcript documents">{draft.files.some(Boolean)&&<button className="collapse-toggle" aria-expanded={showTranscripts} onClick={toggleTranscripts}>{showTranscripts?"▾":"▸"} Transcripts</button>}{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}<div className="analyze-block"><button className="analyze-button" disabled={blocked} onClick={()=>prepareAnalysis()}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : draft.results ? "Review again" : "Review documents"}</button>{loading&&<p role="status"><span className="review-loading-spinner" aria-hidden="true" />{elapsed}s elapsed · {analysisProgress}</p>}{(loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div></section>
+      {loading&&<ReviewProgress analysis={draft.analysis} findings={draft.results??[]} phase={reviewPhase}/>}
       {showTranscripts&&draft.files.some(Boolean)&&<section className="transcript-previews" aria-label="Transcript text">{draft.texts.map((text,i)=>draft.files[i]?<div key={i}><span className="eyebrow">Transcript {i+1} · {draft.files[i].name}</span><pre tabIndex={0}>{text}</pre></div>:null)}</section>}
       {!loading&&draft.results&&(draft.analysis?.status==="complete"||unscoredOnlyCount(draft.analysis))?<section className="summary-strip" aria-label="Result summary">
         <div className="summary-headline"><b>{(counts.DIRECT ?? 0) + (counts.INFERENTIAL ?? 0)}</b><span>contradiction{(counts.DIRECT ?? 0) + (counts.INFERENTIAL ?? 0) === 1 ? "" : "s"} found</span><small role="status">{confidenceChecked<confidenceEligible.length?`Analysis complete · confidence ${confidenceChecked}/${confidenceEligible.length} checked`:'✓ Review complete'}{Number.isFinite(draft.seconds)?` · ${elapsedLabel(draft.seconds)}`:""}</small></div>
@@ -375,7 +392,7 @@ function Dashboard({ session }) {
         {!draft.results && <div className="findings-empty"><span>⌕</span><h3>{loading ? "Review in progress" : "Start with two transcripts"}</h3><p>{loading ? "Findings will appear when analysis completes. Keep this tab open." : "Preview the text above, then analyze to compare the witness’s accounts."}</p></div>}
         {draft.results && visible.length === 0 && <p className="findings-empty">No findings in this category.</p>}
         <div className="finding-list">{visible.map(({result,index}) => <Fragment key={index}>{index === firstDismissed && <p className="list-divider">Not contradictions</p>}<button className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); }}><span className={`type-chip ${result.labelDisagreement?"uncertain":result.type.toLowerCase()}`}>{result.labelDisagreement?"Uncertain":label(result.type)}</span><span className={`score-pill ${scoreBadge(result).kind}`}>{scoreBadge(result).value}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{findingTitle(result)}</h3>{shortRule(result.typeRule)&&<p>{shortRule(result.typeRule)}</p>}<span className="finding-arrow">›</span></button></Fragment>)}</div>
-      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><h2>{findingTitle(selected.result)}</h2></div><ReviewCard result={selected.result} />
+      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><h2>{findingTitle(selected.result)}</h2></div><ReviewCard result={selected.result} texts={draft.texts} files={draft.files} onDownloadOriginal={downloadOriginal} />
           <section className="lawyer-review" aria-label="Your review">
             <div className="lawyer-review-heading"><h3>Your review</h3><button className={draft.reviewed[selected.index] ? "reviewed-button done" : "reviewed-button"} disabled={blocked} onClick={() => patch({ reviewed: { ...draft.reviewed, [selected.index]: !draft.reviewed[selected.index] } })}>{draft.reviewed[selected.index] ? "✓ Reviewed" : "Mark reviewed"}</button></div>
             <textarea aria-label="Review note" disabled={blocked} rows={3} value={draft.notes[selected.index] ?? ""} onChange={event => patch({ notes: { ...draft.notes, [selected.index]: event.target.value } })} placeholder="Notes for this finding…" />
