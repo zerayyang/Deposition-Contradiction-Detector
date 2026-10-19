@@ -44,5 +44,6 @@ export function hybridBadge(result) {
   if (c?.status === 'CALIBRATED' && c.version === HYBRID_VERSION &&
       c.originalType === result.type && Number.isFinite(c.score) && c.score >= 0 && c.score <= 100 &&
       !result.labelDisagreement) return {kind: 'conflict', value: `${c.score}%`, text: 'Classification confidence'};
-  return {kind: 'none', value: '—', text: 'Hybrid confidence not available'};
+  if(c?.status==='UNCALIBRATED'&&c.originalType===result.type&&!result.labelDisagreement) return {kind:'agreement',value:`${c.agreeingVotes}/6`,text:'AI agreement · not calibrated accuracy'};
+  return {kind: 'none', value: '—', text: 'Confidence not checked'};
 }

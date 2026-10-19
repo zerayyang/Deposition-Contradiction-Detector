@@ -75,6 +75,17 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
   };
   const fail = (res, status, code, error) => res.status(status).json({code,error});
   return {
+    async allowance(req,res) {
+      try {
+        const {caseId,texts,budgetUsd=2}=req.body??{};
+        if(typeof caseId!=='string'||!caseId||caseId==='sample'||!Array.isArray(texts)||texts.length!==2||texts.some(t=>typeof t!=='string'||!t))return fail(res,400,'INVALID_ALLOWANCE','Save a case with both transcripts before reviewing.');
+        if(!Number.isFinite(budgetUsd)||budgetUsd<=0||budgetUsd>Math.min(maxBudgetUsd,2))return fail(res,400,'BUDGET_LIMIT','Confidence allowance must be positive and within the server trial limit.');
+        const store=storage(req);await store.authorize(caseId);
+        const jobId=randomUUID();
+        await store.put(caseId,jobId,'confidence-allowance',{sourceHash:hash(texts),budgetUsd,expires:now()+60*60*1000,definitionDigest:hash(definitions)});
+        return res.json({jobId,budgetUsd,requestsPerFinding:7,notice:'Confidence runs automatically after analysis within this additional allowance. Seven checks per eligible finding; coverage may be partial if the allowance is used up. No automatic paid retries.'});
+      } catch {return fail(res,400,'ALLOWANCE_UNAVAILABLE','Could not prepare the confidence allowance. No paid calls started.');}
+    },
     async plan(req,res) {
       try {
         const {caseId} = req.body ?? {};
@@ -83,10 +94,24 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
         const store = storage(req); await store.authorize(caseId);
         const prepared = prepareConfidence(req.body,definitions);
         if (prepared.budgetUsd > Math.min(maxBudgetUsd,2)) return fail(res,400,'BUDGET_LIMIT','This pair exceeds the confidence trial spending limit. No paid calls started.');
+        const allocation=req.body.allowance;
+        let reservedUsd=prepared.budgetUsd;
+        if(allocation){
+          if(!Number.isSafeInteger(allocation.index)||allocation.index<0)return fail(res,400,'INVALID_ALLOCATION','Invalid confidence allocation.');
+          const root=await store.get(caseId,allocation.jobId,'confidence-allowance');
+          if(!root||root.expires<now()||root.definitionDigest!==hash(definitions)||root.sourceHash!==hash(req.body.texts))return fail(res,409,'ALLOWANCE_EXPIRED','The confidence allowance expired or its sources changed. Existing analysis is retained.');
+          if(!Number.isFinite(allocation.approvedUsd)||allocation.approvedUsd<root.budgetUsd)return fail(res,428,'COST_APPROVAL_REQUIRED','Approve the combined review cost first.');
+          const prior=allocation.index?await store.get(caseId,allocation.jobId,`confidence-allocation-${allocation.index-1}`):{reservedUsd:0};
+          if(!prior)return fail(res,409,'INVALID_ALLOCATION','The previous confidence allocation is missing.');
+          if(allocation.index){const finished=await store.get(caseId,prior.jobId,'confidence-result-6');if(!finished?.done)return fail(res,409,'PREVIOUS_STEP_INCOMPLETE','The previous finding did not complete. Saved analysis is unchanged.');}
+          reservedUsd=money(prior.reservedUsd+prepared.budgetUsd);
+          if(reservedUsd>root.budgetUsd+.00001)return fail(res,409,'ALLOWANCE_USED','The confidence allowance is used up. Analysis is retained; remaining findings are marked not checked.');
+        }
         const jobId = randomUUID(), expires = now() + 30*60*1000;
         // Keep exact source context private; never return/log it in plan metadata.
         const plan = {version:1,jobId,caseId,expires,budgetUsd:prepared.budgetUsd,body:req.body,
           inputDigest:prepared.inputDigest,definitionDigest:hash(definitions),models:prepared.models};
+        if(allocation&&!await store.put(caseId,allocation.jobId,`confidence-allocation-${allocation.index}`,{jobId,reservedUsd}))return fail(res,409,'ALLOCATION_ALREADY_STARTED','This allocation already started. It will not be repeated automatically.');
         await store.put(caseId,jobId,'confidence-plan',plan);
         return res.json({caseId,jobId,requests:7,budgetUsd:plan.budgetUsd,models:plan.models,
           notice:'Seven requests for this finding only. Conservative local price estimate, not a billing guarantee. No automatic retries. Agreement is not calibrated accuracy.'});

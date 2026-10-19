@@ -8,7 +8,7 @@ Two distinct qualified model identities each make three equivalent independent c
 The independent reviewer sees the source context without original label or votes. Seven requests per
 pair, no automatic retry. The injected orchestration helper remains available for isolated checks. Live UI integration uses
 POST /api/confidence/plan (free) followed by seven POST /api/confidence/step requests (paid only
-after the user approves the preview). One finding is reviewed at a time; no bulk automatic review.
+after the user approves the preview). Findings are reviewed one at a time automatically after analysis under a shared approved allowance.
 Hosted steps use the existing authenticated private object store with immutable step locks and
 results. A duplicate completed step returns its saved result without a new call. An uncertain
 in-flight or interrupted step cannot be repeated automatically. Local development uses bounded
@@ -31,8 +31,7 @@ Each step has a 45-second timeout and 2,048 output-token ceiling. Truncation/ref
 stops the chain visibly. No automatic retries; in-flight cancellation may still incur charges.
 The server limits a confidence plan to the lower of its configured budget and US$2. Rates and
 UTF-8 input estimates are local assumptions, not verified bills. Missing usage reserves that
-step's full budget; normal token usage is recorded. Completed votes save with the finding when
-the user clicks Save case; private hosted checkpoints are written after each step.
+step's full budget; normal token usage is recorded. Completed votes save automatically with the finding; private hosted checkpoints are written after each step.
 A request whose outcome was not received must be inspected before a newly approved paid run.
 Statistical calibration fitting and evaluation remain unfinished; all live runs return null numeric
 confidence and show vote agreement, reviewer concerns and usage estimates instead.
@@ -67,15 +66,26 @@ This change implements coefficient application, not training, artifact signing o
 Claude logprobs remain unavailable; no fabricated log probabilities. Missing candidates are ungraded.
 No assertion of calibrated accuracy, model quality, complete coverage or witness truthfulness is made.
 
-## Manual live trial after deployment
+## One review flow after deployment
 
-1. Sign in, open a saved case with an existing finding, and select that finding.
-2. Open More details, then Hybrid confidence. Click Review confidence cost (free).
-3. Review the seven-call budget and approve only if acceptable. Watch the seven short steps.
-4. Inspect agreement and the separate reviewer; the original category remains unchanged.
-5. Click Save case. Cancel stops further steps; do not automatically repeat uncertain work.
+1. Save both transcripts and click Review documents (or Review again).
+2. The single approval dialog displays the analysis estimate and an additional US$2 confidence
+   allowance. It explains seven requests per eligible finding and potentially partial confidence coverage.
+3. Approve once. Analysis runs unchanged; the existing borderline double-check stays unchanged.
+4. Confidence runs automatically on the returned findings, sequentially, under the server-side
+   shared allowance. Immutable allocation records reserve each full seven-call finding budget.
+   No automatic retry or second approval occurs. Failed source validation spends nothing for that pair.
+5. Each confidence checkpoint saves with the case. Cancellation or failure preserves analysis and
+   completed votes. Remaining findings explicitly show stopped, incomplete or allowance-limited status.
 
-No scripts in the test commands start servers or make paid/network calls. Focused checks include
-source guards, ownership, cost gates, step order, duplicate replay, lock races, response truncation,
-invalid JSON, cancellation, private-store adapter use and client rendering. They do not establish
-live provider access, real latency, Vercel behavior, calibrated accuracy or hosted UI appearance.
+The finding view shows a prominent AI agreement card, separate reviewer concerns and optional
+explanation. Old numeric evidence displays and separate confidence-start controls are removed from
+UI only; stored evidence fields and scoring code stay intact for compatibility and audit.
+The finding list shows vote counts for finished uncalibrated reviews, never a fabricated percentage.
+Existing saved findings stay readable and say Not checked until included in a newly approved review.
+The approved allowance is tied to both source documents and expires after one hour; a changed source,
+expired allowance or incomplete prior finding blocks new allocations without hidden paid retries.
+
+Local checks use synthetic/mocked data only. No scripts in the test commands make model/network
+calls or start persistent servers. They do not establish live provider access, Vercel behavior,
+calibrated accuracy or hosted UI appearance.

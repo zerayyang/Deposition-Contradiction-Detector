@@ -38,3 +38,15 @@ button,input,textarea{font:inherit}button{box-shadow:none}button:focus-visible,i
 .event-review a.event-button-primary{font:inherit;font-size:12px;line-height:1.4;min-height:40px;padding:10px 16px;border-radius:11px;text-decoration:none;box-sizing:border-box}.event-review a.event-button-primary:focus-visible{outline:3px solid #a6cbd2;outline-offset:3px}@media(max-width:760px){.workspace-header{flex-direction:column;align-items:stretch;gap:14px}.case-save{justify-content:flex-start;gap:10px}.case-title{flex-wrap:wrap;gap:10px}.case-title h1{font-size:28px}.event-main-action>a.event-button-primary{width:100%;justify-content:center}}
 
 .speaker-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.speaker-quick-grid .event-speaker-group{padding:16px;background:#f7f9fa;border-radius:12px;margin:14px 0}.speaker-quick-grid small{font-size:11px;color:#65747f}.speaker-quick-grid .event-speaker-row{align-items:flex-start}.speaker-quick-grid select{min-width:0;max-width:65%}@media(max-width:760px){.speaker-quick-grid{grid-template-columns:1fr;gap:0}}
+
+/* Confidence: one quiet, readable summary alongside the finding. */
+.confidence-summary{margin:24px 0;padding:24px;border:1px solid #e5e7eb;border-radius:20px;background:#f7f9fa;color:#26363d}
+.confidence-summary-top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.confidence-summary h3{margin:6px 0;font-size:30px;letter-spacing:-1px;font-weight:650;line-height:1.2}
+.confidence-summary p{font-size:14px;line-height:1.6;color:#63737c;margin:10px 0}
+.confidence-state{padding:7px 12px;border-radius:30px;background:#e5efed;color:#28594f;font-size:12px;white-space:nowrap}
+.confidence-summary details{margin-top:14px;font-size:13px;color:#63737c}
+.confidence-summary summary{cursor:pointer}.confidence-summary .confidence-concern{color:#805b25}
+.score-pill.none{background:#eff2f5;color:#74808b}.score-pill.agreement{background:#e5efed;color:#28594f}
+.combined-review-cost{background:#f5f8fa;border-radius:16px;padding:18px;margin:18px 0}
+@media(max-width:600px){.confidence-summary{padding:18px}.confidence-summary-top{align-items:flex-start;flex-direction:column}.confidence-summary h3{font-size:26px}}
