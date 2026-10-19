@@ -1,16 +1,99 @@
 # Deposition Contradiction Detector
 
-Compares two depositions from the same witness and lists statement pairs for a lawyer to review, each labelled **DIRECT**, **INFERENTIAL** or **FALSE_POSITIVE**. Claude reads the testimony and decides the logical relationship. The app's own deterministic code checks every quote against the source and calculates any numeric score. The model never supplies a number, and its label cannot change one.
+**Compare two transcripts. Review possible contradictions. Trace each finding to its source.**
 
-This is a review aid, not a legal conclusion. Scores are rule-based evidence indicators, not calibrated probabilities.
+An AI-assisted workspace for reviewing testimony from the same witness. It identifies potentially conflicting statements, classifies their relationship, and checks how strongly additional reviews support that classification.
 
-## Requirements
+**[Open the hosted app](https://deposition-contradiction-detector-nine.vercel.app/)** · **[Explore the confidence demo](https://deposition-contradiction-detector-nine.vercel.app/hybrid-confidence-demo.html)**
 
-- **Node.js 24** and **Git**.
-- An **Anthropic API key** with access to `claude-opus-5-5`. Calls are billed to that key's account.
-- **Optional: a Supabase project.** Without one, the app runs locally in **no-account mode**: no sign-in, and cases, transcripts, results and original files are saved in your browser on this computer. With Supabase configured, the app requires sign-in and saves everything to your project instead (apply the SQL files in `supabase/migrations/` in date order; see `docs/SUPABASE_SETUP.md`). The hosted (Vercel) site always requires Supabase sign-in.
+The hosted app requires sign-in. AI analysis is billed to the deployment’s configured Anthropic account and requires cost approval. The interactive demo makes no model calls.
 
-## Quick start
+> A review aid, not a legal conclusion. A confidence percentage is currently an uncalibrated support index—not the probability that a finding is correct or that a witness is lying.
+
+## What you can do
+
+- **Compare testimony:** upload searchable PDFs, TXT or Markdown, or paste transcript text.
+- **Review classified findings:** Direct, Inferential, Not a contradiction, or Uncertain when the analysis and its double-check disagree.
+- **Check the evidence:** inspect quotations, available source references and highlighted locations in the full transcript.
+- **See confidence alongside findings:** six model checks and a separate reviewer contribute to a code-calculated score.
+- **Control spending:** review the estimated cost, choose a maximum allowance, and retain completed work if the run stops.
+- **Save and export:** reopen cases, add review notes, and choose which findings to include in a printable PDF report.
+- **Suggest corrections:** submit feedback for independent review and optionally release approved, private lessons for future analyses.
+- **Adjust the interface:** Settings links to the interactive confidence demo and offers reduced visual effects.
+
+## Try it
+
+1. Open the hosted app and sign in.
+2. Create a case, or save the included sample as a case.
+3. Add both transcripts. For a first run, use a short, searchable Q/A example.
+4. Select **Review documents**, inspect the cost preview, and approve the review.
+5. Review the findings, source context and confidence checks. Expand details for gaps or failed checks.
+6. Use **Export PDF** to choose the findings you want, then select **Save as PDF** in the print dialog.
+
+For a free explanation of the scoring controls, use **Settings → Explore demo**. Fictional practice PDFs are in [`public/examples/`](public/examples/), with a separate [expected-results guide](public/examples/expected-results.html).
+
+## How it works
+
+```text
+Two transcripts
+      ↓
+Parse text and plan comparisons → approve cost
+      ↓
+AI proposes pairs and answers structured decision questions
+      ↓
+Shared code derives labels; source checks verify quotations/context
+      ↓
+Optional borderline double-check → disagreement shown as Uncertain
+      ↓
+Automatic confidence checks within the approved allowance
+      ↓
+Saved findings, source review and PDF export
+```
+
+The current workspace uses the document-comparison pipeline. Long inputs are divided into sections for cross-document comparison; cost grows with the planned comparison work. The earlier event-extraction workflow is not the current workspace flow.
+
+The model answers questions about subject, occasion, compatibility and values. Shared code derives the category using fixed rules. Source validation and witness-role checks are separate: an unverified quotation is not silently accepted as verified evidence. Rejected suggestions, unresolved sources and incomplete coverage remain visible in the result or its review details.
+
+Progress distinguishes **finished processing** from **fully validated results**. A completed comparison can still have rejected findings. During scoring, progress follows completed confidence checks.
+
+### Classification and confidence are different
+
+**Direct** describes the proposed kind of conflict. It does not automatically mean the finding has strong support. A Direct finding can receive a low confidence score when later checks disagree.
+
+New confidence reviews use this provisional formula:
+
+| Component | Maximum | Contribution |
+| --- | ---: | --- |
+| Six model checks | 60 points | Matching checks ÷ 6 × 60 |
+| Separate reviewer | 30 points | Agrees: 30; agrees with concerns: 15; disagrees: 0 |
+| Deterministic code support | 10 points | Up to 10 for applicable, category-aligned rule support |
+
+**Example:** five matching checks (50) + reviewer agreement (30) + full code support (10) = **90%**.
+
+If no code rule applies, its ten points are excluded: the earned vote and reviewer points are divided by **90**, then multiplied by 100. Missing required model checks or failed source verification do not become zero-confidence evidence; the finding remains unscored with a reason. Older saved results retain their original scoring policy.
+
+The six checks use two model identities, three calls each. They use the same neutral decision task with statement-order variations. A separate reviewer sees the source context without seeing the original label or votes. All checks derive categories through the same code rules; the model does not supply numeric confidence. These calls are **not statistically independent** and can share mistakes.
+
+Current configuration uses `claude-sonnet-5-5` and `claude-opus-5-5` for confidence checks. Model access is required on the account running the backend. The code supports versioned calibration inputs, but the current weighted score is **not a trained statistical calibrator**. Token log probabilities are not part of this score.
+
+### Approved memory
+
+Feedback and lessons are stored in Supabase, with authorization enforced by the database:
+
+1. A user proposes a correction and explanation for a saved finding.
+2. An authorized reviewer checks the original sources and approves, rejects or requests more context. Users cannot approve their own corrections.
+3. Approval alone does not create production memory. A reviewer must separately release a general lesson, with search terms and an explicit privacy/evaluation check.
+4. Future account-based analyses retrieve at most three relevant released lessons for that case owner, using deterministic search-term matching.
+
+Lessons are reasoning reminders—not evidence for a new case. They cannot supply missing facts, override source validation or directly set numeric confidence. This is **retrieval-based memory, not model retraining**. Unavailable memory is reported and analysis can continue without it.
+
+## Run locally
+
+### Requirements
+
+- Node.js **24 or newer** and Git.
+- An Anthropic API key with access to the models configured in the repository.
+- Supabase is optional for local use; it is required for the hosted account-based workspace and review features.
 
 ```sh
 git clone https://github.com/zerayyang/Deposition-Contradiction-Detector.git
@@ -18,100 +101,89 @@ cd Deposition-Contradiction-Detector
 node start.mjs
 ```
 
-On first run the launcher asks for your Anthropic key (input hidden), saves it to `.env`, installs dependencies, starts the API (port 3000) and the web app (port 5173), and opens http://localhost:5173. With no Supabase values configured, the workspace opens directly in no-account mode (the sidebar says "No-account mode · saved in this browser"). Click **Save sample as case**, then **Review reading cost** to try the included sample.
+On first run, the launcher requests an Anthropic key with hidden input if no `.env` exists, installs dependencies if needed, and starts the API and Vite frontend. Open **http://localhost:5173**. Stop both processes with **Ctrl+C**.
 
-No-account mode works only on `localhost` with no Supabase configured; the API then accepts unsigned requests only from the same computer. Feedback review and approved lessons need accounts and are hidden in this mode. Clearing the browser's site data deletes locally saved cases.
+For explicit setup, copy [`.env.example`](.env.example), fill in your own values, and install dependencies with `npm ci`. Keep the provider key on the server; never expose it through a `VITE_` variable.
 
-Practice files: `public/examples/riley-morgan-*.pdf`, with expected answers in `public/examples/expected-results.html`.
+**Local no-account mode:** when Supabase is unconfigured and the API is running on the supported local loopback configuration, cases and original files are stored in this browser. Clearing site data deletes them. Feedback approval and approved-memory features need signed-in accounts and are unavailable in this mode.
 
-## How an analysis works
+The static confidence demo is also available at `/hybrid-confidence-demo.html` when serving the app; opening it does not call the API.
 
-Every paid step shows a cost preview and starts only after you approve it. There are no automatic retries.
+## Supabase and hosting
 
-**Read, then compare** (default)
-1. **Read.** Each transcript is split into small ranges. For every witness answer, Claude records events with exact quotes, or marks the answer as no event or unresolved. Code checks each quote and field against the source; records that fail are set aside, never repaired. Unread or failed ranges stay visible as "Reading incomplete — review required".
-2. **Compare.** Every group of events in one transcript is compared with every group in the other; no keyword filter drops pairs. Claude labels each related pair.
-3. **Review.** Comparisons of the same witness answers that reach different labels are combined into one "Labels disagree" card with every view and no score.
+The production configuration uses **React/Vite**, an **Express API on Vercel**, and **Supabase Auth, Postgres and private Storage**.
 
-**Direct comparison** (previous method): Claude reads both transcripts in one request (or a few for long files) and returns labelled pairs. The same quote validation and scoring apply.
+For an account-based installation:
 
-### Choosing a method (measured on real runs)
+- Provision an owner-scoped `public.cases` table with the fields used by [`caseStore.js`](src/lib/caseStore.js), including transcripts, results and review notes. The migrations assume the base cases table and Supabase Auth/Storage already exist; they are not a complete empty-project bootstrap.
+- Review and apply the SQL in [`supabase/migrations/`](supabase/migrations/) in dependency order. Later migrations add private originals, recoverable jobs, feedback review, private memory, admin access and short review explanations.
+- Set the correct local and production URLs in Supabase Authentication’s URL configuration.
+- Configure the environment variables below in Vercel before deployment.
+- Set up admin access through the admin migration. Never put the admin passphrase or account credentials in this README or frontend code.
 
-| Test | Direct comparison | Read, then compare |
-| --- | --- | --- |
-| Riley Morgan sample, 1 page each | 1 request, $0.15; all expected labels right | 3 requests, $0.64; all expected labels right |
-| Real depositions condensed to 16 pages each (12 audited hard pairs) | 1 request, $0.30; every reported label matched, 1 expected pair missed (plus 1 debatable), 0 false alarms | 19 requests, $6.51; 0 false alarms on the 8 look-alike pairs, 1 expected pair labelled differently, 1 possible extra finding |
-| Full real pair, 219 + 479 pages (estimate only) | 6 requests, about $5 estimated | 164 reading requests plus comparisons; not practical |
+**Pushing code does not apply database migrations.** For example, removing the ten-character review minimum also requires [`202610190003_short_feedback_notes.sql`](supabase/migrations/202610190003_short_feedback_notes.sql) in the database.
 
-Use **Direct comparison** for long documents. **Read, then compare** gives per-answer accounting and visible gaps, and suits shorter documents.
+### Environment variables
 
-## The score
+Use [`.env.example`](.env.example) as the configuration template. Do not commit populated environment files.
 
-When code rules find a conflict:
+| Variable | Purpose |
+| --- | --- |
+| `ANTHROPIC_API_KEY` | Server-side model access |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser sign-in and owner-scoped storage access |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Server-side Supabase access; defaults to the corresponding Vite values |
+| `DEMO_USER_IDS` | Accounts allowed to run analyses in production |
+| `ANALYSIS_JOB_SIGNING_KEY` | Separate key for signing hosted job records |
+| `CRON_SECRET` | Authenticates the configured health cron |
+| `MAX_ANALYSIS_REQUESTS`, `MAX_ANALYSIS_BUDGET_USD` | Server request and spending ceilings |
+| `MODEL_TIMEOUT_MS` | Model-call timeout, subject to hosting limits |
 
-```
-score = 100 × E × (0.5 + 0.5 × C)
-```
+The browser uses a Supabase publishable key and the user’s session, not a service-role key. API keys and signing secrets belong only in server configuration.
 
-- **E** is the strength of the strongest conflict rule that fired (time ranges, quantities, location/activity, state, timeline, knowledge, activity polarity).
-- **C** is how firmly the witness said it (0.30–1.0, from wording such as "I clearly remember" or "I think"); the weaker of the two statements counts.
-- Compatible evidence gives a separate index of at most 15.
-- If no rule applies, the quote fails source validation, or context is unresolved, the card says **Not evaluable** and shows no number.
+### Spending, recovery and operations
 
-Only literal witness words reach the rules. A card keeps its review flag when it refers to testimony outside the read range ("check the link") or when labels disagree.
+- Analysis and confidence have planned allowances shown before approval. An estimate is not a billing guarantee; cancelled in-flight requests may still be charged.
+- Paid steps are not retried automatically. Saved results and reservations prevent ordinary replay from duplicating completed paid work.
+- Hosted jobs store recovery records in private Supabase Storage; local recovery uses `.analysis-jobs/`. Resuming requires compatible source/build/plan identity and the relevant cost approval.
+- Confidence can process up to two findings concurrently, subject to server admission limits. There is no guaranteed completion time.
+- Request IDs, structured server events, rate limits and concurrency admission support diagnosis and overload control. Keep testimony, credentials and source dumps out of logs.
+- [`vercel.json`](vercel.json) requests a 300-second function limit and configures a daily health cron. Actual execution remains subject to the hosting account’s supported limits. Health checks do not call the model.
 
-## Reliability and operations
-
-- **Spending:** each phase needs approval of its exact plan; default allowance 512 requests and $25 per phase (`MAX_ANALYSIS_REQUESTS`, `MAX_ANALYSIS_BUDGET_USD`). Hosted runs reserve each request's worst-case cost before calling and stop when the approved budget cannot cover the next one.
-- **Time limits:** model requests may take up to 600 s locally (`MODEL_TIMEOUT_MS`). On Vercel each step is limited to 240 s inside a 300 s function (`vercel.json`), so very slow requests can still fail there.
-- **No lost work:** inputs and originals are saved before paid work. Hosted runs execute one model request per step and save a signed claim, reservation and result in Supabase Storage, so a cut-off step can be inspected and the job continued without repeating finished work. Local runs keep private recovery files in `.analysis-jobs/`.
-- **Overload:** each server instance admits one heavy analysis at a time, plus per-user and per-IP rate limits; excess requests get 429 with Retry-After instead of crashing.
-- **Logs:** one JSON line per event (HTTP request, model request, hosted job start, step, failure and cancel, cron). Every API response carries an `X-Request-Id`, and the same ID appears on every log line the request produced. Logs contain identifiers, counts, costs, durations and error codes, never testimony or keys.
-- **Scheduled check:** Vercel Cron calls `/api/cron/health` daily at 13:00 UTC (authenticated by `CRON_SECRET`). It checks configuration without calling Claude and logs `cron_health_check` as OK, DEGRADED (with the failing check names), UNAUTHORIZED or NOT_CONFIGURED.
-
-## Configuration
-
-| Variable | Where | Purpose |
-| --- | --- | --- |
-| `ANTHROPIC_API_KEY` | server `.env` / Vercel | Claude access |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | `.env.local` / Vercel build | Browser sign-in and case storage (leave unset for local no-account mode) |
-| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | server / Vercel | Server-side sign-in checks and hosted job storage (defaults to the VITE values) |
-| `DEMO_USER_IDS` | production | Comma-separated Supabase user IDs allowed to run analyses |
-| `ANALYSIS_JOB_SIGNING_KEY` | Vercel | Signs hosted job records; set it separately from the API key |
-| `CRON_SECRET` | Vercel | Authenticates the daily health check |
-| `MAX_ANALYSIS_REQUESTS`, `MAX_ANALYSIS_BUDGET_USD`, `MODEL_TIMEOUT_MS` | optional | Limits described above |
-| `ANALYSIS_JOB_DIR`, `PORT`, `HOST` | optional, self-hosting | Recovery directory and server address |
-
-No Supabase service-role key is used. Never commit `.env` or `.env.local`.
-
-## Checks
+## Development checks
 
 ```sh
-npm test        # every offline test (fake model transport, no paid calls)
+npm test        # Offline suite; mocked model calls, no provider charges
 npm run lint
 npm run build
 ```
 
-`npm test` currently runs 559 tests. They check source validation, scoring rules, status handling, recovery, logging and the cron, using fictional inputs and a fake AI. They do not measure live accuracy; the measured runs above do, on a small set of cases.
+Some offline integration tests bind a temporary loopback server and need local binding permission. A denied binding is a failed check, not a passing test. Test counts change as coverage grows; use the current run’s output.
 
-## Known limits
+Live model evaluations are separate from `npm test` and require explicit spending approval. Offline tests verify code behavior; they do not establish real-world detection accuracy or calibrated confidence.
 
-- Accuracy has been measured on one fictional sample and one condensed real case (12 audited pairs, not lawyer-verified). Labels can vary between runs.
-- Many real comparisons (for example opinions about value) match no scoring rule and show "Not evaluable".
-- Very long documents are expensive with Read, then compare.
-- PDFs with scanned (image-only) pages need OCR first; the app lists such pages and blocks analysis.
+## Limits to understand
 
-## Project map
+- The system can miss contradictions. Confidence checks assess existing findings; they do not recover undiscovered ones.
+- Fresh model responses can vary, and repeated checks can make correlated errors.
+- Hypotheticals, uncertain recollections and unclear occasions still need human judgment. A high support score is not a legal finding.
+- Scanned PDFs need OCR; check extracted text and page coverage before analysis. PDF reading order can affect source parsing.
+- Large documents can create many comparisons, higher costs and longer waits. Incomplete or rejected work must not be interpreted as “no contradictions.”
+- Approved lessons improve available context, not model weights. More stored corrections do not guarantee better accuracy.
 
-| Path | Purpose |
+## Repository guide
+
+| Path | Contents |
 | --- | --- |
-| `start.mjs` | One-command local launcher |
-| `src/` | React app (upload, review cards, reports); `src/lib/localStores.js` is the no-account storage |
-| `server/app.js`, `server/server.js`, `api/index.js` | API, logging and Vercel entry |
-| `server/events/` | Read, then compare: reading, comparison, validation, scoring bridge |
-| `server/documentAnalysis.js`, `server/proper_prompts.md` | Direct comparison and the classification instructions |
-| `server/humanConfidencePipeline.js`, `server/scoring/` | Quote validation, rules and the score formula |
-| `server/cloudAnalysis.js`, `server/cloudJobStore.js` | Hosted step-by-step jobs |
-| `server/cronHealth.js`, `server/requestContext.js` | Scheduled check and request IDs |
-| `supabase/migrations/` | Database setup |
-| `docs/` | Design notes for individual features |
+| [`src/`](src/) | Workspace, upload/source review, confidence UI, Settings and PDF export |
+| [`server/documentAnalysis.js`](server/documentAnalysis.js) | Comparison planning and execution |
+| [`server/typeDecision.js`](server/typeDecision.js) | Shared category rules |
+| [`server/confidence/`](server/confidence/) | Confidence planning, reservations and model checks |
+| [`shared/hybridConfidence.js`](shared/hybridConfidence.js) | Versioned confidence arithmetic and result validation |
+| [`server/scoring/`](server/scoring/) | Deterministic evidence rules |
+| [`server/memory/`](server/memory/) | Approved-lesson retrieval |
+| [`server/cloudAnalysis.js`](server/cloudAnalysis.js) | Hosted job execution |
+| [`supabase/migrations/`](supabase/migrations/) | Database, authorization and storage migrations |
+| [`docs/`](docs/) | Feature notes and operational context; older notes may describe prior designs |
+| [`public/examples/`](public/examples/) | Fictional practice inputs and expected-results guide |
+
+Keep private transcripts, credentials, local recovery data and author/verifier artifacts out of public commits. Evaluation answer keys must remain separate from production prompts.
