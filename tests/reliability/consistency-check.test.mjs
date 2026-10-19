@@ -33,3 +33,7 @@ test('the request and cost estimate are bounded',()=>{
  const est=estimateRecheckCost([f({reviewNote:'x'})],texts);assert.equal(est.pairs,1);assert.ok(est.upperBound>0&&est.upperBound<0.5);
  assert.deepEqual(estimateRecheckCost([f()],texts),{pairs:0,estimated:0,upperBound:0});
 });
+test('dismissals resting on "correction" or "added detail" are double-checked; firmer ones are not',()=>{
+ const fp=(reconciliation,verified=true)=>({type:'FALSE_POSITIVE',modelType:'FALSE_POSITIVE',reconciliationVerified:verified,decision:{reconciliation}});
+ assert.deepEqual(borderlineIndexes([fp('CORRECTION_OR_QUALIFICATION'),fp('ADDED_DETAIL'),fp('UNCERTAIN_RECOLLECTION'),fp('OVERLAPPING_APPROXIMATIONS'),fp('NONE',null)]),[0,1]);
+});

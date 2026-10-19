@@ -36,16 +36,22 @@ test('stated differences and reconciliations count only when their words are in 
  assert.equal(invented.type,'DIRECT');assert.equal(invented.reconciliationVerified,false);
 });
 test('code, not the model, settles time and quantity clashes',()=>{
- assert.deepEqual(compareValues('8 PM','11 PM'),{kind:'time',overlap:false,exact:true});
+ assert.deepEqual(compareValues('8 PM','11 PM'),{kind:'time',overlap:false,exact:true,farApart:true});
  assert.equal(compareValues('around 8 PM','8:15 PM').overlap,true);
  assert.equal(compareValues('three or four cars','9 dollars'),null,'different units are not compared');
- assert.deepEqual(compareValues('three or four cars','9 cars'),{kind:'quantity',overlap:false,exact:false});
+ assert.deepEqual(compareValues('three or four cars','9 cars'),{kind:'quantity',overlap:false,exact:false,farApart:true});
  const v=(value1,value2,conflictForm='DIFFERENT_EXACT_VALUES')=>deriveType(d({conflictForm,value1,value2}),texts);
  assert.equal(v('around 8 PM','8:15 PM').type,'FALSE_POSITIVE','overlapping approximations are compatible even if the AI called them a clash');
- assert.equal(v('around 8 PM','11 PM','NON_OVERLAPPING_APPROXIMATIONS').type,'INFERENTIAL');
+ // Owner decision (Oct 2026): approximate values far apart (1.5x, or 2+ hours) are DIRECT; near misses stay INFERENTIAL.
+ assert.equal(v('around 8 PM','11 PM','NON_OVERLAPPING_APPROXIMATIONS').type,'DIRECT');
  assert.equal(v('8:15 PM','11 PM').type,'DIRECT');
  assert.equal(v('8 PM','11 PM').type,'DIRECT','value missing from the record falls back to the stated form');
- assert.equal(v('three or four','9').type,'INFERENTIAL');
+ assert.equal(v('three or four','9').type,'DIRECT');
+ const near=['A: I left around 8 PM. We had about 40 cars. It cost tens of millions of dollars.','A: I left at 9:30 PM. We had 52 cars. It was maybe $10 billion.'];
+ const w=(value1,value2)=>deriveType(d({conflictForm:'NON_OVERLAPPING_APPROXIMATIONS',value1,value2}),near);
+ assert.equal(w('around 8 PM','9:30 PM').type,'INFERENTIAL','90 minutes apart is a near miss');
+ assert.equal(w('about 40','52').type,'INFERENTIAL','1.3x apart is a near miss');
+ assert.equal(w('tens of millions of dollars','maybe $10 billion').type,'DIRECT','dollar units match and the gap is huge');
 });
 test('older saved decisions with one sameFact question still map',()=>{
  assert.equal(deriveType({sameFact:'YES',canBothBeTrue:'NO',reconciliation:'NONE',reconciliationQuote:'',conflictForm:'AFFIRM_VS_DENY',missingFact:''},texts).type,'DIRECT');

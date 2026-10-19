@@ -96,11 +96,11 @@ DIRECT when, on the ordinary reading of the words, the two statements concern th
 
 Scope set by the witness's own words in either answer counts as stated: if the witness denies discussing "anything related to" a matter and their own words tie an item to that matter, an admitted discussion of that item is a DIRECT exception.
 
-INFERENTIAL when there is no opposing assertion, but the conflict follows necessarily, or by strongly supported implication, from what the testimony states: overlapping times or places that exclude each other, timelines, mutually exclusive states, or approximate values whose ranges do not overlap. Every premise of the inference must be stated in the testimony; never build one from assumptions about normal behaviour, memory, motive or probability. Identity settled in Step 3 is not an inference step.
+INFERENTIAL when there is no opposing assertion, but the conflict follows necessarily, or by strongly supported implication, from what the testimony states: overlapping times or places that exclude each other, timelines, mutually exclusive states, or approximate values whose ranges narrowly miss each other. Every premise of the inference must be stated in the testimony; never build one from assumptions about normal behaviour, memory, motive or probability. Identity settled in Step 3 is not an inference step.
 
 Hedges:
 
-- If the conflict exists only because two APPROXIMATE values are compared (a time, quantity, date or duration qualified by "around", "maybe", "about", "three or four"), the label is INFERENTIAL, never DIRECT.
+- If the conflict exists only because two APPROXIMATE values are compared (a time, quantity, date or duration qualified by "around", "maybe", "about", "three or four"), use conflictForm NON_OVERLAPPING_APPROXIMATIONS and give both literal values. Code decides the label: approximate values far apart (the larger at least 1.5 times the smaller, or times 2+ hours apart) are DIRECT; near misses are INFERENTIAL.
 - A hedge about whether something happened ("I think I went out", "I don't think I met him") does NOT turn an affirm-versus-deny conflict into INFERENTIAL. Application code scores certainty separately.
 
 For a timeline candidate, check the same event and day (AM/PM and midnight resolved from context: 12:00 AM starts a calendar day; "10:30 PM tonight" and "12:00 AM tomorrow" on the same reference day are 90 minutes apart); whether each statement describes a point, an interval or a continuous condition ("at home at 6" is not "at home all evening"); whether the states actually exclude each other; and the exact predicate (going to bed, falling asleep and being asleep differ; scheduled is not attended; knowing of someone is not meeting them). In `reasoning`, state the inference plainly: the first statement establishes A during period P; the second establishes B during overlapping P; A and B cannot coexist because of the stated reason.
@@ -111,7 +111,7 @@ Apply the same answer to the same pattern every time:
 
 - Affirm versus deny of the same fact → DIRECT, whatever the hedging.
 - Exhaustive answer versus an exception inside its scope → DIRECT.
-- Approximate values that do not overlap → INFERENTIAL.
+- Approximate values that do not overlap → INFERENTIAL if close, DIRECT if far apart (code compares the values).
 - "Don't remember" versus a later account → FALSE_POSITIVE.
 - "Didn't know" versus "I knew it then" → DIRECT.
 - Torn between FALSE_POSITIVE and a conflict: choose FALSE_POSITIVE only if you can name which of reconciliations 1–7 applies and quote the testimony that supplies it. Otherwise it is a conflict.
@@ -131,13 +131,13 @@ For every pair you return, answer these questions in `decision` BEFORE writing `
 - `value1` / `value2`: when the clash is about a time, date, amount or count, the exact literal value phrase from each statement (for example "around 8 PM", "three or four"); otherwise "". Code compares these values itself.
 - `missingFact`: a fact genuinely absent from the testimony that would settle the pair; otherwise "".
 
-The rules code applies: different subject → FALSE_POSITIVE; a different time, occasion or scope whose stated words are found → FALSE_POSITIVE; a permitted reconciliation whose words are found → FALSE_POSITIVE; for time or quantity clashes, code compares the two values (overlapping → FALSE_POSITIVE, different exact values → DIRECT, non-overlapping approximations → INFERENTIAL); AFFIRM_VS_DENY or EXHAUSTIVE_VS_EXCEPTION → DIRECT; REQUIRES_INFERENCE → INFERENTIAL; no clash → FALSE_POSITIVE. Set `type` to the result of these rules.
+The rules code applies: different subject → FALSE_POSITIVE; a different time, occasion or scope whose stated words are found → FALSE_POSITIVE; a permitted reconciliation whose words are found → FALSE_POSITIVE; for time or quantity clashes, code compares the two values (overlapping → FALSE_POSITIVE, different exact values → DIRECT, non-overlapping approximations → INFERENTIAL if close, DIRECT if far apart); AFFIRM_VS_DENY or EXHAUSTIVE_VS_EXCEPTION → DIRECT; REQUIRES_INFERENCE → INFERENTIAL; no clash → FALSE_POSITIVE. Set `type` to the result of these rules.
 
 ## 3. Classification Types
 
 ### DIRECT
 
-The statements affirm and deny the same fact, or give different exact values for it, and the conflict does not depend on comparing approximate values. An explicit exhaustive assertion and a directly stated exception within its scope count as opposing assertions even without the literal word "not". Reading that exclusion is not an additional inferential step. Hedges about how sure the witness is do not change this label; the application's confidence score accounts for them.
+The statements affirm and deny the same fact, or give different exact values for it, and the conflict does not depend on comparing close approximate values (approximate values far apart are DIRECT; code compares them). An explicit exhaustive assertion and a directly stated exception within its scope count as opposing assertions even without the literal word "not". Reading that exclusion is not an additional inferential step. Hedges about how sure the witness is do not change this label; the application's confidence score accounts for them.
 
 ### INFERENTIAL
 
@@ -360,7 +360,7 @@ Before returning, confirm:
 1. Every shared topic was reviewed and appears in `topicsReviewed`.
 2. Each claim's `original` comes from the right transcript and is the witness's exact words.
 3. Every non-null literal field and every qualifier appears verbatim in its own `original`.
-4. Affirm-vs-deny pairs, exhaustive-versus-exception pairs and exact-value conflicts were labeled DIRECT, even when the witness hedged. Conflicts that depend on comparing approximate values were labeled INFERENTIAL.
+4. Affirm-vs-deny pairs, exhaustive-versus-exception pairs and exact-value conflicts were labeled DIRECT, even when the witness hedged. Conflicts that depend on comparing approximate values give both literal values so code can compare them.
 5. Every FALSE_POSITIVE names a different subject, a stated different circumstance, or a permitted reconciliation from Step 4 that the testimony supplies; any genuinely missing fact is recorded in `decision.missingFact`.
 6. Each distinct factual issue is reported once. Every returned FALSE_POSITIVE passes the independent-card test; no compatible supporting detail repeats an event conflict already reported.
 7. No outside assumptions, no credibility or intent judgments, no confidence numbers.

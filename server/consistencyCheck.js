@@ -23,11 +23,16 @@ const checkSchema={type:'object',additionalProperties:false,required:['checks'],
   required:['id','decision','reasoning'],properties:{id:{type:'string'},decision:decisionSchema,reasoning:{type:'string'}}}}}};
 export const recheckOutputFormat=providerOutputFormat(checkSchema);
 
+// Dismissals resting on the most interpretive excuses ("a correction or qualification",
+// "just added detail") are re-read too: they are where real conflicts get waved away.
+const INTERPRETIVE=new Set(['CORRECTION_OR_QUALIFICATION','ADDED_DETAIL']);
 // Borderline = the AI's own label differs from the code rules, a fact is missing, a claimed
-// reconciliation failed the quote check, or the type is the weakest category (INFERENTIAL).
+// reconciliation failed the quote check, the type is the weakest category (INFERENTIAL),
+// or a dismissal rests on an interpretive excuse.
 export function borderlineIndexes(findings){
   return (findings??[]).map((f,i)=>({f,i})).filter(({f})=>f?.decision&&!f.labelDisagreement&&(
     (f.modelType&&f.modelType!==f.type)||f.reviewNote||f.reconciliationVerified===false||f.type==='INFERENTIAL'
+    ||(f.type==='FALSE_POSITIVE'&&f.reconciliationVerified===true&&INTERPRETIVE.has(f.decision.reconciliation))
   )).slice(0,MAX_RECHECK_PAIRS).map(({i})=>i);
 }
 function context(transcript,claim,binding){

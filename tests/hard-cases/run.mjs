@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {resolve,join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {MODEL,buildPlan,executePlan} from '../../server/documentAnalysis.js';
+import {runRecheck} from '../../server/consistencyCheck.js';
 
 const here=new URL('./',import.meta.url);
 const money=n=>Math.ceil(n*1e6)/1e6;
@@ -12,6 +13,8 @@ export function optionsFor(args){
  const options={method:'direct',split:'all',repeat:1,approveUsd:null,skipDatasets:false};
  for(let i=0;i<args.length;i++){
   if(args[i]==='--skip-datasets'){options.skipDatasets=true;continue;}
+  // Same double-check the app runs after analysis; Uncertain findings grade as NEEDS_REVIEW.
+  if(args[i]==='--recheck'){options.recheck=true;continue;}
   const [key,...parts]=args[i].split('=');
   if(!['--method','--split','--repeat','--approve-usd','--corpus'].includes(key))throw new Error('Unknown argument. Use --method direct --split tuning|heldout|all --repeat N [--skip-datasets] [--corpus DIR] [--approve-usd=CAP].');
   const value=parts.length?parts.join('='):args[++i];
@@ -72,7 +75,7 @@ export function cappedTransport(callModel,cap,{model=MODEL}={}){
  }};
 }
 // Labels and scores only; quotes stay in the private audit directory.
-const labelsOf=findings=>findings.map(f=>({type:f.type??null,humanConfidence:f.humanConfidence??null,status:f.status??null}));
+const labelsOf=findings=>findings.map(f=>({type:f.labelDisagreement?'NEEDS_REVIEW':f.type??null,humanConfidence:f.humanConfidence??null,status:f.status??null}));
 export async function executeCases(prepared,options,callModel){
  if(options.approveUsd===null)throw new Error('Paid execution refused: --approve-usd=CAP is required.');
  // The transport refuses any request whose ceiling would pass the cap, so the cap only
@@ -81,7 +84,12 @@ export async function executeCases(prepared,options,callModel){
  const transport=cappedTransport(callModel,options.approveUsd),summaries=[];
  for(const job of prepared.jobs){
   const result=await executePlan({plan:job.plan,texts:job.texts,instructions:job.instructions,callModel:(...args)=>transport.call(...args)});
-  summaries.push({id:job.id,attempt:job.attempt,phase:'direct',status:result.analysis.status,findings:result.contradictions.length,labels:labelsOf(result.contradictions)});
+  let findings=result.contradictions,rechecked=0,disagreements=0;
+  if(options.recheck&&findings.length&&!transport.capReached){
+   try{const r=await runRecheck({findings,texts:job.texts,callModel:(...args)=>transport.call(...args)});({findings}=r);rechecked=r.checked;disagreements=r.disagreements;}
+   catch{/* the app keeps the first results when the double-check fails; so does the grade */}
+  }
+  summaries.push({id:job.id,attempt:job.attempt,phase:'direct',status:result.analysis.status,findings:findings.length,labels:labelsOf(findings),...(options.recheck?{rechecked,disagreements}:{})});
   // Incomplete cases are recorded and left ungraded; only an exhausted cap stops the run.
   if(transport.capReached)break;
  }

@@ -43,6 +43,14 @@ export function valueFound(value,sourceTexts){
   return sourceTexts.some(source=>pattern.test(normalize(source)));
 }
 
+// Approximate values this far apart are a plain contradiction, not one that needs reasoning:
+// the larger amount is at least 1.5 times the smaller, or the times are 2+ hours apart
+// (compared at the middle of each range).
+export const FAR_APART_RATIO=1.5,FAR_APART_MINUTES=120;
+const middle=r=>(r.earliest+r.latest)/2;
+// "$", "dollars" and "of dollars" are the same unit.
+const unitOf=unit=>/^(?:\$|(?:of )?(?:us )?dollars?|usd)$/i.test(String(unit??'').trim())?'$':unit;
+
 // Code, not the model, compares times and quantities: parse both literal values and
 // check whether their ranges overlap. Returns null when code cannot read both values.
 export function compareValues(value1,value2){
@@ -50,12 +58,13 @@ export function compareValues(value1,value2){
   const times=[value1,value2].map(v=>parseTimeRange(v));
   if(times.every(t=>t&&Number.isFinite(t.earliest)&&Number.isFinite(t.latest))){
     const overlap=times[0].earliest<=times[1].latest&&times[1].earliest<=times[0].latest;
-    return {kind:'time',overlap,exact:times.every(exact)};
+    return {kind:'time',overlap,exact:times.every(exact),farApart:!overlap&&Math.abs(middle(times[0])-middle(times[1]))>=FAR_APART_MINUTES};
   }
   const amounts=[value1,value2].map(v=>parseQuantityRange(v));
-  if(amounts.every(Boolean)&&amounts[0].unit===amounts[1].unit){
+  if(amounts.every(Boolean)&&unitOf(amounts[0].unit)===unitOf(amounts[1].unit)){
     const overlap=amounts[0].earliest<=amounts[1].latest&&amounts[1].earliest<=amounts[0].latest;
-    return {kind:'quantity',overlap,exact:amounts.every(exact)};
+    const [low,high]=amounts.map(middle).sort((a,b)=>a-b);
+    return {kind:'quantity',overlap,exact:amounts.every(exact),farApart:!overlap&&low>0&&high/low>=FAR_APART_RATIO};
   }
   return null;
 }
@@ -81,8 +90,9 @@ export function deriveType(decision,sourceTexts=[]){
     const values=compareValues(d.value1,d.value2);
     if(values){
       if(values.overlap)return done('FALSE_POSITIVE',`Code check: the ${plural(values.kind)} "${d.value1}" and "${d.value2}" overlap.`,{valueCheck:values,reconciliationVerified});
-      return values.exact?done('DIRECT',`Code check: different exact ${plural(values.kind)} "${d.value1}" and "${d.value2}".`,{valueCheck:values,reconciliationVerified})
-        :done('INFERENTIAL',`Code check: approximate ${plural(values.kind)} "${d.value1}" and "${d.value2}" do not overlap.`,{valueCheck:values,reconciliationVerified});
+      if(values.exact)return done('DIRECT',`Code check: different exact ${plural(values.kind)} "${d.value1}" and "${d.value2}".`,{valueCheck:values,reconciliationVerified});
+      if(values.farApart)return done('DIRECT',`Code check: approximate ${plural(values.kind)} "${d.value1}" and "${d.value2}" are far apart.`,{valueCheck:values,reconciliationVerified});
+      return done('INFERENTIAL',`Code check: approximate ${plural(values.kind)} "${d.value1}" and "${d.value2}" do not overlap.`,{valueCheck:values,reconciliationVerified});
     }
   }
   if(DIRECT_FORMS.has(d.conflictForm))return done('DIRECT',`Direct conflict: ${words(d.conflictForm)}.`,{reconciliationVerified});

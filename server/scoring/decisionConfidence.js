@@ -21,7 +21,7 @@ export function decisionConfidence(finding){
     basis.push(finding.typeRule??'Compatible statements.');
     return {score:Math.round(COMPATIBLE_CAP*commitment),status:'COMPATIBLE',evidence:0,commitment,commitments,basis};
   }
-  let evidence=finding.valueCheck?(finding.valueCheck.exact?1:0.7):(EVIDENCE[decision.conflictForm]??EVIDENCE.NONE);
+  let evidence=finding.valueCheck?(finding.valueCheck.exact?1:finding.valueCheck.farApart?0.9:0.7):(EVIDENCE[decision.conflictForm]??EVIDENCE.NONE);
   basis.push(finding.valueCheck?`Code compared the ${finding.valueCheck.kind}s.`:`Clash form: ${String(decision.conflictForm).toLowerCase().replaceAll('_',' ')} (${evidence}).`);
   if(finding.reviewNote){evidence=Math.round(evidence*MISSING_FACT_FACTOR*100)/100;basis.push(`Missing fact lowers evidence: ${finding.reviewNote}`);}
   basis.push(`Commitment ${commitment.toFixed(2)} from the witness's own wording.`);
