@@ -6,4 +6,5 @@ test('score badge reads plainly for conflicts, compatible pairs and missing scor
   assert.deepEqual(scoreBadge({ type: 'DIRECT', humanConfidence: 62, band: 'MODERATE' }), { kind: 'conflict', value: '62', text: 'confidence · moderate' });
   assert.equal(scoreBadge({ type: 'FALSE_POSITIVE', humanConfidence: 10 }).kind, 'compatible');
   assert.equal(scoreBadge({ type: 'INFERENTIAL', humanConfidence: null }).kind, 'none');
+  assert.equal(scoreBadge({ type: 'DIRECT', humanConfidence: null, labelDisagreement: true }).kind, 'uncertain');
 });

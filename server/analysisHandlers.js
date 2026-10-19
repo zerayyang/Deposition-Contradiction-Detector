@@ -2,6 +2,7 @@ import {checkedSpeakerRoles} from './testimonyMarkers.js';
 import {buildPlan,previewPlan,executePlan,digest,outputBudget,userContent} from './documentAnalysis.js';
 import {assessCandidate} from './humanConfidencePipeline.js';
 import {utf8Bytes} from '../shared/documentLimits.js';
+import {runRecheck,estimateRecheckCost} from './consistencyCheck.js';
 const identity=req=>req.identity?.id??'test-local';
 const remainingPairs=(plan,result)=>plan.pairs.filter(p=>!result?.analysis?.tasks?.some(t=>t.id===p.id&&t.status==='completed'));
 export function remainingPreview(plan,result){
@@ -39,6 +40,17 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
   return {record,plan,body};
  };
  return {
+  // Ask-twice check for borderline findings: one extra request, or none if nothing is borderline.
+  async recheck(req,res){try{
+   const {findings,transcript1,transcript2,estimateOnly}=req.body??{};
+   if(!Array.isArray(findings)||findings.length>200||typeof transcript1!=='string'||typeof transcript2!=='string')return res.status(400).json({error:'Send the findings and both transcripts.'});
+   const texts=[transcript1,transcript2],estimate=estimateRecheckCost(findings,texts);
+   if(estimateOnly||!estimate.pairs)return res.json({findings,checked:0,disagreements:0,estimate});
+   if(estimate.upperBound>maxBudgetUsd)return res.status(400).json({error:'Double-check exceeds the spending allowance.'});
+   const result=await runRecheck({findings,texts,callModel});
+   log({event:'recheck_finished',checked:result.checked,disagreements:result.disagreements});
+   return res.json({...result,estimate});
+  }catch(err){log({event:'recheck_failed',error:String(err?.message??err).slice(0,200)});return res.status(502).json({error:'Double-check failed; the first results are kept.'});}},
   async preview(req,res){try{const loaded=req.body?.resumeJobId?await load(req):null,plan=loaded?.plan??prepare(req.body),preview=loaded?remainingPreview(plan,loaded.record.result):previewPlan(plan);guard(preview);return res.json({...preview,provenance,...(loaded?{resumeJobId:loaded.record.id}:{})});}catch(e){return res.status(400).json({error:e.message});}},
   async list(req,res){try{if(!jobStore)return res.json({jobs:[],recoveryEnabled:false});const records=await jobStore.list(identity(req),req.query.caseId);return res.json({recoveryEnabled:true,jobs:records.filter(r=>r.provenance.workflow!=='events-v1').map(r=>({id:r.id,caseId:r.caseId,state:r.state,updatedAt:r.updatedAt,completed:r.result?.analysis?.completed??0,planned:r.result?.analysis?.planned??null,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'}))});}catch{return res.status(500).json({error:'Recovery records could not be listed.'});}},
   async recover(req,res){try{const r=await jobStore.get(req.params.id,identity(req));return res.json({id:r.id,caseId:r.caseId,state:r.state,notice:r.notice??null,texts:r.texts,documents:r.documents,originalDocuments:r.originalDocuments,result:r.result,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'});}catch{return res.status(404).json({error:'Recovery record not found or unavailable.'});}},

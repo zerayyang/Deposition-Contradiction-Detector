@@ -24,3 +24,4 @@
 .score-hero.none{background:#fff0ef;border-color:#f3c7c4}.score-hero.none b{color:#b42318}.score-hero.none span{color:#8a1f17}.score-pill.none{background:#fde5e3;color:#b42318}
 .analysis-status.is-error{border-color:#f0b8b3;background:#fff4f3}.analysis-status.is-error h2{color:#b42318}
 .error{color:#b42318;background:#fff0ef;border:1px solid #f3c7c4;font-weight:600}
+.type-chip.uncertain{color:#7a4b00;background:#fff1cc}.score-hero.uncertain{background:#fff8e6;border-color:#f1dca6}.score-hero.uncertain b{color:#9a6400}.score-pill.uncertain{background:#fff1cc;color:#7a4b00}.label-disagreement p{margin:4px 0 0}
