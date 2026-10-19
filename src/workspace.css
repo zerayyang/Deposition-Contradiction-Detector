@@ -146,3 +146,15 @@ button,input,textarea{font:inherit}button{box-shadow:none}button:focus-visible,i
 .confidence-budget-warning { margin-top: 14px; padding: 16px; background: rgba(181,129,35,.07); border: 1px solid rgba(181,129,35,.2); border-radius: 15px; color: #685020; }
 .confidence-budget-ack { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-size: 14px; line-height: 1.5; }
 .confidence-budget-ack input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 18px; margin: 2px 0 0; accent-color: #27777e; }
+
+.approval-price { display: grid; gap: 6px; }
+.approval-price > span { font-size: 13px; color: #536977; }
+.approval-price > strong { font-size: 34px; line-height: 1.15; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.approval-price > small, .approval-extra { color: #5c7280; font-size: 12px; }
+.approval-breakdown { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 18px 0 10px; }
+.approval-breakdown > div { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+.approval-breakdown dt { color: #526977; }
+.approval-breakdown dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.approval-cost-details { margin-top: 16px; font-size: 13px; color: #556c7a; line-height: 1.6; }
+.approval-cost-details summary { width: fit-content; cursor: pointer; color: #286b74; }
+.approval-footer { font-size: 12px; line-height: 1.5; color: #5c7280; }
