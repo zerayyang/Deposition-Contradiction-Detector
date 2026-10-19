@@ -1,3 +1,4 @@
+import WorkspaceSettings from './WorkspaceSettings.jsx';
 import ConfidenceAllowance from './ConfidenceAllowance.jsx';
 import {confidenceApprovalReady} from './lib/confidenceApproval.js';
 import ReviewProgress from './ReviewProgress.jsx';
@@ -377,6 +378,7 @@ function Dashboard({ session }) {
       {newCase && <form className="new-case-form" onSubmit={createCase}><label>Case name<input autoFocus value={title} onChange={event => setTitle(event.target.value)} maxLength={200} required /></label><button disabled={caseBusy || !title.trim()}>{caseBusy ? "Saving…" : "Create case"}</button></form>}
       <CaseList cases={cases} userId={session.user.id} activeId={activeId} disabled={blocked} onSelect={selectCase} />
       {caseError && <p className="sidebar-error" role="alert">{caseError}</p>}
+      <WorkspaceSettings />
       <div className="sidebar-footer"><div className="account-avatar">{session.user.email?.slice(0,2).toUpperCase()}</div><div><span className="account-email">{session.user.email}</span>{local?<span className="muted">No-account mode · saved in this browser</span>:<button className="link-button" disabled={blocked} onClick={signOut}>Sign out</button>}</div></div>
     </aside>
     <main className="workspace-main"><header className="workspace-header"><div><div className="case-title"><h1>{caseTitle}</h1></div></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save as case" : "Save"}</button>{activeId !== "sample" && <button className="secondary-button" disabled={blocked} onClick={renameCase}>Rename</button>}{activeId !== "sample" && <button className="secondary-button danger" disabled={blocked} onClick={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }}>Delete</button>}</div></header>

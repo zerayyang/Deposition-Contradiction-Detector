@@ -8,7 +8,7 @@ const html=await readFile(new URL('../../public/hybrid-confidence-demo.html',imp
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 function demo() {
   const elements=new Map();
-  for(const id of ['votes','review','objection','code','source','agree','dots','score','ring','vote-points','review-points','code-points','formula','normalization','available-explanation','vote-math','review-math','code-math','notice','reset','low-example'])
+  for(const id of ['votes','review','objection','code','source','agree','dots','score','ring','vote-points','review-points','code-points','formula','simple-total','normalization','available-explanation','vote-math','review-math','code-math','notice','reset','low-example'])
     elements.set(id,{value:id==='votes'?'5':id==='code'?'supported':'',checked:['review','source'].includes(id),events:{},
       addEventListener(event,handler){this.events[event]=handler;},setAttribute(){},style:{setProperty(){}}});
   const context=vm.createContext({document:{getElementById:id=>elements.get(id)}});
@@ -46,4 +46,15 @@ test('visible formula explains the earned points, denominator and exclusion as c
   assert.match(elements.get('code-math').textContent,/excluded/);
   elements.get('source').checked=false;elements.get('source').events.input();
   assert.equal(elements.get('normalization').textContent,'No score until the quotes are verified.');
+});
+
+test('simple summary shows the total while detailed arithmetic stays collapsed',()=>{
+  const {elements}=demo();
+  assert.equal(elements.get('simple-total').textContent,'90 of 100 points → 90%');
+  assert.match(html,/<details><summary>How it’s calculated<\/summary>/);
+  assert.doesNotMatch(html,/<details[^>]*open/);
+  elements.get('low-example').events.click();
+  assert.equal(elements.get('simple-total').textContent,'20 of 90 points → 22%');
+  elements.get('source').checked=false;elements.get('source').events.input();
+  assert.equal(elements.get('simple-total').textContent,'Verify the quotes to see a score.');
 });
