@@ -12,7 +12,7 @@ export async function runConcurrentConfidence({findings,texts,caseId,allowance,f
   };
   const failureStatus=error=>signal?.aborted?'CANCELLED':['ALLOWANCE_USED','BUDGET_LIMIT'].includes(error.code)?'BUDGET_LIMIT':error.code==='SOURCE_REVIEW_REQUIRED'?'SOURCE_REVIEW_REQUIRED':'INCOMPLETE';
   const review=async({index,plan})=>{
-    const finding=results[index];
+    const finding=results[index],startedAt=Date.now();
     try {
       for(let step=0;step<7;step++) {
         if(signal?.aborted){halt='CANCELLED';break;}
@@ -20,8 +20,9 @@ export async function runConcurrentConfidence({findings,texts,caseId,allowance,f
         const checks=results.reduce((sum,f)=>sum+(f.hybridConfidence.completedSteps??0),0);
         onProgress(`Checking confidence · up to 2 findings at once · ${checks} checks finished`);
         const value=await post(fetchImpl,'/api/confidence/step',{caseId,jobId:plan.jobId,step,approvedBudgetUsd:plan.budgetUsd},signal);
+        // How long this finding's score took, from its first check to its last.
         results[index]={...finding,hybridConfidence:{...value.hybridConfidence,jobId:plan.jobId,completedSteps:value.completed,
-          spentUsd:value.spentUsd,votes:value.votes,reviewer:value.reviewer}};
+          spentUsd:value.spentUsd,votes:value.votes,reviewer:value.reviewer,startedAt,durationMs:Date.now()-startedAt}};
         await save();
         if(value.stopped){halt=signal?.aborted?'CANCELLED':'INCOMPLETE';break;}
       }

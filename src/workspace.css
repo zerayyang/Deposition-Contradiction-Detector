@@ -158,3 +158,9 @@ button,input,textarea{font:inherit}button{box-shadow:none}button:focus-visible,i
 .approval-cost-details { margin-top: 16px; font-size: 13px; color: #556c7a; line-height: 1.6; }
 .approval-cost-details summary { width: fit-content; cursor: pointer; color: #286b74; }
 .approval-footer { font-size: 12px; line-height: 1.5; color: #5c7280; }
+.finding-source pre { position: relative; }
+.finding-source .source-quote-mark { background: #ffe58a; color: inherit; border-radius: 4px; padding: 1px 2px; box-shadow: 0 0 0 2px #ffe58a; animation: source-quote-flash 1.6s ease-out 1; }
+.finding-source .source-jump-button { border: 1px solid #cadcdf; border-radius: 999px; padding: 5px 12px; margin: 0 0 8px; background: #fff8dc; color: #6b4e00; font: 600 12px system-ui,sans-serif; box-shadow: none; }
+@keyframes source-quote-flash { 0%, 30% { background: #ffcf33; box-shadow: 0 0 0 4px #ffcf33; } }
+@media (prefers-reduced-motion: reduce) { .finding-source .source-quote-mark { animation: none; } }
+.confidence-time{margin:4px 0 0;font-size:12px;color:#6b7c88;font-variant-numeric:tabular-nums}

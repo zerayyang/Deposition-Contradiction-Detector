@@ -15,3 +15,4 @@ export function sourceBindingMessage(binding){
  if(binding.status==='AMBIGUOUS')return 'Several witness occurrences match. Confirm the intended occurrence before scoring.';
  return 'The exact quotation was not located in recognized witness speech.';
 }
+export {locateQuote} from './quoteLocation.js';
