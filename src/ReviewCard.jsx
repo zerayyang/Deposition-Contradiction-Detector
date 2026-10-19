@@ -1,5 +1,6 @@
 import {sourceBindingMessage} from './lib/sourceStatus.js';
-import { scoreBadge } from "./lib/scoreBadge.js";
+import {hybridBadge as scoreBadge} from "../shared/hybridConfidence.js";
+import HybridConfidence from "./HybridConfidence.jsx";
 import { shortRule, firstSentence } from "./lib/shortLabels.js";
 const percent = value => Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Unavailable";
 const ruleNames = {time:"Time comparison",state:"Opposing states",timeline:"Timeline conflict","activity polarity":"Action affirmed vs denied","location+activity":"Home presence vs departure","point-location":"Same-time location comparison",knowledge:"Awareness or meeting",quantity:"Amount comparison"};
@@ -7,7 +8,7 @@ const reasonLabels = {LABEL_DISAGREEMENT:"Comparisons of the same witness answer
 
 export function ScoreGuide() {
   return <details className="score-guide"><summary>How to read the confidence score</summary>
-    <p>The score measures support from human-written code rules. It is not the probability that the witness is lying. Claude's classification and the code check are separate.</p>
+    <p>Hybrid classification confidence uses repeated classifications, independent review and calibration against approved examples. Source and evidence checks remain separate. Without calibration no accuracy percentage is shown. The legacy calculation below describes evidence support only.</p>
     <div className="guide-grid">
       <div><h4>Evidence strength (E)</h4><p>How strongly the best applicable rule supports a conflict. <b>1.00 means full rule strength</b>; 0.70 means partial rule strength. These are configured values, not measured probabilities.</p></div>
       <div><h4>Claim commitment (C)</h4><p>How firmly the relevant claim is expressed. Each claim starts at <b>0.80</b>. Scoped hedges or memory uncertainty lower it. The pair uses the lower claim value.</p></div>
@@ -25,7 +26,7 @@ function followUp(reasoning) {
   return match?.[1]?.trim() ?? null;
 }
 
-export function ReviewCard({result:r, dismissed=false}) {
+export function ReviewCard({result:r, dismissed=false, confidence}) {
   const notEvaluable = r.status === "NOT_EVALUABLE";
   const compatible = r.status === "COMPATIBLE_SUPPORTED";
   const support = (r.rulesFired ?? []).filter(rule=>rule.verdict === "CONFLICT");
@@ -51,8 +52,9 @@ export function ReviewCard({result:r, dismissed=false}) {
       const binding=r.sourceBindings[key];
       return binding?.status==='BOUND'?<details key={key}><summary>Transcript {i+1}: one witness occurrence located</summary><p><b>Question:</b> {binding.selected.question || 'No explicit question supplied.'}</p><p style={{whiteSpace:'pre-wrap'}}><b>Full answer:</b> {binding.selected.answer}</p><small>Text characters {binding.selected.start}–{binding.selected.end}</small></details>:<p key={key}>Transcript {i+1}: {sourceBindingMessage(binding)} No answer location was selected.</p>;
     })}</section>}
+    <HybridConfidence result={r} {...confidence} />
     <section className={`verification ${notEvaluable ? "unavailable" : ""}`}>
-      <div className="verification-heading"><div><span className="eyebrow">Code verification</span><h3>{notEvaluable ? "Not evaluable" : compatible ? "Compatible under code rules" : dismissed ? `${r.band?.toLowerCase() ?? "Unknown"} rule support` : `${r.humanConfidence} / 100`}</h3></div>{!notEvaluable && !compatible && !dismissed && <span className="band-chip">{r.band?.toLowerCase()} support</span>}</div>
+      <div className="verification-heading"><div><span className="eyebrow">Legacy evidence support</span><h3>{notEvaluable ? "Not evaluable" : compatible ? "Compatible under code rules" : dismissed ? `${r.band?.toLowerCase() ?? "Unknown"} rule support` : `${r.humanConfidence} / 100 rule index`}</h3></div>{!notEvaluable && !compatible && !dismissed && <span className="band-chip">{r.band?.toLowerCase()} support</span>}</div>
       <p>{notEvaluable ? reasonLabels[r.notEvaluableReason] ?? "More context is needed before code can score this pair." : compatible ? "The applicable rules support compatibility. This does not change Claude's category." : "A heuristic evidence-support score, not a probability of dishonesty."}</p>
       {support.length>0 && <ul className="rule-list">{support.map(rule=><li key={rule.id}><b>{ruleNames[rule.id] ?? rule.id}.</b> {rule.explanation}</li>)}</ul>}
       {context.length>0 && <ul className="rule-list">{context.map(rule=><li key={rule.id}><b>{ruleNames[rule.id] ?? rule.id}.</b> {rule.explanation}</li>)}</ul>}

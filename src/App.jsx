@@ -16,7 +16,7 @@ import { ReviewCard } from "./ReviewCard.jsx";
 import { CorrectionForm } from "./FeedbackReview.jsx";
 import AdminPortal from "./AdminPortal.jsx";
 import { chosenPortal } from "./lib/portal.js";
-import { scoreBadge } from "./lib/scoreBadge.js";
+import {hybridBadge as scoreBadge} from "../shared/hybridConfidence.js";
 import { findingTitle, shortRule } from "./lib/shortLabels.js";
 import { TRANSCRIPT_1, TRANSCRIPT_2 } from "./sampleTranscripts.js";
 import CaseList from "./CaseList.jsx";
@@ -357,7 +357,13 @@ function Dashboard({ session }) {
         {!draft.results && <div className="findings-empty"><span>⌕</span><h3>{loading ? "Review in progress" : "Start with two transcripts"}</h3><p>{loading ? "Findings will appear when analysis completes. Keep this tab open." : "Preview the text above, then analyze to compare the witness’s accounts."}</p></div>}
         {draft.results && visible.length === 0 && <p className="findings-empty">No findings in this category.</p>}
         <div className="finding-list">{visible.map(({result,index}) => <Fragment key={index}>{index === firstDismissed && <p className="list-divider">Not contradictions</p>}<button className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); }}><span className={`type-chip ${result.labelDisagreement?"uncertain":result.type.toLowerCase()}`}>{result.labelDisagreement?"Uncertain":label(result.type)}</span><span className={`score-pill ${scoreBadge(result).kind}`}>{scoreBadge(result).value}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{findingTitle(result)}</h3>{shortRule(result.typeRule)&&<p>{shortRule(result.typeRule)}</p>}<span className="finding-arrow">›</span></button></Fragment>)}</div>
-      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><h2>{findingTitle(selected.result)}</h2></div><ReviewCard result={selected.result} dismissed={selected.result.type === "FALSE_POSITIVE"} />
+      </aside><div className="finding-detail">{selected ? <><div className="detail-title"><h2>{findingTitle(selected.result)}</h2></div><ReviewCard key={`${activeId}:${selected.index}`} result={selected.result} dismissed={selected.result.type === "FALSE_POSITIVE"} confidence={{apiFetch, payload:{caseId:activeId,finding:selected.result,texts:draft.texts}, onUpdate:hybridConfidence=>{
+              const id=activeId,index=selected.index,texts=draft.texts,original=selected.result;
+              setDrafts(previous=>{const current=previous[id];if(!current||current.texts.some((text,i)=>text!==texts[i]))return previous;
+                const target=current.results[index];if(!target||target.type!==original.type||target.claim1?.original!==original.claim1?.original||target.claim2?.original!==original.claim2?.original)return previous;
+                return {...previous,[id]:{...current,dirty:true,results:current.results.map((r,i)=>i===index?{...r,hybridConfidence}:r)}};
+              });
+            }}} />
           <section className="lawyer-review" aria-label="Your review">
             <div className="lawyer-review-heading"><h3>Your review</h3><button className={draft.reviewed[selected.index] ? "reviewed-button done" : "reviewed-button"} disabled={blocked} onClick={() => patch({ reviewed: { ...draft.reviewed, [selected.index]: !draft.reviewed[selected.index] } })}>{draft.reviewed[selected.index] ? "✓ Reviewed" : "Mark reviewed"}</button></div>
             <textarea aria-label="Review note" disabled={blocked} rows={3} value={draft.notes[selected.index] ?? ""} onChange={event => patch({ notes: { ...draft.notes, [selected.index]: event.target.value } })} placeholder="Notes for this finding…" />

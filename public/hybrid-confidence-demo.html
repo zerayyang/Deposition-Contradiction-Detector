@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How sure is the AI? · Pretend example</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#192c34;font:18px/1.5 system-ui,sans-serif}main{max-width:780px;margin:40px auto;padding:0 22px 50px}h1{font-size:clamp(32px,6vw,46px);line-height:1.12;letter-spacing:-1.5px;margin:14px 0}h2{font-size:23px;margin:0 0 12px}.intro{color:#53636b}.notice{background:#fff0c9;border-radius:14px;padding:14px 18px;font-size:16px}section{background:white;border:1px solid #e2e8ed;border-radius:22px;padding:25px;margin:18px 0}.quotes{display:grid;grid-template-columns:1fr 1fr;gap:12px}.quote{background:#f1f6f7;border-radius:14px;padding:16px}.quote small{display:block;color:#52666e;margin-bottom:8px}.quote p{margin:0;font-size:22px;font-weight:600}.step{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#e3f1f1;color:#176f74;margin-right:10px}label{display:block;margin:16px 0}input[type=range]{width:100%;accent-color:#176f74;margin:18px 0}input[type=checkbox]{width:22px;height:22px;accent-color:#176f74;vertical-align:middle;margin:0 10px 0 0}.votes{display:flex;gap:8px;margin:12px 0}.vote{flex:1;border-radius:12px;padding:12px 0;text-align:center;background:#e3f1f1;color:#176f74;font-size:23px;font-weight:700}.vote.no{background:#f1f1f3;color:#7a6570}.caption{font-size:15px;color:#5b6e76;margin-bottom:0}.result{border:2px solid #176f74;text-align:center;background:#f2fbfa}.number{font-size:62px;line-height:1.15;font-weight:750;color:#176f74;margin:10px 0}.tag{display:inline-block;font-size:13px;font-weight:750;letter-spacing:.8px;padding:5px 12px;border-radius:20px;background:#fff0c9}details{padding:15px 3px;font-size:15px;color:#52666e}summary{cursor:pointer;font-weight:600}code{display:block;white-space:normal;background:#eef1f4;padding:14px;border-radius:10px}button{background:white;color:#176f74;border:1px solid #b4cece;padding:10px 18px;border-radius:12px;font:inherit;cursor:pointer}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #568ad4;outline-offset:4px}@media(max-width:480px){.quotes{grid-template-columns:1fr}section{padding:20px}.vote{padding:8px 0}.number{font-size:50px}}
+</style>
+</head>
+<body><main>
+<p class="notice"><b>Just a pretend example.</b> No AI is running and no money is spent. The numbers below are made up to show how the idea works.</p>
+<h1>How sure is the AI?</h1>
+<p class="intro">Move the slider and tick the boxes. Watch the pretend score change.</p>
+<section>
+<h2>Two answers about the same thing</h2>
+<div class="quotes"><div class="quote"><small>First answer</small><p>“I put 3 cookies in the box.”</p></div><div class="quote"><small>Later answer, about that same box and moment</small><p>“I put 5 cookies in the box.”</p></div></div>
+<p>The app says: <b>These answers clash.</b></p>
+<p class="caption">We are checking that label. We are not deciding who is telling the truth.</p>
+</section>
+<section>
+<h2><span class="step">1</span>Ask the AI six times</h2>
+<p>How many answers agree that the two statements clash?</p>
+<label for="votes"><b id="agree"></b></label>
+<input id="votes" type="range" min="0" max="6" value="5" aria-describedby="vote-help">
+<div class="votes" id="dots" aria-hidden="true"></div>
+<p class="caption" id="vote-help">✓ Agrees · ? Does not agree. Even six agreeing answers can all be wrong.</p>
+</section>
+<section>
+<h2><span class="step">2</span>Ask an AI checker</h2>
+<p>A separate AI checks the words without seeing the six votes.</p>
+<label><input id="review" type="checkbox" checked>The checker agrees.</label>
+<label><input id="objection" type="checkbox">The checker says something needs a closer look.</label>
+</section>
+<section>
+<h2><span class="step">3</span>Check the original words</h2>
+<p>Code follows rules written by people to check the sources. AI votes cannot overrule a failed source check.</p>
+<label><input id="source" type="checkbox" checked>The quotes match the witness’s words.</label>
+<p class="caption">In this example, the count-comparison rule also supports a clash. Actual human-approved reviews would help us learn how reliable these signals are.</p>
+</section>
+<section class="result" aria-live="polite" aria-atomic="true">
+<span class="tag">PRETEND SCORE · NOT REAL ACCURACY</span>
+<div class="number" id="score"></div>
+<p id="notice"></p>
+<p class="caption">A real percentage needs a formula checked against answers people have approved. We have not fitted that formula yet.</p>
+<button type="button" id="reset">Start again</button>
+</section>
+<details><summary>What happens behind the scenes?</summary>
+<p>Two model identities each get three versions of the question. That makes six votes. They can make similar mistakes, so we do not treat them as six fully independent experts.</p>
+<p>The calibrator is a formula in code. It learns how votes, reviewer objections and evidence checks relate to correct labels using human-approved examples. It is not another AI voting, and the parts do not get fixed percentage shares.</p>
+<p>For this pretend demo only, the formula uses these made-up weights: agreement 3; checker agreement 0.5; objection −1; rule support 0.25; rule strength 0.25; starting value −1.</p>
+<code id="formula"></code>
+<p>The final step is 100 ÷ (1 + exp(−z)). With five agreeing votes, the checker agreeing and no objection, the pretend result rounds to 92%. Five of six votes alone means 83% agreement—not 83% accuracy.</p>
+<p>This mock does not change the original category, find missed contradictions, or measure whether someone is lying.</p>
+</details>
+</main>
+<script>
+const byId = id => document.getElementById(id);
+function update() {
+  const n = Number(byId('votes').value);
+  const r = Number(byId('review').checked);
+  const o = Number(byId('objection').checked);
+  const s = byId('source').checked;
+  const z = -1 + 3 * n / 6 + .5 * r - o + .25 + .25;
+  byId('agree').textContent = n + ' out of 6 agree';
+  byId('votes').setAttribute('aria-valuetext', n + ' out of 6 agree');
+  byId('dots').innerHTML = Array.from({length:6}, (_,i) => '<span class="vote' + (i<n?'':' no') + '">' + (i<n?'✓':'?') + '</span>').join('');
+  byId('formula').textContent = 'z = −1 + 3 × ' + n + '/6 + 0.5 × ' + r + ' − ' + o + ' + 0.25 + 0.25 = ' + z.toFixed(2);
+  byId('score').textContent = s ? Math.round(100 / (1 + Math.exp(-z))) + '%' : 'Needs review';
+  byId('notice').textContent = !s ? 'The source check failed. More votes cannot fix that.' : o ? 'The checker spotted a concern. A person should take a look.' : 'This shows how the signals could combine. It is not a real confidence measurement.';
+}
+for (const id of ['votes','review','objection','source']) byId(id).addEventListener('input',update);
+byId('reset').addEventListener('click', () => {byId('votes').value = '5';byId('review').checked = true;byId('objection').checked = false;byId('source').checked = true;update();});
+update();
+</script>
+</body></html>
