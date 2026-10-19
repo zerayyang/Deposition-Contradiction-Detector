@@ -8,3 +8,8 @@ export function chosenPortal(storage = globalThis.sessionStorage) {
 export function choosePortal(portal, storage = globalThis.sessionStorage) {
   try { storage?.setItem(KEY, portal === "admin" ? "admin" : "workspace"); } catch { /* storage unavailable: default to the workspace */ }
 }
+// A passphrase typed while creating an admin account is held in memory only (never storage)
+// until the portal opens and uses it once.
+let pending = null;
+export function holdAdminPassphrase(value) { pending = value || null; }
+export function takeAdminPassphrase() { const value = pending; pending = null; return value; }

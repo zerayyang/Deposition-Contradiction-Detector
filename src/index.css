@@ -101,3 +101,7 @@
 .admin-steps b{color:#203346}
 .admin-portal .feedback-inbox{margin:14px 0}
 @media(max-width:700px){.admin-steps{grid-template-columns:1fr}}
+.admin-unlock{max-width:420px;margin:24px 0;padding:22px;border:1px solid #dce5eb;border-radius:14px;background:white}
+.admin-unlock h2{font-size:20px}
+.admin-unlock label{display:grid;gap:6px;font-size:13px;font-weight:600;margin:12px 0}
+.admin-unlock input{font:inherit;padding:10px 12px;border:1px solid #b5cbd2;border-radius:8px}
