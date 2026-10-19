@@ -69,3 +69,10 @@ test('unsupported code is excluded explicitly and compatibility supports a false
   i.votes=i.votes.map(v=>({...v,type:'FALSE_POSITIVE'}));i.evidence.status='COMPATIBLE_SUPPORTED';
   assert.equal(summarizeConfidence(i).score,100);assert.equal(summarizeConfidence(i).combination.code.points,20);
 });
+
+test('a low score follows disagreement rather than being raised for appearance',()=>{
+  const i=input();i.votes=i.votes.map((v,n)=>({...v,type:n<2?'DIRECT':'FALSE_POSITIVE'}));
+  i.reviewer={status:'SUCCESS',type:'FALSE_POSITIVE',objections:['The original category is unsupported.']};
+  i.evidence={sourcesVerified:true,status:'NOT_EVALUABLE',ruleStrength:0};
+  const r=summarizeConfidence(i);assert.equal(r.score,25);assert.equal(r.combination.permutation.points,20);assert.equal(r.combination.reviewer.points,0);
+});

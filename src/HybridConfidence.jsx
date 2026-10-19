@@ -1,4 +1,5 @@
 import {hybridBadge} from '../shared/hybridConfidence.js';
+import {reviewerPoints} from './lib/reviewerPoints.js';
 
 const states={PENDING:'Checking soon',INCOMPLETE:'Checks incomplete',CANCELLED:'Checks stopped',BUDGET_LIMIT:'Not checked · allowance reached',SOURCE_REVIEW_REQUIRED:'Source needs review',REVIEW_REQUIRED:'Needs your review'};
 export default function HybridConfidence({result}) {
@@ -23,8 +24,9 @@ export default function HybridConfidence({result}) {
     </div>
       {done&&<span className="confidence-state">{c.reviewerAgrees?'Checker agrees':'Review suggested'}</span>}
     </div>
-    {valid&&c?.objections?.length>0&&<p className="confidence-concern">{c.objections.join(' ')}</p>}
+    {valid&&c?.objections?.length>0&&<ul className="confidence-concern confidence-concern-points">{reviewerPoints(c.objections).map((point,i)=><li key={i}>{point}</li>)}</ul>}
     <details><summary>How your score adds up</summary>
+      {c?.objections?.length>0&&<details><summary>Full reviewer explanation</summary>{c.objections.map((text,i)=><p key={i}>{text}</p>)}</details>}
       {c?.combination&&<><p>Experimental points, not a probability of correctness.</p><ul>
         <li>Permutation votes: {c.combination.permutation.points.toFixed(1)} / 60</li>
         <li>Independent reviewer: {c.combination.reviewer.points} / 20</li>

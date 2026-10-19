@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {EventEmitter} from 'node:events';
-import {createConfidenceHandlers,prepareConfidence} from '../../server/confidence/handlers.js';
+import {createConfidenceHandlers,prepareConfidence,estimateConfidenceReserve} from '../../server/confidence/handlers.js';
 
 const claim = original => ({original,activityPhrase:null,timePhrase:null,locationPhrase:null,personPhrase:null,
   objectPhrase:null,quantityPhrase:null,statePhrase:null,qualifierPhrases:[]});
@@ -84,4 +84,14 @@ test('hosted store authorization and immutable locks are used across handler ins
   const b={caseId:p.caseId,jobId:p.jobId,step:0,approvedBudgetUsd:p.budgetUsd};
   await invoke(createConfidenceHandlers(options).step,b);await invoke(createConfidenceHandlers(options).step,b);
   assert.equal(calls,1);assert.equal(auth,3);
+});
+
+test('automatic reserve scales to workload with 25 percent headroom and no paid calls',async()=>{
+  const texts=Array.from({length:2},(_,d)=>Array.from({length:40},(_,i)=>`Q: What happened in synthetic event ${i}?\nA: Synthetic answer ${d}-${i}.`).join('\n'));
+  const estimate=estimateConfidenceReserve(texts);
+  assert.equal(estimate.safetyMargin,.25);assert.ok(estimate.budgetUsd>=estimate.forecastFindings*estimate.perFindingBudgetUsd*1.25);
+  assert.ok(estimate.budgetUsd>2);
+  let calls=0;const h=createConfidenceHandlers({callModel:async()=>{calls++;return model();}});
+  const res=await invoke(h.allowance,{caseId:'saved',texts});
+  assert.equal(res.statusCode,200);assert.equal(res.body.budgetUsd,estimate.budgetUsd);assert.equal(calls,0);
 });

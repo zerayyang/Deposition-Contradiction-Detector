@@ -1,3 +1,18 @@
+## Workload-sized confidence reserve and readable review
+
+The flat US$2 allowance is removed from automatic reviews. Free planning counts witness answers,
+forecasts finding workload, prices seven requests using the largest full source-answer context,
+and adds 25% reserve headroom. This is a forecast, not a proof of finding count or provider uptime.
+The complete reserve is displayed before approval. Above the configured server spending ceiling,
+planning blocks paid analysis rather than secretly reducing mandatory confidence coverage.
+Completed finding allocations settle to recorded token usage; unused reservations are released.
+When usage is missing, the full reserve stays charged against the approved allowance. Spending
+cannot silently exceed the approved amount; unexpectedly larger outputs still require approval.
+The summary distinguishes completed analysis from incomplete confidence checks.
+Visible reviewer concerns use up to three short excerpts; full original text remains in Details.
+No weights are raised to make a real low score resemble fictional demo numbers. The provisional
+formula is still not statistically calibrated and should not be interpreted as accuracy probability.
+
 # Current combined score — experimental
 
 Completed reviews now return EXPERIMENTAL with a numeric combined index in the ring.
@@ -46,7 +61,7 @@ https://platform.claude.com/docs/en/models/overview. This is not benchmark quali
 The two models share a provider and can make correlated mistakes. No logprobs requested.
 Each step has a 45-second timeout and 2,048 output-token ceiling. Truncation/refusal/invalid JSON
 stops the chain visibly. No automatic retries; in-flight cancellation may still incur charges.
-The server limits a confidence plan to the lower of its configured budget and US$2. Rates and
+The server limits confidence reserves to its configured spending ceiling. Rates and
 UTF-8 input estimates are local assumptions, not verified bills. Missing usage reserves that
 step's full budget; normal token usage is recorded. Completed votes save automatically with the finding; private hosted checkpoints are written after each step.
 A request whose outcome was not received must be inspected before a newly approved paid run.
@@ -86,8 +101,8 @@ No assertion of calibrated accuracy, model quality, complete coverage or witness
 ## One review flow after deployment
 
 1. Save both transcripts and click Review documents (or Review again).
-2. The single approval dialog displays the analysis estimate and an additional US$2 confidence
-   allowance. It explains seven requests per eligible finding and potentially partial confidence coverage.
+2. The single approval dialog displays the analysis estimate and a workload-sized confidence
+   reserve including 25% headroom. It explains seven requests per eligible finding and potentially partial confidence coverage.
 3. Approve once. Analysis runs unchanged; the existing borderline double-check stays unchanged.
 4. Confidence runs automatically on the returned findings, sequentially, under the server-side
    shared allowance. Immutable allocation records reserve each full seven-call finding budget.

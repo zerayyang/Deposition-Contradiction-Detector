@@ -10,6 +10,7 @@ async function component() {
   const transformed=await transformWithOxc(await readFile(url,'utf8'),url.pathname,{jsx:{runtime:'automatic'}});
   let code=transformed.code;
   for(const name of ['react','react/jsx-runtime'])code=code.replaceAll(`from "${name}"`,`from "${import.meta.resolve(name)}"`).replaceAll(`from '${name}'`,`from '${import.meta.resolve(name)}'`);
+  code=code.replaceAll('./lib/reviewerPoints.js',new URL('../../src/lib/reviewerPoints.js',import.meta.url).href);
   code=code.replaceAll('../shared/hybridConfidence.js',new URL('../../shared/hybridConfidence.js',import.meta.url).href);
   return (await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'))).default;
 }

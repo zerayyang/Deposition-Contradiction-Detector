@@ -16,3 +16,15 @@ test('running view waits for timing and unverified-source review stays visible',
  const html=renderToStaticMarkup(createElement(Component,{analysis:{status:'running',planned:2,completed:0,issues:[{pairId:'0:0',reason:'unverified'}]},active:true,elapsed:10}));
  assert.match(html,/Waiting for the first comparison/);assert.match(html,/findings need source review/);
 });
+test('active first request shows animated activity without a fabricated completion value',()=>{
+ const html=renderToStaticMarkup(createElement(Component,{analysis:{status:'running',planned:1,completed:0},active:true,elapsed:15}));
+ assert.match(html,/In Progress/);assert.match(html,/analysis-progress-dots/);assert.match(html,/analysis-progress-activity/);
+ const progress=html.match(/<progress[^>]*>/)?.[0];assert.ok(progress);assert.doesNotMatch(progress,/value=/);
+ assert.doesNotMatch(html,/An estimate appears after|Results will appear as comparisons finish/);
+});
+test('measured completion drives the bar and stopped reviews do not animate',()=>{
+ const html=renderToStaticMarkup(createElement(Component,{analysis:{status:'running',planned:2,completed:1},active:true,elapsed:30}));
+ assert.match(html,/<progress[^>]*value="1"[^>]*max="2"/);assert.doesNotMatch(html,/analysis-progress-activity/);
+ const stopped=renderToStaticMarkup(createElement(Component,{analysis:{status:'complete',planned:2,completed:2},active:false,elapsed:45}));
+ assert.doesNotMatch(stopped,/analysis-progress-dots|analysis-progress-activity/);assert.match(stopped,/<progress[^>]*value="2"[^>]*max="2"/);
+});
