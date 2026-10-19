@@ -331,7 +331,7 @@ function Dashboard({ session }) {
       const row = await store.rename(activeId, next);
       setCases(previous => previous.map(item => item.id === activeId ? { ...item, title: row.title } : item));
       setError("");
-    } catch (err) { setError(`Rename failed: ${err.message}`); }
+    } catch (err) { setError(/permission denied/i.test(err.message) ? "Rename isn't enabled in the database yet. Run supabase/migrations/202610190002_case_rename.sql in the Supabase SQL Editor." : `Rename failed: ${err.message}`); }
   }
   return <div className="workspace">
     {deleteTarget && <DeleteCaseDialog title={deleteTarget.title} busy={deleting} error={deleteError} onCancel={() => { if (!deleting) { setDeleteTarget(null); setDeleteError(""); } }} onDelete={deleteCase} />}
