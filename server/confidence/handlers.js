@@ -16,7 +16,10 @@ export const CONFIDENCE_MODELS = [
 ];
 const OUTPUT = 2048;
 const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const money = value => Math.ceil(value * 10000) / 10000;
+// Ignore binary floating-point noise at the 0.0001-dollar boundary. Without
+// this, adding already-rounded step reservations can invent an extra unit and
+// prevent the seventh check from fitting its own seven-step reservation.
+const money = value => Math.ceil(value * 10000 - 1e-8) / 10000;
 const schema = {type:'object', additionalProperties:false, required:['type','objections'], properties:{
   type:{type:'string',enum:CONFIDENCE_LABELS}, objections:{type:'array',items:{type:'string'}}}};
 const format = providerOutputFormat(schema);
@@ -104,12 +107,18 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
       try {
         const {caseId,texts}=req.body??{};
         if(typeof caseId!=='string'||!caseId||caseId==='sample'||!Array.isArray(texts)||texts.length!==2||texts.some(t=>typeof t!=='string'||!t))return fail(res,400,'INVALID_ALLOWANCE','Save a case with both transcripts before reviewing.');
-        const estimate=estimateConfidenceReserve(texts,definitions),budgetUsd=req.body.budgetUsd??estimate.budgetUsd;
-        if(!Number.isFinite(budgetUsd)||budgetUsd<=0||budgetUsd>maxBudgetUsd)return fail(res,400,'BUDGET_LIMIT','The required confidence reserve exceeds the server spending limit. No paid analysis started. Review the server limit before proceeding.');
+        const estimate=estimateConfidenceReserve(texts,definitions);
+        // Forecasts may exceed the ceiling. Preview a capped offer, never an
+        // implicitly approved lower coverage level or a raised spending limit.
+        const budgetUsd=req.body.budgetUsd??Math.min(estimate.budgetUsd,maxBudgetUsd);
+        if(!Number.isFinite(budgetUsd)||budgetUsd<=0||budgetUsd>maxBudgetUsd)return fail(res,400,'BUDGET_LIMIT','The requested confidence allowance exceeds the server spending limit. No paid analysis started.');
+        const requiresPartialApproval=budgetUsd<estimate.budgetUsd;
         const store=storage(req);await store.authorize(caseId);
         const jobId=randomUUID();
-        await store.put(caseId,jobId,'confidence-allowance',{sourceHash:hash(texts),budgetUsd,expires:now()+60*60*1000,definitionDigest:hash(definitions)});
-        return res.json({...estimate,jobId,budgetUsd,requestsPerFinding:7,notice:'Confidence is part of the review. Reserve includes 25% headroom; unused step reservations are released as recorded usage arrives. It is a forecast, not a guarantee of unlimited findings. No automatic paid retries or spending beyond approval.'});
+        await store.put(caseId,jobId,'confidence-allowance',{sourceHash:hash(texts),budgetUsd,requiresPartialApproval,expires:now()+60*60*1000,definitionDigest:hash(definitions)});
+        return res.json({...estimate,jobId,budgetUsd,requiredBudgetUsd:estimate.budgetUsd,serverBudgetLimitUsd:maxBudgetUsd,
+          requiresPartialApproval,canFitEstimatedFinding:budgetUsd>=estimate.perFindingBudgetUsd,
+          requestsPerFinding:7,notice:'Confidence is part of the review. Reserve includes 25% headroom; unused step reservations are released as recorded usage arrives. It is a forecast, not a guarantee of unlimited findings. No automatic paid retries or spending beyond approval.'});
       } catch(error) {
         const known=[
           ['WITNESS_CONFIRMATION_REQUIRED','Question/answer labels could not be identified in one transcript. Use the original Q/A transcript; do not label lawyer or court speech as witness testimony. No paid calls started.'],
@@ -134,6 +143,7 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
           const root=await store.get(caseId,allocation.jobId,'confidence-allowance');
           if(!root||root.expires<now()||root.definitionDigest!==hash(definitions)||root.sourceHash!==hash(req.body.texts))return fail(res,409,'ALLOWANCE_EXPIRED','The confidence allowance expired or its sources changed. Existing analysis is retained.');
           if(!Number.isFinite(allocation.approvedUsd)||allocation.approvedUsd<root.budgetUsd)return fail(res,428,'COST_APPROVAL_REQUIRED','Approve the combined review cost first.');
+          if(root.requiresPartialApproval&&allocation.partialApproved!==true)return fail(res,428,'PARTIAL_CONFIDENCE_APPROVAL_REQUIRED','Acknowledge that the capped confidence allowance may leave findings unchecked before starting. No paid calls started.');
           const prior=allocation.index?await store.get(caseId,allocation.jobId,`confidence-allocation-${allocation.index-1}`):{reservedUsd:0};
           if(!prior)return fail(res,409,'INVALID_ALLOCATION','The previous confidence allocation is missing.');
           if(allocation.index){const finished=await store.get(caseId,prior.jobId,'confidence-result-6');if(!finished?.done)return fail(res,409,'PREVIOUS_STEP_INCOMPLETE','The previous finding did not complete. Saved analysis is unchanged.');

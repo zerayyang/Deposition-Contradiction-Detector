@@ -142,3 +142,7 @@ button,input,textarea{font:inherit}button{box-shadow:none}button:focus-visible,i
 .finding-source .source-location-warning { color: #855b22; }
 .finding-source .source-original-button { border: 1px solid #cadcdf; border-radius: 10px; padding: 9px 12px; margin: 12px 0; background: #f5fafb; color: #21666e; font: 13px system-ui,sans-serif; }
 .finding-source > small { display: block; margin-top: 8px; color: #627681; font: 12px/1.5 system-ui,sans-serif; }
+
+.confidence-budget-warning { margin-top: 14px; padding: 16px; background: rgba(181,129,35,.07); border: 1px solid rgba(181,129,35,.2); border-radius: 15px; color: #685020; }
+.confidence-budget-ack { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-size: 14px; line-height: 1.5; }
+.confidence-budget-ack input[type="checkbox"] { width: 18px; height: 18px; flex: 0 0 18px; margin: 2px 0 0; accent-color: #27777e; }

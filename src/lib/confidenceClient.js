@@ -9,6 +9,7 @@ async function post(fetchImpl,url,body,signal) {
 export const prepareConfidenceAllowance=(body,{fetchImpl=fetch,signal}={})=>post(fetchImpl,'/api/confidence/allowance',body,signal);
 
 export async function runAutomaticConfidence({findings,texts,caseId,allowance,fetchImpl=fetch,signal,onCheckpoint=async()=>{},onProgress=()=>{}}) {
+  if(allowance.requiresPartialApproval&&allowance.partialApproved!==true)throw new Error('Approve limited confidence coverage before starting. No confidence calls started.');
   let results=findings.map(f=>({...f,hybridConfidence:{version:HYBRID_VERSION,originalType:f.type,status:'PENDING',score:null}}));
   let allocation=0,halt=null;
   const save=async()=>onCheckpoint(results);
@@ -20,7 +21,7 @@ export async function runAutomaticConfidence({findings,texts,caseId,allowance,fe
     }
     try {
       const plan=await post(fetchImpl,'/api/confidence/plan',{caseId,texts,finding,
-        allowance:{jobId:allowance.jobId,index:allocation,approvedUsd:allowance.budgetUsd}},signal);
+        allowance:{jobId:allowance.jobId,index:allocation,approvedUsd:allowance.budgetUsd,partialApproved:allowance.partialApproved===true}},signal);
       allocation++;
       for(let step=0;step<7;step++) {
         signal?.throwIfAborted();onProgress(`Checking confidence · finding ${i+1} of ${results.length} · ${step+1} of 7 checks`);
@@ -32,7 +33,7 @@ export async function runAutomaticConfidence({findings,texts,caseId,allowance,fe
       }
       if(halt)break;
     } catch(error) {
-      const status=signal?.aborted?'CANCELLED':error.code==='ALLOWANCE_USED'?'BUDGET_LIMIT':error.code==='SOURCE_REVIEW_REQUIRED'?'SOURCE_REVIEW_REQUIRED':'INCOMPLETE';
+      const status=signal?.aborted?'CANCELLED':['ALLOWANCE_USED','BUDGET_LIMIT'].includes(error.code)?'BUDGET_LIMIT':error.code==='SOURCE_REVIEW_REQUIRED'?'SOURCE_REVIEW_REQUIRED':'INCOMPLETE';
       results[i]={...results[i],hybridConfidence:{...results[i].hybridConfidence,status,score:null}};
       if(status==='SOURCE_REVIEW_REQUIRED'){await save();continue;}
       halt=status;break;
