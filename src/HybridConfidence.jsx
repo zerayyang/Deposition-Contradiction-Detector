@@ -1,4 +1,4 @@
-import {hybridBadge} from '../shared/hybridConfidence.js';
+import {hybridBadge,confidenceLabel} from '../shared/hybridConfidence.js';
 import {reviewerPoints} from './lib/reviewerPoints.js';
 
 const states={PENDING:'Checking soon',INCOMPLETE:'Checks incomplete',CANCELLED:'Checks stopped',BUDGET_LIMIT:'Not checked · allowance reached',SOURCE_REVIEW_REQUIRED:'Source needs review',REVIEW_REQUIRED:'Needs your review'};
@@ -19,20 +19,21 @@ export default function HybridConfidence({result}) {
         <svg viewBox="0 0 120 120" aria-hidden="true"><circle className="confidence-ring-track" cx="60" cy="60" r="50"/><circle className="confidence-ring-fill" cx="60" cy="60" r="50" pathLength="100" strokeDasharray={`${percentage??0} 100`}/></svg>
         <span className="confidence-ring-number">{percentage===null?'—':`${percentage}%`}</span>
       </div>
-      <div><span className="eyebrow">{title}</span><h3>{c?.status==='EXPERIMENTAL'?'Experimental':done?'Review checked':states[c?.status]??'Not checked'}</h3>
-        <p>{c?.status==='EXPERIMENTAL'?'Votes + reviewer + code checks':done?`${votes} AI reads agree.`:'Waiting for completed checks.'}</p></div>
+      <div><span className="eyebrow">{combined?'Confidence':title}</span><h3>{combined&&done?(confidenceLabel(percentage,{reviewerAgrees:c.reviewerAgrees})??'Checks incomplete'):done?'Review checked':states[c?.status]??'Not checked'}</h3>
+        <p>{combined?(calibrated?'Support for this label':'Support for this label · uncalibrated'):done?`${votes} AI reads agree.`:'Waiting for completed checks.'}</p></div>
     </div>
       {done&&<span className="confidence-state">{c.reviewerAgrees?'Checker agrees':'Review suggested'}</span>}
     </div>
     {valid&&c?.objections?.length>0&&<ul className="confidence-concern confidence-concern-points">{reviewerPoints(c.objections).map((point,i)=><li key={i}>{point}</li>)}</ul>}
     <details><summary>How your score adds up</summary>
+      {combined&&<p>Display ranges: below 50 is Low confidence; 50–74 is Not sure; 75–89 is Confident; 90–100 is Very confident. A dissenting reviewer keeps the label at Not sure or Low confidence. These ranges are chosen for readability, not validated accuracy.</p>}
       {c?.objections?.length>0&&<details><summary>Full reviewer explanation</summary>{c.objections.map((text,i)=><p key={i}>{text}</p>)}</details>}
       {c?.combination&&<><p>Experimental points, not a probability of correctness.</p><ul>
-        <li>Permutation votes: {c.combination.permutation.points.toFixed(1)} / 60</li>
-        <li>Independent reviewer: {c.combination.reviewer.points} / 20</li>
-        <li>Human-written code: {c.combination.code.points===null?'Not covered by a rule':`${c.combination.code.points.toFixed(1)} / 20`}</li>
+        <li>Permutation votes: {c.combination.permutation.points.toFixed(1)} / {c.combination.permutation.max??60}</li>
+        <li>Independent reviewer: {c.combination.reviewer.points} / {c.combination.reviewer.max??20}</li>
+        <li>Human-written code: {c.combination.code.points===null?'Not covered by a rule':`${c.combination.code.points.toFixed(1)} / ${c.combination.code.max??20}`}</li>
       </ul><p>{votes} reads agree. Final score = earned points ÷ {c.combination.availablePoints} available points × 100. Unsupported code rules are excluded, not counted as evidence against the finding.</p></>}
-<p>Agreement is not measured accuracy. Two models each check the same finding three ways. A separate AI checker sees the original words, without seeing the votes. Source checks cannot be outvoted. Failed checks are never counted as agreeing votes.</p><p>The fixed weights are 60% votes, 20% reviewer and 20% code when all components are available. Reviewer agreement with unresolved concerns earns half reviewer points. Statistical calibration still requires human-approved examples; these weights are not trained.</p>
+<p>Agreement is not measured accuracy. Two models each check the same finding three ways. A separate AI checker sees the original words, without seeing the votes. Source checks cannot be outvoted. Failed checks are never counted as agreeing votes.</p><p>{c?.combination?`This result uses ${c.combination.permutation.max??60}% votes, ${c.combination.reviewer.max??20}% reviewer and ${c.combination.code.max??20}% code when all components are available.`:'New reviews use 60% votes, 30% reviewer and 10% code when all components are available.'} Reviewer agreement with unresolved concerns earns half reviewer points. Statistical calibration still requires human-approved examples; these weights are not trained.</p>
       {Number.isFinite(c?.spentUsd)&&<p>Usage estimate for this finding: US ${c.spentUsd.toFixed(4)}. Not verified billing.</p>}
     </details>
   </section>;

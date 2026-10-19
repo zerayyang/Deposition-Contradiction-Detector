@@ -1,7 +1,7 @@
 import {HYBRID_VERSION} from '../../shared/hybridConfidence.js';
 
-// Two findings per wave; free plans reserve their combined cost before paid
-// steps overlap. Each finding's seven steps retain their original strict order.
+// Keep two findings busy without waiting for a paired batch. Free plans reserve
+// shared funds before paid steps; each finding keeps seven strictly ordered steps.
 export async function runConcurrentConfidence({findings,texts,caseId,allowance,fetchImpl,signal,onCheckpoint,onProgress,post}) {
   let results=findings.map(f=>({...f,hybridConfidence:{version:HYBRID_VERSION,originalType:f.type,status:'PENDING',score:null}}));
   let cursor=0,allocation=0,halt=null,saveQueue=Promise.resolve(),saveFailure=null;
@@ -31,32 +31,37 @@ export async function runConcurrentConfidence({findings,texts,caseId,allowance,f
       halt=status;
     }
   };
-  while(cursor<results.length&&!halt) {
-    if(signal?.aborted){halt='CANCELLED';break;}
-    const wave=[];
-    while(wave.length<2&&cursor<results.length&&!halt) {
-      const index=cursor,finding=results[index];
-      if(finding.labelDisagreement||!['DIRECT','INFERENTIAL','FALSE_POSITIVE'].includes(finding.type)) {
-        results[index]={...finding,hybridConfidence:{...finding.hybridConfidence,status:'REVIEW_REQUIRED'}};
-        cursor++;await save();continue;
+  const active=new Map();
+  try {
+    while((cursor<results.length||active.size)&&!halt) {
+      if(signal?.aborted){halt='CANCELLED';break;}
+      while(active.size<2&&cursor<results.length&&!halt) {
+        const index=cursor,finding=results[index];
+        if(finding.labelDisagreement||!['DIRECT','INFERENTIAL','FALSE_POSITIVE'].includes(finding.type)) {
+          results[index]={...finding,hybridConfidence:{...finding.hybridConfidence,status:'REVIEW_REQUIRED'}};
+          cursor++;await save();continue;
+        }
+        try {
+          const plan=await post(fetchImpl,'/api/confidence/plan',{caseId,texts,finding,
+            allowance:{jobId:allowance.jobId,index:allocation,approvedUsd:allowance.budgetUsd,
+              partialApproved:allowance.partialApproved===true,concurrency:2}},signal);
+          allocation++;cursor++;
+          const running=review({index,plan}).finally(()=>active.delete(index));
+          active.set(index,running);
+        } catch(error) {
+          const status=failureStatus(error);
+          // Only reconsider a free plan after an active finding settles. No
+          // paid step is retried, and the server still reserves the full cost.
+          if(status==='BUDGET_LIMIT'&&active.size)break;
+          results[index]={...finding,hybridConfidence:{...finding.hybridConfidence,status,score:null}};
+          if(status==='SOURCE_REVIEW_REQUIRED'){cursor++;await save();continue;}
+          halt=status;
+        }
       }
-      try {
-        const plan=await post(fetchImpl,'/api/confidence/plan',{caseId,texts,finding,
-          allowance:{jobId:allowance.jobId,index:allocation,approvedUsd:allowance.budgetUsd,
-            partialApproved:allowance.partialApproved===true,concurrency:2}},signal);
-        allocation++;cursor++;wave.push({index,plan});
-      } catch(error) {
-        const status=failureStatus(error);
-        // Another reserved finding may release unused funds when this wave
-        // finishes. Defer this free preview once; never retry a paid step.
-        if(status==='BUDGET_LIMIT'&&wave.length)break;
-        results[index]={...finding,hybridConfidence:{...finding.hybridConfidence,status,score:null}};
-        if(status==='SOURCE_REVIEW_REQUIRED'){cursor++;await save();continue;}
-        halt=status;
-      }
+      if(active.size)await Promise.race(active.values());
     }
-    await Promise.all(wave.map(review)); // Drain in-flight work before returning saved results.
-  }
+  } catch(error) { saveFailure=error;halt='INCOMPLETE'; }
+  await Promise.all(active.values()); // Drain started requests even when a save fails.
   if(signal?.aborted)halt='CANCELLED';
   if(saveFailure)throw saveFailure;
   if(halt)results=results.map(f=>['PENDING','INCOMPLETE'].includes(f.hybridConfidence.status)?

@@ -32,6 +32,7 @@ test('two findings overlap while each keeps seven ordered steps and the same tot
   const result=await runAutomaticConfidence({findings:Array.from({length:4},finding),texts,caseId:'synthetic',allowance,...t,concurrency:2,
     onCheckpoint:async snapshot=>{snapshots.push(snapshot);await Promise.resolve();}});
   assert.equal(result.status,'FINISHED');assert.equal(result.checked,4);assert.equal(t.calls(),28);
+  assert.ok(result.results.every(f=>f.hybridConfidence.combination.code.max===10));
   assert.equal(t.peak(),2);assert.equal(t.active(),0);
   const jobs=Map.groupBy(t.history.filter(h=>h.endpoint==='step'),h=>h.jobId);
   for(const steps of jobs.values())assert.deepEqual(steps.map(s=>s.step),[0,1,2,3,4,5,6]);

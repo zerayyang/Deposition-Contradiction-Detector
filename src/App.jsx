@@ -272,7 +272,7 @@ function Dashboard({ session }) {
       const body=reviewRequestBody(source,{caseId:activeId,local,resumeJobId,resumeCloud});
       const plan=await previewAnalysis(body,{signal:controller.signal,fetchImpl:apiFetch});
       if(!Number.isInteger(plan.requestCount)||plan.requestCount<1||typeof plan.id!=="string")throw new Error("The server returned an invalid analysis plan.");
-      const confidenceAllowance=await prepareConfidenceAllowance({caseId:activeId,texts:source.texts},{signal:controller.signal,fetchImpl:apiFetch});
+      const confidenceAllowance=await prepareConfidenceAllowance({caseId:activeId,texts:source.texts,requestProfile:'compact-v1'},{signal:controller.signal,fetchImpl:apiFetch});
       setPendingPlan({plan:withSuggestedReviewBudget(plan),body,id:activeId,snapshot:source,confidenceAllowance});
     } catch(err) {if(err.name !== "AbortError") setError(err.message);}
     finally {setPreparing(false);}

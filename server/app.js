@@ -32,7 +32,7 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   const storageRequest=/^\/analysis\/jobs(?:\/|$)/.test(req.path);
   if(storageRequest||req.method==='POST'&&/^\/cloud\/[^/]+\/[^/]+\/(start|step)$/.test(req.path)||req.method==='POST'&&['/analysis/plan','/analyze','/analyze/stream','/confidence/plan','/confidence/step','/confidence/allowance'].includes(req.path)){
    const gate=storageRequest?recoveryAdmission:admission;
-   try{await gate.run(req.identity.id,()=>new Promise(resolve=>{const done=()=>{res.off('finish',done);res.off('close',done);resolve();};res.once('finish',done);res.once('close',done);next();}),{ownerLimit:req.path==='/confidence/step'?Math.min(2,maxConcurrentAnalyses):1});}
+   try{await gate.run(req.identity.id,()=>new Promise(resolve=>{const done=()=>{res.off('finish',done);res.off('close',done);resolve();};res.once('finish',done);res.once('close',done);next();}),{ownerLimit:['/confidence/step','/confidence/plan'].includes(req.path)?Math.min(2,maxConcurrentAnalyses):1});}
    catch(e){if(!res.headersSent)res.status(e.status??500).set('Retry-After','30').json({error:e.status?e.message:'Analysis could not start.'});}
    return;
   }

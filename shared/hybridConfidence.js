@@ -2,23 +2,34 @@
 export const HYBRID_VERSION = 'hybrid-confidence-v1';
 export const CONFIDENCE_LABELS = ['DIRECT', 'INFERENTIAL', 'FALSE_POSITIVE'];
 export const FEATURE_NAMES = ['agreement', 'reviewerAgrees', 'reviewerObjects', 'ruleSupported', 'ruleStrength'];
+export const CURRENT_COMBINATION_METHOD = 'fixed-weight-v2';
+
+// Display ranges chosen for readability, not empirically calibrated accuracy.
+export function confidenceLabel(score,{reviewerAgrees}={}) {
+  if(!Number.isFinite(score)||score<0||score>100)return null;
+  if(score<50)return 'Low confidence';
+  if(score<75||reviewerAgrees===false)return 'Not sure';
+  return score>=90?'Very confident':'Confident';
+}
 
 // Provisional, explicitly chosen weights; this is an index, not fitted probability calibration.
-export function combineConfidence({originalType,agreement,reviewer,evidence}) {
+export function combineConfidence({originalType,agreement,reviewer,evidence,method='fixed-weight-v1'}) {
+  const reviewerMax=method===CURRENT_COMBINATION_METHOD?30:20;
+  const codeMax=method===CURRENT_COMBINATION_METHOD?10:20;
   const permutation=60*agreement;
-  const review=reviewer.type===originalType?(reviewer.objections.length?10:20):0;
+  const review=reviewer.type===originalType?reviewerMax*(reviewer.objections.length ? 0.5 : 1):0;
   const known=['CONFLICT_SUPPORTED','COMPATIBLE_SUPPORTED'].includes(evidence.status)||evidence.ruleSupported===true;
   const matches=originalType==='FALSE_POSITIVE'?evidence.status==='COMPATIBLE_SUPPORTED':evidence.status==='CONFLICT_SUPPORTED'||evidence.ruleSupported===true;
   const strength=originalType==='FALSE_POSITIVE'?1:evidence.ruleStrength;
-  const code=known?matches?20*Math.max(0,Math.min(1,Number.isFinite(strength)?strength:0)):0:null;
+  const code=known?matches?codeMax*Math.max(0,Math.min(1,Number.isFinite(strength)?strength:0)):0:null;
   // Unsupported code coverage is unknown, not evidence the category is wrong.
-  const available=code===null?80:100;
+  const available=code===null?60+reviewerMax:100;
   return {score:Math.round(100*(permutation+review+(code??0))/available),
-    scoreKind:'EXPERIMENTAL_INDEX',combination:{method:'fixed-weight-v1',trained:false,
-      permutation:{points:permutation,max:60},reviewer:{points:review,max:20},code:{points:code,max:20},availablePoints:available}};
+    scoreKind:'EXPERIMENTAL_INDEX',combination:{method,trained:false,
+      permutation:{points:permutation,max:60},reviewer:{points:review,max:reviewerMax},code:{points:code,max:codeMax},availablePoints:available}};
 }
 
-export function summarizeConfidence({originalType, votes = [], reviewer, evidence, calibration} = {}) {
+export function summarizeConfidence({originalType, votes = [], reviewer, evidence, calibration,combinationMethod='fixed-weight-v1'} = {}) {
   const base = {version: HYBRID_VERSION, originalType, score: null, logprobs: 'UNAVAILABLE', expectedVotes: 6};
   if (!CONFIDENCE_LABELS.includes(originalType)) return {...base, status: 'REVIEW_REQUIRED'};
   if (evidence?.sourcesVerified !== true) return {...base, status: 'SOURCE_REVIEW_REQUIRED'};
@@ -41,7 +52,10 @@ export function summarizeConfidence({originalType, votes = [], reviewer, evidenc
   if (features[4] < 0 || features[4] > 1) return {...result, status: 'INVALID_EVIDENCE'};
   const signals = {...result, features: Object.fromEntries(FEATURE_NAMES.map((k, i) => [k, features[i]])),
     reviewerAgrees: reviewer.type === originalType, objections: [...reviewer.objections]};
-  if (!calibration) return {...signals,...combineConfidence({originalType,agreement:agreeing/6,reviewer,evidence}),status:'EXPERIMENTAL'};
+  if (!calibration) {
+    if(!['fixed-weight-v1',CURRENT_COMBINATION_METHOD].includes(combinationMethod))return {...signals,status:'INVALID_COMBINATION'};
+    return {...signals,...combineConfidence({originalType,agreement:agreeing/6,reviewer,evidence,method:combinationMethod}),status:'EXPERIMENTAL'};
+  }
   if (calibration.version !== HYBRID_VERSION || calibration.target !== 'ORIGINAL_TYPE_CORRECT' ||
       !calibration.datasetId || calibration.featureNames?.join('|') !== FEATURE_NAMES.join('|') ||
       !Array.isArray(calibration.weights) || calibration.weights.length !== FEATURE_NAMES.length ||
