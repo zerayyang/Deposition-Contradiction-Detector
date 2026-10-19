@@ -30,7 +30,7 @@ export function testimonyMarkers(text,options={}) {
   for(const m of text.matchAll(/^[ \t]*(?:\d+[ \t]+)?(QUESTION|ANSWER|Q|A)[ \t]*[.:][ \t]*/gim)) {
     markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role:/^(Q|QUESTION)$/i.test(m[1])?'Q':'A'});
   }
-  // Bare labels require a printed line number and uppercase Q/A.
+  // Numbered bare labels require uppercase Q/A. Unnumbered pairs are handled below.
   for(const m of text.matchAll(/^[ \t]*\d+[ \t]+([QA])(?=[ \t]|\r?$)[ \t]*/gm)) {
     if(!markers.has(m.index))markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role:m[1]});
   }
@@ -58,6 +58,26 @@ export function testimonyMarkers(text,options={}) {
   // Bare deposition citation lines are metadata boundaries even without a colon.
   for(const m of text.matchAll(/^[ \t]*(?:Dep\.|Deposition citation)[ \t]+[^\r\n]+/gim)){
     if(!markers.has(m.index))markers.set(m.index,{index:m.index,contentStart:m.index+m[0].length,role:'S',speaker:null,roleOrigin:'DOCUMENT_LABEL',roleKnown:true});
+  }
+  // Exported text can omit both printed line numbers and label punctuation.
+  // Recognize an uppercase bare Q, then its bare A only across an uninterrupted
+  // question frame. Named/court/metadata turns still break that frame. Never
+  // rewrite text or promote an isolated prose line starting with A to testimony.
+  const bare=[...text.matchAll(/^[ \t]*([QA])[ \t]+(?=\S)/gm)]
+    .filter(m=>!markers.has(m.index))
+    .map(m=>({index:m.index,contentStart:m.index+m[0].length,role:m[1],bare:true}));
+  let pendingQuestion=false;
+  for(const marker of [...markers.values(),...bare].sort((a,b)=>a.index-b.index)) {
+    if(marker.role==='Q') {
+      // A standalone Q-prefixed prose line is not transcript structure. Defer
+      // inserting a bare Q until an answer actually completes the pair.
+      pendingQuestion=marker.bare?marker:true;
+    } else if(marker.role==='A') {
+      if(pendingQuestion&&typeof pendingQuestion==='object')markers.set(pendingQuestion.index,
+        {index:pendingQuestion.index,contentStart:pendingQuestion.contentStart,role:'Q'});
+      if(marker.bare&&pendingQuestion)markers.set(marker.index,{index:marker.index,contentStart:marker.contentStart,role:'A'});
+      pendingQuestion=false;
+    } else pendingQuestion=false;
   }
   const reporting=pdfReportingRanges(text,options.manifest?.pages??options.pages);
   return [...markers.values()].filter(m=>!reporting.some(r=>m.index>=r.start&&m.index<r.end)).sort((a,b)=>a.index-b.index);

@@ -43,12 +43,12 @@ export function estimateConfidenceReserve(texts,definitions='') {
     const answers=parseTestimonySource(text).turns.filter(t=>t.role==='WITNESS').map(t=>{
       const answer=text.slice(t.contentStart,t.end).trim();return {question:t.question?.text??'',answer,quote:answer};
     });
-    if(!answers.length)throw new Error('No identifiable witness answers.');
+    if(!answers.length)throw new Error('NO_WITNESS_ANSWERS: No identifiable witness answers.');
     const largest=answers.reduce((a,b)=>Buffer.byteLength(JSON.stringify(a))>=Buffer.byteLength(JSON.stringify(b))?a:b);
     return {count:answers.length,largest};
   });
   const context=documents.map(d=>d.largest);
-  if(Buffer.byteLength(JSON.stringify(context))>40000)throw new Error('A witness answer exceeds the confidence context limit. No text was truncated.');
+  if(Buffer.byteLength(JSON.stringify(context))>40000)throw new Error('CONFIDENCE_CONTEXT_LIMIT: A witness answer exceeds the confidence context limit. No text was truncated.');
   const pairs=documents[0].count*documents[1].count;
   const forecastFindings=Math.min(pairs,Math.max(12,Math.ceil((documents[0].count+documents[1].count)/4)));
   const perFindingBudgetUsd=confidenceRequestBudget(context,definitions).budgetUsd;
@@ -110,7 +110,14 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
         const jobId=randomUUID();
         await store.put(caseId,jobId,'confidence-allowance',{sourceHash:hash(texts),budgetUsd,expires:now()+60*60*1000,definitionDigest:hash(definitions)});
         return res.json({...estimate,jobId,budgetUsd,requestsPerFinding:7,notice:'Confidence is part of the review. Reserve includes 25% headroom; unused step reservations are released as recorded usage arrives. It is a forecast, not a guarantee of unlimited findings. No automatic paid retries or spending beyond approval.'});
-      } catch {return fail(res,400,'ALLOWANCE_UNAVAILABLE','Could not prepare the confidence allowance. No paid calls started.');}
+      } catch(error) {
+        const known=[
+          ['WITNESS_CONFIRMATION_REQUIRED','Question/answer labels could not be identified in one transcript. Use the original Q/A transcript; do not label lawyer or court speech as witness testimony. No paid calls started.'],
+          ['NO_WITNESS_ANSWERS','Questions were found but no identifiable witness answers were found in one transcript. Check that complete Q/A turns were included. No paid calls started.'],
+          ['CONFIDENCE_CONTEXT_LIMIT','A full witness answer is too large for the confidence context limit. No text was truncated. Use a shorter complete Q/A excerpt or increase the supported context limit before starting. No paid calls started.'],
+        ].find(([code])=>String(error?.message).startsWith(code+':'));
+        return fail(res,400,known?.[0]??'ALLOWANCE_UNAVAILABLE',known?.[1]??'Could not access or save the confidence allowance. Check your connection and saved case access, then try again. No paid calls started.');
+      }
     },
     async plan(req,res) {
       try {
