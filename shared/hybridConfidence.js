@@ -3,6 +3,21 @@ export const HYBRID_VERSION = 'hybrid-confidence-v1';
 export const CONFIDENCE_LABELS = ['DIRECT', 'INFERENTIAL', 'FALSE_POSITIVE'];
 export const FEATURE_NAMES = ['agreement', 'reviewerAgrees', 'reviewerObjects', 'ruleSupported', 'ruleStrength'];
 
+// Provisional, explicitly chosen weights; this is an index, not fitted probability calibration.
+export function combineConfidence({originalType,agreement,reviewer,evidence}) {
+  const permutation=60*agreement;
+  const review=reviewer.type===originalType?(reviewer.objections.length?10:20):0;
+  const known=['CONFLICT_SUPPORTED','COMPATIBLE_SUPPORTED'].includes(evidence.status)||evidence.ruleSupported===true;
+  const matches=originalType==='FALSE_POSITIVE'?evidence.status==='COMPATIBLE_SUPPORTED':evidence.status==='CONFLICT_SUPPORTED'||evidence.ruleSupported===true;
+  const strength=originalType==='FALSE_POSITIVE'?1:evidence.ruleStrength;
+  const code=known?matches?20*Math.max(0,Math.min(1,Number.isFinite(strength)?strength:0)):0:null;
+  // Unsupported code coverage is unknown, not evidence the category is wrong.
+  const available=code===null?80:100;
+  return {score:Math.round(100*(permutation+review+(code??0))/available),
+    scoreKind:'EXPERIMENTAL_INDEX',combination:{method:'fixed-weight-v1',trained:false,
+      permutation:{points:permutation,max:60},reviewer:{points:review,max:20},code:{points:code,max:20},availablePoints:available}};
+}
+
 export function summarizeConfidence({originalType, votes = [], reviewer, evidence, calibration} = {}) {
   const base = {version: HYBRID_VERSION, originalType, score: null, logprobs: 'UNAVAILABLE', expectedVotes: 6};
   if (!CONFIDENCE_LABELS.includes(originalType)) return {...base, status: 'REVIEW_REQUIRED'};
@@ -26,8 +41,7 @@ export function summarizeConfidence({originalType, votes = [], reviewer, evidenc
   if (features[4] < 0 || features[4] > 1) return {...result, status: 'INVALID_EVIDENCE'};
   const signals = {...result, features: Object.fromEntries(FEATURE_NAMES.map((k, i) => [k, features[i]])),
     reviewerAgrees: reviewer.type === originalType, objections: [...reviewer.objections]};
-  // No built-in weights: an untrained system cannot claim calibrated accuracy.
-  if (!calibration) return {...signals, status: 'UNCALIBRATED'};
+  if (!calibration) return {...signals,...combineConfidence({originalType,agreement:agreeing/6,reviewer,evidence}),status:'EXPERIMENTAL'};
   if (calibration.version !== HYBRID_VERSION || calibration.target !== 'ORIGINAL_TYPE_CORRECT' ||
       !calibration.datasetId || calibration.featureNames?.join('|') !== FEATURE_NAMES.join('|') ||
       !Array.isArray(calibration.weights) || calibration.weights.length !== FEATURE_NAMES.length ||
@@ -44,6 +58,7 @@ export function hybridBadge(result) {
   if (c?.status === 'CALIBRATED' && c.version === HYBRID_VERSION &&
       c.originalType === result.type && Number.isFinite(c.score) && c.score >= 0 && c.score <= 100 &&
       !result.labelDisagreement) return {kind: 'conflict', value: `${c.score}%`, text: 'Classification confidence'};
+  if(c?.status==='EXPERIMENTAL'&&c.version===HYBRID_VERSION&&c.originalType===result.type&&!result.labelDisagreement&&Number.isFinite(c.score)&&c.score>=0&&c.score<=100)return {kind:'agreement',value:`${c.score}%`,text:'Experimental hybrid score · not an accuracy probability'};
   if(c?.status==='UNCALIBRATED'&&c.originalType===result.type&&!result.labelDisagreement) return {kind:'agreement',value:`${c.agreeingVotes}/6`,text:'AI agreement · not calibrated accuracy'};
   return {kind: 'none', value: '—', text: 'Confidence not checked'};
 }

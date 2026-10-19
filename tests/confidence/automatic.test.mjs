@@ -23,8 +23,8 @@ test('single approved flow automatically reviews findings and keeps original ana
   assert.equal(t.calls(),0);let checkpoints=0;
   const result=await runAutomaticConfidence({findings:[original],texts,caseId:'saved',allowance,...t,onCheckpoint:async()=>{checkpoints++;}});
   assert.equal(t.calls(),7);assert.equal(result.checked,1);assert.equal(result.results[0].type,'DIRECT');
-  assert.equal(result.results[0].humanConfidence,90);assert.equal(result.results[0].hybridConfidence.score,null);
-  assert.equal(result.results[0].hybridConfidence.status,'UNCALIBRATED');assert.ok(checkpoints>=7);
+  assert.equal(result.results[0].humanConfidence,90);assert.equal(result.results[0].hybridConfidence.score,100);
+  assert.equal(result.results[0].hybridConfidence.status,'EXPERIMENTAL');assert.ok(checkpoints>=7);
 });
 test('server allowance stops later findings before paid work and exposes partial confidence coverage',async()=>{
   const t=setup();const per=prepareConfidence({finding:finding(),texts}).budgetUsd;

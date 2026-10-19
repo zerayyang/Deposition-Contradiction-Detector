@@ -41,8 +41,8 @@ test('approval, ordered steps, ownership and duplicate replay preserve seven-cal
   assert.equal(calls,0);
   let last;
   for(let step=0;step<7;step++) {last=await invoke(h.step,{...approved,step});assert.equal(last.statusCode,200);}
-  assert.equal(last.body.done,true);assert.equal(last.body.hybridConfidence.status,'UNCALIBRATED');
-  assert.equal(last.body.hybridConfidence.score,null);assert.equal(last.body.hybridConfidence.agreeingVotes,6);
+  assert.equal(last.body.done,true);assert.equal(last.body.hybridConfidence.status,'EXPERIMENTAL');
+  assert.equal(last.body.hybridConfidence.score,100);assert.equal(last.body.hybridConfidence.agreeingVotes,6);
   assert.equal(last.body.hybridConfidence.originalType,'DIRECT');assert.equal(calls,7);
   await invoke(h.step,{...approved,step:0});assert.equal(calls,7);assert.deepEqual(original,before);
 });

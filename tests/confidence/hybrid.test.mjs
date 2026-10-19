@@ -6,9 +6,9 @@ import {reviewConfidence} from '../../server/confidence/review.js';
 const input = () => ({originalType: 'DIRECT', evidence: {sourcesVerified: true, ruleSupported: true, ruleStrength: 1},
   reviewer: {status: 'SUCCESS', type: 'DIRECT', objections: []},
   votes: Array.from({length: 6}, (_, i) => ({model: i < 3 ? 'a' : 'b', permutation: i % 3, status: 'SUCCESS', type: i === 5 ? 'INFERENTIAL' : 'DIRECT'}))});
-test('five of six is agreement only, never an invented calibrated percentage', () => {
+test('five of six feeds a clearly experimental combined index', () => {
   const r = summarizeConfidence(input());
-  assert.equal(r.agreement, 5 / 6); assert.equal(r.score, null); assert.equal(r.status, 'UNCALIBRATED');
+  assert.equal(r.agreement, 5 / 6); assert.equal(r.score,90);assert.equal(r.scoreKind,'EXPERIMENTAL_INDEX');assert.equal(r.combination.trained,false);assert.equal(r.status,'EXPERIMENTAL');
 });
 test('invalid sources block even unanimous votes', () => {
   const i = input(); i.evidence.sourcesVerified = false;
@@ -40,7 +40,7 @@ test('seven mocked reviews neither alter findings nor disclose votes or label to
   const result = await reviewConfidence({finding, evidence: input().evidence, models: ['a', 'b'], context: {pair: 'synthetic'},
     classify: async request => {calls++; assert.equal(request.originalType, undefined); assert.equal(request.votes, undefined); return {type: 'DIRECT'};},
     review: async request => {calls++; assert.equal(request.votes, undefined); return {type: 'DIRECT', objections: []};}});
-  assert.equal(calls, 7); assert.deepEqual(finding, before); assert.equal(result.score, null);
+  assert.equal(calls, 7); assert.deepEqual(finding, before); assert.equal(result.score,100);
 });
 test('source failure makes zero calls and cancellation stops further work', async () => {
   let calls = 0; const controller = new AbortController();
@@ -54,4 +54,18 @@ test('a failed transport is visible and never automatically retried', async () =
   const r = await reviewConfidence({finding: {type: 'DIRECT'}, models: ['a', 'b'], context: {}, evidence: input().evidence,
     classify: async () => {calls++; throw new Error('synthetic');}, review: async () => ({type: 'DIRECT', objections: []})});
   assert.equal(calls, 6); assert.equal(r.status, 'INCOMPLETE'); assert.equal(r.score, null);
+});
+
+test('reviewer disagreement, concerns and code evidence each influence the combined index',()=>{
+  const i=input();assert.equal(summarizeConfidence(i).score,90);
+  i.reviewer.objections=['Context needs review'];assert.equal(summarizeConfidence(i).score,80);
+  i.reviewer.type='FALSE_POSITIVE';assert.equal(summarizeConfidence(i).score,70);
+  i.evidence={sourcesVerified:true,status:'COMPATIBLE_SUPPORTED',ruleStrength:0};assert.equal(summarizeConfidence(i).score,50);
+});
+test('unsupported code is excluded explicitly and compatibility supports a false-positive category',()=>{
+  const i=input();i.evidence={sourcesVerified:true,status:'NOT_EVALUABLE',ruleStrength:0};
+  const r=summarizeConfidence(i);assert.equal(r.score,88);assert.equal(r.combination.code.points,null);assert.equal(r.combination.availablePoints,80);
+  i.originalType='FALSE_POSITIVE';i.reviewer={status:'SUCCESS',type:'FALSE_POSITIVE',objections:[]};
+  i.votes=i.votes.map(v=>({...v,type:'FALSE_POSITIVE'}));i.evidence.status='COMPATIBLE_SUPPORTED';
+  assert.equal(summarizeConfidence(i).score,100);assert.equal(summarizeConfidence(i).combination.code.points,20);
 });

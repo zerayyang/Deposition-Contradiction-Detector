@@ -1,3 +1,20 @@
+# Current combined score — experimental
+
+Completed reviews now return EXPERIMENTAL with a numeric combined index in the ring.
+The fixed-weight combiner runs in deterministic code: permutation agreement × 60 points;
+reviewer agreement without concerns 20 points (with concerns 10; disagreement 0);
+category-aligned deterministic code support up to 20 points, using rule strength for conflicts.
+Code-supported compatibility earns code support for FALSE_POSITIVE. Contrary code earns zero.
+Unsupported code is unknown and excluded: available denominator 80 instead of 100.
+Score = round(100 × earned points / available points). Invalid sources or incomplete required
+votes/reviewer still return no score. Analysis categories and old evidence scores are unchanged.
+
+Example: 5/6 votes → 50; reviewer agrees → 20; full supporting code → 20; combined 90/100.
+The percent sign is presentation of a 0–100 index, NOT a probability of correctness. Details
+show every contribution and coverage. These explicit provisional weights are not statistically
+trained. Supplied validated calibration coefficients remain a separate optional code path;
+no trained artifact is configured. Human-approved examples are still needed for calibration.
+
 # Hybrid classification confidence
 
 Scope: confidence in the ORIGINAL returned category only. Discovery, classification, literal validation,
@@ -33,8 +50,8 @@ The server limits a confidence plan to the lower of its configured budget and US
 UTF-8 input estimates are local assumptions, not verified bills. Missing usage reserves that
 step's full budget; normal token usage is recorded. Completed votes save automatically with the finding; private hosted checkpoints are written after each step.
 A request whose outcome was not received must be inspected before a newly approved paid run.
-Statistical calibration fitting and evaluation remain unfinished; all live runs return null numeric
-confidence and show vote agreement, reviewer concerns and usage estimates instead.
+Statistical calibration fitting and evaluation remain unfinished; completed live runs now return an experimental combined index, with contribution details and
+usage estimates. No claim of calibrated accuracy is made.
 
 ## Worked numbers (fictional, not observed model outcomes)
 
@@ -44,7 +61,7 @@ Feature vector: [5/6, 1, 0, 1, 1]. There are no production calibration coefficie
 For arithmetic illustration ONLY, intercept -1 and weights [3, .5, -1, .25, .25] yield
 z = -1 + 3*(5/6) + .5 + .25 + .25 = 2.5; sigmoid(z) = .9241, rounded 92%.
 Those synthetic weights exist in a unit test only. They must NEVER be used as production calibration.
-Actual UI shows no final confidence percentage until independently evaluated calibration is supplied.
+The current UI uses the separate provisional combined index above; the synthetic logistic coefficients are never used live.
 
 Chicken versus chicken and salad: mock FALSE_POSITIVE, 6/6 agree; this is 100% agreement, not certainty.
 Around eight versus around eight thirty with unclear event/period: mock split 3/6, reviewer objects.
@@ -81,7 +98,7 @@ No assertion of calibrated accuracy, model quality, complete coverage or witness
 The finding view shows a prominent AI agreement card, separate reviewer concerns and optional
 explanation. Old numeric evidence displays and separate confidence-start controls are removed from
 UI only; stored evidence fields and scoring code stay intact for compatibility and audit.
-The finding list shows vote counts for finished uncalibrated reviews, never a fabricated percentage.
+The finding list and ring show the combined experimental index for completed reviews; old agreement-only results remain distinguishable.
 Existing saved findings stay readable and say Not checked until included in a newly approved review.
 The approved allowance is tied to both source documents and expires after one hour; a changed source,
 expired allowance or incomplete prior finding blocks new allocations without hidden paid retries.

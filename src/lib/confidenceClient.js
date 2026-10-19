@@ -40,5 +40,5 @@ export async function runAutomaticConfidence({findings,texts,caseId,allowance,fe
   }
   if(halt)results=results.map(f=>f.hybridConfidence.status==='PENDING'?{...f,hybridConfidence:{...f.hybridConfidence,status:halt,score:null}}:f);
   await save();
-  return {results,status:halt??'FINISHED',checked:results.filter(f=>['UNCALIBRATED','CALIBRATED'].includes(f.hybridConfidence.status)).length};
+  return {results,status:halt??'FINISHED',checked:results.filter(f=>['EXPERIMENTAL','UNCALIBRATED','CALIBRATED'].includes(f.hybridConfidence.status)).length};
 }
