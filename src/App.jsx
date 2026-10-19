@@ -1,4 +1,4 @@
-import {resumableCloudJobId} from './lib/cloudAnalysisClient.js';
+import {reviewRequestBody} from './lib/reviewPlan.js';
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import RecoveryPanel from "./RecoveryPanel.jsx";
 import { recoveredDraft, recoveryRequest, beginAnalysisDraft, checkpointSaveWarning } from "./lib/recovery.js";
@@ -8,9 +8,9 @@ import AuthGate from "./SupabaseCases.jsx";
 import { supabase } from "./lib/supabaseClient.js";
 import { readTranscriptDocument } from "./lib/readTranscript.js";
 import {prepareConfidenceAllowance,runAutomaticConfidence} from "./lib/confidenceClient.js";
-import { analysisBody, previewAnalysis, runAnalysis } from "./lib/analysisClient.js";
+import { previewAnalysis, runAnalysis } from "./lib/analysisClient.js";
 import { checkFileBudget } from "../shared/documentLimits.js";
-import { documentMetadata, createDocumentStore } from "./lib/documentStore.js";
+import { createDocumentStore } from "./lib/documentStore.js";
 import { createCaseStore } from "./lib/caseStore.js";
 import { createLocalCaseStore, createLocalDocumentStore, indexedDbKv } from "./lib/localStores.js";
 import { ReviewCard } from "./ReviewCard.jsx";
@@ -244,14 +244,14 @@ function Dashboard({ session }) {
     const { error: failure } = await supabase.auth.signOut();
     if (failure) setCaseError(failure.message);
   }
-  async function prepareAnalysis(resumeJobId=null,recoveryRecord=null) {
+  async function prepareAnalysis(resumeJobId=null,recoveryRecord=null,{resumeCloud=false}={}) {
     if(blocked || inFlight.current) return;
     if(activeId === "sample") { setError("Save this sample as a case before analyzing."); return; }
     setPreparing(true); setError("");
     const controller = new AbortController(); request.current = controller;
     try {
       const source=recoveryRecord?recoveredDraft(draft,recoveryRecord):draft;
-      const body={...analysisBody(source.texts,source.files),caseId:activeId,...(local?{}:{useApprovedMemory:true}),witnessTestimonyConfirmed:source.texts.map(()=>true),originalDocuments:source.files.map(documentMetadata),...(resumeJobId?{resumeJobId}:{}),...(resumableCloudJobId(source.analysis)?{cloudJobId:resumableCloudJobId(source.analysis)}:{})};
+      const body=reviewRequestBody(source,{caseId:activeId,local,resumeJobId,resumeCloud});
       const plan=await previewAnalysis(body,{signal:controller.signal,fetchImpl:apiFetch});
       if(!Number.isInteger(plan.requestCount)||plan.requestCount<1||typeof plan.id!=="string")throw new Error("The server returned an invalid analysis plan.");
       const confidenceAllowance=await prepareConfidenceAllowance({caseId:activeId,texts:source.texts,budgetUsd:2},{signal:controller.signal,fetchImpl:apiFetch});
@@ -378,7 +378,7 @@ function Dashboard({ session }) {
             {draft.dirty && <small className="muted">Unsaved · click Save to keep notes</small>}
             {local ? <p className="muted lawyer-review-note">Sign in to suggest a different label.</p> : <CorrectionForm key={`${activeId}-${selected.index}-${selected.result.type}-${selected.result.claim1?.original}-${selected.result.claim2?.original}`} client={supabase} caseId={activeId} finding={selected.result} findingIndex={selected.index} disabled={blocked} saved={activeId!=="sample"&&!draft.dirty} />}
           </section></> : <div className="detail-empty"><div className="empty-document">≋</div><span className="eyebrow">THE FULL PICTURE</span><h2>Two accounts.<br/>One clear workspace.</h2><p>Select a finding to see the source quotes, AI explanation and independent code verification together.</p><div className="empty-steps"><span>01 &nbsp; Add testimony</span><span>02 &nbsp; Compare accounts</span><span>03 &nbsp; Review evidence</span></div></div>}</div></section>
-      {["failed","partial","cancelled"].includes(draft.analysis?.status)&&!unscoredOnlyCount(draft.analysis)&&<RecoveryPanel caseId={activeId} disabled={blocked} fetchImpl={apiFetch} onRecover={recoverAnalysis} onResume={prepareAnalysis} cloudJobId={draft.analysis?.cloudJobId} onCloudRecover={async result=>{const next={...draft,results:result.contradictions,analysis:result.analysis,dirty:true};updateDraft(activeId,next);await persist(activeId,next);}} />}
+      {["failed","partial","cancelled"].includes(draft.analysis?.status)&&!unscoredOnlyCount(draft.analysis)&&<RecoveryPanel caseId={activeId} disabled={blocked} fetchImpl={apiFetch} onRecover={recoverAnalysis} onResume={(jobId,record)=>prepareAnalysis(jobId,record,{resumeCloud:!jobId})} cloudJobId={draft.analysis?.cloudJobId} onCloudRecover={async result=>{const next={...draft,results:result.contradictions,analysis:result.analysis,dirty:true};updateDraft(activeId,next);await persist(activeId,next);}} />}
     </main>
   </div>;
 }
