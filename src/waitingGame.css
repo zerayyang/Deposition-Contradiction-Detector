@@ -1,0 +1,24 @@
+/* Mini game docked at the bottom-right while an analysis runs. */
+.waiting-game{--game-ground:#c7d2d8;--game-paper:#ffffff;--game-lines:#dfe6ea;--game-ink:#8a9aa5;--game-player:#126e70;
+  position:fixed;right:max(20px,env(safe-area-inset-right,0px));bottom:max(20px,env(safe-area-inset-bottom,0px));z-index:40;width:min(420px,calc(100vw - 40px));
+  border-radius:18px;background:rgba(250,251,252,.97);box-shadow:0 18px 44px rgba(20,40,55,.22),0 0 0 1px rgba(20,40,55,.08);overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;animation:waiting-in .25s cubic-bezier(.2,.8,.2,1)}
+.waiting-game header{display:flex;align-items:center;gap:10px;padding:10px 12px 8px 16px}
+.waiting-game header b{font-size:14px;color:#203346}
+.waiting-game header span{flex:1;font-size:12px;color:#6b7c88}
+.waiting-close{width:28px;height:28px;padding:0;border-radius:50%;background:#eef2f5;color:#4a5c68;font-size:18px;line-height:1;box-shadow:none}
+.waiting-close:hover:enabled{background:#e1e7ec}
+.waiting-stage{position:relative;cursor:pointer;touch-action:manipulation;user-select:none}
+.waiting-stage canvas{display:block;width:100%;height:auto;background:linear-gradient(#f7fafb,#eef3f5)}
+.waiting-score{position:absolute;top:8px;right:12px;font:600 15px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#3d4f5b;text-align:right;font-variant-numeric:tabular-nums}
+.waiting-score small{display:block;font-size:10px;color:#8b9aa4}
+.waiting-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;background:rgba(247,250,251,.72);backdrop-filter:blur(2px)}
+.waiting-overlay b{font-size:16px;color:#203346}
+.waiting-overlay span{font-size:13px;color:#5d6f80}
+.waiting-overlay.done{background:rgba(247,250,251,.9)}
+.waiting-overlay.done b{color:#126e70;font-size:18px}
+.waiting-overlay button{margin-top:8px;padding:8px 18px;border-radius:999px;background:#126e70;color:#fff;font-size:14px}
+.bored-button{padding:8px 14px;border-radius:999px;background:#fff6df;color:#7a4b00;border:1px solid #f1dca6;box-shadow:none;font-size:13px;font-weight:600}
+.bored-button:hover:enabled{background:#ffefc4}
+@keyframes waiting-in{from{opacity:0;transform:translateY(12px) scale(.97)}}
+@media (prefers-reduced-motion:reduce){.waiting-game{animation:none}}

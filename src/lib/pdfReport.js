@@ -41,7 +41,7 @@ function card({ f, index, kind }, n, options, draft) {
     return `<figure><figcaption>Transcript ${i + 1}${where.length ? ` · Page ${escape(where.join(", "))}` : ""}</figcaption><blockquote>“${escape(f[key]?.original ?? "Quote unavailable")}”</blockquote></figure>`;
   }).join("");
   const reasoning = String(f.reasoning ?? "").replace(/(?:neutral\s+|possible\s+)?follow[- ]up(?:\s+question)?\s*:[\s\S]*$/i, "").trim();
-  const explanation = options.fullExplanations ? reasoning : firstSentence(reasoning);
+  const explanation = options.fullExplanations ? reasoning : firstSentence(reasoning, 600);
   const ask = askQuestion(f.reasoning);
   const note = String(draft.notes?.[index] ?? "").trim();
   const score = badge(f), rule = shortRule(f.typeRule);
