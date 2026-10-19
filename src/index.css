@@ -87,3 +87,17 @@
 .feedback-list button[aria-pressed=true]{background:#e3f3ef;color:#126e70}
 .feedback-error{color:#b42318;font-weight:600}
 .lessons-note{color:#126e70;font-weight:650}
+.login-tabs{display:flex;gap:4px;padding:4px;margin-bottom:18px;border-radius:10px;background:#eef3f6}
+.login-tabs button{flex:1;padding:9px 12px;background:none;color:#5d6f80;box-shadow:none;font-size:13px}
+.login-tabs button:hover:enabled{background:#e3eaef}
+.login-tabs button.active{background:white;color:#203346;box-shadow:0 1px 3px #1b344622}
+.admin-portal{max-width:980px;margin:0 auto;padding:28px 24px 60px;min-height:100vh}
+.admin-header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.admin-brand{display:flex;align-items:center;gap:14px}
+.admin-brand h1{margin:2px 0 0;font-size:30px}
+.admin-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.admin-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;list-style:none;padding:0;margin:0 0 6px;counter-reset:step}
+.admin-steps li{margin:0;padding:12px 14px;border-radius:12px;background:white;border:1px solid #dce5eb;font-size:13px;color:#5d6f80}
+.admin-steps b{color:#203346}
+.admin-portal .feedback-inbox{margin:14px 0}
+@media(max-width:700px){.admin-steps{grid-template-columns:1fr}}

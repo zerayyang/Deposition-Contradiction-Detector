@@ -13,7 +13,9 @@ import { documentMetadata, createDocumentStore } from "./lib/documentStore.js";
 import { createCaseStore } from "./lib/caseStore.js";
 import { createLocalCaseStore, createLocalDocumentStore, indexedDbKv } from "./lib/localStores.js";
 import { ReviewCard } from "./ReviewCard.jsx";
-import { CorrectionForm, FeedbackInbox } from "./FeedbackReview.jsx";
+import { CorrectionForm } from "./FeedbackReview.jsx";
+import AdminPortal from "./AdminPortal.jsx";
+import { chosenPortal } from "./lib/portal.js";
 import { scoreBadge } from "./lib/scoreBadge.js";
 import { findingTitle, shortRule } from "./lib/shortLabels.js";
 import { TRANSCRIPT_1, TRANSCRIPT_2 } from "./sampleTranscripts.js";
@@ -100,7 +102,6 @@ function Dashboard({ session }) {
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("ALL");
-  const [showFeedback, setShowFeedback] = useState(false);
   // The transcript text panel is open by default; each viewer's choice is remembered in this browser.
   const [showTranscripts, setShowTranscripts] = useState(() => { try { return localStorage.getItem("showTranscripts") !== "0"; } catch { return true; } });
   function toggleTranscripts() { setShowTranscripts(open => { try { localStorage.setItem("showTranscripts", open ? "0" : "1"); } catch { /* storage unavailable */ } return !open; }); }
@@ -340,8 +341,7 @@ function Dashboard({ session }) {
       {caseError && <p className="sidebar-error" role="alert">{caseError}</p>}
       <div className="sidebar-footer"><div className="account-avatar">{session.user.email?.slice(0,2).toUpperCase()}</div><div><span className="account-email">{session.user.email}</span>{local?<span className="muted">No-account mode · saved in this browser</span>:<button className="link-button" disabled={blocked} onClick={signOut}>Sign out</button>}</div></div>
     </aside>
-    <main className="workspace-main"><header className="workspace-header"><div><div className="case-title"><h1>{caseTitle}</h1></div></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save as case" : "Save"}</button>{!local && <button className="secondary-button" onClick={() => setShowFeedback(open => !open)}>{showFeedback ? "Close corrections" : "Corrections"}</button>}{activeId !== "sample" && <button className="secondary-button" disabled={blocked} onClick={renameCase}>Rename</button>}{activeId !== "sample" && <button className="secondary-button danger" disabled={blocked} onClick={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }}>Delete</button>}</div></header>
-      {!local && showFeedback && <FeedbackInbox client={supabase} userId={session.user.id} onClose={() => setShowFeedback(false)} />}
+    <main className="workspace-main"><header className="workspace-header"><div><div className="case-title"><h1>{caseTitle}</h1></div></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save as case" : "Save"}</button>{activeId !== "sample" && <button className="secondary-button" disabled={blocked} onClick={renameCase}>Rename</button>}{activeId !== "sample" && <button className="secondary-button danger" disabled={blocked} onClick={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }}>Delete</button>}</div></header>
       {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review before paid analysis</h2><p className="muted">Starting sends both transcripts to Anthropic for analysis. Borderline findings get one small double-check request afterwards (usually under $0.10, at most about $0.35).</p><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p>{pendingPlan.plan.lessons?.used>0&&<p className="lessons-note">Uses {pendingPlan.plan.lessons.used} approved lesson{pendingPlan.plan.lessons.used===1?'':'s'} from past corrections.</p>}{pendingPlan.plan.lessons?.notice&&<p className="muted">{pendingPlan.plan.lessons.notice}</p>}{pendingPlan.plan.execution==='durable-steps'&&<label>Maximum spend for this review (US$)<input aria-label="Maximum review spend" disabled={pendingPlan.plan.budgetFixed} type="number" min="0.01" step="0.01" value={pendingPlan.plan.approvedBudgetUsd??pendingPlan.plan.cost.conservativeBudget} onChange={e=>setPendingPlan(old=>({...old,plan:{...old.plan,approvedBudgetUsd:Number(e.target.value)}}))}/><small>A lower cap can stop with partial coverage. Completed work is kept.</small></label>}<p>{pendingPlan.plan.resuming?"Only unfinished comparisons will run again. Previously completed comparisons are retained.":"Every section is compared across both documents, including differently ordered sections."} Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start {pendingPlan.plan.requestCount} paid request{pendingPlan.plan.requestCount===1?'':'s'}</button></div>}
       <section className="documents-toolbar" aria-label="Transcript documents">{draft.files.some(Boolean)&&<button className="collapse-toggle" aria-expanded={showTranscripts} onClick={toggleTranscripts}>{showTranscripts?"▾":"▸"} Transcripts</button>}{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}<div className="analyze-block"><button className="analyze-button" disabled={blocked} onClick={()=>prepareAnalysis()}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : draft.results ? "Analyze again" : "Analyze"}</button>{loading&&<p role="status">◌ {elapsed}s elapsed · {analysisProgress}</p>}{(loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div></section>
       {showTranscripts&&draft.files.some(Boolean)&&<section className="transcript-previews" aria-label="Transcript text">{draft.texts.map((text,i)=>draft.files[i]?<div key={i}><span className="eyebrow">Transcript {i+1} · {draft.files[i].name}</span><pre tabIndex={0}>{text}</pre></div>:null)}</section>}
@@ -368,6 +368,10 @@ function Dashboard({ session }) {
     </main>
   </div>;
 }
+// Admin sign-in opens only the review portal; lawyer sign-in opens the case workspace.
+function Portal({ session }) {
+  return !session.local && chosenPortal() === "admin" ? <AdminPortal session={session} /> : <Dashboard session={session} />;
+}
 export default function App() {
-  return <AuthGate>{session => <Dashboard key={session.user.id} session={session} />}</AuthGate>;
+  return <AuthGate>{session => <Portal key={session.user.id} session={session} />}</AuthGate>;
 }

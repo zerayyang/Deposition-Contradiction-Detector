@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "./lib/supabaseClient.js";
 import { LOCAL_SESSION, localModeEnabled } from "./lib/localStores.js";
+import { chosenPortal, choosePortal } from "./lib/portal.js";
 
 function SignIn() {
   const [signup, setSignup] = useState(false);
+  const [admin, setAdmin] = useState(() => chosenPortal() === "admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -18,6 +20,7 @@ function SignIn() {
     setBusy(true); setError(""); setMessage("");
     try {
       const credentials = { email: email.trim(), password };
+      choosePortal(admin ? "admin" : "workspace");
       const { data, error: failure } = signup
         ? await supabase.auth.signUp({ ...credentials, options: { emailRedirectTo: window.location.origin } })
         : await supabase.auth.signInWithPassword(credentials);
@@ -28,14 +31,17 @@ function SignIn() {
     finally { submitting.current = false; setBusy(false); }
   }
 
-  return <main className="login-page"><div className="login-intro"><div className="brand-mark">D</div><span className="eyebrow">DEPOSITION WORKSPACE</span><h1>Clarity in<br/>every account.</h1><p>Compare testimony. Trace the evidence.<br/>Review every finding in context.</p><div className="login-caption">Your testimony review, together in one workspace.</div></div><section className="login-card"><span className="eyebrow">WELCOME</span>
-    <h2>{signup ? "Create your account" : "Welcome back"}</h2>
-    <p>{signup ? "Create an account to start reviewing testimony." : "Sign in to open your case workspace."}</p>
+  return <main className="login-page"><div className="login-intro"><div className="brand-mark">D</div><span className="eyebrow">DEPOSITION WORKSPACE</span><h1>Clarity in<br/>every account.</h1><p>Compare testimony. Trace the evidence.<br/>Review every finding in context.</p><div className="login-caption">Your testimony review, together in one workspace.</div></div><section className="login-card">
+    <div className="login-tabs" role="tablist" aria-label="Sign in as"><button type="button" role="tab" aria-selected={!admin} className={!admin ? "active" : ""} onClick={() => { setAdmin(false); setError(""); }}>Lawyer</button><button type="button" role="tab" aria-selected={admin} className={admin ? "active" : ""} onClick={() => { setAdmin(true); setSignup(false); setError(""); }}>Admin</button></div>
+    <span className="eyebrow">{admin ? "ADMIN PORTAL" : "WELCOME"}</span>
+    <h2>{admin ? "Admin sign in" : signup ? "Create your account" : "Welcome back"}</h2>
+    <p>{admin ? "Review lawyer corrections and approve lessons." : signup ? "Create an account to start reviewing testimony." : "Sign in to open your case workspace."}</p>
     <form className="cloud-form" onSubmit={submit}>
       <label>Email<input type="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} required /></label>
       <label>Password<input type="password" autoComplete={signup ? "new-password" : "current-password"} minLength={signup ? 8 : undefined} value={password} onChange={event => setPassword(event.target.value)} required /></label>
-      <button disabled={busy}>{busy ? "Please wait…" : signup ? "Create account" : "Sign in"}</button>
-      <button type="button" disabled={busy} onClick={() => { setSignup(!signup); setError(""); setMessage(""); }}>{signup ? "Already have an account?" : "Create an account"}</button>
+      <button disabled={busy}>{busy ? "Please wait…" : admin ? "Sign in to admin portal" : signup ? "Create account" : "Sign in"}</button>
+      {!admin && <button type="button" disabled={busy} onClick={() => { setSignup(!signup); setError(""); setMessage(""); }}>{signup ? "Already have an account?" : "Create an account"}</button>}
+      {admin && <small className="muted">Admin accounts are set up by the database owner.</small>}
     </form>
     {error && <p role="alert" className="error">{error}</p>}
     {message && <p role="status">{message}</p>}

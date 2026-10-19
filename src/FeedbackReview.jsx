@@ -70,16 +70,19 @@ function ProposalReview({client,proposal,userId,onUpdated}){
  </article>;
 }
 
-export function FeedbackInbox({client,userId,onClose}){
+// adminView: the admin portal shows only reviews assigned to this account, with no inbox header.
+export function FeedbackInbox({client,userId,onClose,adminView=false}){
  const [rows,setRows]=useState([]),[next,setNext]=useState(0),[loading,setLoading]=useState(true),[error,setError]=useState(''),[selected,setSelected]=useState(null);const lock=useRef(false);
  async function load(offset){if(lock.current)return;lock.current=true;setLoading(true);setError('');try{const page=await createFeedbackStore(client).listInbox({offset});setRows(old=>offset===0?page.rows:[...old,...page.rows.filter(row=>!old.some(r=>r.id===row.id))]);setNext(page.nextOffset);}catch(e){setError(e.message);}finally{lock.current=false;setLoading(false);}}
  useEffect(()=>{let live=true;createFeedbackStore(client).listInbox().then(page=>{if(live){setRows(page.rows);setNext(page.nextOffset);}}).catch(e=>{if(live)setError(e.message);}).finally(()=>{if(live)setLoading(false);});return()=>{live=false;};},[client]);
- return <section className="feedback-inbox" aria-label="Review and improve inbox"><header><div><span className="eyebrow">REVIEW &amp; IMPROVE</span><h2>Corrections</h2><p>Your proposals and reviews assigned to you. Nothing is automatically approved.</p></div><button onClick={onClose} disabled={loading}>Close</button></header>
+ const shown=adminView?rows.filter(row=>row.owner_id!==userId):rows;
+ return <section className="feedback-inbox" aria-label="Review and improve inbox">{!adminView&&<header><div><span className="eyebrow">REVIEW &amp; IMPROVE</span><h2>Corrections</h2><p>Your proposals and reviews assigned to you. Nothing is automatically approved.</p></div><button onClick={onClose} disabled={loading}>Close</button></header>}
   <button disabled={loading} onClick={()=>{setSelected(null);load(0);}}>Refresh reviews</button>{error&&<p className="feedback-error" role="alert">{error}</p>}
-  {rows.length===0&&!loading&&!error&&<p>No corrections yet. Open a saved finding to suggest one.</p>}
-  <div className="feedback-list">{rows.map(row=><button key={row.id} aria-pressed={selected===row.id} onClick={()=>setSelected(row.id)}>{row.owner_id===userId?'Your proposal':'Assigned review'} · {label(row.proposed_type)} · {new Date(row.created_at).toLocaleDateString()}</button>)}</div>
+  {loading&&rows.length===0&&<p className="muted">Loading reviews…</p>}
+  {shown.length===0&&!loading&&!error&&<p>{adminView?'No corrections are waiting for your review.':'No corrections yet. Open a saved finding to suggest one.'}</p>}
+  <div className="feedback-list">{shown.map(row=><button key={row.id} aria-pressed={selected===row.id} onClick={()=>setSelected(row.id)}>{adminView?'Suggested':row.owner_id===userId?'Your proposal':'Assigned review'} · {label(row.proposed_type)} · {new Date(row.created_at).toLocaleDateString()}</button>)}</div>
   {next!==null&&<button disabled={loading} onClick={()=>load(next)}>{loading?'Loading…':'Load more'}</button>}
-  {selected&&rows.find(r=>r.id===selected)&&<ProposalReview key={selected} client={client} proposal={rows.find(r=>r.id===selected)} userId={userId}/>}
-  <small>Reviewer assignments are managed by the database administrator. Owners cannot assign or approve themselves.</small>
+  {selected&&shown.find(r=>r.id===selected)&&<ProposalReview key={selected} client={client} proposal={shown.find(r=>r.id===selected)} userId={userId}/>}
+  {!adminView&&<small>Reviewer assignments are managed by the database administrator. Owners cannot assign or approve themselves.</small>}
  </section>;
 }
