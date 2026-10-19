@@ -4,6 +4,13 @@ import {reviewerPoints} from './lib/reviewerPoints.js';
 // "48 s" or "1 min 12 s".
 const checkTime=ms=>{if(!Number.isFinite(ms)||ms<0)return null;const s=Math.max(1,Math.round(ms/1000));return s<60?`${s} s`:`${Math.floor(s/60)} min${s%60?` ${s%60} s`:''}`;};
 
+// Why a finding has no score, in plain words. Only PENDING is still on its way.
+const reasons={PENDING:'Waiting for completed checks.',
+  REVIEW_REQUIRED:'Not scored: the two reads disagree on the label, so there is no settled label to score. Pick the label yourself.',
+  SOURCE_REVIEW_REQUIRED:'Not scored: a quote could not be tied to one exact witness answer. Open the full transcript to check it.',
+  INCOMPLETE:'Not scored: one of its AI checks failed. It is not retried automatically, so you are not charged twice.',
+  CANCELLED:'Not scored: the checks were stopped before this finding.',
+  BUDGET_LIMIT:'Not scored: the confidence allowance ran out before this finding.'};
 const states={PENDING:'Checking soon',INCOMPLETE:'Checks incomplete',CANCELLED:'Checks stopped',BUDGET_LIMIT:'Not checked · allowance reached',SOURCE_REVIEW_REQUIRED:'Source needs review',REVIEW_REQUIRED:'Needs your review'};
 export default function HybridConfidence({result}) {
   const c=result.hybridConfidence;
@@ -23,7 +30,7 @@ export default function HybridConfidence({result}) {
         <span className="confidence-ring-number">{percentage===null?'—':`${percentage}%`}</span>
       </div>
       <div><span className="eyebrow">{combined?'Confidence':title}</span><h3>{combined&&done?(confidenceLabel(percentage,{reviewerAgrees:c.reviewerAgrees})??'Checks incomplete'):done?'Review checked':states[c?.status]??'Not checked'}</h3>
-        <p>{combined?(calibrated?'Support for this label':'Support for this label · uncalibrated'):done?`${votes} AI reads agree.`:'Waiting for completed checks.'}</p>
+        <p>{combined?(calibrated?'Support for this label':'Support for this label · uncalibrated'):done?`${votes} AI reads agree.`:(result.labelDisagreement?reasons.REVIEW_REQUIRED:reasons[c?.status]??'Not checked yet.')}</p>
         {done&&checkTime(c.durationMs)&&<p className="confidence-time">Scored in {checkTime(c.durationMs)}</p>}</div>
     </div>
       {done&&<span className="confidence-state">{c.reviewerAgrees?'Checker agrees':'Review suggested'}</span>}

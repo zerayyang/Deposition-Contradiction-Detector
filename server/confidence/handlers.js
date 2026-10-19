@@ -16,7 +16,9 @@ export const CONFIDENCE_MODELS = [
   {id:'claude-opus-5-5', input:4, output:20},
 ];
 const OUTPUT = 2048;
-const COMPACT_OUTPUT = 768;
+// Checks answer the decision questions plus up to three concerns, which needs more room than
+// the old one-word category; 768 tokens let some answers stop early and leave a finding unscored.
+const COMPACT_OUTPUT = 1536;
 const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 // Ignore binary floating-point noise at the 0.0001-dollar boundary. Without
 // this, adding already-rounded step reservations can invent an extra unit and
@@ -249,7 +251,7 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
         res.on?.('close',close);
         let answer, usage, failure = null;
         try {
-          const message = await callModel(prepared.requestFor(step),{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(45000)]),maxRetries:0});
+          const message = await callModel(prepared.requestFor(step),{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(90000)]),maxRetries:0});
           usage = message.usage;
           answer = parseResponse(message, plan.body.texts);
         } catch { failure = 'RESPONSE_INCOMPLETE'; }

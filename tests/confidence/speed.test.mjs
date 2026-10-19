@@ -49,7 +49,7 @@ test('compact profile lowers output reservation while preserving full source con
   assert.ok(compact.budgetUsd<legacy.budgetUsd);
   for(let step=0;step<7;step++) {
     const old=legacy.requestFor(step),fast=compact.requestFor(step);
-    assert.equal(old.max_tokens,2048);assert.equal(fast.max_tokens,768);assert.equal(fast.model,old.model);
+    assert.equal(old.max_tokens,2048);assert.equal(fast.max_tokens,1536);assert.equal(fast.model,old.model);
     assert.deepEqual(JSON.parse(fast.messages[0].content),JSON.parse(old.messages[0].content));
     assert.match(fast.system,/at most three concerns/);assert.match(fast.system,/180 characters/);
   }
@@ -58,7 +58,7 @@ test('compact profile lowers output reservation while preserving full source con
     const allowance=await prepareConfidenceAllowance({caseId:'synthetic',texts,budgetUsd:10,requestProfile:'compact-v1'},t);
     assert.equal(allowance.requestProfile,'compact-v1');
     const result=await runAutomaticConfidence({findings:[finding('alpha')],texts,caseId:'synthetic',allowance,...t,concurrency:2});
-    assert.equal(result.checked,1);assert.ok(t.requests.every(request=>request.max_tokens===768));
+    assert.equal(result.checked,1);assert.ok(t.requests.every(request=>request.max_tokens===1536));
     const saved=result.results[0].hybridConfidence;
     const replay=await t.fetchImpl('/api/confidence/step',{body:JSON.stringify({caseId:'synthetic',jobId:saved.jobId,step:0,approvedBudgetUsd:compact.budgetUsd,requestProfile:'legacy'})});
     assert.equal(replay.ok,true);assert.equal(t.requests.length,7);
