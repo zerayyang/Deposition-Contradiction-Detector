@@ -24,12 +24,14 @@ export async function runConcurrentConfidence({findings,texts,caseId,allowance,f
         results[index]={...finding,hybridConfidence:{...value.hybridConfidence,jobId:plan.jobId,completedSteps:value.completed,
           spentUsd:value.spentUsd,votes:value.votes,reviewer:value.reviewer,startedAt,durationMs:Date.now()-startedAt}};
         await save();
-        if(value.stopped){halt=signal?.aborted?'CANCELLED':'INCOMPLETE';break;}
+        // A failed check ends only this finding (no automatic retry); the others keep going.
+        if(value.stopped){if(signal?.aborted)halt='CANCELLED';else results[index]={...results[index],hybridConfidence:{...results[index].hybridConfidence,status:'INCOMPLETE',score:null}};break;}
       }
     } catch(error) {
       const status=failureStatus(error);
       results[index]={...results[index],hybridConfidence:{...results[index].hybridConfidence,status,score:null}};
-      halt=status;
+      // Only a spent allowance or a cancel stops the whole run.
+      if(['CANCELLED','BUDGET_LIMIT'].includes(status))halt=status;
     }
   };
   const active=new Map();
@@ -55,7 +57,7 @@ export async function runConcurrentConfidence({findings,texts,caseId,allowance,f
           // paid step is retried, and the server still reserves the full cost.
           if(status==='BUDGET_LIMIT'&&active.size)break;
           results[index]={...finding,hybridConfidence:{...finding.hybridConfidence,status,score:null}};
-          if(status==='SOURCE_REVIEW_REQUIRED'){cursor++;await save();continue;}
+          if(['SOURCE_REVIEW_REQUIRED','INCOMPLETE'].includes(status)){cursor++;await save();continue;}
           halt=status;
         }
       }
@@ -68,5 +70,6 @@ export async function runConcurrentConfidence({findings,texts,caseId,allowance,f
   if(halt)results=results.map(f=>['PENDING','INCOMPLETE'].includes(f.hybridConfidence.status)?
     {...f,hybridConfidence:{...f.hybridConfidence,status:halt,score:null}}:f);
   await save();
-  return {results,status:halt??'FINISHED',checked:results.filter(f=>['EXPERIMENTAL','UNCALIBRATED','CALIBRATED'].includes(f.hybridConfidence.status)).length};
+  const incomplete=results.filter(f=>f.hybridConfidence.status==='INCOMPLETE').length;
+  return {results,status:halt??(incomplete?'INCOMPLETE':'FINISHED'),incomplete,checked:results.filter(f=>['EXPERIMENTAL','UNCALIBRATED','CALIBRATED'].includes(f.hybridConfidence.status)).length};
 }

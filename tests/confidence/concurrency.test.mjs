@@ -64,15 +64,19 @@ test('tight funds defer free planning until settlement; unknown usage cannot ove
     assert.equal(t.peak(),1);
   }
 });
-test('failure and cancellation stop new steps, drain started calls and retain partial votes',async()=>{
+// Owner decision (Oct 2026): a failed check ends only its own finding; the others are still checked.
+// Cancelling still stops new steps. Neither case retries a paid call automatically.
+test('a failed check stops only its finding; cancellation stops new steps; partial votes are kept',async()=>{
   for(const cancel of [false,true]) {
     const t=setup({bad:!cancel}),allowance=await offer(t),controller=new AbortController();
     const result=await runAutomaticConfidence({findings:Array.from({length:4},finding),texts,caseId:'synthetic',allowance,...t,concurrency:2,
       signal:controller.signal,onCheckpoint:async()=>{if(cancel)controller.abort();}});
     assert.equal(result.status,cancel?'CANCELLED':'INCOMPLETE');
-    assert.equal(t.calls(),2);assert.equal(t.active(),0);assert.equal(result.results.length,4);
-    assert.ok(result.results.slice(0,2).every(f=>f.hybridConfidence.votes.length===1));
-    assert.ok(result.results.slice(2).every(f=>f.hybridConfidence.score===null));
+    assert.equal(t.calls(),cancel?2:4,'each finding fails once, with no retry');assert.equal(t.active(),0);assert.equal(result.results.length,4);
+    const tried=cancel?2:4;
+    assert.ok(result.results.slice(0,tried).every(f=>f.hybridConfidence.votes.length===1));
+    assert.ok(result.results.every(f=>f.hybridConfidence.score===null));
+    if(!cancel)assert.equal(result.incomplete,4);
   }
 });
 test('checkpoint failure stops both workers and completes no further calls',async()=>{

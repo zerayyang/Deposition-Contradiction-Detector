@@ -116,6 +116,18 @@ export function parseResponse(message, texts = []) {
   return {type:derived.type, objections:value.objections, decision:value.decision, rule:derived.rule};
 }
 
+// A finding is finished when its last check is saved or a check stopped it (stopped findings are
+// never resumed or retried). Its saved spend, which counts unknown usage at the full reserve,
+// replaces the reservation. A step still in flight keeps the full reserve.
+async function finishedSpend(store,caseId,jobId){
+  for(let step=0;step<7;step++){
+    const result=await store.get(caseId,jobId,`confidence-result-${step}`);
+    if(!result)return null;
+    if(result.done||result.stopped)return result.spentUsd;
+  }
+  return null;
+}
+
 // Local development uses process memory. Hosted runs use existing owner-scoped, signed,
 // immutable private objects, including a write-before-call lock for each paid step.
 export function createConfidenceHandlers({callModel,instructions='',storeForRequest=null,maxBudgetUsd=25,maxConcurrentFindings=2,now=Date.now}) {
@@ -180,8 +192,8 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
             let settledUsd=prior.settledUsd??0;
             const activeReservations=[];
             for(const reservation of prior.activeReservations??[]) {
-              const finished=await store.get(caseId,reservation.jobId,'confidence-result-6');
-              if(finished?.done)settledUsd=money(settledUsd+finished.spentUsd);
+              const spent=await finishedSpend(store,caseId,reservation.jobId);
+              if(spent!==null)settledUsd=money(settledUsd+spent);
               else activeReservations.push(reservation); // Unfinished/uncertain work keeps its full reserve.
             }
             if(activeReservations.length>=2)return fail(res,409,'CONCURRENCY_LIMIT','Two confidence findings are already reserved. No additional paid work started.');

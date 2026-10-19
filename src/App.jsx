@@ -331,7 +331,7 @@ function Dashboard({ session }) {
             finalSnapshot={...finalSnapshot,results,dirty:true};updateDraft(id,finalSnapshot);
             await persist(id,finalSnapshot);
           }});
-        setAnalysisProgress(`Review finished · confidence checked for ${confidence.checked} of ${confidence.results.length} findings`);
+        setAnalysisProgress(`Review finished · confidence checked for ${confidence.checked} of ${confidence.results.length} findings${confidence.incomplete?` · ${confidence.incomplete} could not be checked (a check failed)`:''}`);
         if(confidence.status==='BUDGET_LIMIT')setError('Confidence reached the approved allowance. Your analysis and completed scores are saved; remaining findings were not checked. No automatic retry will run.');
       } catch {
         setError('Your analysis is retained. Confidence checks stopped; saved votes remain available. No automatic retry will run.');
