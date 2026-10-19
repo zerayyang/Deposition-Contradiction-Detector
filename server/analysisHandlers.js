@@ -1,3 +1,4 @@
+import {readLessonsSafely,withApprovedLessons} from './memory/approvedMemory.js';
 import {checkedSpeakerRoles} from './testimonyMarkers.js';
 import {buildPlan,previewPlan,executePlan,digest,outputBudget,userContent} from './documentAnalysis.js';
 import {assessCandidate} from './humanConfidencePipeline.js';
@@ -16,18 +17,21 @@ export function remainingPreview(plan,result){
  conservativeBudget:(inputTokenUpperBudget*plan.model.inputUsdPerMillion+pairs.length*output*plan.model.outputUsdPerMillion)/1e6};
  return {...previewPlan(plan),requestCount:pairs.length,totalRequestCount:plan.requestCount,resuming:true,cost};
 }
-export function createAnalysisHandlers({instructions,callModel,jobStore=null,codeFingerprint='local-test',runtimeIdentity=null,maxRequests=12,maxBudgetUsd=25,log=()=>{}}) {
+export function createAnalysisHandlers({instructions,callModel,jobStore=null,codeFingerprint='local-test',runtimeIdentity=null,maxRequests=12,maxBudgetUsd=25,log=()=>{},readApprovedMemory=null}) {
  const runningJobs=new Map();
  const provenance=runtimeIdentity??{codeFingerprint,promptSha256:digest(instructions)};
- const prepare=body=>buildPlan([body?.transcript1,body?.transcript2],body?.documents,instructions,{speakerRoles:body?.speakerRoles,sourceRolesReviewed:body?.sourceRolesReviewed,witnessTestimonyConfirmed:body?.witnessTestimonyConfirmed});
+ const prepare=(body,prompt=instructions)=>buildPlan([body?.transcript1,body?.transcript2],body?.documents,prompt,{speakerRoles:body?.speakerRoles,sourceRolesReviewed:body?.sourceRolesReviewed,witnessTestimonyConfirmed:body?.witnessTestimonyConfirmed});
+ // Admin-approved lessons that match these transcripts are added to the prompt for this run.
+ // Without a lesson request this stays synchronous, so the plan preview answers immediately.
+ const lessonsFor=(req,body)=>body?.useApprovedMemory&&readApprovedMemory?readLessonsSafely(readApprovedMemory,req,body,log).then(({memory,lessons})=>({prompt:withApprovedLessons(instructions,memory),lessons})):{prompt:instructions,lessons:{used:0,available:false}};
  const guard=preview=>{if(preview.requestCount>maxRequests||preview.cost.conservativeBudget>maxBudgetUsd)throw new Error(`Analysis exceeds this server's request or spending allowance (${maxRequests} requests / USD ${maxBudgetUsd}). No paid calls started.`);};
- const load=async req=>{
+ const load=async(req,prompt=instructions)=>{
   if(!jobStore)throw new Error('Recovery storage is unavailable.');
   const record=await jobStore.get(req.body.resumeJobId,identity(req));
   if(jobStore.isActive(record.id))throw new Error('This analysis is still running. Wait or cancel its original connection.');
   if(record.caseId!==req.body.caseId)throw new Error('Recovery belongs to a different case.');
   if(record.provenance.codeFingerprint!==codeFingerprint)throw new Error('The server code changed since this run. Its saved results remain available, but cannot be resumed under different rules.');
-  const body={transcript1:record.texts[0],transcript2:record.texts[1],documents:record.documents,speakerRoles:record.provenance.speakerRoles??[{},{}],sourceRolesReviewed:true,witnessTestimonyConfirmed:record.provenance.witnessTestimonyConfirmed},plan=prepare(body);
+  const body={transcript1:record.texts[0],transcript2:record.texts[1],documents:record.documents,speakerRoles:record.provenance.speakerRoles??[{},{}],sourceRolesReviewed:true,witnessTestimonyConfirmed:record.provenance.witnessTestimonyConfirmed},plan=prepare(body,prompt);
   if(plan.id!==record.planId)throw new Error('The prompt or plan changed. Export saved results before planning a new analysis.');
   if(req.body.speakerRoles!==undefined){
    if(!Array.isArray(req.body.speakerRoles)||req.body.speakerRoles.length!==2)throw new Error('Supply two reviewed speaker-role maps.');
@@ -51,7 +55,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
    log({event:'recheck_finished',checked:result.checked,disagreements:result.disagreements});
    return res.json({...result,estimate});
   }catch(err){log({event:'recheck_failed',error:String(err?.message??err).slice(0,200)});return res.status(502).json({error:'Double-check failed; the first results are kept.'});}},
-  async preview(req,res){try{const loaded=req.body?.resumeJobId?await load(req):null,plan=loaded?.plan??prepare(req.body),preview=loaded?remainingPreview(plan,loaded.record.result):previewPlan(plan);guard(preview);return res.json({...preview,provenance,...(loaded?{resumeJobId:loaded.record.id}:{})});}catch(e){return res.status(400).json({error:e.message});}},
+  async preview(req,res){try{const pending=lessonsFor(req,req.body),{prompt,lessons}=pending.then?await pending:pending;const loaded=req.body?.resumeJobId?await load(req,prompt):null,plan=loaded?.plan??prepare(req.body,prompt),preview=loaded?remainingPreview(plan,loaded.record.result):previewPlan(plan);guard(preview);return res.json({...preview,lessons,provenance,...(loaded?{resumeJobId:loaded.record.id}:{})});}catch(e){return res.status(400).json({error:e.message});}},
   async list(req,res){try{if(!jobStore)return res.json({jobs:[],recoveryEnabled:false});const records=await jobStore.list(identity(req),req.query.caseId);return res.json({recoveryEnabled:true,jobs:records.map(r=>({id:r.id,caseId:r.caseId,state:r.state,updatedAt:r.updatedAt,completed:r.result?.analysis?.completed??0,planned:r.result?.analysis?.planned??null,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'}))});}catch{return res.status(500).json({error:'Recovery records could not be listed.'});}},
   async recover(req,res){try{const r=await jobStore.get(req.params.id,identity(req));return res.json({id:r.id,caseId:r.caseId,state:r.state,notice:r.notice??null,texts:r.texts,documents:r.documents,originalDocuments:r.originalDocuments,result:r.result,canResume:Boolean(r.result)&&r.provenance.codeFingerprint===codeFingerprint&&r.state!=='running'&&r.result?.analysis?.status!=='complete'});}catch{return res.status(404).json({error:'Recovery record not found or unavailable.'});}},
   async cancel(req,res){try{
@@ -81,14 +85,15 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
    }catch(e){if(!res.destroyed)return res.status(500).json({error:'Failed to analyze depositions',details:e.message});}finally{res.off('close',close);}
   },
   async stream(req,res){
-   let plan,record,body=req.body;
+   let plan,record,body=req.body,prompt;
    try{
-    if(req.body?.resumeJobId){const loaded=await load(req);({plan,record,body}=loaded);}else plan=prepare(body);
+    const pending=lessonsFor(req,req.body);({prompt}=pending.then?await pending:pending);
+    if(req.body?.resumeJobId){const loaded=await load(req,prompt);({plan,record,body}=loaded);}else plan=prepare(body,prompt);
     const preview=record?remainingPreview(plan,record.result):previewPlan(plan);guard(preview);
     if(body.approvedPlanId!==plan.id&&req.body.approvedPlanId!==plan.id)return res.status(409).json({error:'The analysis plan changed or was not approved. Preview and approve the current request count and cost first.'});
     if(!preview.requestCount)return res.status(409).json({error:'All comparisons are already complete. Recover the saved results instead of paying again.'});
     if(jobStore&&!record){if(typeof req.body.caseId!=='string'||!req.body.caseId||req.body.caseId.length>200)throw new Error('Save a case before starting recoverable analysis.');
-     record=await jobStore.create({ownerId:identity(req),caseId:req.body.caseId,texts:[body.transcript1,body.transcript2],documents:body.documents,originalDocuments:req.body.originalDocuments?.map(d=>d?Object.fromEntries(['path','name','size','type','extraction','pageMappingStale'].map(k=>[k,d[k]])):null),planId:plan.id,provenance:{model:plan.model.id,promptSha256:digest(instructions),codeFingerprint,speakerRoles:plan.speakerRoles,witnessTestimonyConfirmed:plan.witnessTestimonyConfirmed}});}
+     record=await jobStore.create({ownerId:identity(req),caseId:req.body.caseId,texts:[body.transcript1,body.transcript2],documents:body.documents,originalDocuments:req.body.originalDocuments?.map(d=>d?Object.fromEntries(['path','name','size','type','extraction','pageMappingStale'].map(k=>[k,d[k]])):null),planId:plan.id,provenance:{model:plan.model.id,promptSha256:digest(prompt),codeFingerprint,speakerRoles:plan.speakerRoles,witnessTestimonyConfirmed:plan.witnessTestimonyConfirmed}});}
    }catch(e){return res.status(400).json({error:e.message});}
    const controller=new AbortController(),close=()=>{if(!res.writableEnded)controller.abort();};res.on('close',close);
    res.status(200).set({'Content-Type':'application/x-ndjson','Cache-Control':'no-store','X-Accel-Buffering':'no'});res.flushHeaders?.();
@@ -97,7 +102,7 @@ export function createAnalysisHandlers({instructions,callModel,jobStore=null,cod
    const heartbeat=setInterval(()=>{if(!res.destroyed)res.write(JSON.stringify({event:'heartbeat'})+'\n');},15000);
    const originalResult=record?.result;
    try{
-    await executePlan({plan,provenance,resume:originalResult,texts:[body.transcript1,body.transcript2],instructions,callModel:(params,options)=>callModel(params,{...options,auditRunId:record?.id}),signal:controller.signal,onEvent:async event=>{
+    await executePlan({plan,provenance,resume:originalResult,texts:[body.transcript1,body.transcript2],instructions:prompt,callModel:(params,options)=>callModel(params,{...options,auditRunId:record?.id}),signal:controller.signal,onEvent:async event=>{
      if(event.analysis)event.analysis={...event.analysis,recoveryEnabled:Boolean(record)};
      if(event.analysis&&record)event.analysis={...event.analysis,jobId:record.id,recoveryEnabled:true,provenance:{...event.analysis.provenance,codeFingerprint}};
      // The server saves before sending a checkpoint or beginning the next paid call.

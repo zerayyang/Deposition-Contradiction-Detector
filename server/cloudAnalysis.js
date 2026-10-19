@@ -2,15 +2,18 @@ import {remainingPreview} from './analysisHandlers.js';
 import {createMeasuredModel} from './runtimeControls.js';
 import {buildPlan,previewPlan,executePlan,digest,MODEL,directRequest} from './documentAnalysis.js';
 import {utf8Bytes} from '../shared/documentLimits.js';
+import {readLessonsSafely,withApprovedLessons} from './memory/approvedMemory.js';
 const cents=n=>Math.ceil(n*1e6)/1e6;
-const sourceBody=body=>Object.fromEntries(['transcript1','transcript2','documents','originalDocuments','caseId','speakerRoles','sourceRolesReviewed','witnessTestimonyConfirmed'].filter(k=>body[k]!==undefined).map(k=>[k,body[k]]));
+const sourceBody=body=>Object.fromEntries(['transcript1','transcript2','documents','originalDocuments','caseId','speakerRoles','sourceRolesReviewed','witnessTestimonyConfirmed','useApprovedMemory'].filter(k=>body[k]!==undefined).map(k=>[k,body[k]]));
 export function requestUpperCost(params){return cents(((utf8Bytes(JSON.stringify(params))+8192)*MODEL.inputUsdPerMillion+params.max_tokens*MODEL.outputUsdPerMillion)/1e6);}
 function observedCost(message,reserved){const u=message?.usage;if(!Number.isSafeInteger(u?.input_tokens)||!Number.isSafeInteger(u?.output_tokens)||u.input_tokens<0||u.output_tokens<0||u.cache_read_input_tokens||u.cache_creation_input_tokens)return reserved;return Math.max(0,(u.input_tokens*MODEL.inputUsdPerMillion+u.output_tokens*MODEL.outputUsdPerMillion)/1e6);}
-export function createCloudAnalysis({instructions,callModel,storeForRequest,codeFingerprint,maxRequests=512,maxBudgetUsd=25,stepTimeoutMs=240000,legacyPlanOptions={},log=()=>{}}){
+export function createCloudAnalysis({instructions,callModel,storeForRequest,codeFingerprint,maxRequests=512,maxBudgetUsd=25,readApprovedMemory=null,stepTimeoutMs=240000,legacyPlanOptions={},log=()=>{}}){
  // Step logs hold identifiers, counts, costs and error codes only: never testimony or keys.
  const errorCode=e=>e?.code??(e?.name==='TimeoutError'||e?.name==='AbortError'?'TIMEOUT_OR_CANCELLED':'STEP_ERROR');
- async function prepare(_req,body){
-  const plan=buildPlan([body.transcript1,body.transcript2],body.documents,instructions,{...legacyPlanOptions,speakerRoles:body.speakerRoles,sourceRolesReviewed:body.sourceRolesReviewed,witnessTestimonyConfirmed:body.witnessTestimonyConfirmed});return {plan,preview:previewPlan(plan)};
+ // Admin-approved lessons that match these transcripts are added to the prompt; each step re-reads them.
+ async function prepare(req,body){
+  const {memory,lessons}=await readLessonsSafely(readApprovedMemory,req,body,log),prompt=withApprovedLessons(instructions,memory);
+  const plan=buildPlan([body.transcript1,body.transcript2],body.documents,prompt,{...legacyPlanOptions,speakerRoles:body.speakerRoles,sourceRolesReviewed:body.sourceRolesReviewed,witnessTestimonyConfirmed:body.witnessTestimonyConfirmed});return {plan,prompt,preview:{...previewPlan(plan),lessons}};
  }
  async function load(req,{allowStale=false,caseId=req.params?.caseId,jobId=req.params?.jobId}={}){
   const store=storeForRequest(req);await store.authorize(caseId);
@@ -34,9 +37,9 @@ export function createCloudAnalysis({instructions,callModel,storeForRequest,code
  const error=(res,e)=>res.status(400).json({error:e.message});
  return {
   async preview(req,res){try{let body=sourceBody(req.body);let resumed=null;if(req.body.cloudJobId){resumed=await load(req,{caseId:body.caseId,jobId:req.body.cloudJobId});if(resumed.claimed)throw new Error('A prior step is still claimed; check saved progress without retrying paid work.');if(resumed.cancelled||final(resumed.latest))throw new Error('This saved job has ended. Inspect its retained results before starting a new review.');if(body.transcript1!==resumed.meta.body.transcript1||body.transcript2!==resumed.meta.body.transcript2)throw new Error('Source text changed; do not resume a different document.');body={...resumed.meta.body};}const prepared=await prepare(req,body);if(resumed)prepared.preview=remainingPreview(prepared.plan,resumed.latest);
-   const params=prepared.plan.pairs.filter(t=>!resumed?.latest?.analysis?.tasks?.some(old=>old.id===t.id&&old.status==='completed')).map(t=>directRequest(prepared.plan,prepared.plan.chunks[0][t.a],prepared.plan.chunks[1][t.b],instructions));
+   const params=prepared.plan.pairs.filter(t=>!resumed?.latest?.analysis?.tasks?.some(old=>old.id===t.id&&old.status==='completed')).map(t=>directRequest(prepared.plan,prepared.plan.chunks[0][t.a],prepared.plan.chunks[1][t.b],prepared.prompt));
    prepared.preview.cost={...prepared.preview.cost,conservativeBudget:cents(params.reduce((n,p)=>n+requestUpperCost(p),0))};
-   if(prepared.preview.requestCount>maxRequests)throw new Error('Plan exceeds hosted request allowance. No paid calls started.');return res.json({...prepared.preview,approvedBudgetUsd:Math.min(prepared.preview.cost.conservativeBudget,maxBudgetUsd),serverBudgetLimitUsd:maxBudgetUsd,...(resumed?{approvedBudgetUsd:Math.max(0,resumed.meta.maxUsd-resumed.spent),budgetFixed:true}:{}),execution:'durable-steps',recoveryEnabled:true,codeFingerprint,provenance:{codeFingerprint,promptSha256:digest(instructions),model:MODEL.id},notice:'One model request per hosted step; private checkpoints survive browser closure. Work pauses between steps when the tab closes. No automatic retries. Cost approval still applies.'});}catch(e){return error(res,e);}},
+   if(prepared.preview.requestCount>maxRequests)throw new Error('Plan exceeds hosted request allowance. No paid calls started.');return res.json({...prepared.preview,approvedBudgetUsd:Math.min(prepared.preview.cost.conservativeBudget,maxBudgetUsd),serverBudgetLimitUsd:maxBudgetUsd,...(resumed?{approvedBudgetUsd:Math.max(0,resumed.meta.maxUsd-resumed.spent),budgetFixed:true}:{}),execution:'durable-steps',recoveryEnabled:true,codeFingerprint,provenance:{codeFingerprint,promptSha256:digest(prepared.prompt),model:MODEL.id},notice:'One model request per hosted step; private checkpoints survive browser closure. Work pauses between steps when the tab closes. No automatic retries. Cost approval still applies.'});}catch(e){return error(res,e);}},
   async start(req,res){try{
    const {caseId,jobId}=req.params,store=storeForRequest(req);await store.authorize(caseId);
    const body=sourceBody(req.body);if(body.caseId!==caseId)throw new Error('Case identifier mismatch.');
@@ -69,7 +72,7 @@ export function createCloudAnalysis({instructions,callModel,storeForRequest,code
      paid++;costUsd=reserved;
      const message=await measured(params,{...options,signal,maxRetries:0});costUsd=observedCost(message,reserved);return message;
     };
-    result=await executePlan({plan:prepared.plan,texts:[body.transcript1,body.transcript2],instructions,callModel:invoke,signal,resume:j.latest,maxNewRequests:1,provenance:{codeFingerprint}});
+    result=await executePlan({plan:prepared.plan,texts:[body.transcript1,body.transcript2],instructions:prepared.prompt,callModel:invoke,signal,resume:j.latest,maxNewRequests:1,provenance:{codeFingerprint}});
    }finally{stopped=true;clearInterval(timer);}
    if(!await j.store.put(j.caseId,j.jobId,`s${j.sequence}-result`,{result,costUsd,totalSpentUsd:j.spent+costUsd,paidRequests:paid,savedAt:new Date().toISOString()}))throw new Error('A checkpoint already exists; inspect saved progress.');
    log({event:'cloud_step_finished',jobId:j.jobId,sequence:j.sequence,paidRequests:paid,costUsd,totalSpentUsd:j.spent+costUsd,status:result?.analysis?.status??null,durationMs:Math.round(performance.now()-began)});

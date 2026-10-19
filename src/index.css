@@ -61,3 +61,29 @@
 .transcript-previews>div{min-width:0}
 .transcript-previews pre{margin:6px 0 0;height:220px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:white;border:1px solid #dce5eb;border-radius:10px;padding:12px 14px;font:12px/1.6 ui-monospace,SFMono-Regular,monospace;color:#33495c}
 @media(max-width:700px){.transcript-previews{grid-template-columns:1fr}}
+.lawyer-review{margin-top:18px;padding:18px 20px;border:1px solid #dce5eb;border-left:4px solid #126e70;border-radius:14px;background:white}
+.lawyer-review-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.lawyer-review-heading h3{margin:0;font-size:16px}
+.reviewed-button{padding:8px 16px;font-size:13px;background:white;color:#126e70;border:1px solid #126e70;box-shadow:none}
+.reviewed-button:hover:enabled{background:#eef7f6}
+.reviewed-button.done{background:#126e70;color:white}
+.reviewed-button.done:hover:enabled{background:#0b585b}
+.lawyer-review textarea{min-height:0;font-family:inherit;font-size:14px;background:#f8fafb}
+.lawyer-review-note{margin:10px 0 0}
+.improve-card{margin-top:14px;border-top:1px solid #e3e9ee;padding-top:12px}
+.improve-card>summary{font-size:13px;font-weight:650;color:#33495c}
+.improve-card>p{font-size:13px;color:#5d6f80;margin:8px 0}
+.improve-card label{display:block;font-size:13px;font-weight:600;margin:10px 0 6px}
+.improve-card select,.improve-card textarea{display:block;width:100%;margin-top:6px;font-size:14px;min-height:0;font-family:inherit;padding:10px;border:1px solid #d6e1e8;border-radius:8px;background:#f8fafb}
+.improve-card fieldset{border:0;padding:0;margin:0}
+.improve-card button[type=submit]{margin:10px 0 6px;padding:10px 18px}
+.improve-card small{display:block;color:#718290}
+.feedback-inbox{margin:14px 22px;padding:18px 20px;border:1px solid #dce5eb;border-radius:14px;background:white}
+.feedback-inbox header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.feedback-inbox header p{font-size:13px;color:#5d6f80;margin:0}
+.feedback-inbox>button{margin:10px 8px 10px 0;padding:8px 14px;font-size:13px}
+.feedback-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.feedback-list button{text-align:left;background:#f4f8fa;color:#203346;box-shadow:none;padding:10px 12px;font-size:13px;font-weight:600}
+.feedback-list button[aria-pressed=true]{background:#e3f3ef;color:#126e70}
+.feedback-error{color:#b42318;font-weight:600}
+.lessons-note{color:#126e70;font-weight:650}
