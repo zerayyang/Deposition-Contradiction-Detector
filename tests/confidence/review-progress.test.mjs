@@ -41,3 +41,14 @@ test('partial analysis never gets fabricated full transcript completion during s
   assert.equal(stages[0].percent,null);assert.equal(stages[0].detail,'Partial coverage retained');
   assert.equal(stages[2].percent,null);
 });
+
+test('finished partial comparisons show processing completion without claiming validated coverage',()=>{
+ const analysis={status:'partial',coverage:[1,2].map(document=>({document,sections:[{id:0,status:'partial',comparisonsPlanned:1,comparisonsCompleted:0,comparisonsPartial:1}]}))};
+ const stages=reviewStages(analysis,[{type:'DIRECT',hybridConfidence:{completedSteps:3,status:'INCOMPLETE'}}],'scoring');
+ assert.deepEqual(stages.map(s=>s.percent),[100,100,42]);
+ assert.match(stages[0].detail,/Processing finished · partial results/);
+ assert.match(stages[1].detail,/partial results/);
+ assert.equal(stages[0].spinning,false);
+ const mixed=structuredClone(analysis);mixed.coverage[0].sections.push({id:1,status:'pending',comparisonsPlanned:1,comparisonsCompleted:0,comparisonsPartial:0});
+ assert.equal(reviewStages(mixed,[],'scoring')[0].percent,50);
+});

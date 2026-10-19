@@ -2,7 +2,7 @@ const types=new Set(['DIRECT','INFERENTIAL','FALSE_POSITIVE']);
 const decisions=new Set(['APPROVE','REJECT','NEEDS_CONTEXT','REVOKE']);
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function id(value,label){if(typeof value!=='string'||!uuid.test(value))throw new Error(`${label} must be a UUID.`);return value;}
-function note(value){if(typeof value!=='string'||value.trim().length<10||value.length>4000)throw new Error('Explain the correction or decision in 10–4,000 characters.');return value;}
+function note(value){if(typeof value!=='string'||!value.trim()||value.length>4000)throw new Error('Add a nonblank explanation, up to 4,000 characters.');return value;}
 function only(input,fields){if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>!fields.includes(k)))throw new Error('Unsupported feedback fields. Scores, ownership and approval state cannot be supplied.');}
 function errorMessage(error){
  if(['42P01','42883','PGRST202','PGRST205'].includes(error.code))return new Error('Review storage is not installed yet. Apply the Stage 6–8 database migrations before using this feature.');
@@ -33,7 +33,7 @@ export function createFeedbackStore(client){
   },
   async releaseMemory(input){
    only(input,['exampleId','enabled','lesson','searchTerms','notEvaluationMaterial']);
-   if(typeof input.enabled!=='boolean'||input.notEvaluationMaterial!==true||typeof input.lesson!=='string'||input.lesson.trim().length<10||input.lesson.length>1500||!Array.isArray(input.searchTerms)||input.searchTerms.length<1||input.searchTerms.length>16||input.searchTerms.some(t=>typeof t!=='string'||t.trim().length<2||t.length>60||!/[\p{L}\p{N}]/u.test(t)))throw new Error('Provide a general lesson, 1–16 search terms and confirm this is not evaluation material.');
+   if(typeof input.enabled!=='boolean'||input.notEvaluationMaterial!==true||typeof input.lesson!=='string'||!input.lesson.trim()||input.lesson.length>1500||!Array.isArray(input.searchTerms)||input.searchTerms.length<1||input.searchTerms.length>16||input.searchTerms.some(t=>typeof t!=='string'||t.trim().length<2||t.length>60||!/[\p{L}\p{N}]/u.test(t)))throw new Error('Provide a general lesson, 1–16 search terms and confirm this is not evaluation material.');
    return rpc('release_feedback_memory',{p_example_id:id(input.exampleId,'Example ID'),p_enabled:input.enabled,p_lesson:input.lesson.trim(),p_search_terms:input.searchTerms.map(t=>t.trim()),p_not_evaluation_material:true});
   },
   reviewSources:feedbackId=>rpc('get_feedback_review_sources',{p_feedback_id:id(feedbackId,'Feedback ID')}),

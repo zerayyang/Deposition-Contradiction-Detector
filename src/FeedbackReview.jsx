@@ -21,8 +21,8 @@ export function CorrectionForm({client,caseId,finding,findingIndex,disabled=fals
  return <details className="improve-card"><summary>Review &amp; Improve</summary><p>Think this category is wrong? Suggest a correction and explain it using the testimony.</p>
   {!saved&&<p className="feedback-notice">Save this case and its current findings first.</p>}
   <form onSubmit={submit}><fieldset disabled={disabled||!saved||busy}><label>Suggested category<select value={type} onChange={e=>{setType(e.target.value);setMessage('');}}>{categories.map(([key,text])=><option key={key} value={key}>{text}</option>)}</select></label>
-  <label>Why should it change?<textarea rows={3} minLength={10} maxLength={4000} required value={reason} onChange={e=>{setReason(e.target.value);setMessage('');}} placeholder="Explain which statements conflict, or why they can both be true."/></label>
-  <button type="submit" disabled={reason.trim().length<10}>{busy?'Submitting…':sent?'Submit again':'Submit correction'}</button></fieldset></form>
+  <label>Why should it change?<textarea rows={3} maxLength={4000} required value={reason} onChange={e=>{setReason(e.target.value);setMessage('');}} placeholder="Explain which statements conflict, or why they can both be true."/></label>
+  <button type="submit" disabled={!reason.trim()}>{busy?'Submitting…':sent?'Submit again':'Submit correction'}</button></fieldset></form>
   <small>Submitting does not train the model, change the score or approve a lesson. A separate assigned reviewer must check it.</small>
   {error&&<p className="feedback-error" role="alert">{error}</p>}{message&&<p role="status" className="feedback-sent">{message}</p>}
  </details>;
@@ -46,7 +46,7 @@ function ProposalReview({client,proposal,userId,onUpdated,practiceStore=null}){
  const unchanged=sources?.sourcesUnchanged&&sources?.findingUnchanged;
  const approved=state?.decision?.decision==='APPROVE',own=!practice&&proposal.owner_id===userId;
  // Say why the save button is disabled instead of leaving it silently grey.
- const blockers=[reason.trim().length<10&&'Write at least 10 characters in the explanation.',decision==='APPROVE'&&!unchanged&&'The case changed after this correction, so it cannot be approved.',decision==='APPROVE'&&unchanged&&!checked&&'Tick “I checked both original sources” to approve.'].filter(Boolean);
+ const blockers=[!reason.trim()&&'Add a review explanation.',decision==='APPROVE'&&!unchanged&&'The case changed after this correction, so it cannot be approved.',decision==='APPROVE'&&unchanged&&!checked&&'Tick “I checked both original sources” to approve.'].filter(Boolean);
  return <article className={`proposal-review${practice?' practice':''}`}>{practice&&<p className="practice-banner"><b>Practice decision</b> · fictional example · nothing is saved and the AI does not learn from it.</p>}<div className="feedback-columns">{[1,2].map(i=><blockquote key={i}><small>Original finding · transcript {i}</small><p>{proposal.original_snapshot?.finding?.['claim'+i]?.original??'No quote available'}</p></blockquote>)}</div>
   <p><b>{label(proposal.original_snapshot?.finding?.type)} → {label(proposal.proposed_type)}</b></p><p>{proposal.rationale}</p>
   {loading&&<p role="status">Loading review and source context…</p>}
@@ -58,15 +58,15 @@ function ProposalReview({client,proposal,userId,onUpdated,practiceStore=null}){
   {!own&&!allowed&&!loading&&<p>You are not currently assigned to review this owner’s feedback.</p>}
   {allowed&&!approved&&state&&<form onSubmit={e=>{e.preventDefault();if(decision==='APPROVE'&&(!unchanged||!checked))return;act(store=>store.review({feedbackId:proposal.id,decision,rationale:reason,sourceChecked:checked,expectedDecisionId:state.decision?.id??null}));}}><fieldset disabled={busy}>
    <label>Decision<select value={decision} onChange={e=>setDecision(e.target.value)}><option value="NEEDS_CONTEXT">Needs more context</option><option value="APPROVE">Approve correction</option><option value="REJECT">Reject correction</option></select></label>
-   <label>Review explanation<textarea required minLength={10} maxLength={4000} rows={3} value={reason} onChange={e=>setReason(e.target.value)}/></label>
+   <label>Review explanation<textarea required maxLength={4000} rows={3} value={reason} onChange={e=>setReason(e.target.value)}/></label>
    <label className="feedback-check"><input type="checkbox" checked={checked} disabled={!unchanged} onChange={e=>setChecked(e.target.checked)}/>I checked both original sources, speaker and occasion.</label>
    <button disabled={blockers.length>0}>{practice?'Test decision':'Save review decision'}</button>{blockers.length>0&&<ul className="feedback-blockers">{blockers.map(b=><li key={b}>{b}</li>)}</ul>}
   </fieldset></form>}
-  {allowed&&approved&&<><form onSubmit={e=>{e.preventDefault();act(store=>store.review({feedbackId:proposal.id,decision:'REVOKE',rationale:reason,sourceChecked:false,expectedDecisionId:state.decision.id}));}}><fieldset disabled={busy}><label>Reason to withdraw approval<textarea required minLength={10} maxLength={4000} rows={2} value={reason} onChange={e=>setReason(e.target.value)}/></label><button disabled={reason.trim().length<10}>Withdraw approval</button></fieldset></form>
+  {allowed&&approved&&<><form onSubmit={e=>{e.preventDefault();act(store=>store.review({feedbackId:proposal.id,decision:'REVOKE',rationale:reason,sourceChecked:false,expectedDecisionId:state.decision.id}));}}><fieldset disabled={busy}><label>Reason to withdraw approval<textarea required maxLength={4000} rows={2} value={reason} onChange={e=>setReason(e.target.value)}/></label><button disabled={!reason.trim()}>Withdraw approval</button></fieldset></form>
    {state.example&&<details className="lesson-release"><summary>Optional: release a private lesson</summary><p>An approved correction is not automatically memory. Write a general lesson without names, quotations, case facts or evaluation answers.</p><form onSubmit={e=>{e.preventDefault();if(!unchanged)return;act(store=>store.releaseMemory({exampleId:state.example.id,enabled:true,lesson,searchTerms:terms.split(',').map(t=>t.trim()),notEvaluationMaterial:attested}));}}><fieldset disabled={busy}>
-    <label>General lesson<textarea required minLength={10} maxLength={1500} rows={3} value={lesson} onChange={e=>setLesson(e.target.value)}/></label><label>Search phrases · separate with commas<input required value={terms} onChange={e=>setTerms(e.target.value)} placeholder="same occasion, denial"/></label>
+    <label>General lesson<textarea required maxLength={1500} rows={3} value={lesson} onChange={e=>setLesson(e.target.value)}/></label><label>Search phrases · separate with commas<input required value={terms} onChange={e=>setTerms(e.target.value)} placeholder="same occasion, denial"/></label>
     <label className="feedback-check"><input type="checkbox" checked={attested} onChange={e=>setAttested(e.target.checked)}/>I checked that this contains no private case details or evaluation material.</label>
-    <button disabled={!attested||!unchanged}>{practice?'Test releasing lesson':'Release private lesson'}</button>{!attested&&<ul className="feedback-blockers"><li>Tick the box above to release.</li></ul>}
+    <button disabled={!attested||!unchanged||!lesson.trim()}>{practice?'Test releasing lesson':'Release private lesson'}</button>{!attested&&<ul className="feedback-blockers"><li>Tick the box above to release.</li></ul>}
    </fieldset></form>
    {state.release?.enabled&&<button disabled={busy} onClick={()=>act(store=>store.releaseMemory({exampleId:state.example.id,enabled:false,lesson:state.release.lesson,searchTerms:state.release.search_terms,notEvaluationMaterial:true}))}>Disable this lesson</button>}
    <small>{practice?'Practice only: no lesson reaches the AI.':'Only this case owner\u2019s future analyses use a released lesson. It cannot set numeric confidence. This is retrieval, not model training.'}</small></details>}

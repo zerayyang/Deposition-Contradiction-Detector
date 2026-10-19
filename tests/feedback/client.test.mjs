@@ -11,7 +11,7 @@ test('submission uses the authenticated RPC and never edits the original finding
  assert.equal('owner_id' in calls[0].args,false);assert.equal('status' in calls[0].args,false);
 });
 test('ownership, scores, approval flags and invalid categories cannot be submitted',async()=>{
- const {store,calls}=fixture();for(const extra of [{ownerId:id},{score:99},{approved:true},{proposedType:'OTHER'},{rationale:'short'},{findingIndex:-1}])await assert.rejects(()=>store.submit({...proposal(),...extra}));
+ const {store,calls}=fixture();for(const extra of [{ownerId:id},{score:99},{approved:true},{proposedType:'OTHER'},{rationale:'   '},{findingIndex:-1}])await assert.rejects(()=>store.submit({...proposal(),...extra}));
  assert.equal(calls.length,0);
 });
 test('review requires an explicit source check and carries the optimistic decision token',async()=>{

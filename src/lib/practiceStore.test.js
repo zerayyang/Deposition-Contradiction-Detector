@@ -4,7 +4,7 @@ import {createPracticeStore} from './practiceStore.js';
 
 test('practice decisions follow the real review rules and save nothing anywhere',async()=>{
  const s=createPracticeStore();
- await assert.rejects(()=>s.review({decision:'APPROVE',rationale:'short',sourceChecked:true,expectedDecisionId:null}),/10 characters/);
+ await assert.rejects(()=>s.review({decision:'APPROVE',rationale:'   ',sourceChecked:true,expectedDecisionId:null}),/nonblank explanation/);
  await assert.rejects(()=>s.review({decision:'APPROVE',rationale:'Checked both answers carefully.',sourceChecked:false,expectedDecisionId:null}),/source review/);
  const first=await s.review({decision:'APPROVE',rationale:'Checked both answers carefully.',sourceChecked:true,expectedDecisionId:null});
  assert.equal((await s.reviewState()).decision.decision,'APPROVE');

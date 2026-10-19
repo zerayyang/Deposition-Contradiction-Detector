@@ -22,7 +22,7 @@ export function selectApprovedMemory(rows,texts){
  const tokens=words(texts.join('\n')),seen=new Set(),ranked=[];
  for(const row of rows){
   if(!row||!['id','decision_id','release_id'].every(k=>uuid.test(row[k]))||seen.has(row.id)
-   ||!['DIRECT','INFERENTIAL','FALSE_POSITIVE'].includes(row.corrected_type)||typeof row.lesson!=='string'||row.lesson.trim().length<10||row.lesson.length>1500
+   ||!['DIRECT','INFERENTIAL','FALSE_POSITIVE'].includes(row.corrected_type)||typeof row.lesson!=='string'||!row.lesson.trim()||row.lesson.length>1500
    ||!Array.isArray(row.search_terms)||row.search_terms.length<1||row.search_terms.length>16
    ||row.search_terms.some(t=>typeof t!=='string'||t.trim().length<2||t.length>60||words(t).size===0))throw new Error('Approved memory failed validation. No analysis started.');
   seen.add(row.id);const matchedTerms=row.search_terms.filter(term=>[...words(term)].every(token=>tokens.has(token)));

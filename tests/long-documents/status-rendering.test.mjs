@@ -28,3 +28,12 @@ test('measured completion drives the bar and stopped reviews do not animate',()=
  const stopped=renderToStaticMarkup(createElement(Component,{analysis:{status:'complete',planned:2,completed:2},active:false,elapsed:45}));
  assert.doesNotMatch(stopped,/analysis-progress-dots|analysis-progress-activity/);assert.match(stopped,/<progress[^>]*value="2"[^>]*max="2"/);
 });
+
+test('scoring bar tracks confidence checks instead of a finished comparison and keeps gaps visible',()=>{
+ const findings=Array.from({length:8},(_,i)=>({type:'DIRECT',hybridConfidence:{status:i<3?'EXPERIMENTAL':'PENDING',completedSteps:i<3?7:0}}));
+ const html=renderToStaticMarkup(createElement(Component,{analysis:{status:'partial',planned:1,completed:0,partial:1},active:true,phase:'scoring',findings,elapsed:208}));
+ assert.match(html,/Checking confidence/);assert.match(html,/21 of 56 checks finished/);
+ assert.match(html,/<progress[^>]*value="37"[^>]*max="100"/);
+ assert.match(html,/Analysis retained partial results/);
+ assert.doesNotMatch(html,/1 of 1 comparisons finished/);
+});

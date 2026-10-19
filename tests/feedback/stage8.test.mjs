@@ -8,7 +8,7 @@ const finding={type:'DIRECT',claim1:{original:'I signed.'},claim2:{original:'I d
 test('lesson release is explicit, independently authorized by RPC, and rejects scores or evaluation material',async()=>{
  const calls=[],store=createFeedbackStore({from(){},async rpc(name,args){calls.push({name,args});return {data:caseId};}});
  const input={exampleId:caseId,enabled:true,lesson:'Check the same occasion before comparing claims.',searchTerms:['signed form'],notEvaluationMaterial:true};
- for(const extra of [{score:99},{notEvaluationMaterial:false},{searchTerms:['??']},{searchTerms:[]},{lesson:'short'}])await assert.rejects(()=>store.releaseMemory({...input,...extra}));
+ for(const extra of [{score:99},{notEvaluationMaterial:false},{searchTerms:['??']},{searchTerms:[]},{lesson:'   '}])await assert.rejects(()=>store.releaseMemory({...input,...extra}));
  assert.equal(calls.length,0);await store.releaseMemory(input);assert.equal(calls[0].name,'release_feedback_memory');assert.equal(calls[0].args.p_enabled,true);
  await store.releaseMemory({...input,enabled:false});assert.equal(calls[1].args.p_enabled,false);assert.equal('owner_id' in calls[0].args,false);
 });

@@ -18,7 +18,7 @@ export function createPracticeStore() {
     async reviewSources() { return SOURCES; },
     async reviewState() { return { decision, example, release }; },
     async review({ decision: choice, rationale, sourceChecked, expectedDecisionId }) {
-      if (!["APPROVE", "REJECT", "NEEDS_CONTEXT", "REVOKE"].includes(choice) || typeof rationale !== "string" || rationale.trim().length < 10 || rationale.length > 4000) fail("Invalid review fields: write at least 10 characters.");
+      if (!["APPROVE", "REJECT", "NEEDS_CONTEXT", "REVOKE"].includes(choice) || typeof rationale !== "string" || !rationale.trim() || rationale.length > 4000) fail("Invalid review fields: add a nonblank explanation, up to 4,000 characters.");
       if ((decision?.id ?? null) !== (expectedDecisionId ?? null)) fail("Review changed. Reload the latest decision before submitting.");
       if (decision?.decision === "APPROVE" && choice !== "REVOKE") fail("Revoke the current approval explicitly before another decision.");
       if (choice === "REVOKE" && decision?.decision !== "APPROVE") fail("Only a currently approved correction can be revoked.");
@@ -32,7 +32,7 @@ export function createPracticeStore() {
     async releaseMemory({ enabled, lesson, searchTerms, notEvaluationMaterial }) {
       if (!example) fail("Approve the correction before releasing a lesson.");
       if (notEvaluationMaterial !== true) fail("Confirm the lesson contains no private case details.");
-      if (typeof lesson !== "string" || lesson.trim().length < 10 || lesson.length > 1500) fail("Write a lesson of at least 10 characters.");
+      if (typeof lesson !== "string" || !lesson.trim() || lesson.length > 1500) fail("Add a nonblank lesson, up to 1,500 characters.");
       if (!Array.isArray(searchTerms) || searchTerms.length < 1 || searchTerms.length > 16 || searchTerms.some(t => typeof t !== "string" || t.trim().length < 2 || t.length > 60)) fail("Add 1–16 search phrases, each at least 2 characters.");
       release = { enabled, lesson: lesson.trim(), search_terms: searchTerms.map(t => t.trim()) };
       return true;
