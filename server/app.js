@@ -6,12 +6,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {DOCUMENT_LIMITS} from '../shared/documentLimits.js';
 import {createAnalysisHandlers} from './analysisHandlers.js';
-import {createAdmission,createRateLimit} from './runtimeControls.js';
+import {createAdmission,createRateLimit,DEFAULT_CONCURRENT_ANALYSES} from './runtimeControls.js';
 import {requestIdFrom,runWithRequest} from './requestContext.js';
 // Factory imports start no listener, invoke no model and read no credentials.
-export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIMITS.requestBytes,authenticate=null,jobStore=null,codeFingerprint,runtimeIdentity=null,maxRequests,maxBudgetUsd,log=()=>{},staticDirectory=null,readApprovedMemory=null,cloudStoreForRequest=null,cronHealth=null}) {
+export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIMITS.requestBytes,authenticate=null,jobStore=null,codeFingerprint,runtimeIdentity=null,maxRequests,maxBudgetUsd,log=()=>{},staticDirectory=null,readApprovedMemory=null,cloudStoreForRequest=null,cronHealth=null,maxConcurrentAnalyses=DEFAULT_CONCURRENT_ANALYSES}) {
  const identity=runtimeIdentity??{version:1,codeFingerprint:codeFingerprint??null,promptSha256:digest(instructions??''),model:MODEL.id,startedAt:null,commit:null};
- const app=express(),admission=createAdmission(),recoveryAdmission=createAdmission(),allowed=createRateLimit(),ipAllowed=createRateLimit({limit:90});app.disable('x-powered-by');
+ const app=express(),admission=createAdmission({maxConcurrent:maxConcurrentAnalyses}),recoveryAdmission=createAdmission(),allowed=createRateLimit(),ipAllowed=createRateLimit({limit:90});app.disable('x-powered-by');
  app.use((_req,res,next)=>{res.set({'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY'});next();});
  app.get('/api/health',(_req,res)=>res.set('Cache-Control','no-store').json({status:'ok',service:'deposition-backend',uptimeSeconds:Math.floor(process.uptime()),externalServices:'not checked',callsClaude:false,provenance:identity}));
  app.use('/api',function auditApiRequest(req,res,next){

@@ -20,6 +20,7 @@
     "start": "node server/server.js",
     "tests:reliability": "node --test tests/reliability/*.test.mjs server/contextReliability.test.js src/lib/recovery.test.js",
     "tests:load": "node tests/reliability/load.mjs",
+    "tests:speed": "node tests/reliability/speed.mjs",
     "tests:feedback": "node --test tests/feedback/*.test.mjs",
     "tests:memory": "node --test tests/memory/*.test.mjs"
   },

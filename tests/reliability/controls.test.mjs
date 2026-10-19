@@ -58,3 +58,11 @@ test('HTTP error logs record outcome and duration without request bodies, URLs o
  audit({method:'POST',body:{transcript1:'PRIVATE_TEST_TEXT'},url:'/api?secret=PRIVATE_TOKEN',headers:{authorization:'Bearer PRIVATE_TOKEN'}},res,()=>{});res.emit('finish');res.emit('close');
  assert.equal(events.length,1);assert.equal(events[0].status,401);assert.doesNotMatch(JSON.stringify(events),/PRIVATE_TEST_TEXT|PRIVATE_TOKEN|authorization|transcript1/);
 });
+test('the server runs up to four analyses at once, still one per user',async()=>{
+ const gate=createAdmission({maxConcurrent:4}),releases=[];
+ const running=['a','b','c','d'].map(u=>gate.run(u,()=>new Promise(r=>releases.push(r))));
+ await assert.rejects(gate.run('a',async()=>{}),e=>e.status===429,'same user twice');
+ await assert.rejects(gate.run('e',async()=>{}),e=>e.status===429,'fifth user waits');
+ releases.forEach(r=>r());await Promise.all(running);assert.equal(gate.active,0);
+ await gate.run('e',async()=>{});
+});

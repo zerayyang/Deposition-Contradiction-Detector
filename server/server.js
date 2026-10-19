@@ -17,7 +17,7 @@ import {createCronHealth} from './cronHealth.js';
 // Vercel supplies deployment secrets through environment variables.
 if(!process.env.VERCEL)dotenv.config({path:['.env.local','.env'],quiet:true});
 const root=fileURLToPath(new URL('../',import.meta.url));
-const {production,host,port,allowedUserIds,directory,maxBudgetUsd,maxRequests,timeoutMs}=runtimeConfiguration(process.env,root);
+const {production,host,port,allowedUserIds,directory,maxBudgetUsd,maxConcurrentAnalyses,maxRequests,timeoutMs}=runtimeConfiguration(process.env,root);
 const log=event=>process.stdout.write(JSON.stringify({timestamp:new Date().toISOString(),...withRequestContext(event)})+'\n');
 const authenticate=createAuthentication({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY,allowLocal:!process.env.VERCEL&&!production&&host==='127.0.0.1',allowedUserIds});
 if(!process.env.ANTHROPIC_API_KEY)throw new Error('ANTHROPIC_API_KEY is required.');
@@ -32,7 +32,7 @@ const cronHealth=createCronHealth({secret:process.env.CRON_SECRET,log,checks:asy
  demoUsersConfigured:!production||Boolean(allowedUserIds?.length),
  separateJobSigningKey:!process.env.VERCEL||Boolean(process.env.ANALYSIS_JOB_SIGNING_KEY),
  buildIdentityRecorded:Boolean(codeFingerprint)})});
-const app=createApp({cronHealth,readApprovedMemory:createApprovedMemoryReader({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}),instructions,callModel,authenticate,runtimeIdentity,cloudStoreForRequest:process.env.VERCEL?createCloudStoreFactory({signingKey:process.env.ANALYSIS_JOB_SIGNING_KEY??process.env.ANTHROPIC_API_KEY,url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}):null,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
+const app=createApp({cronHealth,readApprovedMemory:createApprovedMemoryReader({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}),instructions,callModel,authenticate,runtimeIdentity,cloudStoreForRequest:process.env.VERCEL?createCloudStoreFactory({signingKey:process.env.ANALYSIS_JOB_SIGNING_KEY??process.env.ANTHROPIC_API_KEY,url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}):null,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,maxConcurrentAnalyses,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
 export default app;
 
 // Keep the existing local entry point, but never bind a port in Vercel.

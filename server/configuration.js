@@ -10,5 +10,5 @@ export function runtimeConfiguration(env,root){
  // Local and hosted share one request allowance; the USD allowance remains the spending guard.
  const maxBudgetUsd=Number(env.MAX_ANALYSIS_BUDGET_USD??25);if(!Number.isFinite(maxBudgetUsd)||maxBudgetUsd<=0)throw new Error('Invalid analysis spending allowance.');
  const port=positive(env.PORT,3000);if(port>65535)throw new Error('Invalid server port.');
- return {production,host,port,allowedUserIds,directory,maxBudgetUsd,maxRequests:positive(env.MAX_ANALYSIS_REQUESTS,512),timeoutMs:positive(env.MODEL_TIMEOUT_MS,600000)};
+ return {production,host,port,allowedUserIds,directory,maxBudgetUsd,maxConcurrentAnalyses:positive(env.MAX_CONCURRENT_ANALYSES,4),maxRequests:positive(env.MAX_ANALYSIS_REQUESTS,512),timeoutMs:positive(env.MODEL_TIMEOUT_MS,600000)};
 }

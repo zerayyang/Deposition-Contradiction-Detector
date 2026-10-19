@@ -1,10 +1,10 @@
 import {performance} from 'node:perf_hooks';
 import {writeFile,mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
-import {createAdmission,createMeasuredModel} from '../../server/runtimeControls.js';
+import {createAdmission,createMeasuredModel,DEFAULT_CONCURRENT_ANALYSES} from '../../server/runtimeControls.js';
 import {buildPlan,executePlan} from '../../server/documentAnalysis.js';
 export async function mockLoad({waves=5,usersPerWave=20}={}){
- const gate=createAdmission(),rows=[],start=performance.now(),before=process.memoryUsage().rss;
+ const gate=createAdmission({maxConcurrent:DEFAULT_CONCURRENT_ANALYSES}),rows=[],start=performance.now(),before=process.memoryUsage().rss;
  const texts=['Q: What happened Monday?\nA: I signed the lease.','Q: What happened Monday?\nA: I did not sign the lease.'],plan=buildPlan(texts,[],'synthetic rules');
  let calls=0,peakRss=before;
  const model=createMeasuredModel(async()=>{calls++;await new Promise(r=>setTimeout(r,10));return {stop_reason:'end_turn',usage:{input_tokens:10,output_tokens:10},content:[{type:'text',text:'{"topicsReviewed":[],"contradictions":[]}'}]};});

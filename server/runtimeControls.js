@@ -1,4 +1,6 @@
 import {performance} from 'node:perf_hooks';
+// Analyses the server runs at the same time (each user still runs one at a time).
+export const DEFAULT_CONCURRENT_ANALYSES=4;
 export function createAdmission({maxConcurrent=1}={}) {
  let active=0;const owners=new Set();
  return {get active(){return active;},async run(owner,work){
