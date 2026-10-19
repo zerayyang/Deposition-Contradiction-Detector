@@ -1,5 +1,5 @@
-import {parseTestimonySource} from '../testimonySource.js';
-import {checkedSpeakerRoles,normalizeSpeakerLabel} from '../testimonyMarkers.js';
+import {parseTestimonySource} from './testimonySource.js';
+import {checkedSpeakerRoles,normalizeSpeakerLabel} from './testimonyMarkers.js';
 export function reviewableSpeakerLabels(text){
  const index=parseTestimonySource(text);
  const labels=[...new Set(index.turns.map(t=>t.speaker).filter(Boolean))].filter(label=>{try{checkedSpeakerRoles({speakerRoles:{[label]:'WITNESS'}});return true;}catch{return false;}});

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseTestimonySource} from './testimonySource.js';
 import {witnessQuoteMatches} from './sourceEvidence.js';
-import {reviewableSpeakerLabels,requireSpeakerReview} from './events/sourceRoles.js';
+import {reviewableSpeakerLabels,requireSpeakerReview} from './sourceRoles.js';
 import {checkedSpeakerRoles} from './testimonyMarkers.js';
 test('document captions and court staff stay source boundaries without manual role assignments',()=>{
  const headings=['In The Matter Of','COUNTY OF SAMPLE','B E F O R E','By','FILED','P E O P L E O F T H E S T A T E O F','V I D E O T A P E D D E P O S I T I O N O F','V I D E O T A P E D E P O S I T I O N O F','RE','Dated','CASE NAME','DATE OF DEPOSITION','WITNESSES’ NAME','DISCLAIMER','COURT OFFICER','THE COURT OFFICER','THE VIDEOGRAPHER','THE STENOGRAPHER','BY MR. REED','EXAMINATION BY MR. REED'];

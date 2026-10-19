@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {parseTestimonySource} from '../../server/testimonySource.js';
-import {reviewableSpeakerLabels} from '../../server/events/sourceRoles.js';
+import {reviewableSpeakerLabels} from '../../server/sourceRoles.js';
 import {shingleCoverage} from './fidelity.mjs';
 import {priorOverlap,canonicalUrl} from './identity.mjs';
 const root=new URL('./',import.meta.url),load=name=>fs.readFile(new URL(name,root),'utf8').then(JSON.parse);
@@ -48,7 +48,8 @@ test('detector inputs exclude keys and retain framed witness testimony',async()=
 });
 test('fresh answer-key sentences and IDs do not appear in production prompts',async()=>{
  const baseline=await load('research/baseline.json'),cases=await load('cases.json');
- for(const file of Object.keys(baseline.productionPrompts)){
+ // The baseline also lists the removed events-method prompts; only prompts that still ship are checked.
+ for(const file of Object.keys(baseline.productionPrompts).filter(f=>!f.startsWith('server/events/'))){
   const text=await fs.readFile(new URL('../../'+file,root),'utf8');
   for(const c of cases){
    assert.ok(!text.includes(c.id),'Fresh case ID appears in production prompt');

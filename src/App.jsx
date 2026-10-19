@@ -1,14 +1,13 @@
 import {resumableCloudJobId} from './lib/cloudAnalysisClient.js';
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import RecoveryPanel from "./RecoveryPanel.jsx";
-import EventReview from "./EventReview.jsx";
 import { recoveredDraft, recoveryRequest, beginAnalysisDraft, checkpointSaveWarning } from "./lib/recovery.js";
 import AnalysisStatus from "./AnalysisStatus.jsx";
 import { unscoredOnlyCount, elapsedLabel } from "./lib/analysisStatus.js";
 import AuthGate from "./SupabaseCases.jsx";
 import { supabase } from "./lib/supabaseClient.js";
 import { readTranscriptDocument } from "./lib/readTranscript.js";
-import { analysisBody, previewAnalysis, runAnalysis, eventRecoveryRequest } from "./lib/analysisClient.js";
+import { analysisBody, previewAnalysis, runAnalysis } from "./lib/analysisClient.js";
 import { checkFileBudget } from "../shared/documentLimits.js";
 import { documentMetadata, createDocumentStore } from "./lib/documentStore.js";
 import { createCaseStore } from "./lib/caseStore.js";
@@ -50,6 +49,12 @@ function TranscriptFile({ index, value, file, onChange, onFile, onReadingChange,
     catch (err) { setError(err.name === "AbortError" ? "Import cancelled. Previous case contents were kept." : err.message || "This file could not be saved. Try uploading again."); }
     finally { setFileBusy(false); onReadingChange(false); setFileProgress(""); event.target.value = ""; }
   }
+  // A loaded file shrinks to one slim chip so the findings stay in view.
+  if (file && !error && !fileProgress && !file.pageMappingStale && !(file.extraction?.ocrPages?.length || file.extraction?.failedPages?.length)) return <section className="document-chip">
+    <span className="document-icon">{file.type === "application/pdf" ? "PDF" : "TXT"}</span><span className="document-chip-name" title={file.name}>{file.name}</span>{file.extraction && <span className="muted">{file.extraction.pageCount} pages</span>}
+    <button className="link-button" disabled={disabled || fileBusy} onClick={() => input.current.click()}>Replace</button>
+    <input ref={input} type="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown" onChange={readFile} hidden disabled={disabled || fileBusy} />
+  </section>;
   return <section className="document-card">
     <div className="document-heading"><span className="document-icon">{file?.type === "application/pdf" ? "PDF" : "TXT"}</span><div><h3>{file?.name ?? `Transcript ${index + 1}`}</h3><span>{file?.path ? "Original saved privately" : file ? "Imported text · not uploaded" : value.trim() ? "Pasted testimony" : "Add testimony to begin"}</span></div><button className="document-upload-primary" disabled={disabled || fileBusy} onClick={() => input.current.click()}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5" /></svg>{fileBusy ? "Importing…" : file ? "Replace file" : "Upload file"}</button></div>
     <input ref={input} type="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown" onChange={readFile} hidden disabled={disabled || fileBusy} />
@@ -87,7 +92,6 @@ function Dashboard({ session }) {
   const [caseError, setCaseError] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingPlan, setPendingPlan] = useState(null);
-  const [analysisMode]=useState("legacy");
   const [preparing, setPreparing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState("");
   const [reportError] = useState("");
@@ -95,6 +99,9 @@ function Dashboard({ session }) {
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("ALL");
+  // The transcript text panel is open by default; each viewer's choice is remembered in this browser.
+  const [showTranscripts, setShowTranscripts] = useState(() => { try { return localStorage.getItem("showTranscripts") !== "0"; } catch { return true; } });
+  function toggleTranscripts() { setShowTranscripts(open => { try { localStorage.setItem("showTranscripts", open ? "0" : "1"); } catch { /* storage unavailable */ } return !open; }); }
   const [store] = useState(() => local ? createLocalCaseStore(localKv) : createCaseStore(supabase));
   const request = useRef(null);
   const timer = useRef(null);
@@ -212,8 +219,6 @@ function Dashboard({ session }) {
     try {
       const recovery=await recoveryRequest(apiFetch,`?caseId=${encodeURIComponent(deleteTarget.id)}`);
       for(const job of recovery.jobs)await recoveryRequest(apiFetch,`/${job.id}`,{method:'DELETE'});
-      const eventJobs=await eventRecoveryRequest(apiFetch,`?caseId=${encodeURIComponent(deleteTarget.id)}`);
-      for(const job of eventJobs.jobs)await eventRecoveryRequest(apiFetch,`/${job.id}`,{method:'DELETE'});
       await store.remove(deleteTarget.id);
       try { await documents.removeCaseFiles(deleteTarget.id); }
       catch { setCaseError("The case was deleted, but some original files could not be cleaned up. Storage cleanup needs to be retried."); }
@@ -307,8 +312,14 @@ function Dashboard({ session }) {
     if(draft.dirty&&!window.confirm('Replace the displayed work with the saved server checkpoint? Save your edits first if needed.'))throw new Error('Recovery cancelled.');
     const recovered=recoveredDraft(draft,record);updateDraft(activeId,recovered);await persist(activeId,recovered);
   }
-  const findings = (draft.results ?? []).map((result, index) => ({ result, index }));
-  const visible = findings.filter(({ result }) => filter === "ALL" || result.type === filter);
+  // Real contradictions first (strongest score first), then uncertain, then the dismissed ones.
+  const rank = r => r.labelDisagreement ? 2 : r.type === "DIRECT" ? 0 : r.type === "INFERENTIAL" ? 1 : 3;
+  const findings = (draft.results ?? []).map((result, index) => ({ result, index }))
+    .sort((a, b) => rank(a.result) - rank(b.result) || (b.result.humanConfidence ?? -1) - (a.result.humanConfidence ?? -1));
+  const kindOf = r => r.labelDisagreement ? "UNCERTAIN" : r.type;
+  const counts = findings.reduce((n, { result }) => ({ ...n, [kindOf(result)]: (n[kindOf(result)] ?? 0) + 1 }), {});
+  const visible = findings.filter(({ result }) => filter === "ALL" || kindOf(result) === filter);
+  const firstDismissed = visible.find(({ result }) => rank(result) === 3)?.index;
   const selected = visible.find(item => item.index === draft.selected) ?? visible[0];
   async function renameCase() {
     const next = window.prompt("Rename case", caseTitle);
@@ -329,17 +340,20 @@ function Dashboard({ session }) {
     </aside>
     <main className="workspace-main"><header className="workspace-header"><div><div className="case-title"><h1>{caseTitle}</h1></div></div><div className="case-save"><span className="storage-status" role="status">{opening ? "Opening case…" : uploading ? "Uploading original…" : saving ? "Saving…" : saveError ? "Save failed" : activeId === "sample" ? "Sample · not saved" : draft.dirty ? "Unsaved changes" : loading ? "Analyzing…" : "✓ Saved"}</span><button disabled={blocked} onClick={saveWork}>{saving ? "Saving…" : activeId === "sample" ? "Save as case" : "Save"}</button>{activeId !== "sample" && <button className="secondary-button" disabled={blocked} onClick={renameCase}>Rename</button>}{activeId !== "sample" && <button className="secondary-button danger" disabled={blocked} onClick={() => { setDeleteError(""); setDeleteTarget({ id: activeId, title: caseTitle }); }}>Delete</button>}</div></header>
       {pendingPlan && <div role="dialog" aria-modal="true" aria-labelledby="analysis-plan-title" className="analysis-plan"><h2 id="analysis-plan-title">Review before paid analysis</h2><p className="muted">Starting sends both transcripts to Anthropic for analysis. Borderline findings get one small double-check request afterwards (usually under $0.10, at most about $0.35).</p><p>{pendingPlan.plan.documents.map((d,i)=>`Transcript ${i+1}: ${d.pageCount??'unknown'} PDF pages, ${d.sections} sections`).join(' · ')}</p><p><b>{pendingPlan.plan.requestCount} model request{pendingPlan.plan.requestCount===1?'':'s'}</b> · estimated US ${pendingPlan.plan.cost.estimated.toFixed(2)} · conservative budget US ${pendingPlan.plan.cost.conservativeBudget.toFixed(2)}</p><p>{pendingPlan.plan.cost.note}</p>{pendingPlan.plan.execution==='durable-steps'&&<label>Maximum spend for this review (US$)<input aria-label="Maximum review spend" disabled={pendingPlan.plan.budgetFixed} type="number" min="0.01" step="0.01" value={pendingPlan.plan.approvedBudgetUsd??pendingPlan.plan.cost.conservativeBudget} onChange={e=>setPendingPlan(old=>({...old,plan:{...old.plan,approvedBudgetUsd:Number(e.target.value)}}))}/><small>A lower cap can stop with partial coverage. Completed work is kept.</small></label>}<p>{pendingPlan.plan.resuming?"Only unfinished comparisons will run again. Previously completed comparisons are retained.":"Every section is compared across both documents, including differently ordered sections."} Cancelled or interrupted work may incur charges and produces incomplete results.</p><button onClick={()=>setPendingPlan(null)}>Go back — no paid calls</button><button className="analyze-button" onClick={analyze}>Start {pendingPlan.plan.requestCount} paid request{pendingPlan.plan.requestCount===1?'':'s'}</button></div>}
-      {!loading&&(draft.analysis?.status==="complete"||unscoredOnlyCount(draft.analysis))?<p className="status-line" role="status">✓ Analysis complete · {findings.length} finding{findings.length===1?"":"s"}{Number.isFinite(draft.seconds)?` · ${elapsedLabel(draft.seconds)}`:""}{findings.some(f=>!Number.isFinite(f.result.humanConfidence))?` · ${findings.filter(f=>!Number.isFinite(f.result.humanConfidence)).length} without a score`:""}</p>:<AnalysisStatus analysis={draft.analysis} active={loading} elapsed={loading ? elapsed : draft.seconds} timing={analysisTiming} />}
-      <section className={`documents-toolbar ${analysisMode==='events'?'documents-pair':''}`} aria-label="Transcript documents">{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}{analysisMode==='legacy'&&<div className="analyze-block">{analysisMode==='legacy' && <button className="analyze-button" disabled={blocked} onClick={()=>prepareAnalysis()}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : draft.results ? "Analyze again" : "Analyze"}</button>}{loading&&<p role="status">◌ {elapsed}s elapsed · {analysisProgress}</p>}{analysisMode==='legacy' && (loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div>}</section>
+      <section className="documents-toolbar" aria-label="Transcript documents">{draft.files.some(Boolean)&&<button className="collapse-toggle" aria-expanded={showTranscripts} onClick={toggleTranscripts}>{showTranscripts?"▾":"▸"} Transcripts</button>}{draft.texts.map((text,i) => <TranscriptFile key={`${activeId}-${i}`} index={i} value={text} file={draft.files[i]} disabled={blocked} onReadingChange={setReadingFile} onChange={value => { const texts = [...draft.texts], files=[...draft.files]; texts[i] = value; if(files[i]?.extraction) files[i]={...files[i],pageMappingStale:true}; patch({ texts, files, results: null, seconds: null, analysis:null }); }} onFile={(text, chosen, extraction, options) => uploadOriginal(i, text, chosen, extraction, options)} />)}<div className="analyze-block"><button className="analyze-button" disabled={blocked} onClick={()=>prepareAnalysis()}>{preparing ? "Preparing estimate…" : loading ? "Analyzing…" : draft.results ? "Analyze again" : "Analyze"}</button>{loading&&<p role="status">◌ {elapsed}s elapsed · {analysisProgress}</p>}{(loading || preparing) && <button onClick={()=>request.current?.abort()}>Cancel analysis</button>}</div></section>
+      {showTranscripts&&draft.files.some(Boolean)&&<section className="transcript-previews" aria-label="Transcript text">{draft.texts.map((text,i)=>draft.files[i]?<div key={i}><span className="eyebrow">Transcript {i+1} · {draft.files[i].name}</span><pre tabIndex={0}>{text}</pre></div>:null)}</section>}
+      {!loading&&draft.results&&(draft.analysis?.status==="complete"||unscoredOnlyCount(draft.analysis))?<section className="summary-strip" aria-label="Result summary">
+        <div className="summary-headline"><b>{(counts.DIRECT ?? 0) + (counts.INFERENTIAL ?? 0)}</b><span>contradiction{(counts.DIRECT ?? 0) + (counts.INFERENTIAL ?? 0) === 1 ? "" : "s"} found</span><small role="status">✓ Complete{Number.isFinite(draft.seconds)?` · ${elapsedLabel(draft.seconds)}`:""}</small></div>
+        {[["DIRECT","Direct"],["INFERENTIAL","Inferential"],["UNCERTAIN","Uncertain"],["FALSE_POSITIVE","Not contradictions"]].filter(([key])=>key!=="UNCERTAIN"||counts.UNCERTAIN).map(([key,name])=><button key={key} className={`summary-tile ${key.toLowerCase()} ${filter===key?"active":""}`} aria-pressed={filter===key} onClick={()=>setFilter(filter===key?"ALL":key)}><b>{counts[key] ?? 0}</b><span>{name}</span></button>)}
+      </section>:<AnalysisStatus analysis={draft.analysis} active={loading} elapsed={loading ? elapsed : draft.seconds} timing={analysisTiming} />}
       {draft.texts.some(text=>unlabeledTestimony(text))&&<p className="muted unlabeled-note">No question/answer labels were found in {draft.texts.map((t,i)=>unlabeledTestimony(t)?`Transcript ${i+1}`:null).filter(Boolean).join(" and ")}, so all of that text is treated as the witness\u2019s own words.</p>}
-      {analysisMode==='events' && <EventReview key={activeId} caseId={activeId} memoryAvailable={!local} draft={draft} witnessTestimonyConfirmed={draft.texts.map(()=>true)} fetchImpl={apiFetch} disabled={blocked&&!loading} onBusy={setLoading} onTick={setElapsed} onTiming={setAnalysisTiming} onPlanning={setPreparing} onCheckpoint={async snapshot=>{updateDraft(activeId,{...snapshot,dirty:true});await persist(activeId,snapshot);}}/>}
       {reportError && <p className="error" role="alert">{reportError}</p>}
       {error && <p className="error" role="alert">{error}</p>}
       {saveError && <p className="error" role="alert">{saveError}</p>}
-      <section className="review-layout" id="review-findings"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{findings.length}</span></div>
+      <section className="review-layout" id="review-findings"><aside className="findings-panel"><div className="findings-heading"><h2>Findings</h2><span>{filter === "ALL" ? findings.length : `${visible.length} of ${findings.length}`}</span></div>
         {!draft.results && <div className="findings-empty"><span>⌕</span><h3>{loading ? "Review in progress" : "Start with two transcripts"}</h3><p>{loading ? "Findings will appear when analysis completes. Keep this tab open." : "Preview the text above, then analyze to compare the witness’s accounts."}</p></div>}
         {draft.results && visible.length === 0 && <p className="findings-empty">No findings in this category.</p>}
-        <div className="finding-list">{visible.map(({result,index}) => <button key={index} className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); }}><span className={`type-chip ${result.labelDisagreement?"uncertain":result.type.toLowerCase()}`}>{result.labelDisagreement?"Uncertain":label(result.type)}</span><span className={`score-pill ${scoreBadge(result).kind}`}>{scoreBadge(result).value}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{findingTitle(result)}</h3>{shortRule(result.typeRule)&&<p>{shortRule(result.typeRule)}</p>}<span className="finding-arrow">›</span></button>)}</div>
+        <div className="finding-list">{visible.map(({result,index}) => <Fragment key={index}>{index === firstDismissed && <p className="list-divider">Not contradictions</p>}<button className={`finding-item ${result.type.toLowerCase()} ${selected?.index === index ? "selected" : ""}`} onClick={() => { updateDraft(activeId, { selected: index }); }}><span className={`type-chip ${result.labelDisagreement?"uncertain":result.type.toLowerCase()}`}>{result.labelDisagreement?"Uncertain":label(result.type)}</span><span className={`score-pill ${scoreBadge(result).kind}`}>{scoreBadge(result).value}</span>{draft.reviewed[index] && <span className="reviewed-label">✓ Reviewed</span>}<h3>{findingTitle(result)}</h3>{shortRule(result.typeRule)&&<p>{shortRule(result.typeRule)}</p>}<span className="finding-arrow">›</span></button></Fragment>)}</div>
       </aside><div className="finding-detail">{selected ? <><div className="detail-title"><h2>{findingTitle(selected.result)}</h2></div><ReviewCard result={selected.result} dismissed={selected.result.type === "FALSE_POSITIVE"} /></> : <div className="detail-empty"><div className="empty-document">≋</div><span className="eyebrow">THE FULL PICTURE</span><h2>Two accounts.<br/>One clear workspace.</h2><p>Select a finding to see the source quotes, AI explanation and independent code verification together.</p><div className="empty-steps"><span>01 &nbsp; Add testimony</span><span>02 &nbsp; Compare accounts</span><span>03 &nbsp; Review evidence</span></div></div>}</div></section>
       {["failed","partial","cancelled"].includes(draft.analysis?.status)&&!unscoredOnlyCount(draft.analysis)&&<RecoveryPanel caseId={activeId} disabled={blocked} fetchImpl={apiFetch} onRecover={recoverAnalysis} onResume={prepareAnalysis} cloudJobId={draft.analysis?.cloudJobId} onCloudRecover={async result=>{const next={...draft,results:result.contradictions,analysis:result.analysis,dirty:true};updateDraft(activeId,next);await persist(activeId,next);}} />}
     </main>

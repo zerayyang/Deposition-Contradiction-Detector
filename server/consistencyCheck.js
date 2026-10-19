@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import {MODEL} from './documentAnalysis.js';
 import {decisionSchema,deriveType} from './typeDecision.js';
-import {providerOutputFormat} from './events/structuredOutput.js';
+import {providerOutputFormat} from './structuredOutput.js';
 
 export const MAX_RECHECK_PAIRS=12;
 export const RECHECK_OUTPUT_TOKENS=8000;

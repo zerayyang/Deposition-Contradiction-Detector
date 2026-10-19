@@ -20,13 +20,3 @@ test('a partial result after the run has stopped still says partly complete',()=
   assert.match(html,/Review partly complete/);
 });
 
-const withGaps={workflow:'events-v1',phase:'extract',status:'partial',planned:10,completed:1,gaps:[{code:'UNIT_UNRESOLVED',reason:'Unclear answer.'}],
-  tasks:[{id:'0:0',status:'completed',acceptedFindings:22},{id:'0:1',status:'pending'}]};
-test('reading gaps are not announced while hosted steps are still running',()=>{
-  const html=renderToStaticMarkup(createElement(Component,{analysis:withGaps,active:true,elapsed:200}));
-  assert.match(html,/Reviewing your documents/);assert.doesNotMatch(html,/Reading incomplete/);assert.doesNotMatch(html,/Compare retained notes only/);
-});
-test('reading gaps are announced once the run has stopped',()=>{
-  const html=renderToStaticMarkup(createElement(Component,{analysis:withGaps,active:false}));
-  assert.match(html,/Reading incomplete/);
-});

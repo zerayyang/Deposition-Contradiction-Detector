@@ -5,7 +5,6 @@ import {fileURLToPath} from 'node:url';
 import {resolve,join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {MODEL,buildPlan,executePlan} from '../../server/documentAnalysis.js';
-import {prepareEventWorkflow,executeEventWorkflow} from '../../server/events/workflow.js';
 
 const here=new URL('./',import.meta.url);
 const money=n=>Math.ceil(n*1e6)/1e6;
@@ -14,7 +13,7 @@ export function optionsFor(args){
  for(let i=0;i<args.length;i++){
   if(args[i]==='--skip-datasets'){options.skipDatasets=true;continue;}
   const [key,...parts]=args[i].split('=');
-  if(!['--method','--split','--repeat','--approve-usd','--corpus'].includes(key))throw new Error('Unknown argument. Use --method direct|events --split tuning|heldout|all --repeat N [--skip-datasets] [--corpus DIR] [--approve-usd=CAP].');
+  if(!['--method','--split','--repeat','--approve-usd','--corpus'].includes(key))throw new Error('Unknown argument. Use --method direct --split tuning|heldout|all --repeat N [--skip-datasets] [--corpus DIR] [--approve-usd=CAP].');
   const value=parts.length?parts.join('='):args[++i];
   if(value===undefined||value.startsWith('--'))throw new Error('An option value is missing.');
   if(key==='--method')options.method=value;
@@ -23,7 +22,7 @@ export function optionsFor(args){
   if(key==='--approve-usd')options.approveUsd=Number(value);
   if(key==='--corpus'){if(!value.trim())throw new Error('Corpus directory is required.');options.corpus=resolve(value);}
  }
- if(!['direct','events'].includes(options.method)||!['tuning','heldout','all'].includes(options.split))throw new Error('Invalid method or split.');
+ if(options.method!=='direct'||!['tuning','heldout','all'].includes(options.split))throw new Error('Invalid method or split.');
  if(!Number.isSafeInteger(options.repeat)||options.repeat<1||options.repeat>10)throw new Error('Repeat must be an integer from 1 to 10.');
  if(options.approveUsd!==null&&(!Number.isFinite(options.approveUsd)||options.approveUsd<=0))throw new Error('Approval must be a positive finite USD cap.');
  return options;
@@ -32,7 +31,7 @@ export async function prepareCases(cases,options){
  // Research-dataset rows (contract NLI) are not sworn testimony; they can be left out of paid runs.
  const selected=cases.filter(c=>(options.split==='all'||c.split===options.split)&&!(options.skipDatasets&&c.id.startsWith('contractnli-')));
  if(!selected.length)throw new Error('No cases in the selected split.');
- const instructions=options.method==='direct'?await fs.readFile(new URL('../../server/proper_prompts.md',here),'utf8'):null;
+ const instructions=await fs.readFile(new URL('../../server/proper_prompts.md',here),'utf8');
  const jobs=[];
  for(const item of selected){
   // Deliberately construct the only detector inputs from testimony, not labels,
@@ -40,23 +39,15 @@ export async function prepareCases(cases,options){
   if(typeof item.transcript1!=='string'||typeof item.transcript2!=='string')throw new Error('Case lacks testimony inputs.');
   for(let attempt=1;attempt<=options.repeat;attempt++){
    const texts=[item.transcript1,item.transcript2];
-   if(options.method==='direct'){
-    const plan=buildPlan(texts,[],instructions);
-    jobs.push({id:item.id,attempt,texts,plan,instructions,cost:plan.cost,requestCount:plan.requestCount});
-   }else{
-    const body={workflow:'events-v1',phase:'extract',sameWitnessConfirmed:true,speakerRoles:[{},{}],transcript1:texts[0],transcript2:texts[1]};
-    const prepared=await prepareEventWorkflow(body,{maxRequests:512,maxBudgetUsd:100000});
-    jobs.push({id:item.id,attempt,body,prepared,cost:prepared.preview.cost,requestCount:prepared.preview.requestCount});
-   }
+   const plan=buildPlan(texts,[],instructions);
+   jobs.push({id:item.id,attempt,texts,plan,instructions,cost:plan.cost,requestCount:plan.requestCount});
   }
  }
  return {jobs,preview:{mode:'COST PREVIEW ONLY',method:options.method,split:options.split,cases:selected.length,repeat:options.repeat,skipDatasets:options.skipDatasets,
   model:MODEL.id,plannedRequests:jobs.reduce((n,j)=>n+j.requestCount,0),
-  phase:options.method==='direct'?'comparison':'extraction only',
+  phase:'comparison',
   estimatedUsd:money(jobs.reduce((n,j)=>n+j.cost.estimated,0)),
   conservativeBudgetUsd:money(jobs.reduce((n,j)=>n+j.cost.conservativeBudget,0)),
-  comparisonRequests:options.method==='events'?'UNKNOWN until validated extraction; no fabricated event counts':undefined,
-  completeWorkflowCost:options.method==='events'?'UNKNOWN; extraction estimate excludes comparison':undefined,
   pricing:'Current application-configured uncached USD rates; not verified billing. No automatic retries.',
   answerKeyStatus:'Draft proposals, not approved gold. This runner does not grade or promote them.'}};
 }
@@ -89,25 +80,10 @@ export async function executeCases(prepared,options,callModel){
  if(options.approveUsd<prepared.preview.estimatedUsd)throw new Error('Cap is below the selected phase estimate; no calls started.');
  const transport=cappedTransport(callModel,options.approveUsd),summaries=[];
  for(const job of prepared.jobs){
-  if(options.method==='direct'){
-   const result=await executePlan({plan:job.plan,texts:job.texts,instructions:job.instructions,callModel:(...args)=>transport.call(...args)});
-   summaries.push({id:job.id,attempt:job.attempt,phase:'direct',status:result.analysis.status,findings:result.contradictions.length,labels:labelsOf(result.contradictions)});
-   // Incomplete cases are recorded and left ungraded; only an exhausted cap stops the run.
-   if(transport.capReached)break;
-  }else{
-   const reading=await executeEventWorkflow({prepared:job.prepared,body:job.body,callModel:(...args)=>transport.call(...args)});
-   summaries.push({id:job.id,attempt:job.attempt,phase:'extraction',status:reading.analysis.status});
-   // Never acknowledge gaps automatically. A new explicitly reviewed run is
-   // needed for incomplete reading; no retries or relaxed source validation.
-   if(reading.analysis.status!=='awaiting_comparison'){if(transport.capReached)break;continue;}
-   const body={...job.body,phase:'compare',eventState:reading.analysis.eventState};
-   const comparison=await prepareEventWorkflow(body,{maxRequests:512,maxBudgetUsd:100000});
-   const remaining=options.approveUsd-transport.reservedUsd;
-   if(comparison.preview.cost.estimated>remaining){summaries.push({id:job.id,phase:'comparison',status:'NOT_RUN_CAP',plannedRequests:comparison.preview.requestCount});break;}
-   const result=await executeEventWorkflow({prepared:comparison,body,callModel:(...args)=>transport.call(...args)});
-   summaries.push({id:job.id,attempt:job.attempt,phase:'comparison',status:result.analysis.status,findings:result.contradictions.length,labels:labelsOf(result.contradictions)});
-   if(transport.capReached)break;
-  }
+  const result=await executePlan({plan:job.plan,texts:job.texts,instructions:job.instructions,callModel:(...args)=>transport.call(...args)});
+  summaries.push({id:job.id,attempt:job.attempt,phase:'direct',status:result.analysis.status,findings:result.contradictions.length,labels:labelsOf(result.contradictions)});
+  // Incomplete cases are recorded and left ungraded; only an exhausted cap stops the run.
+  if(transport.capReached)break;
  }
  return {summaries,requests:transport.calls,reservedUsd:transport.reservedUsd,note:'Reserved ceiling at local rates, not measured provider spend. No accuracy grading.'};
 }

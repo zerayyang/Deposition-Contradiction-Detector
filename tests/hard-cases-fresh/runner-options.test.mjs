@@ -18,8 +18,8 @@ test('custom corpus preview reads only the selected synthetic inputs',async()=>{
  try{
   await fs.writeFile(join(dir,'inputs.json'),JSON.stringify([{id:'synthetic-option-test',split:'heldout',transcript1:'Q: What did you sign?\nA: A fictional form.',transcript2:'Q: What did you sign?\nA: A fictional notice.'}]));
   await fs.writeFile(join(dir,'reference-findings.json'),'THIS_REFERENCE_MUST_NOT_BE_READ');
-  const {stdout}=await exec(process.execPath,[run,'--method','events','--corpus',dir]);
-  const preview=JSON.parse(stdout);assert.equal(preview.cases,1);assert.equal(preview.plannedRequests,2);assert.equal(preview.mode,'COST PREVIEW ONLY');
+  const {stdout}=await exec(process.execPath,[run,'--method','direct','--corpus',dir]);
+  const preview=JSON.parse(stdout);assert.equal(preview.cases,1);assert.equal(preview.plannedRequests,1);assert.equal(preview.mode,'COST PREVIEW ONLY');
   assert.ok(!stdout.includes('synthetic-option-test'));assert.ok(!stdout.includes('THIS_REFERENCE_MUST_NOT_BE_READ'));
  }finally{await fs.rm(dir,{recursive:true,force:true});}
 });

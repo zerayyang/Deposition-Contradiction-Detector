@@ -46,24 +46,6 @@ test('cloud client emits durable IDs, starts no extra model work through GET and
  const events=[];await runCloudAnalysis({...body},{id:'fixture',execution:'durable-steps',requestCount:1,cost:{conservativeBudget:1}},{fetchImpl,newId:()=>jobId,onEvent:e=>events.push(e),sleep:async()=>{}});assert.equal(calls,1);assert.ok(events.some(e=>e.analysis?.cloudJobId===jobId));assert.equal(events.at(-1).analysis.status,'complete');
 });
 
-function extraction(input){const units=input.sources.filter(s=>s.role==='WITNESS'&&s.assigned);return {schemaVersion:1,events:units.map((s,i)=>({id:'e'+i,kind:'presence',summary:'Scripted proposed presence event',assertion:{polarity:'AFFIRMED',sourceIds:['w']},attributes:[{name:'location',state:'STATED',value:'home',basis:'WITNESS_WORDS',sourceIds:['w']}],qualifiers:[],relations:[],sources:[{id:'w',unitId:s.id,quote:s.text.trim(),occurrence:0}],reviewRequired:false,unresolvedReasons:[]})),units:units.map((s,i)=>({unitId:s.id,status:'EVENTS',eventIds:['e'+i],reason:null}))};}
-function comparison(input,extra={}){return {schemaVersion:1,rows:input.left.records.map(left=>({leftId:left.id,pairs:input.right.records.map(right=>({rightId:right.id,relation:'RELATED',reason:'Scripted shared Monday evening.',comparisons:[{issue:'Presence',type:'DIRECT',report:true,reasoning:'Scripted classification, not measured model performance.',leftSourceIds:[left.event.sources[0].id],rightSourceIds:[right.event.sources[0].id],missingContext:[],...extra}]})),unrelatedRanges:[]}))};}
-
-test('hosted event extraction resumes every document and comparison requires a separate approval',async()=>{
- const transport=async params=>{const input=JSON.parse(params.messages[0].content);return {...msg(),content:[{type:'text',text:JSON.stringify(input.left?comparison(input):extraction(input))}]};};
- const s=setup({model:transport}),api=s.make();
- const input={...body,transcript1:'Q: Where were you on Monday evening?\nA: I was at home all evening.',transcript2:'Q: Where were you on Monday evening?\nA: I left home at 8 pm.',workflow:'events-v1',phase:'extract',sameWitnessConfirmed:true,speakerRoles:[{},{}]};
- const preview=response();await api.preview(req(input),preview);assert.equal(preview.code,200);assert.equal(preview.value.requestCount,2);
- const approval=response();await api.start(req({...input,approvedPlanId:preview.value.id,approvedRequestCount:2,approvedMaxUsd:preview.value.cost.conservativeBudget}),approval);assert.equal(approval.code,200);
- const first=response();await api.step(req(),first);assert.equal(s.calls,1);assert.equal(first.value.done,false,JSON.stringify(first.value.result?.analysis));
- const second=response();await s.make().step(req(),second);assert.equal(s.calls,2);assert.equal(second.value.result.analysis.status,'awaiting_comparison');assert.equal(second.value.done,true);
- const repeated=response();await api.step(req(),repeated);assert.equal(s.calls,2);
- const compareBody={...input,phase:'compare',eventState:second.value.result.analysis.eventState};const comparePreview=response();await api.preview(req(compareBody),comparePreview);assert.equal(comparePreview.code,200);assert.equal(s.calls,2);assert.ok(comparePreview.value.requestCount>0);
- const comparisonJob='33333333-3333-4333-8333-333333333333';const compareReq=b=>({...req(b),params:{caseId,jobId:comparisonJob}});
- const approved=response();await api.start(compareReq({...compareBody,approvedPlanId:comparePreview.value.id,approvedRequestCount:comparePreview.value.requestCount,approvedMaxUsd:comparePreview.value.cost.conservativeBudget}),approved);assert.equal(approved.code,200);
- const compared=response();await api.step(compareReq(),compared);assert.equal(compared.code,200);assert.equal(s.calls,3);assert.equal(compared.value.result.analysis.status,'complete');assert.ok(compared.value.result.contradictions.length>0);
-});
-
 test('retained source warnings never repeat a completed paid comparison or erase its coverage',async()=>{
  const s=setup(),api=s.make();const plan=await start(api);const first=response();await api.step(req(),first);
  const key=[...s.objects.keys()].find(k=>k.endsWith('/s0-result'));const record=s.objects.get(key);

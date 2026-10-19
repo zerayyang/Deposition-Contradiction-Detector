@@ -4,8 +4,8 @@ import {optionsFor,prepareCases,executeCases,cappedTransport} from './run.mjs';
 const cases=[{id:'synthetic-only',split:'heldout',transcript1:'Q: What did you sign?\nA: A synthetic form.',transcript2:'Q: What did you sign?\nA: A synthetic notice.',label:'ANSWER_KEY_SENTINEL',labelBasis:'JUDICIAL_REFERENCE_SENTINEL',notes:'REFERENCE_NOT_INPUT'}];
 test('preview defaults to no approval and validates method, split, repeats and spending cap',()=>{
  assert.equal(optionsFor([]).approveUsd,null);
- assert.deepEqual(optionsFor(['--method','events','--split=heldout','--repeat=2']),{method:'events',split:'heldout',repeat:2,approveUsd:null,skipDatasets:false});
- for(const args of [['--approve-usd=NaN'],['--approve-usd=0'],['--approve-usd=-1'],['--approve-usd=Infinity'],['--method=other'],['--repeat=0'],['--split=other'],['--unknown'],['--method']])assert.throws(()=>optionsFor(args));
+ assert.deepEqual(optionsFor(['--method','direct','--split=heldout','--repeat=2']),{method:'direct',split:'heldout',repeat:2,approveUsd:null,skipDatasets:false});
+ for(const args of [['--approve-usd=NaN'],['--approve-usd=0'],['--approve-usd=-1'],['--approve-usd=Infinity'],['--method=other'],['--method=events'],['--repeat=0'],['--split=other'],['--unknown'],['--method']])assert.throws(()=>optionsFor(args));
 });
 test('direct preview uses application plans, excludes answer keys and repeats counts without transport',async()=>{
  const options=optionsFor(['--repeat=2']),prepared=await prepareCases(cases,options);
@@ -13,12 +13,6 @@ test('direct preview uses application plans, excludes answer keys and repeats co
  const planned=JSON.stringify(prepared.jobs);
  for(const marker of ['ANSWER_KEY_SENTINEL','JUDICIAL_REFERENCE_SENTINEL','REFERENCE_NOT_INPUT'])assert.ok(!planned.includes(marker));
  let calls=0;await assert.rejects(()=>executeCases(prepared,options,async()=>{calls++;}),/--approve-usd/);assert.equal(calls,0);
-});
-test('events preview explicitly leaves comparison count and total price unknown',async()=>{
- const options=optionsFor(['--method=events','--split=heldout']),prepared=await prepareCases(cases,options);
- assert.equal(prepared.preview.plannedRequests,2);assert.equal(prepared.preview.phase,'extraction only');
- assert.match(prepared.preview.completeWorkflowCost,/UNKNOWN/);assert.match(prepared.preview.comparisonRequests,/UNKNOWN/);
- assert.ok(!JSON.stringify(prepared.jobs).includes('ANSWER_KEY_SENTINEL'));
 });
 test('empty selection and insufficient phase cap refuse before any transport call',async()=>{
  await assert.rejects(()=>prepareCases(cases,optionsFor(['--split=tuning'])),/No cases/);
@@ -35,19 +29,6 @@ test('failed requests keep their reservation and disable retries',async()=>{
  let calls=0;const transport=cappedTransport(async(_params,options)=>{calls++;assert.equal(options.maxRetries,0);throw new Error('Synthetic transport failure.');},1,{model:{id:'synthetic',inputUsdPerMillion:4,outputUsdPerMillion:20}});
  await assert.rejects(()=>transport.call({model:'synthetic',max_tokens:1000},{}),/Synthetic/);
  assert.equal(calls,1);assert.equal(transport.calls,1);assert.ok(transport.reservedUsd>0);
-});
-test('mocked event reading with a quarantined note never acknowledges gaps or starts comparison',async()=>{
- const options=optionsFor(['--method=events','--approve-usd=100']),prepared=await prepareCases(cases,options);let calls=0;
- const result=await executeCases(prepared,options,async params=>{
-  const input=JSON.parse(params.messages[0].content);assert.ok(Array.isArray(input.sources),'Only extraction should run');
-  for(const marker of ['ANSWER_KEY_SENTINEL','JUDICIAL_REFERENCE_SENTINEL','REFERENCE_NOT_INPUT'])assert.ok(!JSON.stringify(params).includes(marker));
-  const units=input.sources.filter(s=>s.role==='WITNESS'&&s.assigned);
-  const events=units.map((u,i)=>({id:'e'+i,kind:'synthetic',summary:'Synthetic note.',assertion:{polarity:'AFFIRMED',sourceIds:['w']},attributes:[],qualifiers:[],relations:[],sources:[{id:'w',unitId:u.id,quote:calls===0?'Absent synthetic quotation.':u.text.trim(),occurrence:0}],reviewRequired:false,unresolvedReasons:[]}));
-  calls++;
-  return {stop_reason:'end_turn',content:[{type:'text',text:JSON.stringify({schemaVersion:1,events,units:units.map((u,i)=>({unitId:u.id,status:'EVENTS',eventIds:['e'+i],reason:null}))})}],usage:{input_tokens:20,output_tokens:20}};
- });
- assert.equal(calls,2);assert.equal(result.requests,2);assert.equal(result.summaries.length,1);
- assert.equal(result.summaries[0].phase,'extraction');assert.notEqual(result.summaries[0].status,'awaiting_comparison');
 });
 test('a response with usage settles its reservation to measured cost',async()=>{
  const model={id:'synthetic',inputUsdPerMillion:4,outputUsdPerMillion:20};

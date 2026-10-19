@@ -3,23 +3,15 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {assessCandidate} from '../../server/humanConfidencePipeline.js';
 import {directWireSchema} from '../../server/directOutput.js';
-import {comparisonWireSchema} from '../../server/events/comparisonProtocol.js';
 
 const shared=readFileSync(new URL('../../server/proper_prompts.md',import.meta.url),'utf8');
-const comparison=readFileSync(new URL('../../server/events/COMPARISON_PROMPT.md',import.meta.url),'utf8');
 const types=['DIRECT','INFERENTIAL','NEEDS_REVIEW','FALSE_POSITIVE'];
 
-// Both methods classify with one procedure. The new method reads the shared text up to
-// "## 6. Required Output"; its own prompt may add transport rules but no classification rules.
-test('both methods share one classification procedure and the same label set',()=>{
+// One classification procedure; the double-check reads the same text up to "## 6. Required Output".
+test('the classification procedure has every step and the label set',()=>{
  const definitions=shared.slice(0,shared.indexOf('## 6. Required Output'));
  for(const heading of ['### Step 2: List every difference','### Step 4: The core test','### Step 5: Which type of conflict?','### Step 6: Consistency check','### Step 7: Record your answers','### Missing facts'])assert.ok(definitions.includes(heading),heading);
  assert.deepEqual(directWireSchema.properties.contradictions.items.properties.type.enum,types);
- const issue=comparisonWireSchema.properties.rows.items.properties.pairs.items.properties.comparisons.items;
- assert.deepEqual([...issue.properties.type.enum].sort(),[...types].sort());
- for(const overlay of ['overrides the earlier instruction','Reconciliations must come from the testimony','Inferences must rest on stated premises','Separate memory from knowledge'])
-  assert.ok(!comparison.includes(overlay),`New-method prompt still carries its own rule: ${overlay}`);
- assert.match(comparison,/adds no classification rules/);
 });
 test('the shared procedure bans imagined reconciliations and the old imperfect-memory default',()=>{
  assert.match(shared,/You may NOT reconcile with any distinction the witness did not draw/);

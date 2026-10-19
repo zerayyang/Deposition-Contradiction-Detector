@@ -1,4 +1,3 @@
-import {readingCanContinue} from '../../shared/readingState.js';
 import {readApiJson} from './apiResponse.js';
 const base=(caseId,jobId)=>'/api/cloud/'+encodeURIComponent(caseId)+'/'+encodeURIComponent(jobId);
 export async function runCloudAnalysis(body,plan,{signal,onEvent=()=>{},fetchImpl=fetch,newId=()=>crypto.randomUUID(),sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms))}={}){
@@ -14,7 +13,7 @@ export async function runCloudAnalysis(body,plan,{signal,onEvent=()=>{},fetchImp
   // A zero-work checkpoint lets the saved case retain the job ID before any
   // provider request. A lost browser cannot erase already saved server results.
   let state=await request('');
-  const initial=state.result??{topicsReviewed:[],contradictions:[],analysis:{workflow:body.workflow,phase:body.phase,status:'running',planned:plan.requestCount,completed:0,failed:0,partial:0,attempted:0,tasks:[],cloudJobId:jobId,cloudCaseId:body.caseId,execution:'durable-steps',recoveryEnabled:true}};
+  const initial=state.result??{topicsReviewed:[],contradictions:[],analysis:{status:'running',planned:plan.requestCount,completed:0,failed:0,partial:0,attempted:0,tasks:[],cloudJobId:jobId,cloudCaseId:body.caseId,execution:'durable-steps',recoveryEnabled:true}};
   await onEvent({event:'checkpoint',...initial});
   for(let n=0;n<1024;n++){
    signal?.throwIfAborted();
@@ -33,8 +32,6 @@ export async function readCloudProgress(caseId,jobId,fetchImpl=fetch){return rea
 
 export function resumableCloudJobId(analysis){
  if(analysis?.comparisonFinished===true)return null;
- if(analysis?.cloudJobId&&readingCanContinue(analysis))return analysis.cloudJobId;
- if(analysis?.readingPolicyVersion===2&&analysis.readingFinished===true)return null;
  if(!analysis?.cloudJobId||['complete','failed','cancelled'].includes(analysis.status)||analysis.tasks?.some(t=>['failed','partial','cancelled'].includes(t.status)))return null;
  return analysis.cloudJobId;
 }

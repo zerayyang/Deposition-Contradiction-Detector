@@ -1,4 +1,4 @@
-import {providerOutputFormat} from './events/structuredOutput.js';
+import {providerOutputFormat} from './structuredOutput.js';
 import {decisionSchema} from './typeDecision.js';
 const strings={type:'array',items:{type:'string'}};
 const nullable={type:['string','null']};

@@ -7,7 +7,6 @@ import {captureBuildIdentity} from './buildIdentity.js';
 import {MODEL} from './documentAnalysis.js';
 import {createCloudStoreFactory} from './cloudJobStore.js';
 import {createApp} from './app.js';
-import {createApprovedMemoryReader} from './memory/approvedMemory.js';
 import {createJobStore} from './jobStore.js';
 import {createAuthentication} from './authentication.js';
 import {runtimeConfiguration} from './configuration.js';
@@ -32,7 +31,7 @@ const cronHealth=createCronHealth({secret:process.env.CRON_SECRET,log,checks:asy
  demoUsersConfigured:!production||Boolean(allowedUserIds?.length),
  separateJobSigningKey:!process.env.VERCEL||Boolean(process.env.ANALYSIS_JOB_SIGNING_KEY),
  buildIdentityRecorded:Boolean(codeFingerprint)})});
-const app=createApp({cronHealth,readApprovedMemory:createApprovedMemoryReader({url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}),instructions,callModel,authenticate,runtimeIdentity,cloudStoreForRequest:process.env.VERCEL?createCloudStoreFactory({signingKey:process.env.ANALYSIS_JOB_SIGNING_KEY??process.env.ANTHROPIC_API_KEY,url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}):null,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
+const app=createApp({cronHealth,instructions,callModel,authenticate,runtimeIdentity,cloudStoreForRequest:process.env.VERCEL?createCloudStoreFactory({signingKey:process.env.ANALYSIS_JOB_SIGNING_KEY??process.env.ANTHROPIC_API_KEY,url:process.env.SUPABASE_URL??process.env.VITE_SUPABASE_URL,key:process.env.SUPABASE_PUBLISHABLE_KEY??process.env.VITE_SUPABASE_PUBLISHABLE_KEY}):null,jobStore:process.env.VERCEL?null:createJobStore(directory),codeFingerprint,maxRequests,maxBudgetUsd,log,staticDirectory:production&&!process.env.VERCEL?path.join(root,'dist'):null});
 export default app;
 
 // Keep the existing local entry point, but never bind a port in Vercel.

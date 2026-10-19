@@ -7,12 +7,12 @@ export function analysisBody(texts,documents) {
   return body;
 }
 export async function previewAnalysis(body,{signal,fetchImpl=fetch}={}) {
-  const response=await fetchImpl(body.workflow==='events-v1'?'/api/events/plan':'/api/analysis/plan',{method:'POST',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const response=await fetchImpl('/api/analysis/plan',{method:'POST',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   return readApiJson(response,'Could not prepare the analysis plan. The analysis service may be unavailable.');
 }
 export async function runAnalysis(body,plan,{signal,onEvent=()=>{},fetchImpl=fetch}={}) {
   if(plan.execution==='durable-steps')return runCloudAnalysis(body,plan,{signal,onEvent,fetchImpl});
-  const response=await fetchImpl(body.workflow==='events-v1'?'/api/events/stream':'/api/analyze/stream',{method:'POST',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,approvedPlanId:plan.id,...(body.workflow==='events-v1'?{approvedRequestCount:plan.requestCount,approvedMaxUsd:plan.cost.conservativeBudget}:{})})});
+  const response=await fetchImpl('/api/analyze/stream',{method:'POST',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,approvedPlanId:plan.id})});
   if(!response.ok)await readApiJson(response,'Analysis failed to start.');
   if(response.headers?.get('content-type')?.includes('text/html'))throw new Error(apiFailureMessage(502));
   if(!response.body)throw new Error('Streaming is unavailable in this browser.');
@@ -28,4 +28,3 @@ export async function runAnalysis(body,plan,{signal,onEvent=()=>{},fetchImpl=fet
   }finally{signal?.removeEventListener('abort',abort);await reader.cancel().catch(()=>{});reader.releaseLock();}
 }
 
-export async function eventRecoveryRequest(fetchImpl,path,options={}){return readApiJson(await fetchImpl('/api/events/jobs'+path,options),'Event recovery could not be loaded.');}

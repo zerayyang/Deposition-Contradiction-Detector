@@ -5,7 +5,7 @@ const categories=[['DIRECT','Direct'],['INFERENTIAL','Inferential'],['FALSE_POSI
 const label=value=>categories.find(([key])=>key===value)?.[1]??value;
 
 export function CorrectionForm({client,caseId,finding,findingIndex,disabled=false,saved=false}){
- const [type,setType]=useState(finding.type),[reason,setReason]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+ const [type,setType]=useState(finding.type),[reason,setReason]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState(''),[sent,setSent]=useState(0);
  const lock=useRef(false),request=useRef(null);
  async function submit(e){
   e.preventDefault();if(disabled||!saved||lock.current)return;lock.current=true;setBusy(true);setError('');setMessage('');
@@ -13,16 +13,17 @@ export function CorrectionForm({client,caseId,finding,findingIndex,disabled=fals
    const payload={caseId,findingIndex,finding,proposedType:type,rationale:reason};const key=JSON.stringify(payload);
    if(request.current?.key!==key)request.current={key,id:crypto.randomUUID()};
    await createFeedbackStore(client).submit({...payload,requestId:request.current.id});
-   setMessage('Correction submitted for independent review. The original finding is unchanged.');
+   // The first send says submitted; any later send (including a double click) says submitted again.
+   setMessage(sent?'✓ Changes submitted again.':'✓ Correction submitted.');setSent(n=>n+1);
   }catch(err){setError(err.message);}finally{lock.current=false;setBusy(false);}
  }
  return <details className="improve-card"><summary>Review &amp; Improve</summary><p>Think this category is wrong? Suggest a correction and explain it using the testimony.</p>
   {!saved&&<p className="feedback-notice">Save this case and its current findings first.</p>}
   <form onSubmit={submit}><fieldset disabled={disabled||!saved||busy}><label>Suggested category<select value={type} onChange={e=>{setType(e.target.value);setMessage('');}}>{categories.map(([key,text])=><option key={key} value={key}>{text}</option>)}</select></label>
   <label>Why should it change?<textarea rows={3} minLength={10} maxLength={4000} required value={reason} onChange={e=>{setReason(e.target.value);setMessage('');}} placeholder="Explain which statements conflict, or why they can both be true."/></label>
-  <button type="submit" disabled={reason.trim().length<10}>{busy?'Submitting…':'Submit correction'}</button></fieldset></form>
+  <button type="submit" disabled={reason.trim().length<10}>{busy?'Submitting…':sent?'Submit again':'Submit correction'}</button></fieldset></form>
   <small>Submitting does not train the model, change the score or approve a lesson. A separate assigned reviewer must check it.</small>
-  {error&&<p className="feedback-error" role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
+  {error&&<p className="feedback-error" role="alert">{error}</p>}{message&&<p role="status" className="feedback-sent">{message}</p>}
  </details>;
 }
 

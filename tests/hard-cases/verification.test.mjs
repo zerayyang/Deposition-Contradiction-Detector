@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {parseTestimonySource} from '../../server/testimonySource.js';
-import {reviewableSpeakerLabels} from '../../server/events/sourceRoles.js';
+import {reviewableSpeakerLabels} from '../../server/sourceRoles.js';
 const root=new URL('./',import.meta.url);
 const load=name=>fs.readFile(new URL(name,root),'utf8').then(JSON.parse);
 test('every active hard case has an affirmative independent source-review record',async()=>{
