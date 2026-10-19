@@ -31,9 +31,11 @@ export function reportSelection(findings = [], scopeId = "contradictions") {
 
 const escape = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pages = (f, key) => [...new Set((f.sourceReferences?.[key] ?? []).map(r => r.pageLabel || r.pdfPage).filter(Boolean))];
+// One score system only: the confidence check's percentage, or a dash when it did not run.
 function badge(f) {
   const hybrid = hybridBadge(f);
-  return hybrid.kind !== "none" ? hybrid : scoreBadge(f);
+  if (hybrid.kind !== "none") return hybrid;
+  return f?.labelDisagreement ? scoreBadge(f) : { kind: "none", value: "—", text: "Confidence not checked" };
 }
 function card({ f, index, kind }, n, options, draft) {
   const quotes = ["claim1", "claim2"].map((key, i) => {
