@@ -32,7 +32,7 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   const storageRequest=/^\/analysis\/jobs(?:\/|$)/.test(req.path);
   if(storageRequest||req.method==='POST'&&/^\/cloud\/[^/]+\/[^/]+\/(start|step)$/.test(req.path)||req.method==='POST'&&['/analysis/plan','/analyze','/analyze/stream','/confidence/plan','/confidence/step','/confidence/allowance'].includes(req.path)){
    const gate=storageRequest?recoveryAdmission:admission;
-   try{await gate.run(req.identity.id,()=>new Promise(resolve=>{const done=()=>{res.off('finish',done);res.off('close',done);resolve();};res.once('finish',done);res.once('close',done);next();}));}
+   try{await gate.run(req.identity.id,()=>new Promise(resolve=>{const done=()=>{res.off('finish',done);res.off('close',done);resolve();};res.once('finish',done);res.once('close',done);next();}),{ownerLimit:req.path==='/confidence/step'?Math.min(2,maxConcurrentAnalyses):1});}
    catch(e){if(!res.headersSent)res.status(e.status??500).set('Retry-After','30').json({error:e.status?e.message:'Analysis could not start.'});}
    return;
   }
@@ -44,7 +44,7 @@ export function createApp({instructions,callModel,requestLimitBytes=DOCUMENT_LIM
   if(error instanceof SyntaxError)return res.status(400).json({error:'Invalid JSON request.'});next(error);
  });
  const cloud=cloudStoreForRequest?createCloudAnalysis({instructions,callModel,storeForRequest:cloudStoreForRequest,codeFingerprint,maxRequests,maxBudgetUsd,readApprovedMemory,log}):null;
- const confidence=createConfidenceHandlers({instructions,callModel,storeForRequest:cloudStoreForRequest,maxBudgetUsd});
+ const confidence=createConfidenceHandlers({instructions,callModel,storeForRequest:cloudStoreForRequest,maxBudgetUsd,maxConcurrentFindings:Math.min(2,maxConcurrentAnalyses)});
  app.post('/api/confidence/allowance',confidence.allowance);app.post('/api/confidence/plan',confidence.plan);app.post('/api/confidence/step',confidence.step);
  const handlers=createAnalysisHandlers({instructions,callModel,jobStore,codeFingerprint,runtimeIdentity:identity,maxRequests,maxBudgetUsd,log,readApprovedMemory});
  app.post('/api/analysis/plan',cloud?cloud.preview:handlers.preview);app.post('/api/analysis/recheck',handlers.recheck);app.post('/api/analyze',handlers.analyze);app.post('/api/analyze/stream',cloud?(_req,res)=>res.status(428).json({error:'Refresh the app and approve a hosted step plan; this older stream cannot run paid work on Vercel.'}):handlers.stream);

@@ -93,7 +93,7 @@ function parseResponse(message) {
 
 // Local development uses process memory. Hosted runs use existing owner-scoped, signed,
 // immutable private objects, including a write-before-call lock for each paid step.
-export function createConfidenceHandlers({callModel,instructions='',storeForRequest=null,maxBudgetUsd=25,now=Date.now}) {
+export function createConfidenceHandlers({callModel,instructions='',storeForRequest=null,maxBudgetUsd=25,maxConcurrentFindings=2,now=Date.now}) {
   const local = new Map();
   const definitions = instructions.split('## 6. Required Output')[0];
   const storage = req => storeForRequest ? storeForRequest(req) : {
@@ -115,9 +115,9 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
         const requiresPartialApproval=budgetUsd<estimate.budgetUsd;
         const store=storage(req);await store.authorize(caseId);
         const jobId=randomUUID();
-        await store.put(caseId,jobId,'confidence-allowance',{sourceHash:hash(texts),budgetUsd,requiresPartialApproval,expires:now()+60*60*1000,definitionDigest:hash(definitions)});
+        await store.put(caseId,jobId,'confidence-allowance',{sourceHash:hash(texts),budgetUsd,requiresPartialApproval,maxConcurrentFindings,expires:now()+60*60*1000,definitionDigest:hash(definitions)});
         return res.json({...estimate,jobId,budgetUsd,requiredBudgetUsd:estimate.budgetUsd,serverBudgetLimitUsd:maxBudgetUsd,
-          requiresPartialApproval,canFitEstimatedFinding:budgetUsd>=estimate.perFindingBudgetUsd,
+          requiresPartialApproval,maxConcurrentFindings,canFitEstimatedFinding:budgetUsd>=estimate.perFindingBudgetUsd,
           requestsPerFinding:7,notice:'Confidence is part of the review. Reserve includes 25% headroom; unused step reservations are released as recorded usage arrives. It is a forecast, not a guarantee of unlimited findings. No automatic paid retries or spending beyond approval.'});
       } catch(error) {
         const known=[
@@ -137,7 +137,7 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
         const prepared = prepareConfidence(req.body,definitions);
         if (prepared.budgetUsd > maxBudgetUsd) return fail(res,400,'BUDGET_LIMIT','This pair exceeds the confidence trial spending limit. No paid calls started.');
         const allocation=req.body.allowance;
-        let reservedUsd=prepared.budgetUsd,spentBeforeUsd=0;
+        let reservedUsd=prepared.budgetUsd,spentBeforeUsd=0,concurrentLedger=null;
         if(allocation){
           if(!Number.isSafeInteger(allocation.index)||allocation.index<0)return fail(res,400,'INVALID_ALLOCATION','Invalid confidence allocation.');
           const root=await store.get(caseId,allocation.jobId,'confidence-allowance');
@@ -146,19 +146,34 @@ export function createConfidenceHandlers({callModel,instructions='',storeForRequ
           if(root.requiresPartialApproval&&allocation.partialApproved!==true)return fail(res,428,'PARTIAL_CONFIDENCE_APPROVAL_REQUIRED','Acknowledge that the capped confidence allowance may leave findings unchecked before starting. No paid calls started.');
           const prior=allocation.index?await store.get(caseId,allocation.jobId,`confidence-allocation-${allocation.index-1}`):{reservedUsd:0};
           if(!prior)return fail(res,409,'INVALID_ALLOCATION','The previous confidence allocation is missing.');
-          if(allocation.index){const finished=await store.get(caseId,prior.jobId,'confidence-result-6');if(!finished?.done)return fail(res,409,'PREVIOUS_STEP_INCOMPLETE','The previous finding did not complete. Saved analysis is unchanged.');
+          if(allocation.concurrency===2) {
+            if(root.maxConcurrentFindings!==2 || (allocation.index&&prior.concurrency!==2))return fail(res,409,'INVALID_ALLOCATION','This allowance does not support this concurrent allocation.');
+            let settledUsd=prior.settledUsd??0;
+            const activeReservations=[];
+            for(const reservation of prior.activeReservations??[]) {
+              const finished=await store.get(caseId,reservation.jobId,'confidence-result-6');
+              if(finished?.done)settledUsd=money(settledUsd+finished.spentUsd);
+              else activeReservations.push(reservation); // Unfinished/uncertain work keeps its full reserve.
+            }
+            if(activeReservations.length>=2)return fail(res,409,'CONCURRENCY_LIMIT','Two confidence findings are already reserved. No additional paid work started.');
+            reservedUsd=money(settledUsd+activeReservations.reduce((sum,r)=>sum+r.budgetUsd,0)+prepared.budgetUsd);
+            concurrentLedger={concurrency:2,settledUsd,activeReservations};
+          } else if(allocation.index){
+            if(prior.concurrency===2)return fail(res,409,'INVALID_ALLOCATION','Do not mix serial and concurrent allocations in one allowance.');
+            const finished=await store.get(caseId,prior.jobId,'confidence-result-6');if(!finished?.done)return fail(res,409,'PREVIOUS_STEP_INCOMPLETE','The previous finding did not complete. Saved analysis is unchanged.');
             // Settle completed usage: do not keep charging the full output reserve forever.
             const previousPlan=await store.get(caseId,prior.jobId,'confidence-plan');
             spentBeforeUsd=money((prior.spentBeforeUsd??Math.max(0,prior.reservedUsd-(previousPlan?.budgetUsd??0)))+finished.spentUsd);
           }
-          reservedUsd=money(spentBeforeUsd+prepared.budgetUsd);
+          if(!concurrentLedger)reservedUsd=money(spentBeforeUsd+prepared.budgetUsd);
           if(reservedUsd>root.budgetUsd+.00001)return fail(res,409,'ALLOWANCE_USED','The confidence allowance is used up. Analysis is retained; remaining findings are marked not checked.');
         }
         const jobId = randomUUID(), expires = now() + 30*60*1000;
         // Keep exact source context private; never return/log it in plan metadata.
         const plan = {version:1,jobId,caseId,expires,budgetUsd:prepared.budgetUsd,body:req.body,
           inputDigest:prepared.inputDigest,definitionDigest:hash(definitions),models:prepared.models};
-        if(allocation&&!await store.put(caseId,allocation.jobId,`confidence-allocation-${allocation.index}`,{jobId,reservedUsd,spentBeforeUsd}))return fail(res,409,'ALLOCATION_ALREADY_STARTED','This allocation already started. It will not be repeated automatically.');
+        if(allocation&&!await store.put(caseId,allocation.jobId,`confidence-allocation-${allocation.index}`,{jobId,reservedUsd,spentBeforeUsd,
+          ...(concurrentLedger?{...concurrentLedger,activeReservations:[...concurrentLedger.activeReservations,{jobId,budgetUsd:prepared.budgetUsd}]}:{})}))return fail(res,409,'ALLOCATION_ALREADY_STARTED','This allocation already started. It will not be repeated automatically.');
         await store.put(caseId,jobId,'confidence-plan',plan);
         return res.json({caseId,jobId,requests:7,budgetUsd:plan.budgetUsd,models:plan.models,
           notice:'Seven requests for this finding only. Conservative local price estimate, not a billing guarantee. No automatic retries. Agreement is not calibrated accuracy.'});

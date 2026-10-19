@@ -1,4 +1,5 @@
 import {HYBRID_VERSION} from '../../shared/hybridConfidence.js';
+import {runConcurrentConfidence} from './confidenceConcurrent.js';
 
 async function post(fetchImpl,url,body,signal) {
   const response=await fetchImpl(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
@@ -8,8 +9,9 @@ async function post(fetchImpl,url,body,signal) {
 }
 export const prepareConfidenceAllowance=(body,{fetchImpl=fetch,signal}={})=>post(fetchImpl,'/api/confidence/allowance',body,signal);
 
-export async function runAutomaticConfidence({findings,texts,caseId,allowance,fetchImpl=fetch,signal,onCheckpoint=async()=>{},onProgress=()=>{}}) {
+export async function runAutomaticConfidence({findings,texts,caseId,allowance,fetchImpl=fetch,signal,onCheckpoint=async()=>{},onProgress=()=>{},concurrency=1}) {
   if(allowance.requiresPartialApproval&&allowance.partialApproved!==true)throw new Error('Approve limited confidence coverage before starting. No confidence calls started.');
+  if(concurrency===2&&allowance.maxConcurrentFindings===2)return runConcurrentConfidence({findings,texts,caseId,allowance,fetchImpl,signal,onCheckpoint,onProgress,post});
   let results=findings.map(f=>({...f,hybridConfidence:{version:HYBRID_VERSION,originalType:f.type,status:'PENDING',score:null}}));
   let allocation=0,halt=null;
   const save=async()=>onCheckpoint(results);

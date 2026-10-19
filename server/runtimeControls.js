@@ -1,11 +1,14 @@
 import {performance} from 'node:perf_hooks';
-// Analyses the server runs at the same time (each user still runs one at a time).
+// Heavy requests the server runs at the same time. Analysis remains one per
+// user; the confidence step route may explicitly admit a two-request lane.
 export const DEFAULT_CONCURRENT_ANALYSES=4;
 export function createAdmission({maxConcurrent=1}={}) {
- let active=0;const owners=new Set();
- return {get active(){return active;},async run(owner,work){
-  if(active>=maxConcurrent||owners.has(owner)){const e=new Error('An analysis is already running. Wait for it to finish or cancel it.');e.status=429;throw e;}
-  active++;owners.add(owner);try{return await work();}finally{active--;owners.delete(owner);}
+ let active=0;const owners=new Map();
+ return {get active(){return active;},async run(owner,work,{ownerLimit=1}={}){
+  const existing=owners.get(owner);
+  if(active>=maxConcurrent||!Number.isInteger(ownerLimit)||ownerLimit<1||existing&&(existing.limit!==ownerLimit||existing.count>=ownerLimit)){const e=new Error('An analysis is already running. Wait for it to finish or cancel it.');e.status=429;throw e;}
+  active++;const entry=existing??{count:0,limit:ownerLimit};entry.count++;owners.set(owner,entry);
+  try{return await work();}finally{active--;entry.count--;if(!entry.count)owners.delete(owner);}
  }};
 }
 export function createRateLimit({limit=30,windowMs=60000,now=Date.now}={}){

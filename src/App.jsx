@@ -321,7 +321,7 @@ function Dashboard({ session }) {
       }catch{/* the double-check is optional; the first results are kept */}
       // Confidence is a separate phase: failure here never downgrades completed analysis.
       try {
-        const confidence=await runAutomaticConfidence({findings:finalSnapshot.results,texts:source.texts,caseId:id,allowance:confidenceAllowance,fetchImpl:apiFetch,signal:controller.signal,
+        const confidence=await runAutomaticConfidence({concurrency:2,findings:finalSnapshot.results,texts:source.texts,caseId:id,allowance:confidenceAllowance,fetchImpl:apiFetch,signal:controller.signal,
           onProgress:setAnalysisProgress,onCheckpoint:async results=>{
             finalSnapshot={...finalSnapshot,results,dirty:true};updateDraft(id,finalSnapshot);
             await persist(id,finalSnapshot);
